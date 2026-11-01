@@ -9,11 +9,13 @@
 	counter-positioned so it sits exactly on top of the cream wordmark, which makes the color split pixel exact at
 	every size and in every phase.
 
-	Layers (bottom → top): sky plate, stars, back clouds, moon rig, front clouds, cream wordmark, anthracite wordmark,
-	portrait, clock, scroll cue. Final painted layers drop into ./assets with the same file names (README.md).
+	Layers (bottom → top): sky plate, stars, back clouds (1, 2), moon rig, front cloud (3), cream wordmark, anthracite
+	wordmark, portrait, clock, scroll cue. The painted masters live in docs/art; tools/build-assets.mjs makes the
+	optimized, cropped copies in ./assets and writes their crop rects to art.ts (README.md).
 
 	Events (window): `night:moon-phase` { phase } on every phase change, `night:moon-full-clicks` { count } for
-	every click on the full moon. Listens to `night:shooting-star` (mascot looks up).
+	every click on the full moon; every 10th one keeps the moon full (the moon presence egg needs a full moon).
+	Listens to `night:shooting-star` (mascot leans back and looks up).
 -->
 <script lang="ts">
 	import { on } from 'svelte/events';
@@ -36,15 +38,19 @@
 		type MoonPhase,
 		type MoonPhaseDetail
 	} from './moon.ts';
-	import sky from './assets/hero-sky.png?enhanced';
-	import skyMobile from './assets/hero-sky-mobile.png?enhanced';
-	import clouds1 from './assets/hero-clouds-1.png?enhanced';
-	import clouds2 from './assets/hero-clouds-2.png?enhanced';
-	import clouds3 from './assets/hero-clouds-3.png?enhanced';
-	import moonDisc from './assets/hero-moon-disc.png?enhanced';
-	import mascot from './assets/mascot-hero-moonrim.png?enhanced';
-	import portrait from './assets/hero-portrait.png?enhanced';
-	import portraitFrame from './assets/hero-portrait-frame.png?enhanced';
+	import { ART_CROPS } from './art.ts';
+	// Explicit width ladders (`…&enhanced`, see imagetools.d.ts): the masters are upscales of smaller generations, so
+	// widths stop at the native detail, and AVIF quality is tuned for the above-the-fold budget (handoff §6.4).
+	import sky from './assets/hero-sky.webp?w=1672;1280;960&quality=40&enhanced';
+	import skyMobile from './assets/hero-sky-mobile.webp?w=852;640&quality=45&enhanced';
+	import clouds1 from './assets/hero-clouds-1.webp?w=1894;1280;800&quality=45&enhanced';
+	import clouds2 from './assets/hero-clouds-2.webp?w=1915;1280;800&quality=45&enhanced';
+	import clouds3 from './assets/hero-clouds-3.webp?w=1858;1280;800&quality=45&enhanced';
+	import moonDisc from './assets/hero-moon-disc.webp?w=1942;1520;1200;900;640&quality=38&enhanced';
+	import mascot from './assets/mascot-hero-moonrim.webp?w=640;420;280&quality=55&enhanced';
+	import mascotGolden from './assets/mascot-golden.webp?w=640;420;280&quality=55&enhanced';
+	import portrait from './assets/hero-portrait.png?w=400;240&quality=55&enhanced';
+	import portraitFrame from './assets/hero-portrait-frame.webp?w=400;240&quality=55&enhanced';
 
 	const PHASE_NAMES: Record<MoonPhase, () => string> = {
 		full: m.home_hero_moon_phase_full,
@@ -56,6 +62,60 @@
 
 	/** Phase change tween in ms (instant under reduced motion). */
 	const PHASE_DURATION = 750;
+	/** Every n-th click on the full moon keeps it full and summons the moon presence egg (eggs/, HOMEPAGE-DEV §11). */
+	const PRESENCE_EVERY = 10;
+
+	// --- Painted layer geometry (master px → layout), from the crop rects in art.ts -----------------------------
+
+	/** The moon circle in the disc master (docs/art/hero/README.md): center (1024, 1024), radius 928 of 2048². */
+	const DISC = { cx: 1024, cy: 1024, r: 928 };
+	const discCrop = ART_CROPS['hero-moon-disc'].crop;
+	/** The cropped disc image (it includes the painted halo) relative to the moon box (= the circle's square), in %. */
+	const discBox = {
+		left: (((discCrop.left - DISC.cx) / DISC.r + 1) / 2) * 100,
+		top: (((discCrop.top - DISC.cy) / DISC.r + 1) / 2) * 100,
+		size: (discCrop.width / DISC.r / 2) * 100
+	};
+
+	/** Seat contact of the mascot master (docs/art/mascot/README.md), as fractions of the cropped image. */
+	const MASCOT_SEAT = { x: 740, y: 980 };
+	const mascotCrop = ART_CROPS['mascot-hero-moonrim'].crop;
+	const mascotRig = {
+		aspect: mascotCrop.width / mascotCrop.height,
+		sitX: ((MASCOT_SEAT.x - mascotCrop.left) / mascotCrop.width) * 100,
+		sitY: ((MASCOT_SEAT.y - mascotCrop.top) / mascotCrop.height) * 100
+	};
+
+	/** Photo window of the torn frame, grown a little so the photo edge always tucks under the paper. */
+	const frame = ART_CROPS['hero-portrait-frame'];
+	const frameWindow = frame.window ?? {
+		left: frame.crop.left,
+		top: frame.crop.top,
+		right: frame.crop.left + frame.crop.width,
+		bottom: frame.crop.top + frame.crop.height
+	};
+	const TUCK = 0.02;
+	const portraitWindow = {
+		aspect: frame.crop.width / frame.crop.height,
+		left: ((frameWindow.left - frame.crop.left) / frame.crop.width - TUCK) * 100,
+		top: ((frameWindow.top - frame.crop.top) / frame.crop.height - TUCK) * 100,
+		right: ((frame.crop.left + frame.crop.width - frameWindow.right) / frame.crop.width - TUCK) * 100,
+		bottom: ((frame.crop.top + frame.crop.height - frameWindow.bottom) / frame.crop.height - TUCK) * 100
+	};
+	const pct = (value: number) => `${value.toFixed(3)}%`;
+
+	/** `sizes` per layer, mirroring the CSS below: phone/tall-portrait layout first, then desktop. */
+	const phone = (length: string, desktop: string) => `(max-width: 47.99rem) ${length}, (max-aspect-ratio: 4/5) ${length}, ${desktop}`;
+	const SIZES = {
+		// moon box 2 × --moon-r, plus the painted halo around the circle (--disc-size)
+		moon: phone(`${(2.5 * discBox.size).toFixed(0)}vw`, `min(${discBox.size.toFixed(0)}vw, ${(1.84 * discBox.size).toFixed(0)}vh)`),
+		cloud1: phone('150vw', '74vw'),
+		cloud2: phone('130vw', '58vw'),
+		cloud3: phone('170vw', '64vw'),
+		mascot: phone('28vw', 'clamp(7rem, 11vw, 13rem)'),
+		photo: 'clamp(4rem, 8vw, 8.5rem)',
+		frame: 'clamp(5.5rem, 10.5vw, 11rem)'
+	};
 
 	// --- Moon phase ---------------------------------------------------------------------------------------------
 
@@ -75,6 +135,8 @@
 		if (phase === 'full') {
 			fullClicks += 1;
 			window.dispatchEvent(new CustomEvent<MoonFullClicksDetail>(MOON_FULL_CLICKS_EVENT, { detail: { count: fullClicks } }));
+			// The presence egg appears over the moon: this click keeps it full instead of moving on to gibbous.
+			if (fullClicks % PRESENCE_EVERY === 0) return;
 		}
 		const next = nextPhase(phase);
 		phase = next;
@@ -179,7 +241,7 @@
 		);
 	});
 
-	// --- Mascot: looks up when a shooting star passes -----------------------------------------------------------
+	// --- Mascot: leans back and looks up when a shooting star passes --------------------------------------------
 
 	const visible = new InView();
 	let looking = $state(false);
@@ -208,6 +270,9 @@
 	class="hero"
 	aria-labelledby="home-hero-title"
 	style:--lit={litFraction.toFixed(3)}
+	style:--disc-left={pct(discBox.left)}
+	style:--disc-top={pct(discBox.top)}
+	style:--disc-size={pct(discBox.size)}
 	{@attach visible.attach}
 	{@attach parallax.attach}
 >
@@ -231,14 +296,14 @@
 	</div>
 
 	<div class="layer clouds-back" aria-hidden="true">
-		<enhanced:img class="cloud cloud-3" src={clouds3} alt="" sizes="40vw" fetchpriority="low" />
-		<enhanced:img class="cloud cloud-1" src={clouds1} alt="" sizes="(max-width: 47.99rem) 110vw, 60vw" fetchpriority="low" />
+		<enhanced:img class="cloud cloud-1" src={clouds1} alt="" sizes={SIZES.cloud1} fetchpriority="low" />
+		<enhanced:img class="cloud cloud-2" src={clouds2} alt="" sizes={SIZES.cloud2} fetchpriority="low" />
 	</div>
 
 	<div class="moon-box moon-rig" class:is-3d={threeReady}>
 		<div class="moon-glow" aria-hidden="true"></div>
 		<button type="button" class="moon" data-egg-moon aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase}>
-			<enhanced:img class="moon-img" src={moonDisc} alt="" sizes="(max-width: 47.99rem) 250vw, 100vw" fetchpriority="high" />
+			<enhanced:img class="moon-img" src={moonDisc} alt="" sizes={SIZES.moon} fetchpriority="high" />
 			{#if use3D}
 				<LazyMount
 					load={() => import('./MoonScene.svelte')}
@@ -262,19 +327,26 @@
 			{/if}
 		</button>
 
-		<div class="mascot" class:looking aria-hidden="true">
-			<enhanced:img class="mascot-body" src={mascot} alt="" sizes="(max-width: 47.99rem) 34vw, 14vw" />
-			<div class="mascot-head">
-				<enhanced:img src={mascot} alt="" sizes="(max-width: 47.99rem) 34vw, 14vw" />
-				<span class="lid lid-left"></span>
-				<span class="lid lid-right"></span>
+		<div
+			class="mascot"
+			class:looking
+			data-shiny-art
+			aria-hidden="true"
+			style:--mascot-aspect={mascotRig.aspect.toFixed(4)}
+			style:--sit-x={pct(mascotRig.sitX)}
+			style:--sit-y={pct(mascotRig.sitY)}
+		>
+			<div class="mascot-figure">
+				<enhanced:img class="mascot-art mascot-normal" src={mascot} alt="" sizes={SIZES.mascot} />
+				<!-- Shiny variant (1 in 4096): lazy and display:none, so the other visitors never download it -->
+				<enhanced:img class="mascot-art mascot-golden" src={mascotGolden} alt="" sizes={SIZES.mascot} loading="lazy" />
+				<span class="laptop-glow"></span>
 			</div>
-			<span class="laptop-glow"></span>
 		</div>
 	</div>
 
 	<div class="layer clouds-front" aria-hidden="true">
-		<enhanced:img class="cloud cloud-2" src={clouds2} alt="" sizes="(max-width: 47.99rem) 120vw, 50vw" fetchpriority="low" />
+		<enhanced:img class="cloud cloud-3" src={clouds3} alt="" sizes={SIZES.cloud3} fetchpriority="low" />
 	</div>
 
 	<div class="wordmark-layer">
@@ -288,9 +360,16 @@
 		</div>
 	</div>
 
-	<figure class="portrait">
-		<enhanced:img class="portrait-photo" src={portrait} alt={m.home_hero_portrait_alt()} sizes="12rem" />
-		<enhanced:img class="portrait-frame" src={portraitFrame} alt="" sizes="14rem" />
+	<figure
+		class="portrait"
+		style:--frame-aspect={portraitWindow.aspect.toFixed(4)}
+		style:--window-left={pct(portraitWindow.left)}
+		style:--window-top={pct(portraitWindow.top)}
+		style:--window-right={pct(portraitWindow.right)}
+		style:--window-bottom={pct(portraitWindow.bottom)}
+	>
+		<enhanced:img class="portrait-photo" src={portrait} alt={m.home_hero_portrait_alt()} sizes={SIZES.photo} />
+		<enhanced:img class="portrait-frame" src={portraitFrame} alt="" sizes={SIZES.frame} />
 	</figure>
 
 	<NightClock time="20:00" />
@@ -315,8 +394,8 @@
 		--moon-cy: 96cqh;
 		/* Mascot sit point on the rim (angle from the moon center) */
 		--mascot-at: -131deg;
-		--mascot-w: clamp(7.5rem, 12.5cqw, 15rem);
-		--mascot-tilt: -6deg;
+		--mascot-w: clamp(7rem, 11cqw, 13rem);
+		--mascot-tilt: 4deg;
 		/* Wordmark */
 		--wm-size: min(14.4cqw, 27cqh);
 		--wm-x: 7.5cqw;
@@ -342,9 +421,9 @@
 			--moon-r: 125cqw;
 			--moon-cx: 148cqw;
 			--moon-cy: 80cqh;
-			--mascot-at: -149deg;
-			--mascot-w: 34cqw;
-			--mascot-tilt: -4deg;
+			--mascot-at: -158deg;
+			--mascot-w: 28cqw;
+			--mascot-tilt: 6deg;
 			--wm-size: min(27cqw, 15cqh);
 			--wm-x: 8cqw;
 			--wm-y: 19cqh;
@@ -409,44 +488,45 @@
 		pointer-events: none;
 	}
 
+	/* Cloud images are cropped to their content (art.ts); widths match SIZES in the script. Order from the art notes:
+	   1 warm low bank and 2 thin wisps behind the moon, 3 dark right-heavy bank in front of the lower moon rim. */
 	.layer :global(.cloud-1) {
-		left: -6cqw;
-		bottom: -9cqh;
-		width: 58cqw;
+		left: -12cqw;
+		bottom: 9cqh;
+		width: 74cqw;
 	}
 
 	.layer :global(.cloud-2) {
-		left: -8cqw;
-		bottom: -14cqh;
-		width: 46cqw;
+		left: 6cqw;
+		top: 11cqh;
+		width: 58cqw;
+		opacity: 0.55;
 	}
 
 	.layer :global(.cloud-3) {
-		left: -4cqw;
-		top: 30cqh;
-		width: 30cqw;
-		opacity: 0.8;
+		left: -14cqw;
+		bottom: -7cqh;
+		width: 64cqw;
 	}
 
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
 		.layer :global(.cloud-1) {
-			left: -35cqw;
-			bottom: 4cqh;
-			width: 120cqw;
+			left: -70cqw;
+			bottom: 12cqh;
+			width: 150cqw;
 		}
 
 		.layer :global(.cloud-2) {
-			left: -30cqw;
-			bottom: -6cqh;
-			width: 115cqw;
+			left: -48cqw;
+			top: 4cqh;
+			width: 130cqw;
+			opacity: 0.6;
 		}
 
 		.layer :global(.cloud-3) {
-			left: auto;
-			right: -38cqw;
-			top: 4cqh;
-			width: 95cqw;
-			scale: -1 1;
+			left: -78cqw;
+			bottom: -3cqh;
+			width: 170cqw;
 		}
 	}
 
@@ -492,7 +572,6 @@
 		outline-offset: 6px;
 	}
 
-	.moon :global(.moon-img),
 	.moon :global(.moon-3d) {
 		position: absolute;
 		inset: 0;
@@ -501,14 +580,28 @@
 	}
 
 	/* Flat butter disc until the painted image has loaded, so the anthracite wordmark always sits on light */
-	.moon :global(.moon-img) {
+	.moon::before {
+		content: '';
+		position: absolute;
+		inset: 0;
 		border-radius: 50%;
 		background: radial-gradient(closest-side, var(--color-butter) 85%, var(--color-ochre));
+	}
+
+	/* The painted disc includes its halo: the image box is larger than the moon circle (geometry from art.ts) */
+	.moon :global(.moon-img) {
+		position: absolute;
+		left: var(--disc-left);
+		top: var(--disc-top);
+		width: var(--disc-size);
+		height: var(--disc-size);
+		max-width: none;
 		transition: opacity 600ms ease;
 	}
 
 	/* The painted image stays in the DOM (LCP element, instant fallback); it only fades out under the 3D moon */
-	.is-3d :global(.moon-img) {
+	.is-3d :global(.moon-img),
+	.is-3d .moon::before {
 		opacity: 0;
 	}
 
@@ -521,96 +614,75 @@
 		pointer-events: none;
 	}
 
-	/* Mascot (rig positions are fractions of the mascot image; adjust when the final art lands) ----------------- */
+	/* Mascot (painted, docs/art/mascot): seat point (--sit-x/y, from art.ts) on the rim; the whole figure leans back
+	   around it when a shooting star passes; a soft screen glow from the laptop flickers on the face and hands. ----- */
 
 	.mascot {
-		--sit-x: 53%;
-		--sit-y: 67%;
-		--head: 14% 32% 58% 35%;
-		--head-pivot: 52% 41%;
-		--eye-left-x: 47.2%;
-		--eye-right-x: 57.2%;
-		--eye-y: 29.2%;
-		--lid-size: 3.2%;
-		--lid-color: #f2c9a3;
-		--glow-x: 41%;
-		--glow-y: 57%;
+		/* laptop light, fractions of the cropped image (between the lid, the hands and the face) */
+		--glow-x: 40%;
+		--glow-y: 45%;
 
 		position: absolute;
 		left: calc(50% + 50% * cos(var(--mascot-at)));
 		top: calc(50% + 50% * sin(var(--mascot-at)));
 		width: var(--mascot-w);
-		aspect-ratio: 600 / 720;
+		aspect-ratio: var(--mascot-aspect);
 		translate: calc(var(--sit-x) * -1) calc(var(--sit-y) * -1);
 		rotate: var(--mascot-tilt);
+		transform-origin: var(--sit-x) var(--sit-y);
 		pointer-events: none;
 	}
 
-	.mascot :global(img) {
+	.mascot-figure {
+		position: absolute;
+		inset: 0;
+		transform-origin: var(--sit-x) var(--sit-y);
+		transition: rotate 900ms cubic-bezier(0.3, 0.7, 0.3, 1);
+	}
+
+	.looking .mascot-figure {
+		rotate: 5deg;
+	}
+
+	.mascot :global(.mascot-art) {
 		position: absolute;
 		inset: 0;
 		width: 100%;
 		height: 100%;
+		filter: drop-shadow(0 0 0.35rem color-mix(in oklab, var(--color-butter) 22%, transparent));
 	}
 
-	.mascot :global(.mascot-body) {
-		clip-path: polygon(0 0, 35% 0, 35% 42%, 68% 42%, 68% 0, 100% 0, 100% 100%, 0 100%);
+	.mascot :global(.mascot-golden) {
+		display: none;
 	}
 
-	.mascot-head {
-		position: absolute;
-		inset: 0;
-		transform-origin: var(--head-pivot);
-		transition: rotate 700ms cubic-bezier(0.3, 0.7, 0.3, 1);
+	:global([data-shiny]) .mascot :global(.mascot-golden) {
+		display: block;
 	}
 
-	.mascot-head :global(img) {
-		clip-path: inset(var(--head));
-	}
-
-	.looking .mascot-head {
-		rotate: -9deg;
-	}
-
-	.lid {
-		position: absolute;
-		width: var(--lid-size);
-		height: calc(var(--lid-size) * 0.95);
-		translate: -50% -50%;
-		border-radius: 50%;
-		background: var(--lid-color);
-		scale: 1 0;
-		transform-origin: 50% 0;
-	}
-
-	.lid-left {
-		left: var(--eye-left-x);
-		top: var(--eye-y);
-	}
-
-	.lid-right {
-		left: var(--eye-right-x);
-		top: var(--eye-y);
+	:global([data-shiny]) .mascot :global(.mascot-normal) {
+		display: none;
 	}
 
 	.laptop-glow {
 		position: absolute;
 		left: var(--glow-x);
 		top: var(--glow-y);
-		width: 70%;
+		width: 62%;
 		aspect-ratio: 1;
 		translate: -50% -50%;
 		border-radius: 50%;
-		background: radial-gradient(closest-side, color-mix(in oklab, var(--color-butter) 55%, transparent), transparent);
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-butter) 42%, transparent),
+			color-mix(in oklab, var(--color-butter) 12%, transparent) 55%,
+			transparent
+		);
 		mix-blend-mode: screen;
 		opacity: 0.75;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		.lid {
-			animation: blink 5.3s 2.4s infinite;
-		}
-
 		.laptop-glow {
 			animation: flicker 4.1s infinite;
 		}
@@ -707,7 +779,7 @@
 		left: clamp(1rem, 3cqw, 3rem);
 		bottom: clamp(1rem, 4cqh, 3rem);
 		width: clamp(5.5rem, 10.5cqw, 11rem);
-		aspect-ratio: 1;
+		aspect-ratio: var(--frame-aspect);
 		margin: 0;
 		rotate: -4deg;
 	}
@@ -718,12 +790,14 @@
 		height: 100%;
 	}
 
+	/* The photo fills the torn frame's window (art.ts) and tucks under the paper edge */
 	.portrait :global(.portrait-photo) {
-		inset: 12%;
-		width: 76%;
-		height: 76%;
+		left: var(--window-left);
+		top: var(--window-top);
+		width: calc(100% - var(--window-left) - var(--window-right));
+		height: calc(100% - var(--window-top) - var(--window-bottom));
 		object-fit: cover;
-		border-radius: 8%;
+		object-position: 50% 30%;
 	}
 
 	.portrait :global(.portrait-frame) {
@@ -821,17 +895,6 @@
 		from {
 			opacity: 0.3;
 			transform: translateY(0.08em);
-		}
-	}
-
-	@keyframes blink {
-		0%,
-		94%,
-		100% {
-			scale: 1 0;
-		}
-		96.5% {
-			scale: 1 1;
 		}
 	}
 
