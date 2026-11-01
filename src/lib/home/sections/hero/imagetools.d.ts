@@ -1,5 +1,7 @@
-// Plain imagetools URL imports used by the hero (e.g. the 3D moon texture: `hero-moon-texture.png?w=2048&format=webp`).
-declare module '*&format=webp' {
-	const src: string;
-	export default src;
+// enhanced-img imports with explicit imagetools directives put `enhanced` last, e.g.
+// `./assets/hero-sky.webp?w=1672;1280&quality=42&enhanced`, so they match this pattern (the stock `*?enhanced` only
+// covers a bare `?enhanced`).
+declare module '*&enhanced' {
+	const value: import('@sveltejs/enhanced-img').Picture;
+	export default value;
 }

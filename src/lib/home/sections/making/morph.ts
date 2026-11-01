@@ -44,13 +44,28 @@ export interface MakingLayout {
 }
 
 /**
- * Where the line ends: on the rim of the painted moon above the cliff, in plate pixels. Tune these when the final
- * plates (making-plate.png 2560×1440, making-plate-mobile.png 1080×2340) land: the line must touch the moon's rim.
- * Placeholder plates: desktop moon center ≈ (2176, 924) r ≈ 172; mobile moon center ≈ (926, 1496) r ≈ 118.
+ * The painted moon above the cliff on the final plates (docs/art/making, 2560×1440 and 1080×2340), in plate pixels.
+ * Measured with `node src/lib/home/sections/making/tools/build-assets.mjs --measure` and checked by overlay.
+ */
+export const PAINTED_MOON = {
+	desktop: { x: 2256, y: 861, r: 157 },
+	mobile: { x: 918, y: 1665, r: 124 }
+} as const satisfies Record<'desktop' | 'mobile', Point & { r: number }>;
+
+/** Point on a painted moon's rim at `degrees` (0 = right, clockwise in screen space). */
+const rim = ({ x, y, r }: Point & { r: number }, degrees: number): Point => ({
+	x: Math.round(x + r * Math.cos((degrees * Math.PI) / 180)),
+	y: Math.round(y + r * Math.sin((degrees * Math.PI) / 180))
+});
+
+/**
+ * Where the line ends: exactly on the rim of the painted moon. Desktop: the left limb a little above the middle
+ * (the line arrives from the shape on the left, clear of the laptop); portrait: the upper left limb (the line
+ * comes down from the shape above).
  */
 export const MOON_ANCHOR = {
-	desktop: { x: 2006, y: 900 },
-	mobile: { x: 884, y: 1384 }
+	desktop: rim(PAINTED_MOON.desktop, 195),
+	mobile: rim(PAINTED_MOON.mobile, 235)
 } as const satisfies Record<'desktop' | 'mobile', Point>;
 
 const norm = (x: number, y: number): Point => {
@@ -71,15 +86,16 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		leaveDir: { x: 0, y: 0.08 },
 		exitHandles: [0.45, 0.4],
 		anchor: MOON_ANCHOR.desktop,
-		anchorDir: norm(1, 0.12),
+		// arrive pointing at the moon's center, so the line meets the limb head on
+		anchorDir: norm(1, 0.27),
 		stroke: 6.5,
 		titleY: 975,
-		moon: { x: 2176, y: 924, r: 172 }
+		moon: PAINTED_MOON.desktop
 	},
 	mobile: {
 		width: 1080,
 		height: 2340,
-		center: { x: 540, y: 880 },
+		center: { x: 540, y: 950 },
 		scale: 0.82,
 		entry: { x: 820, y: -40 },
 		entryDir: norm(-0.15, 1),
@@ -88,10 +104,10 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		leaveDir: { x: 0, y: 0.25 },
 		exitHandles: [0.62, 0.38],
 		anchor: MOON_ANCHOR.mobile,
-		anchorDir: norm(0.15, 1),
+		anchorDir: norm(0.7, 1),
 		stroke: 8.5,
-		titleY: 1170,
-		moon: { x: 926, y: 1496, r: 118 }
+		titleY: 1240,
+		moon: PAINTED_MOON.mobile
 	},
 	// reduced motion: one static figure per state, short line in from the left and out to the right
 	figure: {

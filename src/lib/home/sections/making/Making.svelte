@@ -15,20 +15,17 @@
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
-	import MockupRef from '#lib/home/shared/MockupRef.svelte';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { RafLoop, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import { BLOOM_BOX, LAYOUTS, PILLARS, STATE_IDS, bloomMask, composeLine, lineAt, progressFor, stateAt, toPathData, type MakingStateId } from './morph.ts';
-	import plateDesktop from './assets/making-plate.png?enhanced';
-	import plateMobile from './assets/making-plate-mobile.png?enhanced';
-	import bloomIdea from './assets/making-bloom-idea.png?enhanced';
-	import bloomAi from './assets/making-bloom-ai.png?enhanced';
-	import bloomCode from './assets/making-bloom-code.png?enhanced';
-	import bloomPhone from './assets/making-bloom-phone.png?enhanced';
-	import bloomChart from './assets/making-bloom-chart.png?enhanced';
-	import bloomMoon from './assets/making-bloom-moon.png?enhanced';
-	// TEMPORARY: round-2 mockup for comparison only (hidden; `?ref=1` shows it). Remove with the final art.
-	import mockup from './assets/making-mockup-ref.webp';
+	// Width ladder for the blooms (rendered ~200–440 CSS px): `…&enhanced` imports are typed by the ambient
+	// declaration in sections/hero/imagetools.d.ts.
+	import bloomIdea from './assets/making-bloom-idea.webp?w=900;640;450;300&quality=45&enhanced';
+	import bloomAi from './assets/making-bloom-ai.webp?w=900;640;450;300&quality=45&enhanced';
+	import bloomCode from './assets/making-bloom-code.webp?w=900;640;450;300&quality=45&enhanced';
+	import bloomPhone from './assets/making-bloom-phone.webp?w=900;640;450;300&quality=45&enhanced';
+	import bloomChart from './assets/making-bloom-chart.webp?w=900;640;450;300&quality=45&enhanced';
+	import bloomMoon from './assets/making-bloom-moon.webp?w=900;640;450;300&quality=45&enhanced';
 
 	const BLOOMS: Record<MakingStateId, typeof bloomIdea> = { idea: bloomIdea, ai: bloomAi, code: bloomCode, phone: bloomPhone, chart: bloomChart, moon: bloomMoon };
 	const TITLES: Record<MakingStateId, () => string> = {
@@ -158,14 +155,15 @@
 			<!-- Painted scene in plate coordinates: decorative only, the meaning lives in the titles and the pillar row. -->
 			<div class="scene" aria-hidden="true">
 				<div class="frame" {@attach loop.attach}>
-					<enhanced:img class="plate plate-desktop" src={plateDesktop} alt="" sizes="100vw" loading="lazy" />
-					<enhanced:img class="plate plate-mobile" src={plateMobile} alt="" sizes="100vw" loading="lazy" />
+					<!-- string src: enhanced-img derives a full width ladder from `sizes` (the plate covers the stage) -->
+					<enhanced:img class="plate plate-desktop" src="./assets/making-plate.webp" alt="" sizes="max(100vw, min(178vh, 107vw))" loading="lazy" />
+					<enhanced:img class="plate plate-mobile" src="./assets/making-plate-mobile.webp" alt="" sizes="100vw" loading="lazy" />
 					<div class="moon-glow" bind:this={glow}></div>
 
 					{#each STATE_IDS as id, i (id)}
 						<div class="bloom-mask" style:mask-image={MASKS[id]} style:-webkit-mask-image={MASKS[id]}>
 							<div class="bloom" {@attach (element) => void (blooms[i] = element)}>
-								<enhanced:img src={BLOOMS[id]} alt="" sizes="(max-aspect-ratio: 1/1) 60vw, 30vw" loading="lazy" />
+								<enhanced:img src={BLOOMS[id]} alt="" sizes="(max-aspect-ratio: 1/1) 54vw, 31vw" loading="lazy" />
 							</div>
 						</div>
 					{/each}
@@ -184,7 +182,6 @@
 				</div>
 			</div>
 
-			<MockupRef src={mockup} opacity={0} />
 			<NightClock time="21:00" />
 			<h2 id="home-making-title" class="heading font-mono text-xs">{m.home_making_title()}</h2>
 
@@ -216,7 +213,7 @@
 					<li id="making-{id}" class="figure">
 						<div class="figure-art" aria-hidden="true">
 							<div class="figure-bloom" style:mask-image={MASKS[id]} style:-webkit-mask-image={MASKS[id]}>
-								<enhanced:img src={BLOOMS[id]} alt="" sizes="min(90vw, 36rem)" loading="lazy" />
+								<enhanced:img src={BLOOMS[id]} alt="" sizes="min(63vw, 28rem)" loading="lazy" />
 							</div>
 							<svg viewBox="0 0 {LAYOUTS.figure.width} {LAYOUTS.figure.height}" class="figure-ink">
 								<path d={FIGURE_LINES[id]} />
