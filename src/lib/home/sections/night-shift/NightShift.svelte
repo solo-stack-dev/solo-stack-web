@@ -4,9 +4,10 @@
 	cover-cropped into the viewport (Scene), the monitor types the real latest commits as `git log --oneline`, and six
 	objects are explorable hotspots (the bonsai is the golden tree egg). Geometry lives in `layout.ts`.
 
-	Motion: typing loop, mascot frame swap, steam, lamp flicker, dust, pointer parallax (3 depth layers + dust) and a
-	scroll drift of the moon. Everything pauses off screen and in hidden tabs; under reduced motion the scene is static
-	with the first page of commits fully typed, and the hotspots still work.
+	Motion: typing loop, hand frame swap on the painted mascot, steam, lamp flicker, dust, pointer parallax (the scene
+	plate with everything on it, the sky, the foreground leaf and dust) and a scroll drift of the moon. Everything pauses
+	off screen and in hidden tabs; under reduced motion the scene is static with the first page of commits fully typed,
+	and the hotspots still work.
 -->
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';

@@ -1,12 +1,12 @@
 /**
  * Night shift scene geometry, the single place to re-tune the composition.
  *
- * Source of truth: the coordinate contract in docs/art/night-shift/README.md (desktop art 2560×1440, mobile art
- * 1080×2340, all in art px) and the crop rects that tools/optimize-art.mjs wrote to ./art.ts. Everything here is
+ * Source of truth: the coordinate contract in docs/art/night-shift/README.md ("Coherent scene revision": desktop scene
+ * 2560×1440, mobile scene 1080×2340, all in art px) and the crop rects that tools/optimize-art.mjs wrote to ./art.ts. Everything here is
  * authored in art px and exported as percentages (0…100) of each variant's canvas, so the layers, the live monitor
  * and the hotspots stay pixel-registered at every size.
  */
-import { PROPS, TYPING, type ArtRect } from './art.ts';
+import { PROPS, SCENES, type ArtRect } from './art.ts';
 
 export interface Point {
 	x: number;
@@ -46,8 +46,8 @@ export interface SceneLayout {
 	focal: Point;
 	/** Painted monitor screen. The live terminal is a `box`-sized HTML block mapped onto `quad` with a matrix3d. */
 	monitor: { quad: Quad; box: { width: number; height: number }; fontSize: number; padding: number };
-	/** Reserved mascot area from the art contract (reference for effects). */
-	seat: Rect;
+	/** Box around the painted mascot: the shiny egg's golden glow is a radial gradient inside it, its sparkle sits top right. */
+	mascot: Rect;
 	/** Upper window glass (both panes). */
 	window: Rect;
 	/** Sky plate (drifts with the scroll) and the two glass panes it shows through, as polygons in canvas percent. */
@@ -60,11 +60,13 @@ export interface SceneLayout {
 	bonsai: Point;
 	/** Cropped transparent props, placed on this canvas. */
 	props: { bonsai: Rect; golden: Rect; handheld: Rect; foreground?: Rect };
+	/** Plate image height in percent of the canvas: the file carries the hands band below the scene. */
+	sheet: number;
 	/**
-	 * Typing mascot: `rect` = the cropped body image on the canvas; `hands` = the hand patch (sprite cell) in percent
-	 * of `rect`; `clip` = CSS polygon (percent of `rect`) that hides everything behind the desk except hands on the keys.
+	 * Typing hands: a window at `rect` (canvas percent) onto the same plate image, which is `image` (percent of the
+	 * window) large and translated by `cells[frame - 1]` (percent of the image) to show that frame's cell.
 	 */
-	mascot: { rect: Rect; hands: Rect; clip: string };
+	hands: { rect: Rect; image: { w: number; h: number }; cells: Point[] };
 	/** Hotspots in tab order. */
 	spots: Spot[];
 }
@@ -94,9 +96,23 @@ const rectPct = (canvas: Canvas, x: number, y: number, w: number, h: number): Re
 
 const pointPct = (canvas: Canvas, [x, y]: [number, number]): Point => ({ x: r4((x / canvas.width) * 100), y: r4((y / canvas.height) * 100) });
 
+/** A source point drawn through `t`, as canvas percentages. */
+const at = (canvas: Canvas, [x, y]: [number, number], t: Transform = IDENTITY) => pointPct(canvas, [t.x + x * t.scale, t.y + y * t.scale]);
+
 /** A cropped source rect drawn through `t`, as canvas percentages. */
 const place = (canvas: Canvas, crop: ArtRect, t: Transform = IDENTITY) =>
 	rectPct(canvas, t.x + crop.x * t.scale, t.y + crop.y * t.scale, crop.width * t.scale, crop.height * t.scale);
+
+type Plate = (typeof SCENES)[keyof typeof SCENES];
+
+/** The hands window and its cells from art.ts (plate px) as percentages. */
+const hands = ({ canvas, sheet, hands: rect, cells }: Plate): SceneLayout['hands'] => ({
+	rect: rectPct(canvas, rect.x, rect.y, rect.width, rect.height),
+	image: { w: r4((canvas.width / rect.width) * 100), h: r4((sheet / rect.height) * 100) },
+	cells: cells.map(({ x, y }) => ({ x: r4((-x / canvas.width) * 100), y: r4((-y / sheet) * 100) }))
+});
+
+const sheetPct = ({ canvas, sheet }: Plate) => r4((sheet / canvas.height) * 100);
 
 /** Moves every corner `inset` px toward the quad's center, so the live text keeps clear of the painted bezel. */
 function screen(canvas: Canvas, corners: [number, number][], inset: number): Quad {
@@ -105,31 +121,13 @@ function screen(canvas: Canvas, corners: [number, number][], inset: number): Qua
 	return corners.map(([x, y]) => pointPct(canvas, [x + Math.sign(cx - x) * inset, y + Math.sign(cy - y) * inset])) as Quad;
 }
 
-/**
- * Typing mascot placed with `t` (frame canvas → scene px). `visible` is the area NOT hidden by the desk, as a polygon
- * in scene px; it becomes a clip polygon relative to the body image.
- */
-function mascot(canvas: Canvas, t: Transform, visible: [number, number][]): SceneLayout['mascot'] {
-	const { body, hands } = TYPING;
-	const left = t.x + body.x * t.scale;
-	const top = t.y + body.y * t.scale;
-	const width = body.width * t.scale;
-	const height = body.height * t.scale;
-	const clip = visible.map(([x, y]) => `${r4(((x - left) / width) * 100)}% ${r4(((y - top) / height) * 100)}%`).join(', ');
-	return {
-		rect: rectPct(canvas, left, top, width, height),
-		hands: {
-			x: r4(((hands.x - body.x) / body.width) * 100),
-			y: r4(((hands.y - body.y) / body.height) * 100),
-			w: r4((hands.width / body.width) * 100),
-			h: r4((hands.height / body.height) * 100)
-		},
-		clip: `polygon(${clip})`
-	};
-}
+/** Bonsai pot: center of its baseline on the desktop prop canvas (both tree states share the pot). */
+const POT: [number, number] = [2303, 1090];
 
 // ── Desktop 2560×1440 ───────────────────────────────────────────────────────────────────────────────────────────
 const D: Canvas = { width: 2560, height: 1440 };
+/** The pot's feet would hover at the back edge of the pedestal book on the scene plate; 18 px lower they stand on it. */
+const BONSAI_ON_DESKTOP: Transform = { scale: 1, x: 0, y: 18 };
 
 export const desktop: SceneLayout = {
 	canvas: D,
@@ -149,7 +147,8 @@ export const desktop: SceneLayout = {
 		fontSize: 18,
 		padding: 26
 	},
-	seat: { x: 45, y: 17, w: 36, h: 57 },
+	// head, headphones, shoulders and arms down to the hands on the keys
+	mascot: rectPct(D, 1080, 290, 900, 790),
 	window: rectPct(D, 536, 11, 582, 589),
 	sky: {
 		rect: rectPct(D, 430, -100, 1100, 1100),
@@ -168,25 +167,19 @@ export const desktop: SceneLayout = {
 			]
 		].map((pane) => pane.map((point) => pointPct(D, point as [number, number])))
 	},
-	lamp: { ...pointPct(D, [322, 636]), radius: 16 },
-	// mug opening ≈ (410, 962); the wisps rise from the bottom center of this box
-	steam: rectPct(D, 327, 624, 166, 338),
-	bonsai: pointPct(D, [2303, 1090]),
-	props: { bonsai: place(D, PROPS.bonsai), golden: place(D, PROPS.golden), handheld: place(D, PROPS.handheld), foreground: place(D, PROPS.foreground) },
-	// Seated in the painted chair behind the desk: the desk's back edge hides the legs and the mascot's own chair seat;
-	// the hands rest on the keyboard (x 1048…1650, top ≈ 1008).
-	mascot: mascot(D, { scale: 1.16, x: 993, y: 118 }, [
-		[0, 0],
-		[2560, 0],
-		[2560, 1056],
-		[1600, 1050],
-		[1480, 1048],
-		[1480, 1080],
-		[1130, 1080],
-		[1130, 1036],
-		[1000, 1032],
-		[0, 1032]
-	]),
+	// center of the shade's lit opening
+	lamp: { ...pointPct(D, [320, 628]), radius: 16 },
+	// mug rim ≈ x 355…525 at y 960 (handle on the left); the wisps rise from the bottom center of this box
+	steam: rectPct(D, 357, 622, 166, 338),
+	bonsai: at(D, POT, BONSAI_ON_DESKTOP),
+	props: {
+		bonsai: place(D, PROPS.bonsai, BONSAI_ON_DESKTOP),
+		golden: place(D, PROPS.golden, BONSAI_ON_DESKTOP),
+		handheld: place(D, PROPS.handheld),
+		foreground: place(D, PROPS.foreground)
+	},
+	sheet: sheetPct(SCENES.desktop),
+	hands: hands(SCENES.desktop),
 	spots: [
 		{
 			id: 'window',
@@ -195,17 +188,19 @@ export const desktop: SceneLayout = {
 			glow: rectPct(D, 535, 87, 520, 520),
 			tip: { x: 45, y: 38 }
 		},
-		{ id: 'coffee', rect: { x: 11.5, y: 66, w: 10, h: 13 } },
-		{ id: 'handheld', rect: { x: 5, y: 75, w: 15, h: 13 }, tip: { x: 30, y: 4 }, tipAlign: 'start' },
-		{ id: 'manga', rect: { x: 76, y: 14, w: 24, h: 22 }, tip: { x: 45, y: 8 }, tipAlign: 'end' },
-		{ id: 'bonsai', rect: { x: 79, y: 47, w: 20, h: 29 }, tip: { x: 50, y: 10 }, tipAlign: 'end' },
-		{ id: 'dumbbells', rect: { x: 72, y: 84, w: 17, h: 13 } }
+		// README "coherent scene revision" rects (art px); the bonsai's moves with its 18 px offset
+		{ id: 'coffee', rect: rectPct(D, 294, 948, 255, 195) },
+		{ id: 'handheld', rect: rectPct(D, 126, 1082, 375, 187), tip: { x: 30, y: 4 }, tipAlign: 'start' },
+		{ id: 'manga', rect: rectPct(D, 1940, 200, 620, 355), tip: { x: 45, y: 8 }, tipAlign: 'end' },
+		{ id: 'bonsai', rect: rectPct(D, 2020, 696, 506, 418), tip: { x: 50, y: 10 }, tipAlign: 'end' },
+		{ id: 'dumbbells', rect: rectPct(D, 1858, 1212, 395, 182) }
 	]
 };
 
-// ── Mobile 1080×2340: dedicated portrait plate; the desktop props are reused with the README's affine maps ────────
+// ── Mobile 1080×2340: dedicated portrait scene; the desktop props are reused with the README's affine maps ────────
 const M: Canvas = { width: 1080, height: 2340 };
-const BONSAI_TO_MOBILE: Transform = { scale: 0.6, x: -435, y: 855 };
+/** README map (0.6, -435, 855), nudged 24 px right and 6 px down so both feet of the pot stand on the right-hand book. */
+const BONSAI_TO_MOBILE: Transform = { scale: 0.6, x: -411, y: 861 };
 const HANDHELD_TO_MOBILE: Transform = { scale: 0.8, x: 40, y: 650 };
 
 export const mobile: SceneLayout = {
@@ -226,7 +221,7 @@ export const mobile: SceneLayout = {
 		fontSize: 16,
 		padding: 14
 	},
-	seat: { x: 47, y: 34, w: 46, h: 27 },
+	mascot: rectPct(M, 400, 850, 610, 600),
 	window: rectPct(M, 46, 0, 434, 700),
 	sky: {
 		// README rest rect is (-65, 10); raised 50 px so the scroll drift never uncovers the panes' top edge
@@ -248,28 +243,20 @@ export const mobile: SceneLayout = {
 		].map((pane) => pane.map((point) => pointPct(M, point as [number, number])))
 	},
 	lamp: { ...pointPct(M, [199, 912]), radius: 30 },
-	// mug opening ≈ (166, 1374)
-	steam: rectPct(M, 106, 1163, 119, 211),
-	bonsai: pointPct(M, [2303 * BONSAI_TO_MOBILE.scale + BONSAI_TO_MOBILE.x, 1090 * BONSAI_TO_MOBILE.scale + BONSAI_TO_MOBILE.y]),
+	// mug rim ≈ x 105…220 at y 1378
+	steam: rectPct(M, 104, 1167, 119, 211),
+	bonsai: at(M, POT, BONSAI_TO_MOBILE),
 	props: { bonsai: place(M, PROPS.bonsai, BONSAI_TO_MOBILE), golden: place(M, PROPS.golden, BONSAI_TO_MOBILE), handheld: place(M, PROPS.handheld, HANDHELD_TO_MOBILE) },
-	// keyboard x 415…815, top ≈ 1390; desk back edge ≈ 1400…1410
-	mascot: mascot(M, { scale: 0.82, x: 330, y: 740 }, [
-		[0, 0],
-		[1080, 0],
-		[1080, 1410],
-		[760, 1406],
-		[760, 1438],
-		[420, 1438],
-		[420, 1400],
-		[0, 1400]
-	]),
+	sheet: sheetPct(SCENES.mobile),
+	hands: hands(SCENES.mobile),
 	spots: [
-		{ id: 'window', rect: { x: 4.2593, y: 0, w: 40.1852, h: 29.9145 }, glow: rectPct(M, 10, 95, 380, 380), tip: { x: 45, y: 55 } },
-		{ id: 'manga', rect: { x: 67, y: 18, w: 33, h: 11 }, tip: { x: 45, y: 10 }, tipAlign: 'end' },
-		{ id: 'coffee', rect: { x: 5, y: 58.5, w: 18, h: 6.5 }, tipAlign: 'start' },
-		{ id: 'handheld', rect: { x: 13, y: 64.5, w: 28, h: 7 } },
-		{ id: 'bonsai', rect: { x: 72, y: 54, w: 28, h: 11 }, tip: { x: 45, y: 0 }, tipAlign: 'end', dot: { x: 56, y: 50 } },
-		{ id: 'dumbbells', rect: { x: 56, y: 85.5, w: 44, h: 10.5 } }
+		{ id: 'window', rect: rectPct(M, 46, 0, 434, 700), glow: rectPct(M, 10, 95, 380, 380), tip: { x: 45, y: 55 } },
+		{ id: 'manga', rect: rectPct(M, 760, 420, 320, 280), tip: { x: 45, y: 10 }, tipAlign: 'end' },
+		{ id: 'coffee', rect: rectPct(M, 60, 1368, 186, 155), tipAlign: 'start' },
+		{ id: 'handheld', rect: rectPct(M, 140, 1515, 301, 151) },
+		// README rect moved with the bonsai's nudge (left edge kept clear of the golden canopy at x ≈ 805)
+		{ id: 'bonsai', rect: rectPct(M, 790, 1266, 290, 255), tip: { x: 45, y: 0 }, tipAlign: 'end', dot: { x: 56, y: 50 } },
+		{ id: 'dumbbells', rect: rectPct(M, 605, 2005, 475, 245) }
 	]
 };
 

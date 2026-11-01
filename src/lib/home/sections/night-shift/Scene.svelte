@@ -124,12 +124,15 @@
 <div class="scene" data-variant={variant} {onpointerdown} onpointerenter={want} role="presentation" style={stageVars}>
 	<div class="frame art">
 		<div class="stage" {@attach measure}>
-			<!-- 1 · opaque room plate (complete static fallback, moonless window) -->
-			{#if variant === 'desktop'}
-				<enhanced:img src="./assets/nightshift-room.webp?w=1920;1536;1080" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
-			{:else}
-				<enhanced:img src="./assets/nightshift-room-mobile.webp?w=1080;828;640" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
-			{/if}
+			<!-- 1 · opaque scene plate with the mascot painted in (complete static fallback: moonless window, hands at rest). The
+			     file also carries the typing hands band below the scene, clipped off here. -->
+			<div class="plate" style:--sheet={pct(layout.sheet)}>
+				{#if variant === 'desktop'}
+					<enhanced:img src="./assets/nightshift-scene.webp?w=1920;1536;1080" alt={sceneAlt} loading="lazy" sizes="103vw" class="sheet" />
+				{:else}
+					<enhanced:img src="./assets/nightshift-scene-mobile.webp?w=1080;828;640" alt={sceneAlt} loading="lazy" sizes="103vw" class="sheet" />
+				{/if}
+			</div>
 
 			<!-- 2 · sky with the moon, shown only through the two upper glass panes, drifting with the scroll -->
 			<div class="panes" aria-hidden="true" style:mask-image={skyMask}>
@@ -140,21 +143,25 @@
 
 			<span class="lamp" aria-hidden="true" style:left={pct(layout.lamp.x)} style:top={pct(layout.lamp.y)} style:width={pct(layout.lamp.radius * 2)}></span>
 
-			<Monitor monitor={layout.monitor} {terminal} {stage} blink={!reduced} />
-
-			<!-- 3 · typing mascot: body + hand patch sprite (frames 1…3), hidden behind the desk below its back edge -->
-			<div class="mascot" data-frame={reduced ? 1 : terminal.frame} aria-hidden="true" style="{box(layout.mascot.rect)}; clip-path: {layout.mascot.clip}">
-				<enhanced:img src="./assets/mascot-nightshift-typing.webp?w=903;640;450" alt="" loading="lazy" sizes={vw(layout.mascot.rect.w)} class="fill" />
-				<div class="hands" style={box(layout.mascot.hands)}>
-					<enhanced:img
-						src="./assets/mascot-nightshift-hands.webp?w=286;200"
-						alt=""
-						loading="lazy"
-						sizes={vw((layout.mascot.rect.w * layout.mascot.hands.w) / 100)}
-						class="sprite"
-					/>
+			<!-- 3 · typing hands: a window onto the hands band of the SAME plate image (same srcset and sizes, so the same file
+			     and decode), showing cell 1…3. Under reduced motion the plate's own hands at rest are frame 1. -->
+			{#if !reduced}
+				{@const cell = layout.hands.cells[terminal.frame - 1] ?? layout.hands.cells[0]}
+				<div class="hands" data-frame={terminal.frame} aria-hidden="true" style={box(layout.hands.rect)}>
+					<div class="cell" style:width={pct(layout.hands.image.w)} style:height={pct(layout.hands.image.h)} style:translate="{cell.x}% {cell.y}%">
+						{#if variant === 'desktop'}
+							<enhanced:img src="./assets/nightshift-scene.webp?w=1920;1536;1080" alt="" loading="lazy" sizes="103vw" class="fill" />
+						{:else}
+							<enhanced:img src="./assets/nightshift-scene-mobile.webp?w=1080;828;640" alt="" loading="lazy" sizes="103vw" class="fill" />
+						{/if}
+					</div>
 				</div>
-			</div>
+			{/if}
+
+			<!-- shiny egg: a soft golden wash over the painted mascot; the egg's sparkle is this element's ::after -->
+			<div class="mascot" data-shiny-art aria-hidden="true" style={box(layout.mascot)}></div>
+
+			<Monitor monitor={layout.monitor} {terminal} {stage} blink={!reduced} />
 
 			<!-- 4 · props: bonsai (crossfades to the golden tree), handheld -->
 			<div class={['prop', 'bonsai', golden && goldenReady && 'out']} style={box(art.bonsai)}>
@@ -258,7 +265,23 @@
 		translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
 	}
 
-	.stage :global(.layer),
+	.plate {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+	}
+
+	.plate :global(.sheet) {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: var(--sheet);
+		max-width: none;
+		pointer-events: none;
+		user-select: none;
+	}
+
 	.stage :global(.fill) {
 		position: absolute;
 		inset: 0;
@@ -340,28 +363,33 @@
 		height: 100%;
 	}
 
-	/* ── mascot typing: the hand patch sprite (3 cells stacked) steps per frame, no transition ── */
+	/* ── typing hands: the window steps between the cells per frame (no transition) ── */
 	.hands {
 		position: absolute;
 		overflow: hidden;
+		pointer-events: none;
 	}
 
-	.hands :global(.sprite) {
+	.cell {
 		position: absolute;
 		left: 0;
 		top: 0;
-		width: 100%;
-		height: 300%;
-		max-width: none;
-		user-select: none;
 	}
 
-	.mascot[data-frame='2'] :global(.sprite) {
-		translate: 0 -33.3333%;
+	/* ── shiny egg (docs/HOMEPAGE-DEV.md §11): the mascot is part of the plate, so instead of the egg's filter fallback a
+	   radial gold wash warms just the area around the mascot. Soft light keeps the painting's values (a color blend
+	   muddied the skin, screen looked hazy); the egg's sparkle is this element's ::after. ── */
+	.mascot::before {
+		content: '';
+		display: none;
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(closest-side, rgb(255 196 64 / 0.85), rgb(255 196 64 / 0.45) 55%, transparent);
+		mix-blend-mode: soft-light;
 	}
 
-	.mascot[data-frame='3'] :global(.sprite) {
-		translate: 0 -66.6667%;
+	:global([data-shiny]) .mascot::before {
+		display: block;
 	}
 
 	/* ── handheld contour on hover/focus ── */

@@ -16,9 +16,29 @@ export const PROPS = {
 	foreground: { x: 0, y: 1245, width: 255, height: 195 }
 } satisfies Record<string, ArtRect>;
 
-/** Typing mascot: body crop and hand patch (one sprite cell, three cells stacked) inside the 1024×1536 frame canvas. */
-export const TYPING = {
-	canvas: { width: 1024, height: 1536 },
-	body: { x: 73, y: 148, width: 903, height: 724 },
-	hands: { x: 106, y: 701, width: 286, height: 155 }
+/**
+ * Scene plate files in plate px: the scene (`canvas`) with the hands band below it (file height `sheet`). `hands` is
+ * the typing hands rect on the scene; `cells` are the top left corners of frames 1…3 (each `hands`-sized) in the band.
+ */
+export const SCENES = {
+	desktop: {
+		canvas: { width: 1920, height: 1080 },
+		sheet: 1220,
+		hands: { x: 804, y: 696, width: 340, height: 116 },
+		cells: [
+			{ x: 8, y: 1096 },
+			{ x: 364, y: 1096 },
+			{ x: 720, y: 1096 }
+		]
+	},
+	mobile: {
+		canvas: { width: 1080, height: 2340 },
+		sheet: 2476,
+		hands: { x: 416, y: 1342, width: 308, height: 112 },
+		cells: [
+			{ x: 8, y: 2356 },
+			{ x: 332, y: 2356 },
+			{ x: 656, y: 2356 }
+		]
+	}
 };
