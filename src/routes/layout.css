@@ -237,6 +237,57 @@
 }
 
 /*
+ * Page view transitions between the site pages (src/lib/components/site/view-transition.ts). The navbar is named, so
+ * it leaves the root snapshot and holds still; only the content underneath changes. Entry-weighted: the old page
+ * leaves at once and the new one arrives on a short rise, so a navigation reads as arrival rather than as a wash.
+ */
+:root {
+	--vt-out: 90ms;
+	--vt-in: 170ms;
+	/* Overlaps the tail of the exit, so the content never blinks to bare background. */
+	--vt-in-delay: 60ms;
+}
+
+/* Same geometry on every page, only the current link's underline moves: keep its cross-fade quick. */
+::view-transition-group(site-nav),
+::view-transition-old(site-nav),
+::view-transition-new(site-nav) {
+	animation-duration: var(--vt-in);
+}
+
+::view-transition-old(root) {
+	animation: vt-content-out var(--vt-out) ease-in both;
+}
+
+::view-transition-new(root) {
+	animation: vt-content-in var(--vt-in) var(--vt-in-delay) ease-out both;
+}
+
+html[data-vt-dir='back']::view-transition-new(root) {
+	animation-name: vt-content-in-back;
+}
+
+@keyframes vt-content-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes vt-content-in {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+}
+
+@keyframes vt-content-in-back {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+}
+
+/*
  * Global reduced motion guard. Components still ship a designed static state (§1.3); this only catches leftovers.
  * The `--night` sky is not affected: under reduced motion NightPage drives it from a scroll listener instead of a
  * scroll-driven animation, so the sky still follows the scroll without any autonomous motion.

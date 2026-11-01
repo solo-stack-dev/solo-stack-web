@@ -11,10 +11,9 @@
 	| crescent slash | `night:moon-phase` with `crescent` (hero), at most once per 10 s          |
 	| eclipse moon   | 3rd crescent of a visit, `?eclipse=1` / `?eclipse=0` (site/eclipse-moon.ts) |
 	| moon presence  | `night:moon-full-clicks` count 10, 20, 30 …                              |
-	| ARISE          | Konami code (not while typing), `arise()` in the console, `night:egg-arise` |
+	| ARISE          | Konami code (not while typing), `arise()` in the console (site/console-egg.ts), `night:egg-arise` |
 	| three stars    | 1 in 6 page views after 30–90 s idle in a dark section, `night:egg-three-stars` |
 	| shiny mascot   | 1 in 4096 sessions, `?shiny=1` (forces on) / `?shiny=0` (forces off)      |
-	| console        | idle after load: ASCII moon once per session, defines `window.arise`     |
 -->
 <script lang="ts">
 	import type { Component } from 'svelte';
@@ -63,10 +62,6 @@
 		} finally {
 			loading.delete(id);
 		}
-	}
-
-	function installConsole() {
-		import('./console/console.ts').then((module) => module.install()).catch(() => {});
 	}
 
 	function finish(key: number) {
@@ -197,16 +192,6 @@
 		page?.setAttribute(SHINY_ATTR, '');
 		import('./shiny/Shiny.svelte').then((module) => (Shiny = module.default)).catch(() => {});
 		return () => page?.removeAttribute(SHINY_ATTR);
-	});
-
-	// Console greeting + window.arise(), once the page is idle (production too)
-	$effect(() => {
-		if ('requestIdleCallback' in window) {
-			const handle = requestIdleCallback(installConsole, { timeout: 4000 });
-			return () => cancelIdleCallback(handle);
-		}
-		const timer = setTimeout(installConsole, 1500);
-		return () => clearTimeout(timer);
 	});
 </script>
 

@@ -13,11 +13,14 @@
 	import SiteFooter from '#lib/components/site/SiteFooter.svelte';
 	import SiteNav from '#lib/components/site/SiteNav.svelte';
 	import ThemeToggle from '#lib/components/site/ThemeToggle.svelte';
+	import { useViewTransitions } from '#lib/components/site/view-transition.ts';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import { m } from '#lib/paraglide/messages.js';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+	useViewTransitions();
 </script>
 
 <ModeWatcher defaultMode="system" themeColors={{ light: '#fdf9ee', dark: '#18191b' }} synchronousModeChanges />

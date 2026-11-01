@@ -131,13 +131,13 @@ const scenes = {
 	desktop: await plate(
 		'nightshift-scene.png',
 		1920,
-		[1, 2, 3].map((n) => ({ file: `nightshift-hands@${n}.png`, x: 1040, y: 925 })),
+		[1, 2, 3].map((n) => ({ file: `nightshift-hands@${n}.png`, x: 1000, y: 920 })),
 		'nightshift-scene.webp'
 	),
 	mobile: await plate(
 		'nightshift-scene-mobile.png',
 		1080,
-		[1, 2, 3].map((n) => ({ file: `nightshift-hands-mobile@${n}.png`, x: 370, y: 1330 })),
+		[1, 2, 3].map((n) => ({ file: `nightshift-hands-mobile@${n}.png`, x: 372, y: 1220 })),
 		'nightshift-scene-mobile.webp'
 	)
 };

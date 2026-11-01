@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { bundleAnalyzerPlugin } from 'rolldown/experimental';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 // Public origin per build mode (`vite build --mode <mode>`). SvelteKit uses it as `page.url.origin` while
 // prerendering (absolute hreflang/canonical/OG URLs) and as the trusted origin for CSRF checks on forms and
@@ -15,6 +15,25 @@ const origins: Record<string, string> = {
 	production: 'https://solo-stack.dev'
 };
 
+// enhanced-img encodes AVIF + WebP + a fallback, and the fallback is PNG for every image with alpha (JPEG otherwise):
+// about 50 MB of files no browser fetches, since every supported browser takes WebP. Appending `format=avif;webp` to
+// every enhanced import (an explicit `format` wins over the plugin's defaults) makes WebP the `<img>` fallback.
+// `<enhanced:img src="…">` resolves its URL through Vite too, so this covers both forms. An import that sets its own
+// `format` is left alone.
+function enhancedImagesWithoutLegacyFallback(): Plugin {
+	return {
+		name: 'solo-stack:enhanced-img-webp-fallback',
+		enforce: 'pre',
+		resolveId(source, importer, options) {
+			const query = source.split('?')[1];
+			if (!query) return null;
+			const params = new URLSearchParams(query);
+			if (!params.has('enhanced') || params.has('format')) return null;
+			return this.resolve(`${source}&format=avif;webp`, importer, { ...options, skipSelf: true });
+		}
+	};
+}
+
 export default defineConfig(({ mode }) => ({
 	build: {
 		rolldownOptions: {
@@ -23,6 +42,7 @@ export default defineConfig(({ mode }) => ({
 		}
 	},
 	plugins: [
+		enhancedImagesWithoutLegacyFallback(),
 		enhancedImages(),
 		tailwindcss(),
 		sveltekit({

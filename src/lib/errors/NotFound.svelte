@@ -1,250 +1,262 @@
 <!--
 	@component
-	404: the page collapses into an endless ink void, and the lost mascot drifts at its center on a scrap of rock.
-	The vanishing point (`--vp-x`, `--vp-y`) is shared by the canvas and the mascot, set per breakpoint below.
-
-	The collapse is pure CSS so it plays from the first paint, before hydration: warm paper, then the void grows out
-	of the vanishing point (a circular clip on `.abyss`, synced with a ragged ink rim scaling over its edge).
-	Under reduced motion the void is simply there.
+	404: the page went missing, like Ging. The scene is the World Tree (`WorldTree.svelte`). A Hunter emblem sticker
+	is slapped onto the status digits; it opens a holographic Hunter License (a native popover: light dismiss and
+	Escape for free) issued to the mascot, No. 404.
 -->
 <script lang="ts">
-	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import { m } from '#lib/paraglide/messages.js';
-	import grain from './assets/error-paper-grain.webp';
+	import photo from './assets/error-mascot-lost.webp?enhanced';
 	import ErrorShell from './ErrorShell.svelte';
-	import InkVoid from './InkVoid.svelte';
-	import mascot from './assets/error-mascot-lost.webp?enhanced';
-	import { blotPath } from './void.ts';
+	import HunterEmblem from './HunterEmblem.svelte';
+	import WorldTree from './WorldTree.svelte';
 
-	const rim = blotPath(7, 96);
+	/** Pointer over the card, 0 … 1, drives the holo sheen and the tilt. */
+	let glare = $state({ x: 0.5, y: 0.5 });
+
+	function tilt(event: PointerEvent) {
+		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+		glare = { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height };
+	}
 </script>
 
-<ErrorShell status={404} title={m.error_404_title()} body={m.error_404_body()} variant="void">
-	{#snippet scene()}
-		<div class="void">
-			<div class="abyss">
-				<InkVoid />
-			</div>
-			<svg class="rim" viewBox="-100 -100 200 200" aria-hidden="true">
-				<path d={rim} fill="none" stroke="#0e0f10" stroke-width="5" stroke-linejoin="round" />
-				<path d={rim} fill="none" stroke="#0e0f10" stroke-width="1.2" stroke-dasharray="1 7 3 11" transform="scale(1.035)" />
-			</svg>
-			<!-- watercolor tooth on paper and rings (multiply barely touches the ink) -->
-			<PaperGrain fixed={false} src={grain} size={256} opacity={0.55} blend="multiply" />
-			<div class="castaway">
-				<div class="drift">
-					<enhanced:img class="mascot" src={mascot} alt={m.error_404_mascot_alt()} sizes="(min-width: 64rem) 9rem, 7rem" />
-					<svg class="rock" viewBox="0 0 200 110" aria-hidden="true">
-						<defs>
-							<linearGradient id="rock-top" x1="0" y1="0" x2="0" y2="1">
-								<stop offset="0" stop-color="#8a6a2c" />
-								<stop offset="1" stop-color="#2a2723" />
-							</linearGradient>
-							<filter id="rock-rough" x="-10%" y="-10%" width="120%" height="120%">
-								<feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" seed="4" />
-								<feDisplacementMap in="SourceGraphic" scale="6" />
-							</filter>
-						</defs>
-						<g filter="url(#rock-rough)">
-							<path d="M8 22 L40 12 L96 9 L150 12 L192 20 L176 44 L150 58 L128 86 L104 106 L86 80 L58 62 L30 46 Z" fill="#0e0f10" />
-							<path d="M8 22 L40 12 L96 9 L150 12 L192 20 L184 28 L140 31 L96 33 L50 30 L18 29 Z" fill="url(#rock-top)" />
-							<path d="M40 40 L72 56 M126 44 L112 70 M150 36 L164 46" stroke="#4a3a1e" stroke-width="2.5" fill="none" stroke-linecap="round" />
-						</g>
-					</svg>
+<ErrorShell status={404} title={m.error_404_title()} body={m.error_404_body()} variant="tree">
+	{#snippet badge()}
+		<button type="button" class="sticker" popovertarget="hunter-license" aria-label={m.error_404_license_label()}>
+			<HunterEmblem sticker />
+		</button>
+
+		<div id="hunter-license" class="license-popover" popover>
+			<!-- svelte-ignore a11y_no_static_element_interactions (decorative tilt only) -->
+			<div class="license" style:--gx={glare.x} style:--gy={glare.y} onpointermove={tilt} onpointerleave={() => (glare = { x: 0.5, y: 0.5 })}>
+				<HunterEmblem class="watermark" />
+				<div class="license-head">
+					<HunterEmblem class="emblem" />
+					<div>
+						<p class="license-title font-display font-black tracking-wordmark uppercase">{m.error_404_license_title()}</p>
+						<p class="license-class">{m.error_404_license_class()}</p>
+					</div>
 				</div>
-				<!-- pebbles that broke off -->
-				<span class="pebble p1"></span>
-				<span class="pebble p2"></span>
-				<span class="pebble p3"></span>
+				<div class="license-body">
+					<enhanced:img class="photo" src={photo} alt="" sizes="5rem" />
+					<div class="license-id">
+						<p class="font-mono text-xs tracking-clock opacity-70" aria-hidden="true">No.</p>
+						<p class="number font-mono font-bold tabular-nums">404</p>
+						<p class="font-display font-black tracking-wordmark uppercase">SOLO STACK</p>
+					</div>
+				</div>
+				<p class="license-note">{m.error_404_license_note()}</p>
+				<div class="holo" aria-hidden="true"></div>
 			</div>
 		</div>
+	{/snippet}
+
+	{#snippet scene()}
+		<WorldTree />
 	{/snippet}
 </ErrorShell>
 
 <style>
-	.void {
+	/* Sticker on the status digits ------------------------------------------------------------------------------ */
+
+	.sticker {
 		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		/* the page before the collapse: warm paper */
-		background: var(--color-cream);
-		--vp-x: 0.5;
-		--vp-y: 0.3;
-		--vp: calc(var(--vp-x) * 100%) calc(var(--vp-y) * 100%);
+		right: -2.4rem;
+		top: -1.1rem;
+		width: clamp(4rem, 9vw, 5.5rem);
+		padding: 0;
+		rotate: 14deg;
+		cursor: pointer;
+		filter: drop-shadow(0 0.25rem 0.4rem rgb(14 15 16 / 0.55));
+		transition:
+			rotate 220ms cubic-bezier(0.3, 1.5, 0.5, 1),
+			translate 220ms cubic-bezier(0.3, 1.5, 0.5, 1),
+			filter 220ms ease;
 	}
 
-	@media (min-width: 64rem) {
-		.void {
-			--vp-x: 0.66;
-			--vp-y: 0.45;
+	.sticker:hover {
+		rotate: 6deg;
+		translate: 0 -0.25rem;
+		filter: drop-shadow(0 0.7rem 0.8rem rgb(14 15 16 / 0.6)) drop-shadow(0 0 0.8rem rgb(200 35 58 / 0.45));
+	}
+
+	.sticker:active {
+		translate: 0 0;
+		rotate: 10deg;
+	}
+
+	.sticker:focus-visible {
+		outline: 2px solid var(--color-butter);
+		outline-offset: 0.3rem;
+		border-radius: 0.5rem;
+	}
+
+	@media (max-width: 63.99rem) {
+		.sticker {
+			right: -1.6rem;
+			top: -0.6rem;
 		}
 	}
 
-	.abyss {
-		position: absolute;
-		inset: 0;
-		/* before the canvas paints (and without JS): the void at rest */
-		background: radial-gradient(circle at var(--vp), #fcd772 0 2.5vmax, #3b2e17 6vmax, #121314 45vmax, #0e0f10);
+	/* License card ---------------------------------------------------------------------------------------------- */
+
+	.license-popover {
+		margin: auto;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		overflow: visible;
+		color: var(--color-cream);
+		perspective: 900px;
 	}
 
-	.abyss > :global(canvas) {
-		position: absolute;
-		inset: 0;
+	.license-popover::backdrop {
+		background: rgb(14 15 16 / 0.6);
+		backdrop-filter: blur(3px);
 	}
 
-	/* The ink rim riding the edge of the clip. Rim radius = 48 % of the box, so at scale 3.125 it matches the clip's
-	   final 150vmax. A small box scaled up keeps the layer cheap; it moves too fast for the softness to show. */
-	.rim {
+	.license {
+		--tilt-x: calc((var(--gy) - 0.5) * -10deg);
+		--tilt-y: calc((var(--gx) - 0.5) * 14deg);
+		position: relative;
+		display: grid;
+		gap: 0.9rem;
+		width: min(23rem, 88vw);
+		aspect-ratio: 1.586;
+		padding: 1.1rem 1.25rem;
+		border: 2px solid color-mix(in oklab, var(--color-butter) 70%, transparent);
+		border-radius: 1rem;
+		background: radial-gradient(120% 90% at 0% 0%, rgb(252 215 114 / 0.12), transparent 60%), linear-gradient(160deg, #24252a, #18191b 55%, #121316);
+		box-shadow:
+			0 1.5rem 3rem rgb(14 15 16 / 0.65),
+			inset 0 0 0 1px rgb(251 243 221 / 0.06);
+		overflow: hidden;
+		transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+		transition: transform 160ms ease-out;
+	}
+
+	.license :global(.watermark) {
 		position: absolute;
-		left: calc(var(--vp-x) * 100%);
-		top: calc(var(--vp-y) * 100%);
-		width: 100vmax;
-		height: 100vmax;
-		translate: -50% -50%;
-		opacity: 0;
+		right: -2.5rem;
+		bottom: -2.2rem;
+		width: 12rem;
+		opacity: 0.07;
+		filter: grayscale(1) brightness(3);
 		pointer-events: none;
 	}
 
-	/* The mascot stands on the vanishing point; the light becomes its halo. */
-	.castaway {
+	.license-head {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+	}
+
+	.license-head :global(.emblem) {
+		width: 3.2rem;
+		flex: none;
+		filter: drop-shadow(0 0 0.25rem rgb(251 243 221 / 0.55)) drop-shadow(0 0 0 #fbf3dd);
+		background: var(--color-cream);
+		border-radius: 0.4rem;
+		padding: 0.25rem;
+	}
+
+	.license-title {
+		font-size: 1.2rem;
+		line-height: 1;
+		color: var(--color-butter);
+	}
+
+	.license-class {
+		margin-top: 0.25rem;
+		font-size: 0.85rem;
+		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+	}
+
+	.license-body {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.photo {
+		width: 4.75rem;
+		height: 4.75rem;
+		flex: none;
+		border-radius: 0.6rem;
+		object-fit: cover;
+		object-position: 50% 12%;
+		background: radial-gradient(circle at 50% 30%, #fbf3dd, #e2a93b);
+		border: 2px solid rgb(251 243 221 / 0.4);
+	}
+
+	.number {
+		font-size: 2.2rem;
+		line-height: 1;
+		letter-spacing: -0.04em;
+		color: var(--color-cream);
+	}
+
+	.license-note {
+		font-size: 0.8rem;
+		line-height: 1.4;
+		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
+	}
+
+	/* holographic foil following the pointer */
+	.holo {
 		position: absolute;
-		left: calc(var(--vp-x) * 100%);
-		top: calc(var(--vp-y) * 100%);
-		width: clamp(6rem, 22vw, 7rem);
-		translate: -50% -58%;
-	}
-
-	@media (min-width: 64rem) {
-		.castaway {
-			width: clamp(7rem, 10vw, 9rem);
-		}
-	}
-
-	.drift {
-		position: relative;
-		display: grid;
-		justify-items: center;
-	}
-
-	.mascot {
-		position: relative;
-		z-index: 1;
-		display: block;
-		width: 100%;
-		height: auto;
-		filter: drop-shadow(0 0 1.4rem rgb(252 215 114 / 0.35));
-	}
-
-	.rock {
-		width: 150%;
-		margin-top: -9%;
-		height: auto;
-	}
-
-	.pebble {
-		position: absolute;
-		width: 0.7rem;
-		aspect-ratio: 1;
-		background: #0e0f10;
-		border-top: 2px solid #8a6a2c;
-		clip-path: polygon(50% 0, 100% 40%, 70% 100%, 10% 80%, 0 30%);
-	}
-
-	.p1 {
-		left: -38%;
-		top: 92%;
-		rotate: 20deg;
-	}
-
-	.p2 {
-		right: -46%;
-		top: 84%;
-		width: 0.5rem;
-		rotate: -30deg;
-	}
-
-	.p3 {
-		left: 18%;
-		top: 128%;
-		width: 0.4rem;
-		rotate: 60deg;
+		inset: 0;
+		background:
+			radial-gradient(40% 50% at calc(var(--gx) * 100%) calc(var(--gy) * 100%), rgb(251 243 221 / 0.22), transparent 70%),
+			linear-gradient(
+				calc(110deg + var(--gx) * 40deg),
+				transparent 20%,
+				rgb(252 215 114 / 0.16) 35%,
+				rgb(120 220 255 / 0.12) 45%,
+				rgb(255 120 190 / 0.12) 55%,
+				transparent 70%
+			);
+		background-size:
+			100% 100%,
+			220% 220%;
+		background-position:
+			0 0,
+			calc(var(--gx) * 100%) calc(var(--gy) * 100%);
+		mix-blend-mode: color-dodge;
+		pointer-events: none;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		.abyss {
-			animation: collapse 1.6s cubic-bezier(0.55, 0, 0.25, 1) 0.15s both;
+		.license-popover {
+			transition:
+				opacity 260ms ease,
+				translate 420ms cubic-bezier(0.2, 1.3, 0.4, 1),
+				rotate 420ms cubic-bezier(0.2, 1.3, 0.4, 1),
+				scale 420ms cubic-bezier(0.2, 1.3, 0.4, 1),
+				overlay 420ms allow-discrete,
+				display 420ms allow-discrete;
 		}
 
-		.rim {
-			animation: rim 1.6s cubic-bezier(0.55, 0, 0.25, 1) 0.15s both;
-		}
-
-		/* arrives with the collapse, then floats */
-		.castaway {
-			animation: arrive 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.5s both;
-		}
-
-		.drift {
-			animation: drift 7s ease-in-out 1.8s infinite;
-		}
-
-		.pebble {
-			animation: drift 5s ease-in-out infinite;
-		}
-
-		.p2 {
-			animation-duration: 6.5s;
-			animation-direction: reverse;
-		}
-
-		.p3 {
-			animation-duration: 4.2s;
-		}
-	}
-
-	@keyframes collapse {
-		from {
-			clip-path: circle(0 at var(--vp));
-		}
-		to {
-			clip-path: circle(150vmax at var(--vp));
-		}
-	}
-
-	@keyframes rim {
-		from {
-			scale: 0;
-			opacity: 1;
-		}
-		92% {
-			opacity: 1;
-		}
-		to {
-			scale: 3.125;
+		.license-popover:not(:popover-open) {
 			opacity: 0;
+			translate: 0 2rem;
+			rotate: -8deg;
+			scale: 0.85;
+		}
+
+		@starting-style {
+			.license-popover:popover-open {
+				opacity: 0;
+				translate: -30vw -20svh;
+				rotate: -40deg;
+				scale: 0.3;
+			}
 		}
 	}
 
-	@keyframes arrive {
-		from {
-			opacity: 0;
-			scale: 0.35;
-		}
-	}
-
-	@keyframes drift {
-		0%,
-		100% {
-			translate: 0 0;
-			rotate: 0deg;
-		}
-		35% {
-			translate: 0.25rem -0.45rem;
-			rotate: 1.5deg;
-		}
-		70% {
-			translate: -0.2rem 0.2rem;
-			rotate: -1deg;
+	@media (prefers-reduced-motion: reduce) {
+		.license {
+			transform: none;
 		}
 	}
 </style>

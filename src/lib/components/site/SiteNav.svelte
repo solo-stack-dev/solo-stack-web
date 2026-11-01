@@ -155,6 +155,8 @@
 		color: var(--foreground);
 		backdrop-filter: blur(12px) saturate(1.2);
 		-webkit-backdrop-filter: blur(12px) saturate(1.2);
+		/* Holds still during page view transitions (view-transition.ts) */
+		view-transition-name: site-nav;
 	}
 
 	.is-site .bar {

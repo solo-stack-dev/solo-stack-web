@@ -14,6 +14,18 @@
 
 	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]).
 	const ownAlternates = $derived(page.route.id === '/(site)/blog/[slug]');
+
+	// DevTools egg on every page (wordmark + System window, `window.arise()`), loaded once the page is idle
+	const installConsoleEgg = () => import('#lib/components/site/console-egg.ts').then((module) => module.install()).catch(() => {});
+
+	$effect(() => {
+		if ('requestIdleCallback' in window) {
+			const handle = requestIdleCallback(installConsoleEgg, { timeout: 4000 });
+			return () => cancelIdleCallback(handle);
+		}
+		const timer = setTimeout(installConsoleEgg, 1500);
+		return () => clearTimeout(timer);
+	});
 </script>
 
 <svelte:head>

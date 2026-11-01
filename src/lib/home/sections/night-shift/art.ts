@@ -23,22 +23,22 @@ export const PROPS = {
 export const SCENES = {
 	desktop: {
 		canvas: { width: 1920, height: 1080 },
-		sheet: 1210,
-		hands: { x: 788, y: 694, width: 266, height: 106 },
+		sheet: 1222,
+		hands: { x: 754, y: 692, width: 272, height: 118 },
 		cells: [
 			{ x: 8, y: 1096 },
-			{ x: 290, y: 1096 },
-			{ x: 572, y: 1096 }
+			{ x: 296, y: 1096 },
+			{ x: 584, y: 1096 }
 		]
 	},
 	mobile: {
 		canvas: { width: 1080, height: 2340 },
-		sheet: 2472,
-		hands: { x: 374, y: 1328, width: 240, height: 108 },
+		sheet: 2468,
+		hands: { x: 380, y: 1224, width: 214, height: 104 },
 		cells: [
 			{ x: 8, y: 2356 },
-			{ x: 264, y: 2356 },
-			{ x: 520, y: 2356 }
+			{ x: 238, y: 2356 },
+			{ x: 468, y: 2356 }
 		]
 	}
 };

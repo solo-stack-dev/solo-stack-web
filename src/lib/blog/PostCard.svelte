@@ -5,7 +5,7 @@
 	name). `featured` lays it out wide (image beside the text from `md`).
 -->
 <script lang="ts">
-	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
+	import VideoThumbnail from '#lib/home/sections/cinema/VideoThumbnail.svelte';
 	import { m } from '#lib/paraglide/messages.js';
 	import { FORMAT_LABELS, formatDate, postHref } from './content.ts';
 	import NightScene from './NightScene.svelte';
@@ -19,13 +19,22 @@
 	}
 
 	let { post, featured = false, eager = false }: Props = $props();
+
+	// Rendered thumbnail width. Blog index: max-w-6xl container with px-4 (sm: px-8), grid gap 1.5rem with 1/2/3 columns
+	// (md/lg), card padding 0.75rem. Featured from md: one full-width card, image column 1.15fr beside 1fr, 2rem gap.
+	const SIZES_SINGLE = '(min-width: 40rem) calc(100vw - 5.5rem), calc(100vw - 3.5rem)';
+	const sizes = $derived(
+		featured
+			? `(min-width: 48rem) min(calc((100vw - 7.5rem) * 0.535), 34.5rem), ${SIZES_SINGLE}`
+			: `(min-width: 64rem) min(calc((100vw - 7rem) / 3 - 1.5rem), 20.25rem), (min-width: 48rem) calc(50vw - 4.25rem), ${SIZES_SINGLE}`
+	);
 </script>
 
 <!-- `lang` marks only the post's own text: the format, date and reading time are page UI in the page locale -->
 <article class={['post-card group', featured && 'is-featured']}>
 	<div class="thumb">
 		{#if post.youtubeId}
-			<img src={thumbnailPath(post.youtubeId)} alt="" width="1280" height="720" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+			<VideoThumbnail id={post.youtubeId} {sizes} loading={eager ? 'eager' : 'lazy'} />
 		{:else}
 			<NightScene class="scene" variant="moonrise">
 				<span class="no-video">{m.blog_card_no_video()}</span>
@@ -83,7 +92,7 @@
 		background: var(--color-night);
 	}
 
-	.thumb img,
+	.thumb :global(img),
 	.thumb :global(.scene) {
 		width: 100%;
 		height: 100%;
@@ -91,7 +100,7 @@
 		transition: scale 500ms ease;
 	}
 
-	.post-card:hover .thumb img,
+	.post-card:hover .thumb :global(img),
 	.post-card:hover .thumb :global(.scene) {
 		scale: 1.03;
 	}

@@ -1,4 +1,5 @@
-import { THUMBNAIL_CANDIDATES, VIDEO_ID_PATTERN } from './thumbnail.ts';
+import type { default as Sharp } from 'sharp';
+import { THUMBNAIL_CANDIDATES, VIDEO_ID_PATTERN, type ThumbnailFormat } from './thumbnail.ts';
 
 /** Dark 16×9 JPEG (#18191b) served when YouTube has no thumbnail or is unreachable, so a build never fails on it. */
 const EMPTY_JPEG = Uint8Array.from(
@@ -23,4 +24,22 @@ export async function fetchVideoThumbnail(id: string): Promise<Uint8Array<ArrayB
 		}
 	}
 	return EMPTY_JPEG;
+}
+
+// One download per video per build, shared by all of its variants
+const originals = new Map<string, Promise<Uint8Array<ArrayBuffer>>>();
+
+// sharp is a native Node module: it only runs in the prerender step (Node) and in `vite dev`, never in the Worker.
+// The specifier is a variable so neither Vite nor wrangler's bundler pulls it into the Worker bundle.
+const SHARP_MODULE = 'sharp';
+
+/** `id`'s thumbnail cropped to 16:9 (removes the letterbox bars of the 4:3 fallbacks) at `width`, encoded as `format`. */
+export async function renderVideoThumbnail(id: string, width: number, format: ThumbnailFormat): Promise<Uint8Array<ArrayBuffer>> {
+	let original = originals.get(id);
+	if (!original) originals.set(id, (original = fetchVideoThumbnail(id)));
+
+	const { default: sharp } = (await import(/* @vite-ignore */ SHARP_MODULE)) as { default: typeof Sharp };
+	const image = sharp(await original).resize({ width, height: Math.round((width * 9) / 16), fit: 'cover' });
+	const encoded = format === 'avif' ? image.avif({ quality: 50 }) : format === 'webp' ? image.webp({ quality: 75 }) : image.jpeg({ quality: 80, mozjpeg: true });
+	return new Uint8Array(await encoded.toBuffer());
 }

@@ -1,54 +1,82 @@
 /**
- * Original ink shadow figures for ARISE: one hand-drawn hunched silhouette (viewBox 0 0 240 640, the feet are
- * tendrils that run off the bottom edge), reused at different sizes, leans, and mirrors. The ragged ink edge comes
- * from a displacement filter in Arise.svelte.
+ * Shadow soldiers for ARISE: painted ink cutouts (assets/arise-*.webp, masters in docs/art/arise/). Every image is the
+ * same 2:3 canvas with the smoke fading out at the bottom edge, so they share one baseline and scale. `eyes` is the
+ * point between the glowing eyes (0 … 1 of the canvas), where the ignition flare sits.
  */
+import assassin from './assets/arise-assassin.webp';
+import brute from './assets/arise-brute.webp';
+import knight from './assets/arise-knight.webp';
+import mascot from './assets/arise-mascot.webp';
 
-export const FIGURE_VIEWBOX = '0 0 240 640';
+export const CANVAS_ASPECT = 2 / 3;
 
-export const FIGURE_PATH =
-	'M96 30C120 18 146 30 150 58C154 84 144 104 134 112C168 122 196 142 204 176C214 220 206 270 212 330C218 390 226 430 222 470C220 500 210 520 214 560' +
-	'C216 590 206 610 200 640L178 640C182 600 176 560 170 520C166 490 160 470 158 440C154 480 150 540 156 640L120 640C118 590 112 540 104 500' +
-	'C96 540 92 590 86 640L66 640C72 580 70 520 64 470C56 430 48 400 50 360C52 300 58 240 76 190C84 168 96 152 108 140C92 136 74 120 70 96C66 64 76 38 96 30Z';
+type SoldierId = 'knight' | 'brute' | 'assassin' | 'mascot';
 
-export interface Figure {
+const SOLDIERS: Record<SoldierId, { src: string; eyes: { x: number; y: number } }> = {
+	knight: { src: knight, eyes: { x: 0.425, y: 0.114 } },
+	brute: { src: brute, eyes: { x: 0.513, y: 0.198 } },
+	assassin: { src: assassin, eyes: { x: 0.455, y: 0.134 } },
+	mascot: { src: mascot, eyes: { x: 0.487, y: 0.634 } }
+};
+
+export interface Soldier {
+	src: string;
+	eyes: { x: number; y: number };
 	/** Horizontal center in % of the viewport width. */
 	x: number;
-	/** Height in viewport heights. */
+	/** Canvas height in viewport heights. */
 	height: number;
+	/** Back rows are dimmer and rise later. */
+	depth: 0 | 1 | 2;
 	mirror: boolean;
-	/** Lean in degrees (pivot at the feet). */
-	lean: number;
-	/** 0…1 ink density (far figures are paler). */
-	ink: number;
 	/** Rise delay in ms. */
 	delay: number;
-	drops: { x: number; y: number; r: number; dx: number; dy: number }[];
+	/** Smoke puffs curling off the base: offset in % of the figure width, size in % of it, timing in ms. */
+	puffs: { x: number; size: number; delay: number; duration: number; drift: number }[];
 }
 
-export function createFigures(narrow: boolean): Figure[] {
+type Slot = { id: SoldierId; x: number; height: number; depth: 0 | 1 | 2; mirror: boolean };
+
+/** Wide screens: the army fills the right, where the hero has open sky. Narrow: across the bottom. */
+const WIDE: Slot[] = [
+	{ id: 'brute', x: 64, height: 0.8, depth: 1, mirror: false },
+	{ id: 'knight', x: 78, height: 0.92, depth: 2, mirror: false },
+	{ id: 'assassin', x: 91, height: 0.78, depth: 1, mirror: true },
+	{ id: 'mascot', x: 49, height: 0.82, depth: 0, mirror: false }
+];
+
+const NARROW: Slot[] = [
+	{ id: 'brute', x: 18, height: 0.56, depth: 1, mirror: false },
+	{ id: 'knight', x: 52, height: 0.66, depth: 2, mirror: false },
+	{ id: 'assassin', x: 84, height: 0.54, depth: 1, mirror: true },
+	{ id: 'mascot', x: 36, height: 0.58, depth: 0, mirror: false }
+];
+
+/** Rise order: the knight first, then the flanks, the little one last (the punchline). */
+const ORDER: SoldierId[] = ['knight', 'brute', 'assassin', 'mascot'];
+
+export function createSoldiers(narrow: boolean): Soldier[] {
 	const rand = Math.random;
-	const layout = narrow
-		? [
-				{ x: 22, height: 0.5, mirror: false, lean: -4, ink: 0.7 },
-				{ x: 60, height: 0.64, mirror: true, lean: 3, ink: 0.92 },
-				{ x: 90, height: 0.46, mirror: true, lean: 6, ink: 0.6 }
-			]
-		: [
-				{ x: 58, height: 0.78, mirror: false, lean: -6, ink: 0.97 },
-				{ x: 76, height: 0.86, mirror: false, lean: 2, ink: 0.88 },
-				{ x: 91, height: 0.66, mirror: true, lean: 5, ink: 0.72 }
-			];
-	return layout.map((figure, index) => ({
-		...figure,
-		delay: index * 230 + Math.round(rand() * 120),
-		drops: Array.from({ length: 14 }, () => ({
-			// In viewBox units around the silhouette; drift upwards while it dissolves
-			x: Math.round(20 + rand() * 200),
-			y: Math.round(40 + rand() * 520),
-			r: Math.round((1.5 + rand() * (rand() < 0.2 ? 9 : 4)) * 10) / 10,
-			dx: Math.round((rand() - 0.5) * 80),
-			dy: -Math.round(60 + rand() * 180)
+	return (narrow ? NARROW : WIDE).map(({ id, ...slot }) => ({
+		...SOLDIERS[id],
+		...slot,
+		delay: ORDER.indexOf(id) * 260 + Math.round(rand() * 80),
+		puffs: Array.from({ length: 7 }, () => ({
+			x: Math.round(15 + rand() * 70),
+			size: Math.round(22 + rand() * 30),
+			delay: Math.round(rand() * 1400),
+			duration: Math.round(1600 + rand() * 1200),
+			drift: Math.round((rand() - 0.5) * 40)
 		}))
 	}));
+}
+
+/** Preloads and decodes the cutouts, so nothing pops in mid-rise. Resolves after `timeout` ms at the latest. */
+export function preloadSoldiers(timeout = 1500) {
+	const decodes = Object.values(SOLDIERS).map(({ src }) => {
+		const image = new Image();
+		image.src = src;
+		return image.decode().catch(() => {});
+	});
+	return Promise.race([Promise.all(decodes), new Promise((resolve) => setTimeout(resolve, timeout))]);
 }

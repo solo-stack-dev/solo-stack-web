@@ -1,0 +1,54 @@
+{
+	"desktop": {
+		"size": [2560, 1440],
+		"filledPixels": 184815,
+		"frames": [
+			{
+				"file": "scene-hands@2.png",
+				"registration": {
+					"error": 7.8916174018493255,
+					"dx": 0,
+					"dy": 0
+				},
+				"changedPixels": 25280,
+				"changedBoundingRect": [1018, 936, 337, 133]
+			},
+			{
+				"file": "scene-hands@3.png",
+				"registration": {
+					"error": 7.563134758223435,
+					"dx": 0,
+					"dy": 0
+				},
+				"changedPixels": 25350,
+				"changedBoundingRect": [1018, 936, 337, 133]
+			}
+		]
+	},
+	"mobile": {
+		"size": [1080, 2340],
+		"filledPixels": 101115,
+		"frames": [
+			{
+				"file": "scene-mobile-hands@2.png",
+				"registration": {
+					"error": 6.138991389913899,
+					"dx": 1,
+					"dy": 1
+				},
+				"changedPixels": 9067,
+				"changedBoundingRect": [388, 1232, 197, 87]
+			},
+			{
+				"file": "scene-mobile-hands@3.png",
+				"registration": {
+					"error": 6.023985239852398,
+					"dx": 1,
+					"dy": 1
+				},
+				"changedPixels": 9007,
+				"changedBoundingRect": [388, 1232, 197, 87]
+			}
+		]
+	}
+}

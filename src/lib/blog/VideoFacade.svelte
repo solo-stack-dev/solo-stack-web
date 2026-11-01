@@ -1,14 +1,14 @@
 <!--
 	@component
 	YouTube facade for a blog post. Before the click only the self-hosted thumbnail is shown (prerendered by
-	/media/video-thumbnail/[id].jpg, so no request reaches YouTube); the click swaps in a youtube-nocookie iframe with
+	/media/video-thumbnail/[id]/[width].[format], so no request reaches YouTube); the click swaps in a youtube-nocookie iframe with
 	autoplay. `seek(seconds)` (chapter links) starts the player at that time, or seeks the running player through the
 	IFrame API postMessage protocol (no API script needed). Without a `youtubeId` it shows the painted night with a
 	"video follows" note instead.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
-	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
+	import VideoThumbnail from '#lib/home/sections/cinema/VideoThumbnail.svelte';
 	import NightScene from './NightScene.svelte';
 
 	interface Props {
@@ -64,7 +64,8 @@
 		></iframe>
 	{:else if youtubeId}
 		<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} onclick={() => (playing = true)}>
-			<img class="frame thumbnail" src={thumbnailPath(youtubeId)} alt="" width="1280" height="720" decoding="async" fetchpriority="high" />
+			<!-- Post page: max-w-4xl with px-4 (sm: px-8) -->
+			<VideoThumbnail id={youtubeId} class="frame thumbnail" sizes="(min-width: 40rem) min(calc(100vw - 4rem), 52rem), calc(100vw - 2rem)" fetchpriority="high" />
 			<span class="play" aria-hidden="true">
 				<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
 			</span>
@@ -119,12 +120,12 @@
 		cursor: pointer;
 	}
 
-	.thumbnail {
+	.facade :global(.thumbnail) {
 		object-fit: cover;
 		transition: scale 400ms ease;
 	}
 
-	.facade:hover .thumbnail {
+	.facade:hover :global(.thumbnail) {
 		scale: 1.02;
 	}
 

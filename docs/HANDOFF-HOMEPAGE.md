@@ -349,7 +349,7 @@ References in `01-mascot-easter-eggs/` (mascot style there is outdated; use mode
 | Three stars          | Rare at random in the star field, or a game milestone | Three stars align into stacked triangles for a moment                                           | `10-egg-three-stars-desktop.png`            |
 | Shiny mascot         | 1 in 4096 page loads                                  | The mascot appears in a golden variant everywhere on the page, with a tiny sparkle              | model sheet v2 (golden variant)             |
 | Console              | Opening DevTools                                      | ASCII moon, a short message (copy via sol), and a hidden `arise()` function that triggers ARISE | `11-egg-devtools-arise-console-desktop.png` |
-| 404                  | Unknown route                                         | "Domain expansion": the page collapses into an infinite ink void around the lost mascot         | `07-error-404-ink-void-desktop.png`         |
+| 404                  | Unknown route                                         | Replaced 2026-11-01: Hunter x Hunter World Tree at sunrise (`src/lib/errors/WorldTree.svelte`)  | `07-error-404-ink-void-desktop.png`         |
 | 500                  | Server error                                          | A huge faceless giant peeks over a wall at the studio                                           | `08-error-500-giant-at-wall-desktop.png`    |
 | Hidden radio station | Later                                                 | Secret station on the dial                                                                      | to be designed                              |
 

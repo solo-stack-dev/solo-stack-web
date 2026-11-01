@@ -1,0 +1,44 @@
+[
+	{
+		"file": "scene.png",
+		"width": 2560,
+		"height": 1440,
+		"bytes": 8434097,
+		"sha256": "e103effc5ac7431a7307a52a79ddf7a7841b050e7fb186c2df869f6809d15301"
+	},
+	{
+		"file": "scene-mobile.png",
+		"width": 1080,
+		"height": 2340,
+		"bytes": 5460853,
+		"sha256": "545feec7f781bd407761b12f983edc6c8ff5fb8cd1b14d211aa60cf2517f483c"
+	},
+	{
+		"file": "scene-hands@2.png",
+		"width": 2560,
+		"height": 1440,
+		"bytes": 8431422,
+		"sha256": "1bb8a77933d03844ec72950e9e24f496b8d0dceafef67cc17092765ca8ad2a6e"
+	},
+	{
+		"file": "scene-hands@3.png",
+		"width": 2560,
+		"height": 1440,
+		"bytes": 8430294,
+		"sha256": "5056e4b9d35ca5a8e99aef06be2529f98963b235ff3675c26ccf22ad05a592a3"
+	},
+	{
+		"file": "scene-mobile-hands@2.png",
+		"width": 1080,
+		"height": 2340,
+		"bytes": 5460533,
+		"sha256": "ed17d25df673539c37801706e45bb6197495f6f70b7bd3fa0741aa6bf24e2090"
+	},
+	{
+		"file": "scene-mobile-hands@3.png",
+		"width": 1080,
+		"height": 2340,
+		"bytes": 5460662,
+		"sha256": "39eb6106f0f1281f08710f3aed381a51dcc74c139aca295286ebdd398e58a7d3"
+	}
+]

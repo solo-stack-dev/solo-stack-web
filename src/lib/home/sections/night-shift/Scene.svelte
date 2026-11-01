@@ -134,7 +134,7 @@
 				{/if}
 			</div>
 
-			<!-- 2 · sky with the moon, shown only through the two upper glass panes, drifting with the scroll -->
+			<!-- 2 · the moon (from the sky plate), shown only through the glass panes, drifting with the scroll -->
 			<div class="panes" aria-hidden="true" style:mask-image={skyMask}>
 				<div class="sky" style={box(layout.sky.rect)}>
 					<enhanced:img src="./assets/nightshift-window-sky.webp?w=1100;800;550" alt="" loading="lazy" sizes={vw(layout.sky.rect.w)} class="fill" />
@@ -300,16 +300,21 @@
 	}
 
 	/* ── 2 · sky in the glass panes: pointer parallax plus a slow drift with the scroll (the moon sinks as the night goes on) ── */
+	/* the mask isolates .panes, so the blend has to sit here to reach the plate below */
 	.panes {
 		position: absolute;
 		inset: 0;
+		mix-blend-mode: lighten;
 		mask-size: 100% 100%;
 		mask-repeat: no-repeat;
 		pointer-events: none;
 	}
 
+	/* The plate paints its own sky, stars and treetops: only the moon and its glow (a soft circle around it at 33.2 %, 40.7 %
+	   of the sky image) lighten the glass, so the painted trees stay in front where they are brighter. */
 	.sky {
 		position: absolute;
+		mask-image: radial-gradient(ellipse 16.5% 16.5% at 33.2% 40.7%, #000 80%, transparent);
 		translate: calc(var(--px, 0) * 9px) calc(var(--py, 0) * 6px);
 	}
 

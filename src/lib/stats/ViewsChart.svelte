@@ -3,7 +3,6 @@
 	YouTube views per day (LayerChart columns). Loaded lazily by YoutubeSection.
 -->
 <script lang="ts">
-	import { scaleBand } from 'd3-scale';
 	import { BarChart } from 'layerchart';
 	import * as Chart from '#lib/components/ui/chart/index.js';
 	import { m } from '#lib/paraglide/messages.js';
@@ -34,7 +33,7 @@
 		<BarChart
 			data={rows}
 			x="date"
-			xScale={scaleBand().padding(padding)}
+			bandPadding={padding}
 			y="views"
 			series={[{ key: 'views', label: m.stats_youtube_views_series(), color: 'var(--chart-accent)' }]}
 			padding={{ left: 40, bottom: 24, top: 8, right: 20 }}

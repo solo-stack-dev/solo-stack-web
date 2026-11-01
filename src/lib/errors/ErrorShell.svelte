@@ -2,7 +2,7 @@
 	@component
 	Frame shared by every error page: wordmark (home), the 03:00 clock (the one hour the night on the homepage
 	skips), the status in mono, heading, body, the way home, optional retry, and the homepage sections as plain
-	links. The scene (`InkVoid`, `GiantWall`) renders behind via the `scene` snippet.
+	links. The scene (`WorldTree`, `GiantWall`) renders behind via the `scene` snippet.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -19,12 +19,14 @@
 		body: string;
 		/** Show the reload button (server errors). */
 		retry?: boolean;
-		/** `void` (404) or `wall` (500 and everything else): layout and intro timing. */
-		variant: 'void' | 'wall';
+		/** `tree` (404) or `wall` (500 and everything else): layout and intro timing. */
+		variant: 'tree' | 'wall';
 		scene: Snippet;
+		/** Something stuck onto the status digits (the 404's Hunter sticker). */
+		badge?: Snippet;
 	}
 
-	let { status, title, body, retry = false, variant, scene }: Props = $props();
+	let { status, title, body, retry = false, variant, scene, badge }: Props = $props();
 
 	const sectionLabels: Record<SectionId, () => string> = {
 		hero: m.home_nav_section_hero,
@@ -48,7 +50,10 @@
 	</header>
 
 	<main class="panel" aria-labelledby="error-title">
-		<p class="status font-mono tabular-nums" aria-hidden="true" style:--grain="url({grain})">{status}</p>
+		<div class="status-row">
+			<p class="status font-mono tabular-nums" aria-hidden="true" style:--grain="url({grain})">{status}</p>
+			{@render badge?.()}
+		</div>
 		<h1 id="error-title" class="title font-display font-black tracking-wordmark text-balance">
 			<span class="sr-only">{status}</span>
 			{title}
@@ -125,7 +130,10 @@
 
 	/* Panel ---------------------------------------------------------------------------------------------------- */
 
+	/* The panel box overlaps the scene (phones: its top half is transparent), so only its children take clicks and the
+	   interactive parts of the scene stay reachable. */
 	.panel {
+		pointer-events: none;
 		position: relative;
 		z-index: 2;
 		align-self: center;
@@ -134,6 +142,14 @@
 		gap: 0;
 		width: min(100%, 36rem);
 		padding: 2rem clamp(1.25rem, 6vw, 6rem) 3rem;
+	}
+
+	.panel > * {
+		pointer-events: auto;
+	}
+
+	.status-row {
+		position: relative;
 	}
 
 	.status {
@@ -281,6 +297,11 @@
 			background: linear-gradient(to bottom, transparent 38svh, rgb(14 15 16 / 0.88) 47svh, var(--color-ink) 60svh);
 		}
 
+		.is-tree .panel {
+			padding-top: 58svh;
+			background: linear-gradient(to bottom, transparent 50svh, rgb(14 15 16 / 0.82) 62svh, var(--color-ink) 78svh);
+		}
+
 		.is-wall .panel {
 			padding-top: 54svh;
 			background: linear-gradient(to bottom, transparent 50svh, rgb(14 15 16 / 0.86) 60svh, var(--color-ink) 76svh);
@@ -320,8 +341,8 @@
 			animation-delay: calc(var(--intro) - 200ms);
 		}
 
-		.is-void {
-			--intro: 1100ms;
+		.is-tree {
+			--intro: 500ms;
 		}
 
 		.is-wall {
@@ -332,7 +353,7 @@
 			--i: 0;
 		}
 
-		.status {
+		.status-row {
 			--i: 1;
 		}
 

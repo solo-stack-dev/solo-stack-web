@@ -4,7 +4,6 @@
 	`total`: one area for all platforms. `platforms`: stacked areas, one color per entity (SERIES_COLOR).
 -->
 <script lang="ts">
-	import { scaleUtc } from 'd3-scale';
 	import { curveMonotoneX } from 'd3-shape';
 	import { AreaChart } from 'layerchart';
 	import * as Chart from '#lib/components/ui/chart/index.js';
@@ -58,7 +57,6 @@
 		<AreaChart
 			data={rows}
 			x="date"
-			xScale={scaleUtc()}
 			{series}
 			seriesLayout={view === 'total' ? 'overlap' : 'stack'}
 			yDomain={view === 'total' ? totalDomain : undefined}

@@ -2,7 +2,18 @@
  * Precomputed geometry for the 500 scene (`GiantWall.svelte`). All layers share one coordinate system: a
  * 1000 × 800 box (`viewBox="0 0 1000 800"`), so separately animated SVGs line up exactly.
  */
-import { mulberry32 } from './void.ts';
+
+/** Small seeded PRNG, so the stones and dust are the same on server and client. */
+export function mulberry32(seed: number) {
+	let a = seed >>> 0;
+	return () => {
+		a = (a + 0x6d2b79f5) >>> 0;
+		let t = a;
+		t = Math.imul(t ^ (t >>> 15), t | 1);
+		t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+}
 
 export const SCENE = { width: 1000, height: 800 } as const;
 export const WALL = { left: 300, right: 1000, top: 392, coping: 14, bottom: 800 } as const;
@@ -71,3 +82,25 @@ export const HANDS = {
 	right: [finger(878, 36, 56, -1, 24), finger(913, 36, 52, 1, 22), finger(948, 32, 40, 3, 16)].join(''),
 	tapper: finger(844, 34, 44, -3, 18)
 } as const;
+
+/** The giant's single eye, on the part of the head that clears the wall. */
+export const EYE = { x: 702, y: 300, rx: 25, ry: 10.5 } as const;
+
+/** Cracks in the wall face, one per knock: from under the fingers down into the stones. */
+export const CRACKS = [
+	'M861 407 L866 428 L857 446 L868 470 L861 494 L872 520 M866 470 L888 482 L896 503',
+	'M650 407 L644 430 L656 452 L641 478 L650 506 L636 538 M656 452 L678 466 L684 490',
+	'M770 407 L762 436 L778 462 L760 494 L776 532 L758 576 L770 618 M778 462 L806 476 L812 506 M760 494 L734 510 L728 540'
+] as const;
+
+/** Dust specks shaken off the coping (positions in % of the scene width, fall and drift in container units). */
+export const DUST = (() => {
+	const random = mulberry32(7);
+	return Array.from({ length: 16 }, () => ({
+		x: Math.round(32 + random() * 66),
+		fall: Math.round(14 + random() * 26),
+		drift: Math.round((random() - 0.5) * 60) / 10,
+		size: Math.round(2 + random() * 3),
+		delay: Math.round(random() * 220)
+	}));
+})();

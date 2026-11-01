@@ -1,7 +1,7 @@
 /**
  * Night shift scene geometry, the single place to re-tune the composition.
  *
- * Source of truth: the coordinate contract in docs/art/night-shift/README.md ("Facing monitor revision": desktop scene
+ * Source of truth: the measurements of the over-the-shoulder repaint in docs/art/night-shift/repaint/ (desktop scene
  * 2560×1440, mobile scene 1080×2340, all in art px) and the crop rects that tools/optimize-art.mjs wrote to ./art.ts. Everything here is
  * authored in art px and exported as percentages (0…100) of each variant's canvas, so the layers, the live monitor
  * and the hotspots stay pixel-registered at every size.
@@ -123,90 +123,93 @@ function screen(canvas: Canvas, corners: [number, number][], inset: number): Qua
 
 /** Bonsai pot: center of its baseline on the desktop prop canvas (both tree states share the pot). */
 const POT: [number, number] = [2303, 1090];
+/** Handheld: the cropped prop's center on the desktop prop canvas. */
+const CONSOLE: [number, number] = [313, 1175];
 
-// ── Desktop 2560×1440 ───────────────────────────────────────────────────────────────────────────────────────────
+/** Maps a prop canvas point `from` to `to` on a scene canvas at `scale`. */
+const anchor = (from: [number, number], to: [number, number], scale: number): Transform => ({ scale, x: to[0] - from[0] * scale, y: to[1] - from[1] * scale });
+
+// ── Desktop 2560×1440: over-the-shoulder repaint (docs/art/night-shift/repaint/NOTES.md, measurements.json) ──────────
 const D: Canvas = { width: 2560, height: 1440 };
-/** The pot's feet would hover at the back edge of the pedestal book on the scene plate; 18 px lower they stand on it. */
-const BONSAI_ON_DESKTOP: Transform = { scale: 1, x: 0, y: 18 };
+/** The props were painted for the old, closer room: 0.8 matches the repaint's scale (mug rim 134 vs 171 px). */
+const BONSAI_ON_DESKTOP = anchor(POT, [2420, 850], 0.8);
+const HANDHELD_ON_DESKTOP = anchor(CONSOLE, [370, 1180], 0.8);
 
 export const desktop: SceneLayout = {
 	canvas: D,
 	focal: { x: 0.55, y: 0.6 },
 	monitor: {
+		// left edge is nearer the camera (the screen turns slightly toward the typist)
 		quad: screen(
 			D,
 			[
-				[603, 600],
-				[1247, 474],
-				[1282, 927],
-				[626, 898]
+				[799, 525],
+				[1400, 513],
+				[1400, 797],
+				[799, 855]
 			],
 			10
 		),
-		// the screen's mid lines measure ≈ 656×375 art px; the box keeps that aspect
-		box: { width: 520, height: 296 },
+		// the screen's mid lines measure ≈ 601×307 art px; the box keeps that aspect and fits a page plus the prompt
+		box: { width: 540, height: 276 },
 		fontSize: 18,
-		padding: 26
+		padding: 24
 	},
-	// hair, headphones, back and arms down to the hands on the keys (the chair excluded)
-	mascot: rectPct(D, 1060, 300, 900, 770),
-	// upper glass down to the monitor's top edge (the turned screen now covers the panes' lower part)
-	window: rectPct(D, 536, 11, 582, 533),
+	// head, headphones, back and both arms down to the hands on the keys (the chair excluded)
+	mascot: rectPct(D, 1018, 230, 1160, 1082),
+	window: rectPct(D, 420, 0, 1080, 480),
 	sky: {
-		rect: rectPct(D, 430, -100, 1100, 1100),
-		// README "facing monitor" pane clips, their lower edges run 1 px above the turned monitor's bezel (the README's
-		// left a 5–6 px strip of moonless plate glass above it)
+		// moon (at 33.2 %, 40.7 % of the sky plate) in the upper left pane, right of the heading and above the treetops
+		rect: rectPct(D, 523, -211, 985, 985),
 		panes: [
 			[
-				[538, 11],
-				[943, 106],
-				[943, 518],
-				[796, 544],
-				[536, 508]
+				[72, 0],
+				[1058, 0],
+				[1058, 498],
+				[769, 506],
+				[768, 758],
+				[91, 811],
+				[72, 758]
 			],
 			[
-				[969, 113],
-				[1116, 153],
-				[1118, 487],
-				[968, 513]
+				[1147, 0],
+				[1664, 0],
+				[1664, 231],
+				[1550, 330],
+				[1520, 500],
+				[1419, 496],
+				[1147, 501]
 			]
 		].map((pane) => pane.map((point) => pointPct(D, point as [number, number])))
 	},
 	// center of the shade's lit opening
-	lamp: { ...pointPct(D, [318, 624]), radius: 16 },
-	// mug rim [355, 951, 171, 34], steam origin (438, 964): the wisps rise from the bottom center of this box
-	steam: rectPct(D, 355, 626, 166, 338),
+	lamp: { ...pointPct(D, [358, 622]), radius: 14 },
+	// mug rim [501, 860, 134, 30], steam origin (568, 873): the wisps rise from the bottom center of this box
+	steam: rectPct(D, 503, 609, 130, 264),
 	bonsai: at(D, POT, BONSAI_ON_DESKTOP),
 	props: {
 		bonsai: place(D, PROPS.bonsai, BONSAI_ON_DESKTOP),
 		golden: place(D, PROPS.golden, BONSAI_ON_DESKTOP),
-		handheld: place(D, PROPS.handheld),
-		foreground: place(D, PROPS.foreground)
+		handheld: place(D, PROPS.handheld, HANDHELD_ON_DESKTOP)
 	},
 	sheet: sheetPct(SCENES.desktop),
 	hands: hands(SCENES.desktop),
 	spots: [
-		{
-			id: 'window',
-			// upper panes, stopping at the turned monitor's top edge
-			rect: rectPct(D, 536, 11, 582, 533),
-			glow: rectPct(D, 545, 60, 500, 490),
-			tip: { x: 45, y: 38 }
-		},
-		// README "facing monitor revision" rects (art px); the bonsai's includes the grown golden canopy
-		{ id: 'coffee', rect: rectPct(D, 294, 948, 255, 195) },
-		{ id: 'handheld', rect: rectPct(D, 126, 1082, 375, 187), tip: { x: 30, y: 4 }, tipAlign: 'start' },
-		{ id: 'manga', rect: rectPct(D, 1940, 200, 620, 355), tip: { x: 45, y: 8 }, tipAlign: 'end' },
-		{ id: 'bonsai', rect: rectPct(D, 2020, 678, 506, 418), tip: { x: 50, y: 10 }, tipAlign: 'end' },
-		{ id: 'dumbbells', rect: rectPct(D, 1858, 1212, 395, 182) }
+		// upper panes above the monitor, left of the head
+		{ id: 'window', rect: rectPct(D, 420, 0, 1080, 480), tip: { x: 45, y: 60 } },
+		{ id: 'coffee', rect: rectPct(D, 452, 856, 201, 190) },
+		{ id: 'handheld', rect: rectPct(D, 210, 1095, 330, 170), tip: { x: 30, y: 4 }, tipAlign: 'start' },
+		{ id: 'manga', rect: rectPct(D, 2025, 0, 535, 475), tip: { x: 45, y: 40 }, tipAlign: 'end' },
+		// pedestal book plus the grown golden canopy
+		{ id: 'bonsai', rect: rectPct(D, 2270, 500, 290, 400), tip: { x: 50, y: 10 }, tipAlign: 'end' },
+		{ id: 'dumbbells', rect: rectPct(D, 2270, 1190, 290, 218), tipAlign: 'end' }
 	]
 };
 
-// ── Mobile 1080×2340: dedicated portrait scene; the desktop props are reused with the README's affine maps ────────
+// ── Mobile 1080×2340: dedicated portrait repaint; the desktop props are reused, anchored on its own measurements ───
 const M: Canvas = { width: 1080, height: 2340 };
-/** README map (0.6, -435, 855), nudged 24 px right and 6 px down so both feet of the pot stand on the right-hand book. */
-const BONSAI_TO_MOBILE: Transform = { scale: 0.6, x: -411, y: 861 };
-const HANDHELD_TO_MOBILE: Transform = { scale: 0.8, x: 40, y: 650 };
+const BONSAI_TO_MOBILE = anchor(POT, [995, 1141], 0.4);
+const HANDHELD_TO_MOBILE = anchor(CONSOLE, [190, 1400], 0.4);
 
 export const mobile: SceneLayout = {
 	canvas: M,
@@ -215,54 +218,55 @@ export const mobile: SceneLayout = {
 		quad: screen(
 			M,
 			[
-				[93, 1012],
-				[536, 952],
-				[567, 1294],
-				[117, 1270]
+				[160, 945],
+				[609, 928],
+				[607, 1140],
+				[160, 1184]
 			],
-			7
+			6
 		),
-		// the screen's mid lines measure ≈ 448×300 art px; 216 px tall fits a full page plus the prompt (≈ 7% taller glyphs)
-		box: { width: 300, height: 216 },
-		fontSize: 16,
-		padding: 14
+		// the screen's mid lines measure ≈ 448×226 art px; 174 px tall fits a full page plus the prompt
+		box: { width: 344, height: 174 },
+		fontSize: 13,
+		padding: 10
 	},
-	mascot: rectPct(M, 390, 870, 650, 580),
-	window: rectPct(M, 46, 0, 434, 700),
+	mascot: rectPct(M, 388, 895, 614, 572),
+	window: rectPct(M, 60, 20, 662, 700),
 	sky: {
-		// README rest rect is (-65, 10); raised 50 px so the scroll drift never uncovers the panes' top edge
-		rect: rectPct(M, -65, -40, 800, 800),
+		// moon in the upper right pane, above the treetops
+		rect: rectPct(M, 289, -89, 833, 833),
 		panes: [
 			[
-				[46, 0],
-				[76, 0],
-				[349, 133],
-				[349, 663],
-				[46, 586]
+				[60, 15],
+				[357, 61],
+				[357, 931],
+				[150, 940],
+				[150, 1047],
+				[60, 1060]
 			],
 			[
-				[371, 145],
-				[480, 197],
-				[480, 700],
-				[371, 672]
+				[411, 66],
+				[722, 119],
+				[722, 897],
+				[612, 923],
+				[411, 932]
 			]
 		].map((pane) => pane.map((point) => pointPct(M, point as [number, number])))
 	},
-	lamp: { ...pointPct(M, [194, 909]), radius: 30 },
-	// mug rim [105, 1371, 126, 25], steam origin (169, 1380)
-	steam: rectPct(M, 109, 1169, 120, 211),
+	lamp: { ...pointPct(M, [172, 882]), radius: 26 },
+	// mug rim [79, 1212, 68, 22], steam origin (112, 1223)
+	steam: rectPct(M, 80, 1103, 66, 120),
 	bonsai: at(M, POT, BONSAI_TO_MOBILE),
 	props: { bonsai: place(M, PROPS.bonsai, BONSAI_TO_MOBILE), golden: place(M, PROPS.golden, BONSAI_TO_MOBILE), handheld: place(M, PROPS.handheld, HANDHELD_TO_MOBILE) },
 	sheet: sheetPct(SCENES.mobile),
 	hands: hands(SCENES.mobile),
 	spots: [
-		{ id: 'window', rect: rectPct(M, 46, 0, 434, 700), glow: rectPct(M, 10, 95, 380, 380), tip: { x: 45, y: 55 } },
-		{ id: 'manga', rect: rectPct(M, 760, 420, 320, 280), tip: { x: 45, y: 10 }, tipAlign: 'end' },
-		{ id: 'coffee', rect: rectPct(M, 60, 1368, 186, 155), tipAlign: 'start' },
-		{ id: 'handheld', rect: rectPct(M, 140, 1515, 301, 151) },
-		// README rect, includes the golden canopy; the dot sits on the trunk (x ≈ 971 with the nudge)
-		{ id: 'bonsai', rect: rectPct(M, 775, 1260, 305, 255), tip: { x: 45, y: 0 }, tipAlign: 'end', dot: { x: 63, y: 50 } },
-		{ id: 'dumbbells', rect: rectPct(M, 605, 2005, 475, 245) }
+		{ id: 'window', rect: rectPct(M, 60, 20, 662, 700), tip: { x: 50, y: 50 } },
+		{ id: 'manga', rect: rectPct(M, 872, 300, 208, 514), tip: { x: 45, y: 10 }, tipAlign: 'end' },
+		{ id: 'coffee', rect: rectPct(M, 40, 1190, 140, 150), tipAlign: 'start' },
+		{ id: 'handheld', rect: rectPct(M, 90, 1340, 200, 120), tipAlign: 'start' },
+		{ id: 'bonsai', rect: rectPct(M, 900, 950, 180, 220), tip: { x: 45, y: 0 }, tipAlign: 'end' },
+		{ id: 'dumbbells', rect: rectPct(M, 670, 2006, 370, 285), tipAlign: 'end' }
 	]
 };
 

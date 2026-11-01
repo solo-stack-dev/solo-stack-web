@@ -1,0 +1,92 @@
+{
+	"desktop": {
+		"files": [
+			{
+				"file": "scene.png",
+				"size": [2560, 1440],
+				"screenPixels": 184530,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 0,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": null
+			},
+			{
+				"file": "scene-hands@2.png",
+				"size": [2560, 1440],
+				"screenPixels": 184530,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 25280,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": [1018, 936, 337, 133]
+			},
+			{
+				"file": "scene-hands@3.png",
+				"size": [2560, 1440],
+				"screenPixels": 184530,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 25350,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": [1018, 936, 337, 133]
+			}
+		],
+		"flatScreenConnectedComponent": {
+			"pixels": 184815,
+			"bounds": [799, 513, 602, 342]
+		},
+		"handsRect": [1018, 936, 402, 170]
+	},
+	"mobile": {
+		"files": [
+			{
+				"file": "scene-mobile.png",
+				"size": [1080, 2340],
+				"screenPixels": 101112,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 0,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": null
+			},
+			{
+				"file": "scene-mobile-hands@2.png",
+				"size": [1080, 2340],
+				"screenPixels": 101112,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 9067,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": [388, 1232, 197, 87]
+			},
+			{
+				"file": "scene-mobile-hands@3.png",
+				"size": [1080, 2340],
+				"screenPixels": 101112,
+				"screenErrors": 0,
+				"pureBlack": 0,
+				"pureWhite": 0,
+				"changedPixels": 9007,
+				"outsideHands": 0,
+				"outsideFingerMask": 0,
+				"changedBounds": [388, 1232, 197, 87]
+			}
+		],
+		"flatScreenConnectedComponent": {
+			"pixels": 101115,
+			"bounds": [160, 928, 450, 256]
+		},
+		"handsRect": [388, 1232, 216, 113]
+	}
+}

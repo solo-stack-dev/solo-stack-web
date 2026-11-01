@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import type { Component } from 'svelte';
 import { m } from '#lib/paraglide/messages.js';
 import { getLocale, localizeHref, type Locale } from '#lib/paraglide/runtime.js';
@@ -6,9 +7,10 @@ import type { PostFormat } from './schema.ts';
 /** The rendered Markdown body of every post, one lazy chunk each. */
 const bodies = import.meta.glob<{ default: Component }>('/src/content/blog/*.md');
 
+/** Body of a post. Unknown slugs are a 404 like in `getPost`, which this races against in `Promise.all`. */
 export async function loadPostBody(slug: string): Promise<Component> {
 	const load = bodies[`/src/content/blog/${slug}.md`];
-	if (!load) throw new Error(`No post body for ${slug}`);
+	if (!load) error(404);
 	return (await load()).default;
 }
 

@@ -20,7 +20,7 @@
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { CINEMA_LAYOUT, beamMask, placeVars } from './layout.ts';
-	import { thumbnailPath } from './thumbnail.ts';
+	import VideoThumbnail from './VideoThumbnail.svelte';
 
 	const latest = $derived(await getLatestVideo());
 
@@ -133,16 +133,8 @@
 			{:else if video}
 				<button type="button" class="facade" aria-label={m.home_cinema_play_label({ title: video.title })} onclick={play}>
 					{#if !thumbnailFailed}
-						<img
-							class="thumbnail"
-							src={thumbnailPath(video.id)}
-							alt=""
-							width="1280"
-							height="720"
-							loading="lazy"
-							decoding="async"
-							onerror={() => (thumbnailFailed = true)}
-						/>
+						<!-- The window is 1344/2560 of the stage on desktop, 907/1080 on mobile (./layout.ts) -->
+						<VideoThumbnail id={video.id} class="thumbnail" sizes="(min-width: 48rem) 53vw, 84vw" loading="lazy" onerror={() => (thumbnailFailed = true)} />
 					{/if}
 					<span class="moon" aria-hidden="true"><span class="moon-play"></span></span>
 				</button>
@@ -379,7 +371,7 @@
 
 	.player,
 	.facade,
-	.thumbnail,
+	.facade :global(.thumbnail),
 	.empty {
 		display: block;
 		width: 100%;
@@ -398,8 +390,8 @@
 		outline-offset: -6px;
 	}
 
-	.thumbnail {
-		/* hqdefault fallbacks are 4:3 with letterbox bars: cover crops them away */
+	.facade :global(.thumbnail) {
+		/* The variants are already cropped to 16:9; cover only guards against rounding */
 		object-fit: cover;
 	}
 
