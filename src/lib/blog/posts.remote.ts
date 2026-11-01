@@ -2,6 +2,7 @@ import { dev } from '$app/env';
 import { prerender } from '$app/server';
 import { error } from '@sveltejs/kit';
 import * as v from 'valibot';
+import { outlineOf } from './outline.ts';
 import { PostFrontmatterSchema, type Post, type PostSummary } from './schema.ts';
 
 /*
@@ -34,7 +35,8 @@ function loadAll(): Post[] {
 		}
 		const file = path.split('/').pop()!.replace(/\.md$/, '');
 		if (result.output.slug !== file) throw new Error(`Slug "${result.output.slug}" does not match the file name ${path}`);
-		return { ...result.output, readingMinutes: countReadingMinutes(sources[path] ?? '') };
+		const source = sources[path] ?? '';
+		return { ...result.output, readingMinutes: countReadingMinutes(source), outline: outlineOf(source) };
 	});
 }
 

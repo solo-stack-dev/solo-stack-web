@@ -1,8 +1,9 @@
 <!--
 	@component
 	The total follower curve of the period, painted as a landscape: the line is a hill ridge (ink on paper, moonlit rim
-	at night) that ends on a cliff, like the laptop cliff of the Nachtstudio banner, and the painted moon rises beyond
-	it. A faint second ridge behind adds depth. Hover or drag to read a day. Plain SVG, no chart library; the edges
+	at night) that ends on a cliff, like the laptop cliff of the Nachtstudio banner, and runs into the painted moon
+	beyond it at the moon's middle. The whole picture spans the page's content column, the moon closes it on the right.
+	A faint second ridge behind adds depth. Hover or drag to read a day. Plain SVG, no chart library; the edges
 	bleed through one cheap turbulence filter. Screen readers get the numbers from the table in Horizon.
 -->
 <script lang="ts">
@@ -24,40 +25,41 @@
 	const id = $props.id();
 
 	const geometry = $derived.by(() => {
-		const w = Math.max(320, width);
+		const w = Math.max(280, width);
 		const h = Math.max(160, height);
 		const narrow = w < 640;
-		const endX = w * (narrow ? 0.68 : 0.8);
+		// The moon closes the content column on the right, so the chart spans exactly the text column: the curve starts at
+		// its left edge and runs into the moon's left limb at the moon's vertical middle.
+		const moonSize = Math.round(Math.min(narrow ? 112 : 220, h * 0.62, w * 0.3));
+		const endX = w - moonSize - 2;
 		const min = Math.min(...values);
 		const max = Math.max(...values);
 		const span = max - min || 1;
-		const top = h * 0.14;
-		const bottom = h * 0.72;
+		// Room above for the upper half of the moon when the period ends on its high
+		const top = Math.max(h * 0.2, moonSize * 0.42);
+		const bottom = h * 0.78;
 		const last = values.length - 1 || 1;
 		const points = values.map((value, index) => [(index / last) * endX, bottom - ((value - min) / span) * (bottom - top)] as [number, number]);
-		// Let the ridge start just outside the left edge, so it reads as a landscape and not as a chart box.
-		points[0] = [-4, points[0][1]];
 		const ridge = d3line().curve(curveMonotoneX)(points) ?? '';
 		const [ex, ey] = points[points.length - 1];
-		// The cliff: a short flat ledge, then a steep, slightly undercut drop to the ground.
-		const cliff = `L${ex + 10} ${ey + 1}C${ex + 20} ${ey + 4} ${ex + 14} ${ey + h * 0.2} ${ex + 26} ${ey + h * 0.32}S${ex + 30} ${h * 0.9} ${ex + 48} ${h + 2}`;
-		const body = `${ridge}${cliff}L-4 ${h + 2}Z`;
+		// The cliff below today: a steep, slightly undercut drop that stays left of the moon.
+		const cliff = `C${ex + 3} ${ey + h * 0.12} ${ex - 8} ${ey + h * 0.22} ${ex - 4} ${ey + h * 0.36}S${ex - 2} ${h * 0.9} ${ex + 2} ${h + 2}`;
+		const body = `${ridge}${cliff}L0 ${h + 2}Z`;
 
-		// A distant ridge behind: the same curve, flattened and lifted, running on past the cliff.
-		const far = points.map(([x, y]) => [x * 1.12 - 30, top * 0.6 + (y - top) * 0.55] as [number, number]);
-		far.push([w + 10, far[far.length - 1][1] + h * 0.18]);
+		// A distant ridge behind: the same curve, flattened and lifted, running on below the moon to the right edge.
+		const far = points.map(([x, y]) => [x * 1.06, top * 0.5 + (y - top) * 0.55] as [number, number]);
+		far.push([w, far[far.length - 1][1] + h * 0.22]);
 		const farRidge = d3line().curve(curveMonotoneX)(far) ?? '';
 
-		const moonSize = Math.round(Math.min(narrow ? 120 : 230, h * 0.62, (w - ex) * (narrow ? 0.95 : 0.9)));
 		return {
 			w,
 			h,
 			points,
 			ridge,
 			body,
-			far: `${farRidge}L${w + 10} ${h + 2}L-30 ${h + 2}Z`,
+			far: `${farRidge}L${w} ${h + 2}L0 ${h + 2}Z`,
 			end: [ex, ey] as const,
-			moon: { size: moonSize, x: Math.min(w - moonSize / 2 - 8, ex + moonSize * 0.62), y: Math.max(moonSize / 2 + 4, ey - moonSize * 0.42) }
+			moon: { size: moonSize, x: ex + 2 + moonSize / 2, y: ey }
 		};
 	});
 
@@ -91,7 +93,7 @@
 		style:width="{geometry.moon.size}px"
 		style:height="{geometry.moon.size}px"
 	>
-		<enhanced:img src={moon} alt="" sizes="(min-width: 640px) 230px, 120px" class="size-full" fetchpriority="high" />
+		<enhanced:img src={moon} alt="" sizes="(min-width: 640px) 220px, 112px" class="size-full" fetchpriority="high" />
 	</div>
 
 	<svg viewBox="0 0 {geometry.w} {geometry.h}" width={geometry.w} height={geometry.h} class="absolute inset-0 size-full overflow-visible">
@@ -105,14 +107,26 @@
 				<stop offset="0.55" stop-color="var(--ridge-mid)" stop-opacity="var(--ridge-mid-alpha)" />
 				<stop offset="1" stop-color="var(--background)" stop-opacity="1" />
 			</linearGradient>
+			<!-- The land fades in from the left edge of the column, so it reads as a landscape and not as a chart box -->
+			<linearGradient id="fade-{id}" x1="0" y1="0" x2="1" y2="0">
+				<stop offset="0" stop-color="#fff" stop-opacity="0" />
+				<stop offset="0.12" stop-color="#fff" stop-opacity="1" />
+				<stop offset="0.9" stop-color="#fff" stop-opacity="1" />
+				<stop offset="1" stop-color="#fff" stop-opacity="0.4" />
+			</linearGradient>
+			<mask id="land-{id}" maskUnits="userSpaceOnUse" x="-20" y="-20" width={geometry.w + 40} height={geometry.h + 40}>
+				<rect x="-20" y="-20" width={geometry.w + 40} height={geometry.h + 40} fill="url(#fade-{id})" />
+			</mask>
 			<linearGradient id="far-{id}" x1="0" y1="0" x2="0" y2="1">
 				<stop offset="0" stop-color="var(--ridge-far)" stop-opacity="var(--ridge-far-alpha)" />
 				<stop offset="0.7" stop-color="var(--background)" stop-opacity="0" />
 			</linearGradient>
 		</defs>
 
-		<path d={geometry.far} fill="url(#far-{id})" filter="url(#bleed-{id})" />
-		<path d={geometry.body} fill="url(#body-{id})" filter="url(#bleed-{id})" />
+		<g mask="url(#land-{id})">
+			<path d={geometry.far} fill="url(#far-{id})" filter="url(#bleed-{id})" />
+			<path d={geometry.body} fill="url(#body-{id})" filter="url(#bleed-{id})" />
+		</g>
 		<!-- Rim light on the ridge (a soft wide stroke) and the ink line on top -->
 		{#key values.length}
 			<path d={geometry.ridge} fill="none" stroke="var(--ridge-rim)" stroke-width="10" stroke-opacity="var(--ridge-rim-alpha)" stroke-linecap="round" class="rim" />
@@ -128,7 +142,7 @@
 		<circle cx={geometry.end[0]} cy={geometry.end[1]} r="4.5" fill="var(--color-butter)" stroke="var(--ridge-line)" stroke-width="1.5" />
 	</svg>
 
-	<span class="absolute bottom-3 left-4 font-mono text-[0.7rem] text-muted-foreground sm:left-6 lg:left-8">{formatDay(dates[0])}</span>
+	<span class="absolute bottom-3 left-0 font-mono text-[0.7rem] text-muted-foreground">{formatDay(dates[0])}</span>
 	<span class="absolute bottom-3 font-mono text-[0.7rem] text-muted-foreground" style:left="{geometry.end[0] - 4}px" style:transform="translateX(-100%)"
 		>{formatDay(dates[dates.length - 1])}</span
 	>

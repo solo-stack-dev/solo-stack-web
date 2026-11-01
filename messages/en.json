@@ -175,6 +175,7 @@
 	"blog_video_placeholder_title": "Video coming soon",
 	"blog_video_placeholder_body": "The video for this article is coming soon to Solo Stack on YouTube.",
 	"blog_summary_title": "Summary",
+	"blog_toc_title": "In this article",
 	"blog_chapters_title": "Chapters",
 	"blog_chapter_seek": "Jump to {time} in the video: {title}",
 	"blog_takeaways_title": "Key takeaways",

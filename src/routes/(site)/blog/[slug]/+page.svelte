@@ -6,6 +6,8 @@
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
 	import { getPost } from '#lib/blog/posts.remote.ts';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
+	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
+	import StarField from '#lib/home/shared/StarField.svelte';
 	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
 	import { YOUTUBE_CHANNEL_URL } from '#lib/home/data/socials.ts';
 	import { m } from '#lib/paraglide/messages.js';
@@ -71,6 +73,26 @@
 		return graph([{ ...blogPosting, video: { '@id': videoObject['@id'] } }, videoObject]);
 	});
 
+	/** Lit part of a moon in a 16×16 box (light from the right), `lit` 0…1: crescent → half → full. */
+	function phase(lit: number) {
+		const rx = Math.abs(1 - 2 * lit) * 6.6;
+		return `M8 1.4A6.6 6.6 0 0 1 8 14.6A${rx.toFixed(2)} 6.6 0 0 ${lit < 0.5 ? 0 : 1} 8 1.4Z`;
+	}
+
+	// Table of contents: the section whose heading last crossed the upper third of the viewport is the current one.
+	let current = $state<string | null>(null);
+	$effect(() => {
+		const headings = post.outline.map(({ id }) => document.getElementById(id)).filter((heading) => heading !== null);
+		if (!headings.length) return;
+		const update = () => {
+			const line = innerHeight * 0.33;
+			current = headings.findLast((heading) => heading.getBoundingClientRect().top < line)?.id ?? null;
+		};
+		const observer = new IntersectionObserver(update, { rootMargin: '0px 0px -67% 0px' });
+		for (const heading of headings) observer.observe(heading);
+		return () => observer.disconnect();
+	});
+
 	function seek(event: MouseEvent, seconds: number) {
 		if (!video || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
 		event.preventDefault();
@@ -105,132 +127,175 @@
 	{@html jsonLdScript(structuredData)}
 </svelte:head>
 
-<article class="post" lang={post.lang}>
-	<header class="mx-auto max-w-3xl px-4 pt-8 sm:px-8 sm:pt-12">
-		<a
-			href={localizeHref('/blog')}
-			class="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-		>
-			<ArrowLeftIcon class="size-4" aria-hidden="true" />
-			{m.blog_post_back()}
-		</a>
+<!-- Reading progress: a butter hairline under the navbar, driven by a CSS scroll timeline (no JS; absent where unsupported) -->
+<div class="progress" aria-hidden="true"></div>
 
-		<p class="meta mt-6">
-			<span class="format">{FORMAT_LABELS[post.format]()}</span>
-			<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
-			<span aria-hidden="true">·</span>
-			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-		</p>
-		<h1 class="mt-4 font-display text-4xl leading-tight font-black tracking-tight text-balance sm:text-5xl">{post.title}</h1>
-		{#if post.tags.length}
-			<ul class="mt-5 flex flex-wrap gap-2" aria-label={m.blog_tags_label()}>
-				{#each post.tags as tag, index (index)}
-					<li class="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{tag}</li>
-				{/each}
-			</ul>
-		{/if}
-	</header>
-
-	<div class="mx-auto mt-8 max-w-4xl px-4 sm:mt-10 sm:px-8">
-		<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} />
-		{#if watchUrl}
-			<p class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
-				<span>{m.blog_video_privacy_note()}</span>
-				<a href={watchUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-1 font-medium text-foreground hover:underline">
-					{m.blog_video_youtube_link()}
-					<ArrowUpRightIcon class="size-3.5" aria-hidden="true" />
-				</a>
-			</p>
-		{/if}
-	</div>
-
-	<div class="mx-auto grid max-w-3xl gap-12 px-4 pt-12 pb-20 sm:px-8">
-		{#if post.summary}
-			<section aria-labelledby="summary-title" class="summary">
-				<h2 id="summary-title" class="eyebrow">{m.blog_summary_title()}</h2>
-				<p class="mt-3 text-lg leading-relaxed text-pretty">{post.summary}</p>
-			</section>
-		{/if}
-
-		{#if post.chapters.length}
-			<section aria-labelledby="chapters-title">
-				<h2 id="chapters-title" class="section-title">{m.blog_chapters_title()}</h2>
-				<ol class="chapters mt-4">
-					{#each post.chapters as chapter, index (index)}
-						{@const time = formatTimestamp(chapter.start)}
-						<li>
-							<a
-								href={watchUrl ? `${watchUrl}&t=${chapter.start}s` : undefined}
-								aria-label={m.blog_chapter_seek({ time, title: chapter.title })}
-								onclick={(event) => seek(event, chapter.start)}
-							>
-								<span class="time">{time}</span>
-								<span>{chapter.title}</span>
-							</a>
-						</li>
-					{/each}
-				</ol>
-			</section>
-		{/if}
-
-		{#if post.takeaways.length}
-			<section aria-labelledby="takeaways-title">
-				<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
-				<ul class="takeaways mt-4">
-					{#each post.takeaways as takeaway, index (index)}
-						<li>{takeaway}</li>
-					{/each}
-				</ul>
-			</section>
-		{/if}
-
-		<div class="prose-post">
-			<Body />
+<article class="post" lang={post.lang} style:--bloom="url({bloom.img.src})">
+	<div class="relative isolate">
+		<!-- Night sky over the header, only in the dark theme (like /stats and the blog index) -->
+		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
+			<StarField density={0.45} brightness={0.65} seed={71} />
 		</div>
 
-		{#if post.transcript.length}
-			<section aria-labelledby="transcript-title">
-				<h2 id="transcript-title" class="section-title">{m.blog_transcript_title()}</h2>
-				<details class="transcript mt-4">
-					<summary>
-						<span>{m.blog_transcript_show()}</span>
-						<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
-					</summary>
-					<div class="transcript-body">
-						{#each post.transcript as segment, index (index)}
-							<p>
-								{#if watchUrl}
-									<a href={`${watchUrl}&t=${segment.start}s`} class="time" onclick={(event) => seek(event, segment.start)}>{formatTimestamp(segment.start)}</a>
-								{/if}
-								{segment.text}
-							</p>
-						{/each}
-					</div>
-				</details>
-			</section>
-		{/if}
+		<header class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8">
+			<a
+				href={localizeHref('/blog')}
+				class="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+			>
+				<ArrowLeftIcon class="size-4" aria-hidden="true" />
+				{m.blog_post_back()}
+			</a>
 
-		{#if post.links.length}
-			<section aria-labelledby="links-title">
-				<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
-				<ul class="links mt-4">
-					{#each post.links as link, index (index)}
-						<li>
-							<a href={link.url} target="_blank" rel="noopener">
-								<span>{link.label}</span>
-								<span class="host">{new URL(link.url).host.replace(/^www\./, '')}{new URL(link.url).pathname.replace(/\/$/, '')}</span>
-								<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" />
-							</a>
-						</li>
+			<p class="meta mt-8">
+				<span class="format">{FORMAT_LABELS[post.format]()}</span>
+				<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
+				<span aria-hidden="true">·</span>
+				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+			</p>
+			<h1 class="headline mt-5 max-w-4xl font-display font-black tracking-wordmark text-balance">{post.title}</h1>
+			{#if post.tags.length}
+				<ul class="mt-6 flex flex-wrap gap-2" aria-label={m.blog_tags_label()}>
+					{#each post.tags as tag, index (index)}
+						<li class="rounded-full bg-foreground/[0.06] px-3 py-1 text-xs text-muted-foreground ring-1 ring-foreground/10 ring-inset">{tag}</li>
 					{/each}
 				</ul>
-			</section>
-		{/if}
+			{/if}
+		</header>
 
-		<p class="generated">
-			<span class="moon" aria-hidden="true"></span>
-			{m.blog_generated_note({ model: post.generatedBy })}
-		</p>
+		<div class="mx-auto mt-10 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
+			<div class="stage">
+				<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} />
+			</div>
+			{#if watchUrl}
+				<p class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
+					<span>{m.blog_video_privacy_note()}</span>
+					<a href={watchUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-1 font-medium text-foreground hover:underline">
+						{m.blog_video_youtube_link()}
+						<ArrowUpRightIcon class="size-3.5" aria-hidden="true" />
+					</a>
+				</p>
+			{/if}
+		</div>
+	</div>
+
+	<!-- Reading column (about 70 characters per line) beside a sticky table of contents from lg -->
+	<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-14 pb-24 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_15rem] lg:px-8">
+		<div class="grid min-w-0 content-start gap-14">
+			{#if post.summary}
+				<section aria-labelledby="summary-title" class="summary">
+					<h2 id="summary-title" class="stamp">{m.blog_summary_title()}</h2>
+					<p class="mt-4 text-lg leading-relaxed text-pretty sm:text-xl sm:leading-relaxed">{post.summary}</p>
+				</section>
+			{/if}
+
+			{#if post.chapters.length}
+				<section aria-labelledby="chapters-title">
+					<h2 id="chapters-title" class="section-title">{m.blog_chapters_title()}</h2>
+					<ol class="chapters mt-5">
+						{#each post.chapters as chapter, index (index)}
+							{@const time = formatTimestamp(chapter.start)}
+							<li>
+								<a
+									href={watchUrl ? `${watchUrl}&t=${chapter.start}s` : undefined}
+									aria-label={m.blog_chapter_seek({ time, title: chapter.title })}
+									onclick={(event) => seek(event, chapter.start)}
+								>
+									<span class="time">{time}</span>
+									<span>{chapter.title}</span>
+								</a>
+							</li>
+						{/each}
+					</ol>
+				</section>
+			{/if}
+
+			{#if post.takeaways.length}
+				<section aria-labelledby="takeaways-title">
+					<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
+					<!-- The bullets wax from a crescent to the full moon, like the moon phases of the period switch on /stats -->
+					<ul class="takeaways mt-5">
+						{#each post.takeaways as takeaway, index (index)}
+							<li>
+								<svg viewBox="0 0 16 16" class="phase" aria-hidden="true">
+									<circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1" />
+									<path d={phase(post.takeaways.length > 1 ? 0.2 + (0.8 * index) / (post.takeaways.length - 1) : 1)} fill="currentColor" />
+								</svg>
+								{takeaway}
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+
+			<div class="prose-post">
+				<Body />
+			</div>
+
+			{#if post.transcript.length}
+				<section aria-labelledby="transcript-title">
+					<h2 id="transcript-title" class="section-title">{m.blog_transcript_title()}</h2>
+					<details class="transcript mt-5">
+						<summary>
+							<span>{m.blog_transcript_show()}</span>
+							<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
+						</summary>
+						<div class="transcript-body">
+							{#each post.transcript as segment, index (index)}
+								<p>
+									{#if watchUrl}
+										<a href={`${watchUrl}&t=${segment.start}s`} class="time" onclick={(event) => seek(event, segment.start)}>{formatTimestamp(segment.start)}</a>
+									{/if}
+									{segment.text}
+								</p>
+							{/each}
+						</div>
+					</details>
+				</section>
+			{/if}
+
+			{#if post.links.length}
+				<section aria-labelledby="links-title">
+					<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
+					<ul class="links mt-5">
+						{#each post.links as link, index (index)}
+							<li>
+								<a href={link.url} target="_blank" rel="noopener">
+									<span>{link.label}</span>
+									<span class="host">{new URL(link.url).host.replace(/^www\./, '')}{new URL(link.url).pathname.replace(/\/$/, '')}</span>
+									<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" />
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</section>
+			{/if}
+
+			<p class="generated">
+				<span class="moon" aria-hidden="true"></span>
+				{m.blog_generated_note({ model: post.generatedBy })}
+			</p>
+		</div>
+
+		{#if post.outline.length}
+			<aside class="hidden lg:block">
+				<nav class="toc" aria-labelledby="toc-title">
+					<p id="toc-title" class="toc-title">
+						<!-- A moon that waxes while you read (same scroll timeline as the progress hairline) -->
+						<svg viewBox="0 0 16 16" class="toc-moon" aria-hidden="true">
+							<defs><clipPath id="toc-disc"><circle cx="8" cy="8" r="6.6" /></clipPath></defs>
+							<circle cx="8" cy="8" r="6.6" fill="currentColor" fill-opacity="0.16" />
+							<g clip-path="url(#toc-disc)"><circle cx="8" cy="8" r="6.6" fill="currentColor" class="toc-lit" /></g>
+						</svg>
+						{m.blog_toc_title()}
+					</p>
+					<ol class="toc-list">
+						{#each post.outline as section (section.id)}
+							<li><a href="#{section.id}" aria-current={current === section.id ? 'location' : undefined}>{section.title}</a></li>
+						{/each}
+					</ol>
+				</nav>
+			</aside>
+		{/if}
 	</div>
 </article>
 
@@ -258,24 +323,140 @@
 		color: var(--color-butter);
 	}
 
-	.eyebrow {
-		color: var(--muted-foreground);
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: var(--tracking-clock);
-		text-transform: uppercase;
+	/* Reading progress ---------------------------------------------------------------------------------------- */
+
+	.progress {
+		display: none;
 	}
 
+	@supports (animation-timeline: scroll()) {
+		.progress {
+			position: fixed;
+			inset: 0 0 auto;
+			z-index: 60;
+			display: block;
+			height: 3px;
+			background: linear-gradient(90deg, var(--color-ochre), var(--color-butter));
+			box-shadow: 0 0 12px rgb(252 215 114 / 0.55);
+			transform-origin: 0 50%;
+			animation: read linear both;
+			animation-timeline: scroll(root);
+		}
+
+		/* The toc moon waxes with the same timeline: the lit disc slides in from the right limb */
+		.toc-lit {
+			animation: wax linear both;
+			animation-timeline: scroll(root);
+		}
+	}
+
+	@keyframes read {
+		from {
+			scale: 0 1;
+		}
+	}
+
+	@keyframes wax {
+		from {
+			translate: 13.2px 0;
+		}
+	}
+
+	/* Header ------------------------------------------------------------------------------------------------- */
+
+	.headline {
+		font-size: clamp(2.4rem, 5.6vw, 4.5rem);
+		line-height: 0.98;
+		padding-bottom: 0.08em;
+		/* Ink on paper; at night it catches the moonlight like the big titles on /blog and /stats */
+		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
+		background-clip: text;
+		color: transparent;
+	}
+
+	:global(.dark) .headline {
+		background: linear-gradient(180deg, var(--color-cream) 45%, var(--color-butter));
+		background-clip: text;
+	}
+
+	/* A soft moon glow behind the video, so the screen sits in the night instead of on it */
+	.stage {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.stage::before {
+		content: '';
+		position: absolute;
+		inset: 8% 6% -6%;
+		z-index: -1;
+		border-radius: 50%;
+		background: radial-gradient(closest-side, rgb(252 215 114 / 0.22), transparent);
+		filter: blur(40px);
+		pointer-events: none;
+	}
+
+	:global(html:not(.dark)) .stage::before {
+		background: radial-gradient(closest-side, rgb(226 169 59 / 0.22), transparent);
+	}
+
+	/* Section titles: Geist Black over a wash of butter pigment, like the section headings on /stats */
 	.section-title {
-		font-size: 1.5rem;
-		font-weight: 800;
-		letter-spacing: -0.02em;
+		position: relative;
+		isolation: isolate;
+		width: fit-content;
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 3vw, 2rem);
+		font-weight: 900;
+		letter-spacing: -0.035em;
+		line-height: 1.1;
+	}
+
+	.section-title::before {
+		content: '';
+		position: absolute;
+		top: 40%;
+		left: -0.6rem;
+		z-index: -1;
+		width: min(78%, 14rem);
+		height: 100%;
+		background: var(--bloom) center / 100% 100% no-repeat;
+		opacity: 0.55;
+		mix-blend-mode: multiply;
+		rotate: -2deg;
+		pointer-events: none;
+	}
+
+	:global(.dark) .section-title::before {
+		opacity: 0.25;
+		mix-blend-mode: normal;
+	}
+
+	/* "Summary" as a rubber stamp, like the mock data stamp on /stats */
+	.stamp {
+		display: inline-block;
+		padding: 0.3rem 0.7rem;
+		border: 2px solid currentColor;
+		border-radius: 0.5rem;
+		color: #7d560a;
+		font-family: var(--font-mono);
+		font-size: 0.7rem;
+		font-weight: 700;
+		letter-spacing: 0.2em;
+		text-transform: uppercase;
+		transform: rotate(-3deg);
+		mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.8) 85%);
+		opacity: 0.9;
+	}
+
+	:global(.dark) .stamp {
+		color: rgb(252 215 114 / 0.85);
 	}
 
 	/* Summary: a sheet of butter paper with a pigment edge on the left */
 	.summary {
 		position: relative;
-		padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+		padding: 1.75rem 2rem 1.9rem 2.25rem;
 		border-radius: calc(var(--radius) + 0.25rem);
 		background: color-mix(in oklab, var(--color-butter) 22%, var(--card));
 		overflow: hidden;
@@ -336,13 +517,26 @@
 
 	.takeaways li {
 		position: relative;
-		padding-left: 2rem;
+		padding-left: 2.1rem;
 		font-size: 1.0625rem;
 		line-height: 1.6;
 	}
 
-	/* A small butter moon as the bullet */
-	.takeaways li::before,
+	.phase {
+		position: absolute;
+		left: 0.1rem;
+		top: 0.3em;
+		width: 1.1rem;
+		height: 1.1rem;
+		color: var(--color-ochre);
+	}
+
+	:global(.dark) .phase {
+		color: var(--color-butter);
+		filter: drop-shadow(0 0 0.35rem rgb(252 215 114 / 0.45));
+	}
+
+	/* A small butter moon */
 	.generated .moon {
 		content: '';
 		position: absolute;
@@ -356,7 +550,6 @@
 		rotate: -20deg;
 	}
 
-	:global(html:not(.dark)) .takeaways li::before,
 	:global(html:not(.dark)) .generated .moon {
 		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--color-ochre) 48%);
 	}
@@ -462,10 +655,101 @@
 		top: calc(1.25rem + 0.3em);
 	}
 
+	/* Table of contents ------------------------------------------------------------------------------------- */
+
+	.toc {
+		position: sticky;
+		top: 6rem;
+		display: grid;
+		gap: 1rem;
+		max-height: calc(100svh - 8rem);
+		overflow-y: auto;
+		scrollbar-width: none;
+	}
+
+	.toc-title {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-family: var(--font-display);
+		font-size: 0.95rem;
+		font-weight: 800;
+		letter-spacing: -0.01em;
+	}
+
+	.toc-moon {
+		width: 1.1rem;
+		height: 1.1rem;
+		color: var(--color-ochre);
+	}
+
+	:global(.dark) .toc-moon {
+		color: var(--color-butter);
+		filter: drop-shadow(0 0 0.35rem rgb(252 215 114 / 0.45));
+	}
+
+	.toc-list {
+		display: grid;
+		border-left: 1px solid var(--border);
+	}
+
+	.toc-list a {
+		position: relative;
+		display: block;
+		padding: 0.45rem 0 0.45rem 1rem;
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+		line-height: 1.4;
+		text-wrap: pretty;
+		transition: color 200ms ease;
+	}
+
+	.toc-list a:hover {
+		color: var(--foreground);
+	}
+
+	/* The current section: a butter mark on the rail */
+	.toc-list a::before {
+		content: '';
+		position: absolute;
+		top: 0.45rem;
+		bottom: 0.45rem;
+		left: -1.5px;
+		width: 2px;
+		border-radius: 2px;
+		background: var(--color-ochre);
+		box-shadow: 0 0 10px rgb(252 215 114 / 0.6);
+		opacity: 0;
+		scale: 1 0.3;
+		transition:
+			opacity 250ms ease,
+			scale 350ms cubic-bezier(0.3, 1.35, 0.5, 1);
+	}
+
+	:global(.dark) .toc-list a::before {
+		background: var(--color-butter);
+	}
+
+	.toc-list a[aria-current] {
+		color: var(--foreground);
+		font-weight: 600;
+	}
+
+	.toc-list a[aria-current]::before {
+		opacity: 1;
+		scale: 1;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.toc-list a::before {
+			transition: none;
+		}
+	}
+
 	/* Article body (mdsvex) ----------------------------------------------------------------------------------- */
 
 	.prose-post {
-		max-width: 68ch;
+		max-width: 70ch;
 		font-size: 1.125rem;
 		line-height: 1.8;
 		text-wrap: pretty;
@@ -477,10 +761,12 @@
 	}
 
 	.prose-post :global(h2) {
+		scroll-margin-top: 6rem;
 		margin-top: 2.4em;
-		font-size: 1.6rem;
-		font-weight: 800;
-		letter-spacing: -0.02em;
+		font-family: var(--font-display);
+		font-size: 1.7rem;
+		font-weight: 900;
+		letter-spacing: -0.035em;
 		line-height: 1.25;
 		text-wrap: balance;
 		hyphens: manual;

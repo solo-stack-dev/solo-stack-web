@@ -64,8 +64,13 @@
 		></iframe>
 	{:else if youtubeId}
 		<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} onclick={() => (playing = true)}>
-			<!-- Post page: max-w-4xl with px-4 (sm: px-8) -->
-			<VideoThumbnail id={youtubeId} class="frame thumbnail" sizes="(min-width: 40rem) min(calc(100vw - 4rem), 52rem), calc(100vw - 2rem)" fetchpriority="high" />
+			<!-- Post page: max-w-6xl (72rem) with px-4 (sm: px-6, lg: px-8) -->
+			<VideoThumbnail
+				id={youtubeId}
+				class="frame thumbnail"
+				sizes="(min-width: 64rem) min(calc(100vw - 4rem), 68rem), (min-width: 40rem) calc(100vw - 3rem), calc(100vw - 2rem)"
+				fetchpriority="high"
+			/>
 			<span class="play" aria-hidden="true">
 				<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
 			</span>
