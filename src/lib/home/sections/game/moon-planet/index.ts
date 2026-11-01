@@ -1,17 +1,13 @@
 import type { GameButton } from '../shared/input.svelte.ts';
-import type { TuningDef } from '../shared/types.ts';
+import { MOON_TUNING } from './tuning.ts';
 
 /**
- * Game candidate module (contract: GameModule in ../shared/types.ts). Loaded lazily by GameFrame.
- * STUB: the moon-planet agent replaces this folder. `gravity` and `speed` drive the placeholder; the other keys are
- * suggestions for the real prototype.
+ * Candidate A: moon planet (docs/HANDOFF-HOMEPAGE.md §5.3). Contract: GameModule in ../shared/types.ts.
+ * Canvas 2D prototype: radial gravity platformer around a tiny moon. Simulation in sim.ts, drawing in render.ts.
  */
 export { default } from './MoonPlanet.svelte';
 
-export const tuning: TuningDef[] = [
-	{ key: 'gravity', min: 0.5, max: 6, step: 0.1, default: 2.4 },
-	{ key: 'speed', min: 0.1, max: 1.5, step: 0.05, default: 0.5 },
-	{ key: 'bugSpawn', min: 0.2, max: 4, step: 0.1, default: 1 }
-];
+export const tuning = MOON_TUNING;
 
-export const controls: GameButton[] = ['left', 'right', 'action'];
+/** `down` is a dive (fast fall) for stomping; jump is `action` (Space) or `up` on the keyboard. */
+export const controls: GameButton[] = ['left', 'right', 'down', 'action'];
