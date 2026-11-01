@@ -18,8 +18,10 @@
 	{#each ranked as video, index (video.id)}
 		{@const href = video.id.startsWith('mock-') ? null : `https://www.youtube.com/watch?v=${video.id}`}
 		<li class="relative grid grid-cols-[2rem_1fr] gap-x-2 rounded-lg px-2 py-2.5 transition-colors hover:bg-muted/60">
-			<span class="pt-0.5 font-mono text-xs text-muted-foreground tabular-nums" aria-label={m.stats_youtube_top_rank({ rank: index + 1 })}>
-				{String(index + 1).padStart(2, '0')}
+			<!-- aria-label is ignored on a plain span: the rank is read from the sr-only text, the "01" is decoration -->
+			<span class="pt-0.5 font-mono text-xs text-muted-foreground tabular-nums">
+				<span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+				<span class="sr-only">{m.stats_youtube_top_rank({ rank: index + 1 })}</span>
 			</span>
 			<div class="grid min-w-0 gap-1.5">
 				<p class="line-clamp-2 text-sm leading-snug font-medium text-balance">
