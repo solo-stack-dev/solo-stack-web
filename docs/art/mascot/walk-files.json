@@ -1,0 +1,152 @@
+[
+  {
+    "name": "build-walk.mjs",
+    "bytes": 14926
+  },
+  {
+    "name": "mascot-walk8@1.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1152351
+  },
+  {
+    "name": "mascot-walk8@2.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1127133
+  },
+  {
+    "name": "mascot-walk8@3.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1041580
+  },
+  {
+    "name": "mascot-walk8@4.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1120080
+  },
+  {
+    "name": "mascot-walk8@5.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1127551
+  },
+  {
+    "name": "mascot-walk8@6.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1071619
+  },
+  {
+    "name": "mascot-walk8@7.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1099560
+  },
+  {
+    "name": "mascot-walk8@8.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1143606
+  },
+  {
+    "name": "walk-contact-sheet.png",
+    "width": 1152,
+    "height": 800,
+    "bytes": 586153
+  },
+  {
+    "name": "walk-cycle-preview.gif",
+    "width": 288,
+    "height": 400,
+    "bytes": 185730
+  },
+  {
+    "name": "walk-cycle-sheet.png",
+    "width": 9216,
+    "height": 1600,
+    "bytes": 6453605
+  },
+  {
+    "name": "walk-detail-check.png",
+    "width": 3000,
+    "height": 1240,
+    "bytes": 3139323
+  },
+  {
+    "name": "walk-joint-check.png",
+    "width": 1152,
+    "height": 533,
+    "bytes": 318986
+  },
+  {
+    "name": "walk-puppet-arm-near.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 135272
+  },
+  {
+    "name": "walk-puppet-body.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 736196
+  },
+  {
+    "name": "walk-puppet-leg-far.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 235883
+  },
+  {
+    "name": "walk-puppet-leg-near.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 253125
+  },
+  {
+    "name": "walk-puppet-preview.gif",
+    "width": 288,
+    "height": 400,
+    "bytes": 741267
+  },
+  {
+    "name": "walk-puppet-rest.png",
+    "width": 1152,
+    "height": 1600,
+    "bytes": 1060951
+  },
+  {
+    "name": "walk-rig.json",
+    "bytes": 5223
+  },
+  {
+    "name": "walk-source-arm.png",
+    "width": 1064,
+    "height": 1478,
+    "bytes": 576743
+  },
+  {
+    "name": "walk-source-body.png",
+    "width": 1064,
+    "height": 1478,
+    "bytes": 936546
+  },
+  {
+    "name": "walk-source-far.png",
+    "width": 1064,
+    "height": 1478,
+    "bytes": 701029
+  },
+  {
+    "name": "walk-source-near.png",
+    "width": 1064,
+    "height": 1478,
+    "bytes": 781043
+  },
+  {
+    "name": "walk-validation.json",
+    "bytes": 1850
+  }
+]

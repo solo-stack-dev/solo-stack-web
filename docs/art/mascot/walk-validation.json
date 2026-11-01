@@ -1,0 +1,108 @@
+{
+  "checks": [
+    {
+      "frame": 1,
+      "bounds": {
+        "left": 248,
+        "top": 135,
+        "width": 679,
+        "height": 1366
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 2,
+      "bounds": {
+        "left": 298,
+        "top": 145,
+        "width": 527,
+        "height": 1356
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 3,
+      "bounds": {
+        "left": 300,
+        "top": 120,
+        "width": 480,
+        "height": 1381
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 4,
+      "bounds": {
+        "left": 300,
+        "top": 110,
+        "width": 505,
+        "height": 1391
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 5,
+      "bounds": {
+        "left": 295,
+        "top": 135,
+        "width": 582,
+        "height": 1366
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 6,
+      "bounds": {
+        "left": 300,
+        "top": 145,
+        "width": 480,
+        "height": 1356
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 7,
+      "bounds": {
+        "left": 300,
+        "top": 120,
+        "width": 480,
+        "height": 1381
+      },
+      "baseline": 1500,
+      "alpha": true
+    },
+    {
+      "frame": 8,
+      "bounds": {
+        "left": 300,
+        "top": 110,
+        "width": 555,
+        "height": 1391
+      },
+      "baseline": 1500,
+      "alpha": true
+    }
+  ],
+  "source": "imagegen painted parts; continuous skin mesh, foot IK, transforms and assembly",
+  "spriteSheet": [
+    9216,
+    1600
+  ],
+  "sheetSlicesPixelIdentical": true,
+  "previewTiming": {
+    "sprite": {
+      "frames": 8,
+      "delayMs": 110
+    },
+    "puppet": {
+      "frames": 32,
+      "delayMs": 30
+    }
+  }
+}
