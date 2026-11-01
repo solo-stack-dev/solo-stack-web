@@ -217,3 +217,90 @@ Hand export:
 - Validation: correct dimensions; frame-1 decoded RGB exactly matches scene crop; unchanged border rims; changed bounds stay inside the hand rectangles; screen polygons uniformly #18191B; manual 100% hands/chair/mouse inspection; visual desktop/mobile composites with the existing prop mappings.
 
 Temporary local export scripts and inspection composites were removed before commit. No new dependency, public text, source component, old artwork or deployment configuration was changed.
+
+## Facing monitor revision — 2026-11-01
+
+Built-in image_gen.imagegen, opaque outputs, highest quality requested; no CLI/API fallback, no installation, no public copy. Eight generation calls: four composition candidates and four local hand edits. The first desktop and mobile candidates were rejected because their monitors retained the original perspective facing away from the typist. Both had improved gaze, but that alone did not resolve the physical inconsistency. Candidate B in each format was selected for the left-facing profile, rotated chair, readable screen and coherent working axis. Rejected rasters are not committed.
+
+### Desktop candidate A — rejected
+
+Inputs: Original desktop scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Edit the provided production watercolor room plate. Highest quality, output 2560x1440 landscape. Fix the coding pose convincingly: the man at right turns his entire chair, shoulders and head to the LEFT toward the monitor. Show his right side and some back, near strict left-facing profile: nose points LEFT, one visible eye looking LEFT into the center of the screen, no eye contact with viewer. Short dark hair, stubble, black short-sleeve tee, dark headphones, same soft anime watercolor identity. Turn monitor toward him at right: its right edge is closer to viewer and taller than left edge, top edge slopes upward toward right, bottom slopes downward toward right. Keep a LARGE wide unobstructed readable screen face occupying roughly x24–48%, y37–66%, uniform #18191B with clear ink bezel, no content. Keyboard directly between monitor and man on their diagonal working axis, both relaxed hands contacting keys, anatomically sound fingers. One coherent chair behind his right shoulder, one mouse beside keyboard. Preserve exact room framing and all non-workstation objects: window, lamp, coffee, shelf with blank book spines, plants, notebook, empty bonsai book at far right, empty handheld surface lower left, dumbbells. Preserve warm butter lamplight, charcoal wall, ink and watercolor paper grain. No bonsai or console painted in: existing separate overlays retained. No moon painted in: existing sky overlay retained. No steam, text, letters, glyphs, logos or UI anywhere. Change only man/chair/monitor/keyboard/mouse and immediate surface, keep room layout intact.
+```
+
+### Desktop candidate B — selected
+
+Inputs: Original desktop scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Edit the provided production watercolor room plate. Highest quality, output 2560x1440 landscape. Fix the coding pose convincingly: the man at right turns his entire chair, shoulders and head to the LEFT toward the monitor. Show his right side and some back, near strict left-facing profile: nose points LEFT, one visible eye looking LEFT into the center of the screen, no eye contact with viewer. Short dark hair, stubble, black short-sleeve tee, dark headphones, same soft anime watercolor identity. Turn monitor toward him at right: its right edge is closer to viewer and taller than left edge, top edge slopes upward toward right, bottom slopes downward toward right. Keep a LARGE wide unobstructed readable screen face occupying roughly x24–48%, y37–66%, uniform #18191B with clear ink bezel, no content. Keyboard directly between monitor and man on their diagonal working axis, both relaxed hands contacting keys, anatomically sound fingers. One coherent chair behind his right shoulder, one mouse beside keyboard. Preserve exact room framing and all non-workstation objects: window, lamp, coffee, shelf with blank book spines, plants, notebook, empty bonsai book at far right, empty handheld surface lower left, dumbbells. Preserve warm butter lamplight, charcoal wall, ink and watercolor paper grain. No bonsai or console painted in: existing separate overlays retained. No moon painted in: existing sky overlay retained. No steam, text, letters, glyphs, logos or UI anywhere. Change only man/chair/monitor/keyboard/mouse and immediate surface, keep room layout intact.
+COMPOSITION B — CRITICAL monitor perspective correction: completely repaint the monitor; do not retain the original left-tall trapezoid. Inner screen corners on 2560x1440 MUST be approximately TL(600,640), TR(1170,550), BR(1170,940), BL(600,870). The RIGHT screen edge is nearer the man and is TALLER, so the visible screen actually faces him. This is essential. Keyboard is angled diagonally, long edge recedes toward upper-left, centered x1170,y1030. Left-facing profile head, eye aimed into screen; visible right shoulder/back. Retain wide visible screen and both hands.
+```
+
+### Mobile candidate A — rejected
+
+Inputs: Original mobile scene; selected desktop candidate B. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality. Image 1 is the portrait room edit target, keep exactly its framing and 1080x2340 ratio. Image 2 is the accepted DESKTOP composition reference. Repaint only mobile workstation to match image 2: man in right-side/back three-quarter view, head strict left-facing profile with one visible eye looking LEFT into screen center, short dark hair, stubble, headphones, black tee. Chair turned left, one chair only. Large monitor face turned toward the man: RIGHT vertical edge taller and nearer him; top edge rises toward right, bottom edge descends toward right. Large unobscured uniformly #18191B screen, ink bezel, approximately x8–56%, y41–57%. Keyboard aligned on screen-to-man axis, both hands touching blank keys. Natural arms and seated anatomy. Keep EXACT portrait room and non-workstation locations: tall window, lamp, mug, shelf and trailing plant, book on right for separate bonsai, blank handheld space, desk legs, chair base, dumbbells. Match warm butter light, anthracite, ink/watercolor paper texture and mascot style. No text, letters, UI, logos, steam. No painted bonsai/console/moon, these retain separate registered layers. Do not crop or reframe. Same portrait proportions.
+```
+
+### Mobile candidate B — selected
+
+Inputs: Original mobile scene; selected desktop candidate B. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality. Image 1 is the portrait room edit target, keep exactly its framing and 1080x2340 ratio. Image 2 is the accepted DESKTOP composition reference. Repaint only mobile workstation to match image 2: man in right-side/back three-quarter view, head strict left-facing profile with one visible eye looking LEFT into screen center, short dark hair, stubble, headphones, black tee. Chair turned left, one chair only. Large monitor face turned toward the man: RIGHT vertical edge taller and nearer him; top edge rises toward right, bottom edge descends toward right. Large unobscured uniformly #18191B screen, ink bezel, approximately x8–56%, y41–57%. Keyboard aligned on screen-to-man axis, both hands touching blank keys. Natural arms and seated anatomy. Keep EXACT portrait room and non-workstation locations: tall window, lamp, mug, shelf and trailing plant, book on right for separate bonsai, blank handheld space, desk legs, chair base, dumbbells. Match warm butter light, anthracite, ink/watercolor paper texture and mascot style. No text, letters, UI, logos, steam. No painted bonsai/console/moon, these retain separate registered layers. Do not crop or reframe. Same portrait proportions.
+MANDATORY screen perspective: discard original monitor silhouette. Inner screen on 1080x2340 must approximately be TL(90,1060), TR(550,970), BR(575,1320), BL(110,1280). RIGHT edge taller, TOP edge slopes UP toward right, opposite the original plate. Match image 2 monitor orientation exactly. Do not retain old screen angle. Keep screen wide, entire face visible. Preserve portrait canvas and original prop locations.
+```
+
+### Desktop hands beat 2
+
+Inputs: Final registered desktop scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Production typing animation beat 2. Edit supplied 2560x1440 scene ONLY inside hands rectangle [1040,925,440,140]. Keep palms, wrists, forearms, keyboard and all room pixels exactly registered. Near hand's index finger lifts a few pixels while middle finger presses a key; far hand index presses and middle lifts slightly. Tiny anatomically plausible fingertip motion only, both hands remain on keys. Five fingers, no extra digits. No changes to arms, pose, head, screen, lighting, texture or camera. No text. Output full identical landscape canvas; a small hand crop will be extracted.
+```
+
+### Desktop hands beat 3
+
+Inputs: Final registered desktop scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Production typing animation beat 3. Edit supplied 2560x1440 scene ONLY inside hands rectangle [1040,925,440,140]. Keep palms, wrists, forearms, keyboard and all room pixels exactly registered. Near hand index gently presses its key and ring fingertip lifts slightly; far index lifts a few pixels while middle finger presses. Opposite beat. Tiny anatomically plausible fingertip motion only, both hands remain on keys. Five fingers, no extra digits. No changes to arms, pose, head, screen, lighting, texture or camera. No text. Output full identical landscape canvas; a small hand crop will be extracted.
+```
+
+### Mobile hands beat 2
+
+Inputs: Final registered mobile scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Production typing animation beat 2. Edit supplied 1080x2340 scene ONLY inside hands rectangle [370,1330,300,105]. Keep palms, wrists, forearms, keyboard and all room pixels exactly registered. Near hand's index finger lifts a few pixels while middle finger presses a key; far hand index presses and middle lifts slightly. Tiny anatomically plausible fingertip motion only, both hands remain on keys. Five fingers, no extra digits. No changes to arms, pose, head, screen, lighting, texture or camera. No text. Output full identical portrait canvas; a small hand crop will be extracted.
+```
+
+### Mobile hands beat 3
+
+Inputs: Final registered mobile scene. Transparent background: false.
+
+```text
+Use case: precise-object-edit. Production typing animation beat 3. Edit supplied 1080x2340 scene ONLY inside hands rectangle [370,1330,300,105]. Keep palms, wrists, forearms, keyboard and all room pixels exactly registered. Near hand index gently presses its key and ring fingertip lifts slightly; far index lifts a few pixels while middle finger presses. Opposite beat. Tiny anatomically plausible fingertip motion only, both hands remain on keys. Five fingers, no extra digits. No changes to arms, pose, head, screen, lighting, texture or camera. No text. Output full identical portrait canvas; a small hand crop will be extracted.
+```
+
+### Registration and export
+
+Native outputs: desktop 1672×941; mobile 852×1846. Windows System.Drawing high-quality bicubic resize to 2560×1440 and 1080×2340. These are normalized masters, not native full-resolution generations. Original base pixels are retained outside workstation masks. Generated pixels blend inward over 12 final pixels, using distance to the nearest polygon segment. No anatomy was drawn with code.
+
+Masks in native generated coordinates, scaled to final canvas with rounded vertices:
+
+- Desktop: [[370,295],[850,295],[850,170],[1230,170],[1230,380],[1500,380],[1500,695],[1100,695],[1100,750],[500,750],[500,700],[360,700]].
+- Mobile: [[48,750],[440,730],[440,665],[720,665],[730,780],[852,780],[852,1150],[690,1150],[690,1180],[190,1180],[190,1080],[65,1080]].
+
+Initial hard-edged export was rejected for visible joins and a retained old chair edge. Added the 12-pixel inward feather and expanded desktop right-upper mask from y420 to y380. Mobile mask was expanded from y850 to y780 to remove an old floating headrest edge. These were export corrections, not additional image generations.
+
+Fill measured monitor quads with RGB(24,25,27), as documented in README. Retain original transparent props and their affine placements. Desktop sky clip is shortened around the new monitor top; mobile clip stays unchanged. Do not bake sky or props into the scene.
+
+Hand exports remain 440×140 desktop and 300×105 mobile. Frame 1 is an exact scene crop at the new rect. Resize each generated full-frame beat to master size and crop the same rect. Blend only the union of two ellipses in patch-local coordinates: desktop center/radii (125,83)/(105,48) and (263,52)/(93,42); mobile (80,59)/(68,39) and (173,34)/(62,29). Let r be the smaller normalized elliptical distance, alpha=clamp((1-r)*6,0,1). Multiply by clamp((d-4)/10,0,1), where d is distance to nearest patch edge. Round blended RGB values to nearest integer. This keeps wrists, most keycaps, surrounding texture and five-pixel patch rims stationary. Full generated variants are not runtime frames.
+
+Review: final plates, native-size face/workstation crops, all hand frames, 640×360 desktop and 270×585 mobile composites with existing moon, bonsai, handheld and foreground. Hand motion is intentionally small, especially at mobile size; profile occludes some far fingers naturally. Palette and paper texture remain matched to the original room.

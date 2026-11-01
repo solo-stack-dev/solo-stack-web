@@ -195,3 +195,65 @@ The window hotspot must still be clipped to the two upper panes, using the origi
 - The built-in editor has no explicit mask/model/quality selector. Highest quality and local-region edits were requested in the prompts. It still repainted pixels outside the requested region, so only the cropped hand regions were used, with deterministic soft edge blending.
 - Native generations were 1672×941 desktop and 852×1846 mobile. The final 2560×1440 and 1080×2340 masters are Lanczos-resampled/registered exports, not native-resolution generations. The original background pixels are preserved outside the edit mask. No anatomical content was drawn with code.
 - All requested deliverables are supplied, including mobile hands. The assets are ready for integration; this commit does not alter the live site. Keep these PNG masters in the art source folder and derive appropriately compressed responsive assets through the existing pipeline.
+
+## Facing monitor revision
+
+2026-11-01. **This is the authoritative coordinate contract for the current scene and hand PNGs.** It supersedes the coherent-scene coordinates above. Origin is top left; all values below are final-canvas pixels. Rectangles are [x,y,width,height]; quads are clockwise TL, TR, BR, BL.
+
+The mascot now presents his right side/back, with a left-facing profile and visible eye aimed into the monitor. The monitor's right edge is taller, turning its readable face toward him; keyboard and hands sit along that working axis. Scene masters remain 2560×1440 desktop and 1080×2340 mobile. Hand crops retain 440×140 and 300×105 respectively, but their placement changes. These coordinates must be adopted together during integration.
+
+### Desktop — 2560×1440
+
+- Monitor inner screen quad: **[[603,600],[1246,474],[1282,927],[626,897]]**. Interior is uniform #18191B; inset terminal content a few pixels from the edge.
+- Mascot visible box (hair, body, arms; excludes chair): [1060,300,900,770].
+- Hands patch: **[1040,925,440,140]**.
+- Lamp bulb/light center: [318,624]. Visible shade opening bounds: [196,575,247,101].
+- Mug rim: [355,951,171,34]; steam origin: [438,964]; proposed unpainted steam box: [375,790,125,175].
+- Bonsai pot baseline: y1090, center x2303. Original green/golden registration retained.
+- Window visible upper-pane clips, shortened where the new monitor occludes the original glass:
+  - Left: [[538,11],[943,106],[943,513],[790,544],[536,508]].
+  - Right: [[969,113],[1116,153],[1118,477],[968,507]].
+- Sky placement remains [430,-100,1100,1100]. Use these revised fixed clips; otherwise the old sky overlay would paint across the monitor's top edge.
+
+Hotspot rectangles, measured practical bounds including modest target padding:
+
+- Window: [536,11,582,533], clipped to the two revised pane polygons.
+- Coffee: [294,948,255,195].
+- Handheld: [126,1082,375,187].
+- Manga: [1940,200,620,355].
+- Bonsai: [2020,678,506,418], includes golden grown state.
+- Dumbbells: [1858,1212,395,182].
+
+### Mobile — 1080×2340
+
+- Monitor inner screen quad: **[[93,1012],[535,951],[567,1294],[117,1269]]**. Interior is uniform #18191B.
+- Mascot visible box (hair, body, arms; excludes chair): [390,870,650,580].
+- Hands patch: **[370,1330,300,105]**.
+- Lamp bulb/light center: [194,909]. Visible shade opening bounds: [92,871,207,77].
+- Mug rim: [105,1371,126,25]; steam origin: [169,1380]; proposed unpainted steam box: [119,1210,100,172].
+- Bonsai pot baseline: y1509, center x947. Original mobile affine mapping retained.
+- Window upper-pane clips unchanged:
+  - Left: [[46,0],[76,0],[349,133],[349,663],[46,586]].
+  - Right: [[371,145],[480,197],[480,700],[371,672]].
+- Sky placement remains [-65,10,800,800].
+
+Hotspot rectangles:
+
+- Window: [46,0,434,700], clipped to the two pane polygons.
+- Coffee: [60,1368,186,155].
+- Handheld: [140,1515,301,151].
+- Manga: [760,420,320,280].
+- Bonsai: [775,1260,305,255], includes golden grown state.
+- Dumbbells: [605,2005,475,245].
+
+### Layers, verification and limitations
+
+Keep the coherent-scene layer order: scene, clipped sky, hands patch, handheld plus one bonsai state, optional foreground, then implementation-owned steam/terminal/hotspots. The moon, bonsai and handheld intentionally remain separate. All four transparent prop files remain unchanged: the book and tabletop anchors still register in reviewed desktop/mobile composites. Mobile bonsai overlaps the right torso/chair edge naturally without obscuring hands. Use the previously documented mobile affine mappings.
+
+Frame 1 is an exact decoded-RGB crop of its plate. Frames 2 and 3 use generated fingertips blended only within local elliptical masks and retain a five-pixel unchanged rim; there are no animation changes outside the documented patch. Start with 1→2→1→3 at approximately 5–6 changes per second, freeze to frame 1 for reduced motion. The profile naturally hides some far-hand fingers; animation is restrained and subtle on small mobile displays.
+
+Final inspection covered both plates at full resolution through original-size detail views and full-canvas views, every patch, and 640×360 / 270×585 prop-composited thumbnails. The face reads as concentrating on the screen even at thumbnail size. Exact pixel validation covers dimensions, frame-1 equality, patch rims and uniform screen fills. Live terminal font size still needs implementation-level checking.
+
+Native generated images were 1672×941 / 852×1846; these masters are resized exports with original background pixels preserved outside the workstation masks. No application code, visitor copy, dependency, deployment or remote push is part of this revision. Exact prompts, rejections and export masks are in PROMPTS.md.
+
+Pixel audit: all eight PNG dimensions passed; both frame-1 crops match exactly; both screen interiors match RGB(24,25,27). Frame 2/3 changed bounds within each crop are desktop [21,11,335,120] and mobile [13,6,222,92], so all five-pixel rims remain unchanged.

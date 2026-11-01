@@ -1,7 +1,7 @@
 /**
  * Night shift scene geometry, the single place to re-tune the composition.
  *
- * Source of truth: the coordinate contract in docs/art/night-shift/README.md ("Coherent scene revision": desktop scene
+ * Source of truth: the coordinate contract in docs/art/night-shift/README.md ("Facing monitor revision": desktop scene
  * 2560×1440, mobile scene 1080×2340, all in art px) and the crop rects that tools/optimize-art.mjs wrote to ./art.ts. Everything here is
  * authored in art px and exported as percentages (0…100) of each variant's canvas, so the layers, the live monitor
  * and the hotspots stay pixel-registered at every size.
@@ -136,41 +136,46 @@ export const desktop: SceneLayout = {
 		quad: screen(
 			D,
 			[
-				[609, 563],
-				[1168, 639],
-				[1220, 950],
-				[661, 949]
+				[603, 600],
+				[1247, 474],
+				[1282, 927],
+				[626, 898]
 			],
-			8
+			10
 		),
-		box: { width: 480, height: 320 },
+		// the screen's mid lines measure ≈ 656×375 art px; the box keeps that aspect
+		box: { width: 520, height: 296 },
 		fontSize: 18,
 		padding: 26
 	},
-	// head, headphones, shoulders and arms down to the hands on the keys
-	mascot: rectPct(D, 1080, 290, 900, 790),
-	window: rectPct(D, 536, 11, 582, 589),
+	// hair, headphones, back and arms down to the hands on the keys (the chair excluded)
+	mascot: rectPct(D, 1060, 300, 900, 770),
+	// upper glass down to the monitor's top edge (the turned screen now covers the panes' lower part)
+	window: rectPct(D, 536, 11, 582, 533),
 	sky: {
 		rect: rectPct(D, 430, -100, 1100, 1100),
+		// README "facing monitor" pane clips, their lower edges run 1 px above the turned monitor's bezel (the README's
+		// left a 5–6 px strip of moonless plate glass above it)
 		panes: [
 			[
 				[538, 11],
 				[943, 106],
-				[942, 569],
+				[943, 518],
+				[796, 544],
 				[536, 508]
 			],
 			[
 				[969, 113],
 				[1116, 153],
-				[1118, 600],
-				[968, 575]
+				[1118, 487],
+				[968, 513]
 			]
 		].map((pane) => pane.map((point) => pointPct(D, point as [number, number])))
 	},
 	// center of the shade's lit opening
-	lamp: { ...pointPct(D, [320, 628]), radius: 16 },
-	// mug rim ≈ x 355…525 at y 960 (handle on the left); the wisps rise from the bottom center of this box
-	steam: rectPct(D, 357, 622, 166, 338),
+	lamp: { ...pointPct(D, [318, 624]), radius: 16 },
+	// mug rim [355, 951, 171, 34], steam origin (438, 964): the wisps rise from the bottom center of this box
+	steam: rectPct(D, 355, 626, 166, 338),
 	bonsai: at(D, POT, BONSAI_ON_DESKTOP),
 	props: {
 		bonsai: place(D, PROPS.bonsai, BONSAI_ON_DESKTOP),
@@ -183,16 +188,16 @@ export const desktop: SceneLayout = {
 	spots: [
 		{
 			id: 'window',
-			// upper panes, stopping at the monitor's top edge (y 563)
-			rect: rectPct(D, 536, 11, 582, 552),
-			glow: rectPct(D, 535, 87, 520, 520),
+			// upper panes, stopping at the turned monitor's top edge
+			rect: rectPct(D, 536, 11, 582, 533),
+			glow: rectPct(D, 545, 60, 500, 490),
 			tip: { x: 45, y: 38 }
 		},
-		// README "coherent scene revision" rects (art px); the bonsai's moves with its 18 px offset
+		// README "facing monitor revision" rects (art px); the bonsai's includes the grown golden canopy
 		{ id: 'coffee', rect: rectPct(D, 294, 948, 255, 195) },
 		{ id: 'handheld', rect: rectPct(D, 126, 1082, 375, 187), tip: { x: 30, y: 4 }, tipAlign: 'start' },
 		{ id: 'manga', rect: rectPct(D, 1940, 200, 620, 355), tip: { x: 45, y: 8 }, tipAlign: 'end' },
-		{ id: 'bonsai', rect: rectPct(D, 2020, 696, 506, 418), tip: { x: 50, y: 10 }, tipAlign: 'end' },
+		{ id: 'bonsai', rect: rectPct(D, 2020, 678, 506, 418), tip: { x: 50, y: 10 }, tipAlign: 'end' },
 		{ id: 'dumbbells', rect: rectPct(D, 1858, 1212, 395, 182) }
 	]
 };
@@ -210,18 +215,19 @@ export const mobile: SceneLayout = {
 		quad: screen(
 			M,
 			[
-				[96, 975],
-				[548, 1052],
-				[593, 1320],
-				[138, 1318]
+				[93, 1012],
+				[536, 952],
+				[567, 1294],
+				[117, 1270]
 			],
-			6
+			7
 		),
+		// the screen's mid lines measure ≈ 448×300 art px; 216 px tall fits a full page plus the prompt (≈ 7% taller glyphs)
 		box: { width: 300, height: 216 },
 		fontSize: 16,
 		padding: 14
 	},
-	mascot: rectPct(M, 400, 850, 610, 600),
+	mascot: rectPct(M, 390, 870, 650, 580),
 	window: rectPct(M, 46, 0, 434, 700),
 	sky: {
 		// README rest rect is (-65, 10); raised 50 px so the scroll drift never uncovers the panes' top edge
@@ -242,9 +248,9 @@ export const mobile: SceneLayout = {
 			]
 		].map((pane) => pane.map((point) => pointPct(M, point as [number, number])))
 	},
-	lamp: { ...pointPct(M, [199, 912]), radius: 30 },
-	// mug rim ≈ x 105…220 at y 1378
-	steam: rectPct(M, 104, 1167, 119, 211),
+	lamp: { ...pointPct(M, [194, 909]), radius: 30 },
+	// mug rim [105, 1371, 126, 25], steam origin (169, 1380)
+	steam: rectPct(M, 109, 1169, 120, 211),
 	bonsai: at(M, POT, BONSAI_TO_MOBILE),
 	props: { bonsai: place(M, PROPS.bonsai, BONSAI_TO_MOBILE), golden: place(M, PROPS.golden, BONSAI_TO_MOBILE), handheld: place(M, PROPS.handheld, HANDHELD_TO_MOBILE) },
 	sheet: sheetPct(SCENES.mobile),
@@ -254,8 +260,8 @@ export const mobile: SceneLayout = {
 		{ id: 'manga', rect: rectPct(M, 760, 420, 320, 280), tip: { x: 45, y: 10 }, tipAlign: 'end' },
 		{ id: 'coffee', rect: rectPct(M, 60, 1368, 186, 155), tipAlign: 'start' },
 		{ id: 'handheld', rect: rectPct(M, 140, 1515, 301, 151) },
-		// README rect moved with the bonsai's nudge (left edge kept clear of the golden canopy at x ≈ 805)
-		{ id: 'bonsai', rect: rectPct(M, 790, 1266, 290, 255), tip: { x: 45, y: 0 }, tipAlign: 'end', dot: { x: 56, y: 50 } },
+		// README rect, includes the golden canopy; the dot sits on the trunk (x ≈ 971 with the nudge)
+		{ id: 'bonsai', rect: rectPct(M, 775, 1260, 305, 255), tip: { x: 45, y: 0 }, tipAlign: 'end', dot: { x: 63, y: 50 } },
 		{ id: 'dumbbells', rect: rectPct(M, 605, 2005, 475, 245) }
 	]
 };
