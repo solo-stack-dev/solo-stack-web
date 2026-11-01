@@ -7,18 +7,23 @@
 	- `position="top"`: the strip sits above the section's top edge (overlapping the previous section by `height`,
 	  minus `overlap` pulled inside), ragged side up. Paint it with this section's own base color.
 	- `position="bottom"`: mirrored, below the section's bottom edge.
-	- `mask`: URL of a final painted edge mask (PNG/WebP alpha, opaque = visible) from Phase 1. Replaces the generated one.
+	- `edge`: one of the shared painted watercolor masks (1 wet blooms, 2 dry brush, 3 diagonal bleed; materials.ts),
+	  oriented for `position` automatically. Without `edge`/`mask` the generated SVG edge is used (the fallback).
+	- `mask`: URL of any other painted edge mask (PNG/WebP alpha, opaque = visible), used as is (no auto orientation).
+	- `mirror`: flip the strip horizontally (also flips `children`), to vary a reused edge.
 	- `children`: content rendered inside the masked strip instead of `fill` (e.g. a painted texture layer).
 
 	```svelte
 	<section class="relative">
 		<SectionEdge position="top" fill="var(--color-ink)" height="7rem" seed={4} />
+		<SectionEdge position="bottom" fill="var(--color-ink)" height="8rem" edge={3} mirror />
 		…
 	</section>
 	```
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { EDGE_MASKS, type EdgeMask } from './materials.ts';
 
 	interface Props {
 		position?: 'top' | 'bottom';
@@ -32,13 +37,29 @@
 		seed?: number;
 		/** Amplitude multiplier of the ragged line, 0…2. Default 1. */
 		roughness?: number;
-		/** Final painted mask image URL (replaces the generated mask). */
+		/** Shared painted edge mask (1…3), oriented for `position`. Replaces the generated mask. */
+		edge?: EdgeMask;
+		/** Custom painted mask image URL, used as is (replaces the generated mask). */
 		mask?: string;
+		/** Mirror the strip horizontally. */
+		mirror?: boolean;
 		children?: Snippet;
 		class?: string;
 	}
 
-	let { position = 'top', fill = 'currentColor', height = '6rem', overlap = '1px', seed = 1, roughness = 1, mask, children, class: className = '' }: Props = $props();
+	let {
+		position = 'top',
+		fill = 'currentColor',
+		height = '6rem',
+		overlap = '1px',
+		seed = 1,
+		roughness = 1,
+		edge,
+		mask,
+		mirror = false,
+		children,
+		class: className = ''
+	}: Props = $props();
 
 	const WIDTH = 1200;
 	const HEIGHT = 120;
@@ -79,12 +100,14 @@
 		return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 	});
 
-	const maskImage = $derived(mask ? `url("${mask}")` : generatedMask);
+	// Painted masks are "opaque above"; a top strip needs the flipped one (opaque towards its own section, below).
+	const painted = $derived(edge ? EDGE_MASKS[edge][position === 'top' ? 'up' : 'down'] : mask);
+	const maskImage = $derived(painted ? `url("${painted}")` : generatedMask);
 </script>
 
 <div
 	aria-hidden="true"
-	class={['section-edge', position === 'top' ? 'is-top' : 'is-bottom', className]}
+	class={['section-edge', position === 'top' ? 'is-top' : 'is-bottom', mirror && 'is-mirrored', className]}
 	style:--edge-height={height}
 	style:--edge-overlap={overlap}
 	style:--edge-mask={maskImage}
@@ -115,5 +138,9 @@
 
 	.is-bottom {
 		top: calc(100% - var(--edge-overlap));
+	}
+
+	.is-mirrored {
+		scale: -1 1;
 	}
 </style>

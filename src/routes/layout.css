@@ -53,6 +53,14 @@
 		text-rendering: optimizeLegibility;
 	}
 
+	/*
+	 * Overscroll: the canvas shows the html background. Night above the page; butter paper below the sunrise footer
+	 * (NightPage sets `data-night-end` while the sunrise is on screen, when only bottom overscroll is possible).
+	 */
+	html[data-night-end] {
+		background-color: var(--color-butter);
+	}
+
 	::selection {
 		background-color: var(--color-butter);
 		color: var(--color-night);

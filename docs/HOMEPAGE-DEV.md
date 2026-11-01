@@ -57,8 +57,9 @@ Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with 
 
 - `--night` is a registered `<number>` custom property (`@property` in `src/routes/layout.css`), set on NightPage's wrapper `[data-night-page]` and inherited by every section: **0 at the top of the hero (20:00), 1 at the bottom of the page (06:00)**. It is linear in page scroll position.
 - Driver: a CSS scroll-driven animation (`animation-timeline: scroll(root block)`) where supported and motion is allowed; otherwise (no support, or `prefers-reduced-motion: reduce`) a passive, rAF-throttled scroll listener writes it inline. Both produce the same value; you never write `--night` yourself.
-- The base sky is a fixed stack of color layers built from `NIGHT_HOURS[].sky`. Each hour's color is reached when that section's center meets the viewport center (stops re-measured on resize). Colors: `20:00 #2d2620` dusky warm → `21:00 #221f1d` → `22:00 #1a1a1b` → `01:00 #111213` → `02:00 #0e0f10` deepest → `04:00 #2a2723` warming → `06:00 #fcd772` butter paper. Only the lead changes the curve (`night.ts`).
-- Global stars fade in after the hero and retreat before sunrise (driven by `--night`).
+- The base sky is a fixed stack of color layers built from `NIGHT_HOURS[].sky`. Each hour's color is reached when that section's center meets the viewport center (stops re-measured on resize). Colors: `20:00 #2d2620` dusky warm → `21:00 #221f1d` → `22:00 #1a1a1b` → `01:00 #111213` → `02:00 #0e0f10` deepest → `04:00 #2a2723` still night, with a warming horizon (`horizon: #4a3826`, a bottom gradient) → `06:00 #fcd772` butter paper. The sunrise has `from: 'enter'`: its blend only starts when the sunrise section's top enters the viewport, so 04:00 stays night and butter arrives with the sunrise. Only the lead changes the curve (`night.ts`).
+- `--dawn` (0…1): progress of that last blend (0 through the whole night, 1 at the page end). `--sky-now`: the current flat sky color as one CSS value (a nested `color-mix` of the hours driven by `--night`), for anything that must match the sky exactly (the seam bands).
+- Global stars fade in after the hero and retreat with `--dawn`. Global shooting stars pause while the hero covers the top of the viewport (the hero has its own).
 - Use it in CSS, never by polling it in JS:
 
 ```css
@@ -68,7 +69,10 @@ Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with 
 }
 ```
 
-- Readable ink on the sky: `var(--night-ink)` is cream at night and turns anthracite once the paper is bright (used by the nav and rail).
+- Readable ink on the sky: `var(--night-ink)` is cream at night and turns anthracite as `--dawn` completes. The nav and the rail do not use it: they track the real background under them (cream until the sunrise night edge has cleared them, then anthracite) and carry a soft opposite-ink halo for ragged edges.
+- Page chrome: the nav wordmark and the hour rail are hidden while the hero covers the top 40 % of the viewport. The rail shows its clock labels only on hover/focus, and only its dots take pointer events (24 px each, right edge), so art underneath stays clickable.
+- Overscroll: `html` is night; NightPage sets `html[data-night-end]` (butter) while the sunrise is on screen, so bottom overscroll shows paper.
+- Sunrise hook (sunrise agent, optional): put `data-night-edge` on the retreating night edge element (and `data-edge-clear="0.72"`, the fraction of its height below which the ink is gone, if the art changes). Until then NightPage falls back to `#sunrise .night`.
 - For progress **within** your section (morphs, pinning, sunrise), use `ScrollProgress` (§6.8), not `--night`.
 
 ## 4. Data
@@ -110,10 +114,12 @@ interface GameProps {
 	reducedMotion: boolean; // offer a calmer mode (less shake, no flashes)
 	onScore?: (score: number) => void; // absolute score; the frame stores the local high score
 	onGameOver?: (score: number) => void; // end of round; restart remounts your component
+	onRestart?: () => void; // you started a new round yourself (tap/jump after game over): the frame clears its game-over state
 }
 ```
 
 - `GameInput`: `isDown(button)`, `consume(button)` (true once per press), `axisX`, `axisY`, `held` (reactive). Buttons: `left` (←, A), `right` (→, D), `up` (↑, W), `down` (↓, S), `action` (Space). Uses `KeyboardEvent.code`, so WASD works on QWERTZ.
+- Restart by the game itself: if your game restarts without the frame (e.g. jump or tap after game over), call `onRestart?.()` at that moment. GameFrame then resets the shown score and drops the restart highlight. The frame's own restart (button, R) remounts you and needs no call.
 - `GameFrame` owns: poster + play button, lazy load on click, focus on the game surface, pause (button, P, Escape, off screen, hidden tab), restart (button or R, remounts the game), score and high score in mono, touch buttons (coarse pointers, or the lab's touch toggle), debug sliders (`debug` prop, lab only). High scores: `localStorage` key `solostack:game:<id>:highscore`.
 - Fill your canvas/scene to the parent box. The stage is 16:9 (4:5 below 40 rem); override with `--game-aspect` / `--game-aspect-mobile` on the frame if your game needs it (tell the lead).
 - Drive your loop with `RafLoop` and set `loop.paused = paused` in an `$effect`. Keep a round between 30 and 90 seconds, instant restart, no network.
@@ -130,15 +136,15 @@ interface GameProps {
 
 ### 6.2 `PaperGrain.svelte`
 
-Generated `feTurbulence` tile as a repeating background (rasterized once). NightPage already renders one fixed grain for the whole page. Props: `opacity` (0.07), `fixed` (true; `false` = absolute in a positioned parent), `src` (painted grain tile URL), `size` (220 px), `blend` (`'normal'`), `class`.
+Repeating grain tile (decoded once). Default: the painted grain from `docs/art/shared/` as a two-tone cream/ink alpha tile (`assets/paper-grain.png`, 20 kB, 256 px), so it works with `normal` blending on night and on paper. NightPage already renders one fixed grain for the whole page. Props: `opacity` (0.07), `fixed` (true; `false` = absolute in a positioned parent), `texture` (`'painted'` default, `'generated'` = the old SVG `feTurbulence` noise), `src` (any other tile URL), `size` (native tile size), `blend` (`'normal'`), `class`.
 
 ### 6.3 `StarField.svelte`
 
-One canvas, fills its positioned parent, deterministic per seed, twinkle at ≤ 20 fps, paused off screen and in hidden tabs, static under reduced motion. Props: `density` (1 ≈ one star per 7000 px²), `brightness` (1), `seed` (7), `twinkle` (true), `class`. The global sky already has one; add your own only for a denser local sky.
+One canvas, fills its positioned parent, deterministic per seed, twinkle at ≤ 20 fps, paused off screen and in hidden tabs, static under reduced motion. The few bright stars (~3 %) are drawn with the painted star sprites once decoded. Props: `density` (1 ≈ one star per 7000 px²), `brightness` (1), `seed` (7), `twinkle` (true), `sprites` (true), `class`. The global sky already has one; add your own only for a denser local sky.
 
 ### 6.4 `ShootingStars.svelte`
 
-Random streaks every `minDelay`…`maxDelay` ms (8000…20000), in the top `maxY` (0.6) of the parent; off under reduced motion. Each streak dispatches a `window` event `SHOOTING_STAR_EVENT` (`'night:shooting-star'`, detail `{ x, y, angle, duration }`), e.g. for the hero mascot to look up:
+Random streaks every `minDelay`…`maxDelay` ms (8000…20000), in the top `maxY` (0.6) of the parent, drawn with the painted streak sprite (`sprite={false}`: generated SVG streak); off under reduced motion and while `enabled` is false (no streaks, no events). Each streak dispatches a `window` event `SHOOTING_STAR_EVENT` (`'night:shooting-star'`, detail `{ x, y, angle, duration }`), e.g. for the hero mascot to look up:
 
 ```ts
 import { SHOOTING_STAR_EVENT, type ShootingStarDetail } from '#lib/home/shared/ShootingStars.svelte';
@@ -154,7 +160,15 @@ Ragged watercolor edge so sections bleed into each other. Place it inside your `
 <SectionEdge position="bottom" mask={paintedEdge} height="10rem">{@render paintedTexture()}</SectionEdge>
 ```
 
-Props: `position` (`'top'` sits above your top edge, `'bottom'` below your bottom edge), `fill` (CSS background, default `currentColor`), `height` (`6rem`), `overlap` (how far it reaches into your own section, `1px`), `seed` (1; use a unique one per edge), `roughness` (1), `mask` (URL of a final painted alpha mask, replaces the generated one), `children` (content inside the masked strip instead of `fill`), `class`. Sections that come later in the DOM paint above earlier ones, so a top edge overlaps the previous section.
+Props: `position` (`'top'` sits above your top edge, `'bottom'` below your bottom edge), `fill` (CSS background, default `currentColor`), `height` (`6rem`), `overlap` (how far it reaches into your own section, `1px`), `seed` (1; use a unique one per edge), `roughness` (1), `edge` (1 wet blooms, 2 dry brush, 3 diagonal bleed: the shared painted masks, oriented for `position` automatically), `mask` (URL of any other painted alpha mask, used as is), `mirror` (flip horizontally), `children` (content inside the masked strip instead of `fill`), `class`. Without `edge`/`mask` the generated SVG edge is used. Sections that come later in the DOM paint above earlier ones, so a top edge overlaps the previous section.
+
+### 6.5b `Seam.svelte` and `materials.ts` (lead)
+
+`Seam` is a zero-height band over the boundary between two sections, placed in `src/routes/+page.svelte` (never inside a section). It is filled with `var(--sky-now)` (invisible over open sky, it only hides straight edges of art) and bordered by the painted edge masks: `<Seam height="clamp(7rem, 12vw, 12rem)" above={0.5} top={3} bottom={1} mirror fill="…" />`. It paints above both neighbors and takes no pointer events. 04→06 has none: the sunrise brings its own night edge.
+
+`materials.ts` exports the optimized shared materials: `PAPER_GRAIN`, `EDGE_MASKS[1|2|3].down|up`, `STAR_SPRITES`, `SHOOTING_STAR_SPRITE`. Regenerate the files after the masters change: `node src/lib/home/shared/tools/optimize-materials.mjs` (uses `sharp` from pnpm's store, no new dependency).
+
+QA screenshots: `node src/lib/home/shared/tools/scroll-screens.mjs <dev url> docs/screens/integration --prefix desktop-1440 [--width 390 --height 844] [--reduced] [--sheet] [--seams]` (headless Chrome on a random free port, one WebP per half viewport, reports console errors).
 
 ### 6.6 `LazyMount.svelte`
 
@@ -171,7 +185,7 @@ Props: `load` (required), `props`, `rootMargin` (`'100% 0px'`), `when` (true; ex
 
 ### 6.7 `MockupRef.svelte` (temporary)
 
-`<MockupRef src={mockup} opacity={0.3} fit="cover" />`. Decorative reference image, see §2.
+`<MockupRef src={mockup} opacity={0.3} fit="cover" />`. Decorative reference image, see §2. The game shell no longer uses it; it stays until making and radio drop their references.
 
 ### 6.8 `motion.svelte.ts`
 

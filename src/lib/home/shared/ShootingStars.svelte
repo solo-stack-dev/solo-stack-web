@@ -1,7 +1,8 @@
 <!--
 	@component
-	Occasional shooting stars: one CSS-animated SVG streak every `minDelay`…`maxDelay` ms (default 8–20 s).
-	Fills its positioned parent. Off under reduced motion; no new streaks while the tab is hidden.
+	Occasional shooting stars: one CSS-animated streak every `minDelay`…`maxDelay` ms (default 8–20 s), drawn with the
+	painted streak sprite (materials.ts; `sprite={false}` = the generated SVG streak). Fills its positioned parent.
+	Off under reduced motion; no new streaks (and no events) while the tab is hidden or `enabled` is false.
 
 	Every streak dispatches `window` event `night:shooting-star` (detail: `ShootingStarDetail`), so other parts of
 	the page can react (e.g. the hero mascot turns its head):
@@ -26,6 +27,7 @@
 </script>
 
 <script lang="ts">
+	import { SHOOTING_STAR_SPRITE } from './materials.ts';
 	import { reducedMotion } from './motion.svelte.ts';
 
 	interface Props {
@@ -35,10 +37,14 @@
 		maxDelay?: number;
 		/** Limit spawn positions to the top part of the container (0…1). Default 0.6. */
 		maxY?: number;
+		/** Spawn streaks (and dispatch their events). False e.g. while the layer is covered. Default true. */
+		enabled?: boolean;
+		/** Painted streak sprite (default) or the generated SVG streak. */
+		sprite?: boolean;
 		class?: string;
 	}
 
-	let { minDelay = 8000, maxDelay = 20000, maxY = 0.6, class: className = '' }: Props = $props();
+	let { minDelay = 8000, maxDelay = 20000, maxY = 0.6, enabled = true, sprite = true, class: className = '' }: Props = $props();
 
 	interface Streak extends ShootingStarDetail {
 		id: number;
@@ -50,10 +56,12 @@
 	let nextId = 0;
 
 	$effect(() => {
-		if (reducedMotion.current) {
-			streaks = [];
+		if (reducedMotion.current || !enabled) {
+			if (reducedMotion.current) streaks = [];
 			return;
 		}
+		// warm the sprite before the first streak (7 kB, cached afterwards)
+		if (sprite) new Image().src = SHOOTING_STAR_SPRITE;
 		let timer: ReturnType<typeof setTimeout>;
 		const schedule = () => {
 			timer = setTimeout(spawn, minDelay + Math.random() * Math.max(0, maxDelay - minDelay));
@@ -94,17 +102,21 @@
 			style:--length="{streak.length}px"
 			onanimationend={() => remove(streak.id)}
 		>
-			<svg width={streak.length} height="6" viewBox="0 0 {streak.length} 6">
-				<defs>
-					<linearGradient id="{uid}-{streak.id}" x1="0" x2="1" y1="0" y2="0">
-						<stop offset="0" stop-color="#fbf3dd" stop-opacity="0" />
-						<stop offset="0.85" stop-color="#fcd772" stop-opacity="0.7" />
-						<stop offset="1" stop-color="#fbf3dd" stop-opacity="1" />
-					</linearGradient>
-				</defs>
-				<path d="M0 3 L{streak.length - 3} 2 Q{streak.length} 3 {streak.length - 3} 4 Z" fill="url(#{uid}-{streak.id})" />
-				<circle cx={streak.length - 3} cy="3" r="1.6" fill="#fbf3dd" />
-			</svg>
+			{#if sprite}
+				<img src={SHOOTING_STAR_SPRITE} alt="" width={streak.length} height={Math.round(streak.length / 10)} decoding="async" />
+			{:else}
+				<svg width={streak.length} height="6" viewBox="0 0 {streak.length} 6">
+					<defs>
+						<linearGradient id="{uid}-{streak.id}" x1="0" x2="1" y1="0" y2="0">
+							<stop offset="0" stop-color="#fbf3dd" stop-opacity="0" />
+							<stop offset="0.85" stop-color="#fcd772" stop-opacity="0.7" />
+							<stop offset="1" stop-color="#fbf3dd" stop-opacity="1" />
+						</linearGradient>
+					</defs>
+					<path d="M0 3 L{streak.length - 3} 2 Q{streak.length} 3 {streak.length - 3} 4 Z" fill="url(#{uid}-{streak.id})" />
+					<circle cx={streak.length - 3} cy="3" r="1.6" fill="#fbf3dd" />
+				</svg>
+			{/if}
 		</div>
 	{/each}
 </div>
@@ -125,8 +137,11 @@
 		will-change: transform, opacity;
 	}
 
-	.streak svg {
+	.streak svg,
+	.streak img {
 		display: block;
+		/* the sprite's head sits on its vertical center, like the SVG's */
+		translate: 0 -50%;
 	}
 
 	@keyframes shoot {
