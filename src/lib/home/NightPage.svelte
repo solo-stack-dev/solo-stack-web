@@ -24,7 +24,7 @@
 	import { on } from 'svelte/events';
 	import { page } from '$app/state';
 	import SiteNav from '#lib/components/site/SiteNav.svelte';
-	import { SITE_LINKS, siteCurrent, siteHref, siteRel } from '#lib/components/site/links.ts';
+	import { SITE_LINKS, siteCurrent, siteHref } from '#lib/components/site/links.ts';
 	import { m } from '#lib/paraglide/messages.js';
 	import Eggs from './eggs/Eggs.svelte';
 	import { NIGHT_HOURS, NIGHT_HOUR_ATTR, skyBackground, type NightHourDef, type SectionId } from './night.ts';
@@ -288,7 +288,7 @@
 			<nav class="menu-site" aria-label={m.site_nav_label()}>
 				<ul>
 					{#each SITE_LINKS as link (link.id)}
-						<li><a href={siteHref(link)} rel={siteRel(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
+						<li><a href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
 					{/each}
 				</ul>
 			</nav>

@@ -9,7 +9,7 @@
 	import { page } from '$app/state';
 	import * as Sheet from '#lib/components/ui/sheet/index.js';
 	import { m } from '#lib/paraglide/messages.js';
-	import { SITE_LINKS, siteCurrent, siteHref, siteRel } from './links.ts';
+	import { SITE_LINKS, siteCurrent, siteHref } from './links.ts';
 
 	let open = $state(false);
 
@@ -35,7 +35,6 @@
 					<li>
 						<a
 							href={siteHref(link)}
-							rel={siteRel(link)}
 							aria-current={current}
 							onclick={() => (open = false)}
 							class={[

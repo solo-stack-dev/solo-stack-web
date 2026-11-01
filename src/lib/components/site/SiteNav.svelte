@@ -17,7 +17,7 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
-	import { SITE_LINKS, siteCurrent, siteHref, siteRel } from './links.ts';
+	import { SITE_LINKS, siteCurrent, siteHref } from './links.ts';
 
 	interface Props {
 		variant?: 'site' | 'night';
@@ -48,7 +48,7 @@
 		<nav class="links" aria-label={m.site_nav_label()}>
 			<ul>
 				{#each SITE_LINKS as link (link.id)}
-					<li><a href={siteHref(link)} rel={siteRel(link)} aria-current={siteCurrent(link, pathname)}>{link.label()}</a></li>
+					<li><a href={siteHref(link)} aria-current={siteCurrent(link, pathname)}>{link.label()}</a></li>
 				{/each}
 			</ul>
 		</nav>
