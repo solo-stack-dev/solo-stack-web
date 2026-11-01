@@ -2,6 +2,7 @@
  * Canvas 2D renderer for the moon planet prototype: programmer art in the night palette with ink outlines.
  * World space = sim space (moon radius `R`, y down); the camera maps it to CSS pixels. No text except digits.
  */
+import { drawMascotSprite } from './mascot-sprite.ts';
 import { COLORS, LIVES, PLAYER_H, R, TAU, toXY, type Bug, type Game, type Player, type Star } from './sim.ts';
 
 const MONO = "ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace";
@@ -442,7 +443,7 @@ export class Renderer {
 		const sy = Math.max(0.55, Math.min(1.5, p.stretch));
 		ctx.scale(1 / Math.sqrt(sy), sy);
 		ctx.scale(p.facing, 1);
-		drawMascot(ctx, p);
+		if (!drawSpriteMascot(ctx, p)) drawMascot(ctx, p);
 		ctx.restore();
 		ctx.globalAlpha = 1;
 	}
@@ -658,7 +659,31 @@ function keycap(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, 
 	ctx.stroke();
 }
 
-/** Placeholder chibi mascot, facing +x, feet at the origin, about PLAYER_H tall. */
+/** Height of the painted sprite (world units; the hitbox stays PLAYER_H). */
+const SPRITE_H = 34;
+
+/**
+ * Painted mascot (one pose) with a procedural run/jump/fall pose on top of the caller's squash & stretch: a footfall
+ * bob and forward lean while running, a lean back on the way up and forward on the way down. Feet at the origin, facing
+ * +x. Returns false until the sprite sheet is decoded (the caller then draws the vector placeholder).
+ */
+function drawSpriteMascot(ctx: CanvasRenderingContext2D, p: Player): boolean {
+	ctx.save();
+	if (!p.dead) {
+		if (p.grounded) {
+			const run = Math.min(1, Math.abs(p.vt) / 90);
+			ctx.translate(0, -Math.abs(Math.sin(p.runPhase)) * run * 2.2);
+			ctx.rotate(run * 0.12 + Math.sin(p.runPhase * 2) * run * 0.03);
+		} else {
+			ctx.rotate(p.vr > 0 ? -0.07 : 0.1);
+		}
+	}
+	const drawn = drawMascotSprite(ctx, SPRITE_H);
+	ctx.restore();
+	return drawn;
+}
+
+/** Placeholder chibi mascot, facing +x, feet at the origin, about PLAYER_H tall. Used until the sprite is decoded. */
 function drawMascot(ctx: CanvasRenderingContext2D, p: Player) {
 	const air = !p.grounded;
 	const run = Math.min(1, Math.abs(p.vt) / 90);

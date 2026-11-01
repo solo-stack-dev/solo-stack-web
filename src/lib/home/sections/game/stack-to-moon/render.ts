@@ -2,6 +2,8 @@
 import { BLOCK_H, ROPE, blockPoint, topCenter, type Game, type Paper } from './engine.ts';
 import { PAD, cloudBank, cloudPuff, hexAlpha, moonTexture, paperTexture } from './paper.ts';
 import { clamp, hash2, lerp, rng, smoothstep } from './rng.ts';
+// The painted mascot sprite lives with candidate A; one shared copy (see its header).
+import { drawMascotSprite, mascotSpriteReady } from '../moon-planet/mascot-sprite.ts';
 
 const CREAM = '#fbf3dd';
 const BUTTER = '#fcd772';
@@ -42,6 +44,9 @@ export class Renderer {
 	#camY = 0;
 	/** camera height of the start view; parallax layers line up with the world there */
 	#origin = 3;
+	/** the painted mascot faces the way it last moved (it starts facing the tower) */
+	#mascotX = Number.NaN;
+	#mascotFacing: 1 | -1 = 1;
 
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
@@ -394,6 +399,8 @@ export class Renderer {
 		const y = this.#sy(mascot.y);
 		if (y < -200 || y > this.cssH + 200) return;
 		const t = mascot.t;
+		if (Math.abs(mascot.x - this.#mascotX) > 1e-3) this.#mascotFacing = mascot.x > this.#mascotX ? 1 : -1;
+		this.#mascotX = mascot.x;
 		const s = (scale * 1.05) / 100;
 		let pop = 1;
 		let bounce = 0;
@@ -418,6 +425,11 @@ export class Renderer {
 		context.scale(s * pop, s * pop);
 		context.lineJoin = 'round';
 		context.lineCap = 'round';
+		if (mascotSpriteReady()) {
+			this.#spriteMascot(mascot.mode, t, bounce, calm);
+			context.restore();
+			return;
+		}
 		const wave = Math.sin(t * (mascot.mode === 'cheer' ? 14 : 6)) * 0.35;
 		const stride = mascot.mode === 'walk' ? Math.sin(t * 14) * 6 : 0;
 		// legs + sneakers
@@ -502,6 +514,31 @@ export class Renderer {
 		else context.arc(0, hy + 7, 4, 0.3, Math.PI - 0.3);
 		context.stroke();
 		context.restore();
+	}
+
+	/**
+	 * Painted mascot (one pose, local units: feet at the origin, about 112 tall like the vector placeholder). The pose
+	 * comes from squash & stretch: a breathing idle, a stretched hop, a forward lean on the walk, and on the moon a
+	 * bouncing cheer that squashes on each landing and wiggles in the air.
+	 */
+	#spriteMascot(mode: Game['mascot']['mode'], t: number, bounce: number, calm: boolean) {
+		const { context } = this;
+		let sy = 1;
+		let rotate = 0;
+		if (mode === 'ground') {
+			sy = calm ? 1 : 1 + Math.sin(t * 2.2) * 0.015;
+		} else if (mode === 'hop') {
+			sy = lerp(0.88, 1.14, clamp(bounce / 30, 0, 1));
+		} else if (mode === 'walk') {
+			rotate = 0.09;
+		} else if (!calm) {
+			const air = clamp(bounce / 12, 0, 1);
+			sy = lerp(0.84, 1.1, Math.sqrt(air));
+			rotate = Math.sin(t * 14) * 0.07 * air;
+		}
+		context.scale(this.#mascotFacing / Math.sqrt(sy), sy);
+		context.rotate(rotate);
+		drawMascotSprite(context, 112);
 	}
 
 	#particles(game: Game, layer: 'back' | 'front') {
