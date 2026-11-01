@@ -102,5 +102,10 @@
 	"lab_games_tabs_label": "TODO(copy): accessible name of the tab list that switches between game prototypes",
 	"lab_games_debug_title": "TODO(copy): tiny heading of the debug tuning slider panel",
 	"lab_games_debug_reset": "TODO(copy): button text that resets all tuning sliders to their defaults",
-	"lab_games_touch_toggle": "TODO(copy): tiny label of a checkbox that always shows the on screen touch buttons, for testing on desktop"
+	"lab_games_touch_toggle": "TODO(copy): tiny label of a checkbox that always shows the on screen touch buttons, for testing on desktop",
+	"egg_arise_title": "TODO(copy): one huge word shown for a few seconds while ink shadow figures rise (Konami code easter egg); a summoning command in the spirit of ARISE, one word, uppercase works",
+	"egg_console_title": "TODO(copy): short greeting printed next to SOLO STACK in the browser DevTools console for curious developers; a few words, playful, night themed",
+	"egg_console_message": "TODO(copy): one or two sentences in the DevTools console under the ASCII moon: you found the backstage of the night studio, the site is built with SvelteKit, nod to fellow builders; casual, no marketing",
+	"egg_console_hint": "TODO(copy): one short line in the DevTools console hinting that typing arise() summons something; must contain the literal arise()",
+	"egg_console_arise_reply": "TODO(copy): very short reply printed in the DevTools console after the visitor calls arise(); a wink, two to five words"
 }

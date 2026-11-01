@@ -237,7 +237,7 @@
 
 	<div class="moon-box moon-rig" class:is-3d={threeReady}>
 		<div class="moon-glow" aria-hidden="true"></div>
-		<button type="button" class="moon" aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase}>
+		<button type="button" class="moon" data-egg-moon aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase}>
 			<enhanced:img class="moon-img" src={moonDisc} alt="" sizes="(max-width: 47.99rem) 250vw, 100vw" fetchpriority="high" />
 			{#if use3D}
 				<LazyMount
