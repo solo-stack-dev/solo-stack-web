@@ -19,12 +19,6 @@
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
-	import beamTexture from './assets/cinema-beam.png?enhanced';
-	import cliff from './assets/cinema-cliff.png?enhanced';
-	import frame from './assets/cinema-frame.png?enhanced';
-	import landscapeMobile from './assets/cinema-landscape-mobile.png?enhanced';
-	import landscape from './assets/cinema-landscape.png?enhanced';
-	import mascot from './assets/mascot-cinema-sitting.png?enhanced';
 	import { CINEMA_LAYOUT, beamMask, placeVars } from './layout.ts';
 	import { thumbnailPath } from './thumbnail.ts';
 
@@ -62,6 +56,14 @@
 		`--d-apex: ${d.beam.apex.x}% ${d.beam.apex.y}%`,
 		`--m-apex: ${mo.beam.apex.x}% ${mo.beam.apex.y}%`
 	].join('; ');
+	const beamArtStyle = [
+		`--dw: ${d.beamTexture.w}%`,
+		`--dh: ${d.beamTexture.h}%`,
+		`--d-transform: ${d.beamTexture.transform}`,
+		`--mw: ${mo.beamTexture.w}%`,
+		`--mh: ${mo.beamTexture.h}%`,
+		`--m-transform: ${mo.beamTexture.transform}`
+	].join('; ');
 	const dust = d.dust.map((mote, index) => {
 		const mobile = mo.dust[index];
 		return `${placeVars(mote, mobile)}; --size: ${mote.size}px; --delay: ${mote.delay}s; --duration: ${mote.duration}s; --drift-x: ${mote.drift.x}px; --drift-y: ${mote.drift.y}px`;
@@ -91,14 +93,27 @@
 	<NightClock time="04:00" />
 
 	<div class="stage" {@attach near.attach}>
-		<enhanced:img src={landscape} alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
-		<enhanced:img src={landscapeMobile} alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
-		<enhanced:img src={cliff} alt="" class="placed cliff" style={place.cliff} sizes="(min-width: 48rem) 47vw, 92vw" loading="lazy" decoding="async" />
-		<enhanced:img src={mascot} alt="" class="placed mascot" style={place.mascot} sizes="(min-width: 48rem) 11vw, 26vw" loading="lazy" decoding="async" />
+		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
+		<enhanced:img src="./assets/cinema-landscape-mobile.webp?w=1080;828;640" alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
+		<enhanced:img
+			src="./assets/cinema-cliff.webp?w=1582;1100;760"
+			alt=""
+			class="placed cliff"
+			style={place.cliff}
+			sizes="(min-width: 48rem) 41vw, 81vw"
+			loading="lazy"
+			decoding="async"
+		/>
+		<!-- The shiny egg's golden filter fallback and sparkle apply to this .mascot wrapper (there is no golden sitting art). -->
+		<div class="placed mascot" style={place.mascot}>
+			<enhanced:img src="./assets/mascot-cinema-sitting.webp?w=480;300" alt="" class="mascot-art" sizes="(min-width: 48rem) 10vw, 19vw" loading="lazy" decoding="async" />
+		</div>
 
 		<div class="beam" style={beamStyle} aria-hidden="true">
 			<div class="beam-light"></div>
-			<enhanced:img src={beamTexture} alt="" class="beam-texture" sizes="60vw" loading="lazy" decoding="async" />
+			<div class="beam-art" style={beamArtStyle}>
+				<enhanced:img src="./assets/cinema-beam.webp?w=700;450" alt="" class="beam-texture" sizes="40vw" loading="lazy" decoding="async" />
+			</div>
 			{#each dust as style, index (index)}
 				<span class="dust" {style}></span>
 			{/each}
@@ -139,7 +154,15 @@
 				</div>
 			{/if}
 		</div>
-		<enhanced:img src={frame} alt="" class="placed frame" style={place.frame} sizes="(min-width: 48rem) 58vw, 100vw" loading="lazy" decoding="async" />
+		<enhanced:img
+			src="./assets/cinema-frame.webp?w=1925;1400;1000;700"
+			alt=""
+			class="placed frame"
+			style={place.frame}
+			sizes="(min-width: 48rem) 61vw, 97vw"
+			loading="lazy"
+			decoding="async"
+		/>
 
 		<div class={['placed caption font-mono', d.caption.align === 'center' && 'd-center', mo.caption.align === 'center' && 'm-center']} style={place.caption}>
 			{#if video}
@@ -210,6 +233,11 @@
 		display: none;
 	}
 
+	/* The landscape plate is opaque: its top melts into the section's own night backdrop above the stage. */
+	.landscape {
+		mask-image: linear-gradient(to bottom, transparent, black 9%);
+	}
+
 	/* The bottom melts into the night edge that opens the sunrise section. */
 	.landscape-fade {
 		position: absolute;
@@ -220,21 +248,28 @@
 	}
 
 	.cliff,
-	.mascot,
 	.frame {
 		height: auto;
 		pointer-events: none;
 		user-select: none;
 	}
 
-	/* Light cone from the laptop to the frame */
+	.mascot {
+		pointer-events: none;
+	}
+
+	.mascot-art {
+		display: block;
+		width: 100%;
+		height: 100%;
+		user-select: none;
+	}
+
+	/* Light cone from the laptop to the frame: a soft CSS glow plus the painted beam, both added with screen. */
 	.beam {
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		mask-image: var(--d-mask);
-		mask-size: 100% 100%;
-		mask-repeat: no-repeat;
 		mix-blend-mode: screen;
 		opacity: 0.62;
 		transition:
@@ -245,17 +280,29 @@
 	.beam-light {
 		position: absolute;
 		inset: 0;
+		mask-image: var(--d-mask);
+		mask-size: 100% 100%;
+		mask-repeat: no-repeat;
+		opacity: 0.55;
 		background: radial-gradient(circle at var(--d-apex), rgb(255 238 186 / 0.95) 0, rgb(252 215 114 / 0.75) 12%, rgb(226 169 59 / 0.35) 45%, rgb(226 169 59 / 0.18) 70%);
 	}
 
-	.beam-texture {
+	/* The painted beam (cropped canvas at the stage origin), mapped onto the cone by layout.ts's affine transform */
+	.beam-art {
 		position: absolute;
-		inset: 0;
+		left: 0;
+		top: 0;
+		width: var(--dw);
+		height: var(--dh);
+		transform-origin: 0 0;
+		transform: var(--d-transform);
+		opacity: 0.75;
+	}
+
+	.beam-texture {
+		display: block;
 		width: 100%;
 		height: 100%;
-		object-fit: cover;
-		opacity: 0.35;
-		mix-blend-mode: soft-light;
 	}
 
 	.cinema:has(.facade:hover, .facade:focus-visible) .beam {
@@ -471,14 +518,19 @@
 		}
 
 		.cliff,
-		.mascot,
 		.frame,
 		.screen,
 		.caption {
 			height: auto;
 		}
 
-		.beam {
+		.beam-art {
+			width: var(--mw);
+			height: var(--mh);
+			transform: var(--m-transform);
+		}
+
+		.beam-light {
 			mask-image: var(--m-mask);
 		}
 
