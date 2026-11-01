@@ -129,3 +129,92 @@ Mechanical export steps (all coordinates in final desktop pixels unless stated):
 - Clear only alpha values below 4/255 to zero to remove nearly invisible export residue; preserve other soft alpha values. Set the two room plates and sky plate fully opaque. Change visible exact #000000 pixels to #0E0F10 and visible exact #FFFFFF pixels to #FBF3DD. No pure black/white remains in visible pixels. All cutouts retain genuine alpha; no green-screen fallback.
 
 Each generated image was inspected, followed by the final PNGs and desktop normal/golden and mobile composites. Temporary composites and export/audit scripts were removed before committing; only the seven PNGs and two handoff documents are deliverables.
+
+
+## Coherent scene and localized typing revision — 2026-11-01
+
+Built-in `image_gen.imagegen`, highest available quality requested. No explicit quality/model or mask parameter is exposed. No CLI/API fallback. All six generated images were inspected; the two scene edits and four hand variants were retained. No visitor copy was generated. The owner's live-result screenshot and all three previous mascot typing PNGs were inspected to diagnose the duplicated chair and misplaced hands, but were not used as composition targets.
+
+### Desktop scene
+
+Inputs in order: `nightshift-room.png`; `../mascot/mascot-model-sheet-v2.png`; `../../mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit / identity-preserve. Highest available image quality. Edit image 1, the existing production ROOM PLATE, into a coherent painted scene. Output 2560x1440 landscape exactly, same camera, same framing. Image 2 is mascot identity model sheet v2. Image 3 is watercolor/ink style only; do NOT copy its text, bonsai, console or layout changes.
+Preserve image 1's window, monitor and its entire screen quadrilateral, lamp, mug, shelf, trailing plant, framed art, notebook, far-right empty pedestal book and floor dumbbells at EXACT original coordinates, sizes and appearance. Only edit the chair/mascot area and keyboard/mouse area. Paint the mascot sitting IN the existing SINGLE upholstered office chair, facing diagonally LEFT toward the monitor: calm focused friendly face, short dark hair, light stubble, black sweater, dark over-ear headphones. Match model sheet facial identity and soft anime watercolor proportions, warm butter #FCD772 lamplight and anthracite #18191B. Torso and chair form one natural seated working pose behind the desk, backrest behind his back; no separate sprite chair, no doubled backrests, no second seat. Head approximately x59%, y36%; do not cover monitor screen or shelf.
+Correct desk ergonomics: move the keyboard into the desk space directly in front of the monitor and between monitor and seated person, centered on their working axis, in correct perspective. Both forearms naturally extend forward and BOTH hands visibly rest with anatomically clear fingers ON keycaps, wrists relaxed, no floating hands or hands on the desk instead. Keys have no lettering. Remove original mouse at the keyboard's left. Paint ONE mouse to the keyboard's RIGHT from the seated user's perspective, oriented in the same direction as the keyboard toward the monitor; mouse buttons/front and cable lead TOWARD the monitor, away from user's palm. Only one keyboard, one mouse, one chair. Keep blank wood for the separate handheld at lower left and the bonsai pedestal book at far right. No bonsai, handheld, coffee steam, moon, text, letters, numerals, labels, logos, UI or watermark anywhere. Monitor inner screen remains entirely flat solid #18191B with no texture, reflection or content. Preserve ink outlines, paper grain, watercolor and lighting. This is final production illustration, not mockup.
+```
+
+### Mobile scene
+
+Inputs in order: `nightshift-room-mobile.png`; generated desktop scene; `../mascot/mascot-model-sheet-v2.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit / identity-preserve. Highest available quality production illustration. Image 1 is the MOBILE room plate to edit, preserve exactly its 1080x2340 portrait canvas, framing, tall composition and object positions. Image 2 is the approved new desktop scene, reference for the mascot and corrected single-chair typing workstation. Image 3 is mascot identity model sheet v2. Match the DESKTOP man's face, headphones, black sweater and calm expression. Paint this same short dark haired lightly stubbled anime watercolor mascot INTO image 1's existing single chair, behind the desk, turned toward the monitor at left. His head approximately x69%, y43%; the head is ABOVE the chair, torso in the chair, arms extend naturally to keys. Only ONE chair including its existing wheeled base, no extra backrest or duplicated furniture. BOTH hands visibly contact blank keyboard keycaps. Move keyboard so it is directly in front of the monitor between screen and person, correct desk perspective, centered on his working axis. Remove original left-side mouse and place one mouse to the right of the keyboard, front/buttons and cable pointing toward the MONITOR, away from the typist. Match desktop corrected arrangement. No floating fingers. Keep monitor inner quad fully clear, uniformly #18191B, zero content/texture/glare. Preserve its exact coordinates and all bezel/stand geometry. Preserve window and glass, lamp, mug, shelf, trailing plant, framed art, notebook, bonsai pedestal book at right, blank handheld space at lower left, desk legs, chair base, dumbbells at their exact positions in image 1. NO bonsai, handheld, steam, moon, text, lettering, numbers, logo, watermark, symbols. Warm butter #FCD772 lamp lighting, anthracite #18191B, original painted watercolor pigment with ink, preserve base room style. Change ONLY mascot/chair upper part, keyboard, mouse and immediate working surface. No reframe, no crop, no camera change. The portrait height must be retained.
+```
+
+### Desktop hand beat 2
+
+Inputs in order: final registered `nightshift-scene.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality. This is a PRODUCTION animation-frame edit of the supplied 2560x1440 scene. Keep camera, whole canvas, lighting, colors and every object unchanged. Modify ONLY the finger/hand region inside pixel rectangle x=1080,y=935,width=440,height=130 of the supplied full canvas. Do not shift the wrists or arms. Produce typing animation beat 2: the farther hand (on the LEFT in the image) lightly depresses its index finger onto a key while its middle finger lifts just a few pixels; near/right hand's index lifts a little and middle finger touches its key. Both hands remain on keyboard, subtle plausible typing motion, five fingers anatomically correct. Keep the keyboard rows and key positions perfectly registered, no new or removed keys, no letters. ALL pixels outside this region should match the supplied source exactly. Do not change face, hair, headphones, body, chair, screen, mouse, desk, background, scale, grain, or exposure. No text or new objects. Same 2560x1440 landscape output. This will be cropped into a small patch, so edge registration and unchanged wrist position are essential.
+```
+
+### Desktop hand beat 3
+
+Inputs in order: final registered `nightshift-scene.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality. This is a PRODUCTION animation-frame edit of the supplied 2560x1440 scene. Keep camera, whole canvas, lighting, colors and every object unchanged. Modify ONLY the finger/hand region inside pixel rectangle x=1080,y=935,width=440,height=130 of the supplied full canvas. Do not shift the wrists or arms. Produce typing animation beat 3, opposite keystroke: the farther hand (LEFT in image) lifts its index fingertip 5 pixels while middle and ring fingers contact their keys; near/right hand gently depresses its index finger and lifts its ring finger 5 pixels. Keep the hands' overall shape and position fixed; only alternate the fingertips. Both hands remain on keyboard, subtle plausible typing motion, five fingers anatomically correct. Keep the keyboard rows and key positions perfectly registered, no new or removed keys, no letters. ALL pixels outside this region should match the supplied source exactly. Do not change face, hair, headphones, body, chair, screen, mouse, desk, background, scale, grain, or exposure. No text or new objects. Same 2560x1440 landscape output. This will be cropped into a small patch, so edge registration and unchanged wrist position are essential.
+```
+
+### Mobile hand beat 2
+
+Inputs in order: final registered `nightshift-scene-mobile.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality PRODUCTION animation-frame edit. Supplied image is the approved 1080x2340 portrait scene. Keep exactly the same full canvas, framing, camera, objects, lighting and pigment. Edit ONLY the fingers/hands in pixel rectangle x=420,y=1345,width=300,height=105 on the supplied canvas. Typing beat 2: the farther hand (LEFT in image) gently depresses its index fingertip onto its key and raises middle fingertip a tiny amount; the nearer/right hand raises index fingertip just 3 pixels while middle finger remains on its key. Both hands stay naturally on the keyboard. Only tiny finger motion, wrists and forearms do not move. Preserve exact keyboard/keycap registration, no letters. Everything outside this small hand rectangle must remain pixel-identical including head, sweater, chair, monitor, mouse, room and desk. No changed grain, exposure, zoom or position. No new objects or text. Output same 1080x2340 portrait. A small hand patch will be extracted; keep its edge pixels registered.
+```
+
+### Mobile hand beat 3
+
+Inputs in order: final registered `nightshift-scene-mobile.png`.
+
+Transparent background: false.
+
+```text
+Use case: precise-object-edit. Highest quality PRODUCTION animation-frame edit. Supplied image is the approved 1080x2340 portrait scene. Keep exactly the same full canvas, framing, camera, objects, lighting and pigment. Edit ONLY the fingers/hands in pixel rectangle x=420,y=1345,width=300,height=105 on the supplied canvas. Typing beat 3, opposite keystroke: farther hand (LEFT in image) raises its index fingertip 4 pixels while its middle and ring fingers contact keys; nearer/right hand presses its index fingertip onto its key while ring fingertip rises 4 pixels. Keep the overall palm silhouette unchanged. Both hands stay naturally on the keyboard. Only tiny finger motion, wrists and forearms do not move. Preserve exact keyboard/keycap registration, no letters. Everything outside this small hand rectangle must remain pixel-identical including head, sweater, chair, monitor, mouse, room and desk. No changed grain, exposure, zoom or position. No new objects or text. Output same 1080x2340 portrait. A small hand patch will be extracted; keep its edge pixels registered.
+```
+
+### Registration and localized export
+
+Desktop native outputs were 1672×941; mobile outputs were 852×1846. Each was resized with Pillow Lanczos to the original plate dimensions (2560×1440 and 1080×2340). All original files were preserved.
+
+The scene edit was composited over the original room using a polygon mask defined in native-generation coordinates, scaled to the final canvas with rounded integer vertices, then blurred with Gaussian radius 5 final pixels:
+
+- Desktop polygon on 1672×941: `[(830,175),(1170,175),(1170,390),(1390,395),(1445,465),(1425,696),(1110,700),(1105,740),(480,740),(480,680),(600,650),(690,605),(805,605),(800,475),(830,460)]`.
+- Mobile polygon on 852×1846: `[(435,680),(690,680),(720,820),(805,845),(850,900),(850,1130),(655,1130),(655,1180),(210,1180),(210,1115),(330,1085),(460,1065),(445,820)]`.
+
+The first desktop assembly mask stopped too far to the right and retained part of the old bezel in front of the far hand. Its boundary was expanded to include `(690,605)` and `(805,605)`, then re-exported and inspected. The mobile lower-left mask boundary was also tightened to x=210 native pixels to retain the original coffee coaster completely. These were compositing-boundary corrections, not new generated poses. The final monitor quads from README.md were filled uniformly with RGB `(24,25,27)`, preserving their original geometry and eliminating generated glare/texture. All scene pixels outside the local blend remain original-room pixels.
+
+Hand export:
+
+- Desktop common crop `[x,y,w,h]=[1080,935,440,140]` (ten pixels taller than the initial prompt region to include a clean lower join).
+- Mobile common crop `[420,1345,300,105]`.
+- Frame 1 is an exact RGB crop from the final base scene.
+- Frames 2/3: resize the generated full-frame variant to the final canvas, extract the same crop, then blend against frame 1. For patch pixel `(i,j)`, let `d=min(i,j,w-1-i,h-1-j)` and `alpha=round(255*clamp((d-4)/10,0,1))`. This gives an unchanged five-pixel rim followed by an inward ten-pixel ramp. Keep the original monitor aperture unchanged wherever its polygon intersects the crop. Export opaque RGB PNGs.
+- The generated full-frame variants are discarded after extracting their hand patches. This guarantees zero animation changes outside the documented small rectangles even though the editor did not preserve other pixels exactly.
+- Validation: correct dimensions; frame-1 decoded RGB exactly matches scene crop; unchanged border rims; changed bounds stay inside the hand rectangles; screen polygons uniformly #18191B; manual 100% hands/chair/mouse inspection; visual desktop/mobile composites with the existing prop mappings.
+
+Temporary local export scripts and inspection composites were removed before commit. No new dependency, public text, source component, old artwork or deployment configuration was changed.

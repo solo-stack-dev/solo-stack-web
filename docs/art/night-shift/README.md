@@ -118,3 +118,81 @@ The same polygons in canvas percentages:
 - The generator returned smaller native rasters despite requested output sizes. These are normalized PNG masters, not native 2560-pixel generation; source dimensions and export transforms are disclosed in PROMPTS.md.
 - No requested layer remains missing or unusable. The sky requires the documented clip; the mobile props require the documented transforms. The room is intentionally a combined furniture/background plate, not independently movable lamp, chair, desk and book cutouts.
 - These are large source masters outside the website bundle. Create optimized AVIF/WebP imports in the implementation task and respect the section download budget. No application code, dependencies, other art folders, deployment or push was changed by this task.
+
+
+## Coherent scene revision — 2026-11-01
+
+This revision supersedes the separate mascot/seat-reservation instructions above **when using the new `nightshift-scene*.png` files**. The original seven layers and all files in `docs/art/mascot/` are retained unchanged. The new bases already contain the mascot and exactly one chair: do not overlay `mascot-nightshift-typing@*.png` on them. Replace the base-room import with the corresponding scene and animate only the small hand patch. Source/component integration is outside this art-only change.
+
+### New deliverables
+
+All PNGs below are opaque RGB. Byte counts are exact. Frame 1 is a pixel-exact crop of the matching scene.
+
+- [nightshift-scene.png](nightshift-scene.png): 2560×1440; 4,800,989 bytes.
+- [nightshift-scene-mobile.png](nightshift-scene-mobile.png): 1080×2340; 3,718,415 bytes.
+- [nightshift-hands@1.png](nightshift-hands@1.png): 440×140; 94,545 bytes.
+- [nightshift-hands@2.png](nightshift-hands@2.png): 440×140; 92,516 bytes.
+- [nightshift-hands@3.png](nightshift-hands@3.png): 440×140; 94,028 bytes.
+- [nightshift-hands-mobile@1.png](nightshift-hands-mobile@1.png): 300×105; 57,926 bytes.
+- [nightshift-hands-mobile@2.png](nightshift-hands-mobile@2.png): 300×105; 56,813 bytes.
+- [nightshift-hands-mobile@3.png](nightshift-hands-mobile@3.png): 300×105; 57,354 bytes.
+
+### Replacement layer order and typing
+
+1. New opaque desktop/mobile scene with the painted mascot, one chair, one keyboard and one mouse.
+2. Existing sky using the unchanged sky placements and upper-pane clips documented above.
+3. Exactly one hands patch at the rectangle below, using the same scene coordinate system. Use normal opaque compositing; do not independently trim, stretch or reposition a frame.
+4. Existing handheld and either green or golden bonsai, with the unchanged desktop registration/mobile affine mappings above.
+5. Optional foreground leaf layer, plus implementation-owned steam, monitor HTML and hotspots.
+
+Start with 1→2→1→3 at about 5–6 frame changes per second. Pause offscreen and use the bare scene or frame 1 for reduced motion. Head, chair, arms outside the patch, furniture and background are stationary by construction. The full generated variants are not runtime frames. Each exported variant has an unchanged edge rim and an inward blend; no whole-scene replacement is needed.
+
+### Desktop replacement-scene coordinates — 2560×1440
+
+Origin is top left. Rectangles are `[x,y,w,h]`; screen corners are clockwise TL, TR, BR, BL. Pixel coordinates are authoritative. All percentages are of the complete artwork canvas.
+
+- Monitor screen quad, px: `[[609,563],[1168,639],[1220,950],[661,949]]`.
+- Monitor screen quad, %: `[[23.7891,39.0972],[45.6250,44.3750],[47.6563,65.9722],[25.8203,65.9028]]`.
+- Hands patch rect, px: `[1080,935,440,140]`.
+- Hands patch rect, %: `[42.1875,64.9306,17.1875,9.7222]`.
+
+Re-measured practical hotspot rectangles (including modest target padding; bonsai includes its grown state):
+
+- Bonsai: px `[2020,678,506,418]`; % `[78.9063,47.0833,19.7656,29.0278]`.
+- Handheld: px `[126,1082,375,187]`; % `[4.9219,75.1389,14.6484,12.9861]`.
+- Dumbbells: px `[1858,1212,395,182]`; % `[72.5781,84.1667,15.4297,12.6389]`.
+- Coffee: px `[294,948,255,195]`; % `[11.4844,65.8333,9.9609,13.5417]`.
+- Manga shelf: px `[1940,200,620,355]`; % `[75.7813,13.8889,24.2188,24.6528]`.
+- Window: px `[536,11,582,589]`; % `[20.9375,0.7639,22.7344,40.9028]`.
+
+The window hotspot must still be clipped to the two upper panes, using the original polygons above. The window and monitor coordinates remain valid because their geometry was preserved. Enlarge hotspot hit areas to at least 44 CSS pixels in implementation without moving the artwork.
+
+### Mobile replacement-scene coordinates — 1080×2340
+
+Origin is top left. Rectangles are `[x,y,w,h]`; screen corners are clockwise TL, TR, BR, BL. Pixel coordinates are authoritative. All percentages are of the complete artwork canvas.
+
+- Monitor screen quad, px: `[[96,975],[548,1052],[593,1320],[138,1318]]`.
+- Monitor screen quad, %: `[[8.8889,41.6667],[50.7407,44.9573],[54.9074,56.4103],[12.7778,56.3248]]`.
+- Hands patch rect, px: `[420,1345,300,105]`.
+- Hands patch rect, %: `[38.8889,57.4786,27.7778,4.4872]`.
+
+Re-measured practical hotspot rectangles (including modest target padding; bonsai includes its grown state):
+
+- Bonsai: px `[775,1260,305,255]`; % `[71.7593,53.8462,28.2407,10.8974]`.
+- Handheld: px `[140,1515,301,151]`; % `[12.9630,64.7436,27.8704,6.4530]`.
+- Dumbbells: px `[605,2005,475,245]`; % `[56.0185,85.6838,43.9815,10.4701]`.
+- Coffee: px `[60,1368,186,155]`; % `[5.5556,58.4615,17.2222,6.6239]`.
+- Manga shelf: px `[760,420,320,280]`; % `[70.3704,17.9487,29.6296,11.9658]`.
+- Window: px `[46,0,434,700]`; % `[4.2593,0.0000,40.1852,29.9145]`.
+
+The window hotspot must still be clipped to the two upper panes, using the original polygons above. The window and monitor coordinates remain valid because their geometry was preserved. Enlarge hotspot hit areas to at least 44 CSS pixels in implementation without moving the artwork.
+
+### Inspection, invariants and limitations
+
+- Inspected the generated scenes and all hand variants, then the final scenes, 100% face/chair/hand/mouse crops, every final patch at 100%, and desktop/mobile prop composites. Both hands contact the keycaps, the backrest/headrest belong to one chair, and the mouse is on the keyboard's right with its button/front end toward the monitor. No second keyboard, chair or mouse remains.
+- The monitor apertures are uniformly RGB `(24,25,27)` (`#18191B`). The existing screen quads were retained exactly. No text, UI, bonsai or handheld was added to either base scene; the optional prop inspection composites are not shipped.
+- Window, lamp, mug, shelf, pedestal book, dumbbells and handheld surface retain their original positions. Original pixels outside the local mascot/workstation blend mask are retained. The sky clips and prop transforms above continue to apply. A bonsai can naturally overlap the right sleeve/chair edge on mobile; it does not cover the typing fingers.
+- Every frame 1 is byte-for-byte identical in decoded RGB to its scene crop. Each variant has a five-pixel unchanged rim; the following ten-pixel inward ramp blends generated content to the original crop. Desktop variants change only inside `[1085,940,430,130]`; mobile variants only inside `[425,1350,290,95]`. Outside the documented patch rectangles, assembled frames have zero changed pixels.
+- The built-in editor has no explicit mask/model/quality selector. Highest quality and local-region edits were requested in the prompts. It still repainted pixels outside the requested region, so only the cropped hand regions were used, with deterministic soft edge blending.
+- Native generations were 1672×941 desktop and 852×1846 mobile. The final 2560×1440 and 1080×2340 masters are Lanczos-resampled/registered exports, not native-resolution generations. The original background pixels are preserved outside the edit mask. No anatomical content was drawn with code.
+- All requested deliverables are supplied, including mobile hands. The assets are ready for integration; this commit does not alter the live site. Keep these PNG masters in the art source folder and derive appropriately compressed responsive assets through the existing pipeline.
