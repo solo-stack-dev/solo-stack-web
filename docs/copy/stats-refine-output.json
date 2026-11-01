@@ -1,0 +1,16 @@
+{
+	"de": {
+		"stats_period_days": "{days} Tage",
+		"stats_delta_previous": "ggü. den {days} Tagen davor",
+		"stats_growth_description": "So haben sich die Followerzahlen in den letzten {days} Tagen entwickelt.",
+		"stats_sparkline_label": "Trend der letzten {days} Tage",
+		"stats_activity_description": "Hier siehst du die Beiträge der letzten {weeks} Wochen auf allen Plattformen."
+	},
+	"en": {
+		"stats_period_days": "{days} days",
+		"stats_delta_previous": "vs. the previous {days} days",
+		"stats_growth_description": "See how follower counts have changed over the last {days} days.",
+		"stats_sparkline_label": "Trend over the last {days} days",
+		"stats_activity_description": "See posts across all platforms over the last {weeks} weeks."
+	}
+}

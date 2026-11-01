@@ -105,3 +105,13 @@ Recommended shape:
 ## Homepage code
 
 The homepage lives in `src/lib/home/` (one folder per section, shared components, data remote functions) and is composed by `src/routes/+page.svelte`. Folder ownership, the `--night` scroll contract, shared component APIs, the game module contract, message key rules, and asset conventions are in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md). `docs/mockups/` holds design artifacts and is excluded from oxfmt and oxlint.
+
+## Stats page
+
+`/stats` (`src/routes/(site)/stats/`, components in `src/lib/stats/`) shows the numbers of all social profiles. **It runs on mock data** until the platform APIs are connected.
+
+- **Data contract:** `src/lib/stats/schema.ts` (valibot `StatsSchema`): daily series of `HISTORY_DAYS` entries (two of the longest period plus today) for followers per platform, YouTube views and watch time, and posts; plus the top YouTube videos with views per period. The UI only reads a parsed `Stats` object.
+- **Source:** `getStats()` in `stats.remote.ts` is a `prerender` remote function that currently returns `createMockStats()` (`mock.ts`, seeded and deterministic). Replace it with real fetches and keep the `v.parse`. Switch to a cached `query` if the numbers should refresh without a rebuild.
+- **Charts:** LayerChart via shadcn-svelte `chart`, loaded lazily with `LazyMount` (own chunk); sparklines, the share bar and the activity calendar are plain SVG/HTML. Colors come from `--chart-1` … `--chart-5` (fixed per entity, validated per theme), `--chart-accent` and `--chart-wash` in `src/routes/layout.css`.
+- **Copy:** `stats_*` messages, generated with `gpt-6.1-sol` (`docs/copy/stats-*`).
+- **Open (real data):** YouTube Data API v3 + YouTube Analytics API (subscribers, views, watch time, top videos; OAuth for analytics), GitHub REST (followers), Bluesky public API (`app.bsky.actor.getProfile`, no auth), Twitch Helix (followers, app token), Instagram/Threads/Facebook via Meta Graph APIs (business or creator account and app review), TikTok Display API, X API (paid tier for follower counts). Daily history needs a stored snapshot per day (e.g. a scheduled Worker writing to D1/KV), since most APIs only return the current count.
