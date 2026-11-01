@@ -130,3 +130,9 @@ Rebuild with an already installed Sharp: `node docs/art/mascot/build-walk.mjs`. 
 - `walk-source-far.png`: 1064×1478, 701,029 bytes.
 - `walk-source-near.png`: 1064×1478, 781,043 bytes.
 - `walk-validation.json`: 1,850 bytes.
+
+### C: sixteen-frame cycle for the sunrise footer (2026-11-01)
+
+`node docs/art/mascot/build-walk.mjs <sharp module path> --frames=16` bakes a 16-frame cycle from the same puppet and leaves every file above untouched. Differences from B: the support foot moves back at a **constant** speed relative to the hip during stance (140 → −200 px over half a cycle; B's eight keys were uneven: 95/110/80/55 px), so a runtime that advances the figure by exactly `cycleLength / frames` = 42.5 px per frame keeps the planted foot fixed. Swing x is cosine-eased, lift is `62·sin(π·t^0.75)` (fits B's 0/55/60/35), pitch, bob and arm angle are periodic Catmull-Rom through B's eight keys.
+
+Outputs: `mascot-walk16@1…16.png` (full frames, review only; not committed, the command regenerates them), `walk16-leg-far@1…16.png` and `walk16-leg-near@1…16.png` (each leg alone, bob baked in; the production source), `walk16-cycle.json` (step length 340 px, per-frame bob, arm angle, IK joint angles, bounds). Frames 1 and 9 are the contact poses. The sunrise section (`src/lib/home/sections/sunrise/tools/build-assets.mjs`) packs the legs into one atlas and layers it with the static body (translateY by bob) and near arm (rotated around the shoulder), which costs about half the bytes of a full-figure sheet.

@@ -1,10 +1,17 @@
+/* oxlint-disable no-console -- CLI tool that reports what it baked */
 // Offline art assembly only. All painted pixels come from the four imagegen masters.
-// Usage: node docs/art/mascot/build-walk.mjs [absolute path to an existing sharp module]
+// Usage: node docs/art/mascot/build-walk.mjs [absolute path to an existing sharp module] [--frames=N]
+// --frames=N bakes only an N-frame cycle (mascot-walkN@1…N.png, the legs alone as walkN-leg-{far,near}@1…N.png, and
+// walkN-cycle.json with per-frame body bob and arm angle) from the existing puppet parts, with
+// the support foot moving at a constant speed relative to the hip, so a runtime that advances the figure by
+// cycleLength / N per frame keeps the planted foot fixed (no skating). Everything else is left untouched.
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 const require = createRequire(import.meta.url);
-const sharp = require(process.argv[2] || 'sharp');
+const args = process.argv.slice(2);
+const sharp = require(args.find((arg) => !arg.startsWith('--')) || 'sharp');
+const cycleFrames = Number(args.find((arg) => arg.startsWith('--frames='))?.slice(9) ?? 0);
 const dir = fileURLToPath(new URL('.', import.meta.url));
 const W = 1152,
 	H = 1600,
@@ -33,7 +40,7 @@ const placements = {
 	far: { output: 'leg-far', width: 280, height: 600, left: 450, top: 900, flop: true },
 	arm: { output: 'arm-near', width: 180, height: 480, left: 408, top: 580 }
 };
-for (const [key, p] of Object.entries(placements)) {
+for (const [key, p] of cycleFrames ? [] : Object.entries(placements)) {
 	const source = dir + `walk-source-${key}.png`;
 	const input = await sharp(source)
 		.extract(await bounds(source))
@@ -202,18 +209,19 @@ const pitch = [-8, 0, 0, 8, 8, 8, 0, -5];
 const bob = [35, 45, 20, 10, 35, 45, 20, 10];
 const rad = Math.PI / 180;
 const inverseLeg = async (side, phase, bodyY) => {
+	const gait = typeof phase === 'number' ? { x: stepX[phase], lift: lift[phase], pitch: pitch[phase] } : phase;
 	const r = rig[side],
 		[hx, hy] = r.hip,
 		[kx, ky] = r.knee,
 		[ax, ay] = r.ankle;
 	// Find the rotated sole's actual lowest opaque pixel, then put it on the ground or swing arc.
 	const footBounds = await bounds(
-		await sharp(svg(rotate(pitch[phase], r.ankle, img(`foot-${side}`))))
+		await sharp(svg(rotate(gait.pitch, r.ankle, img(`foot-${side}`))))
 			.png()
 			.toBuffer()
 	);
-	const targetX = hx + stepX[phase];
-	const targetY = baseline - lift[phase] - (footBounds.top + footBounds.height - 1 - ay);
+	const targetX = hx + gait.x;
+	const targetY = baseline - gait.lift - (footBounds.top + footBounds.height - 1 - ay);
 	const dx = targetX - hx,
 		dy = targetY - (hy + bodyY);
 	const a = Math.hypot(kx - hx, ky - hy),
@@ -228,9 +236,70 @@ const inverseLeg = async (side, phase, bodyY) => {
 		restLower = Math.atan2(-(ax - kx), ay - ky);
 	const hip = (upper - restUpper) / rad;
 	const knee = (lower - restLower) / rad - hip;
-	const ankle = pitch[phase] - hip - knee;
-	return { hip, knee, ankle, footTarget: [targetX, targetY], footLift: lift[phase], footPitch: pitch[phase] };
+	const ankle = gait.pitch - hip - knee;
+	return { hip, knee, ankle, footTarget: [targetX, targetY], footLift: gait.lift, footPitch: gait.pitch };
 };
+// Periodic Catmull-Rom through the eight keyed values (equally spaced over one cycle).
+const periodic = (table, p) => {
+	const n = table.length,
+		f = (((p % 1) + 1) % 1) * n,
+		i = Math.floor(f),
+		t = f - i;
+	const v = (k) => table[(((i + k) % n) + n) % n];
+	const [p0, p1, p2, p3] = [v(-1), v(0), v(1), v(2)];
+	return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+};
+if (cycleFrames) {
+	const stance = stepX[0] - stepX[4];
+	// Stance (p 0…0.5): linear, so the planted foot is fixed while the body advances evenly. Swing: eased, lifted.
+	const foot = (p) => {
+		p = ((p % 1) + 1) % 1;
+		const footPitch = periodic(pitch, p);
+		if (p <= 0.5) return { x: stepX[0] - 2 * stance * p, lift: 0, pitch: footPitch };
+		const t = (p - 0.5) * 2;
+		return { x: stepX[4] + (stance * (1 - Math.cos(Math.PI * t))) / 2, lift: Math.round(62 * Math.sin(Math.PI * t ** 0.75) * 10) / 10, pitch: footPitch };
+	};
+	const arms = rig.poses.map((pose) => pose.arm);
+	const cycle = {
+		frames: cycleFrames,
+		canvas: [W, H],
+		baseline,
+		stepLength: stance,
+		cycleLength: 2 * stance,
+		advancePerFrame: (2 * stance) / cycleFrames,
+		contactFrames: [0, cycleFrames / 2],
+		poses: []
+	};
+	for (let i = 0; i < cycleFrames; i++) {
+		const p = i / cycleFrames,
+			bodyY = Math.round(periodic(bob, p) * 10) / 10;
+		const nearGait = foot(p),
+			farGait = foot(p + 0.5);
+		const near = await inverseLeg('near', nearGait, bodyY),
+			far = await inverseLeg('far', farGait, bodyY);
+		const arm = periodic(arms, p);
+		const legs = { far: await meshLeg('far', far), near: await meshLeg('near', near) };
+		const content = legs.far + img('body') + legs.near + rotate(arm, rig.shoulder, img('arm-near'));
+		// The legs alone, per frame, for runtimes that layer them with the static body (translateY) and arm (rotate).
+		for (const side of ['far', 'near'])
+			await sharp(svg(`<g transform="translate(0 ${bodyY})">${legs[side]}</g>`))
+				.png()
+				.toFile(dir + `walk${cycleFrames}-leg-${side}@${i + 1}.png`);
+		const png = await sharp(svg(`<g transform="translate(0 ${bodyY})">${content}</g>`))
+			.png()
+			.toBuffer();
+		const b = await bounds(png);
+		if (b.top + b.height - 1 > baseline + 1) throw new Error(`Frame ${i + 1}: below the baseline (${b.top + b.height - 1})`);
+		await fs.writeFile(dir + `mascot-walk${cycleFrames}@${i + 1}.png`, png);
+		cycle.poses.push({ frame: i + 1, phase: p, translateY: bodyY, arm, bounds: b, near, far });
+		console.log(
+			`frame ${i + 1}/${cycleFrames}: bottom ${b.top + b.height - 1}, near ${nearGait.x.toFixed(1)}/${nearGait.lift}, far ${farGait.x.toFixed(1)}/${farGait.lift}`
+		);
+	}
+	await fs.writeFile(dir + `walk${cycleFrames}-cycle.json`, JSON.stringify(cycle, null, 2) + '\n');
+	console.log(`Baked ${cycleFrames}-frame cycle.`);
+	process.exit(0);
+}
 for (let i = 0; i < 8; i++) {
 	const near = await inverseLeg('near', i, bob[i]),
 		far = await inverseLeg('far', (i + 4) % 8, bob[i]);
