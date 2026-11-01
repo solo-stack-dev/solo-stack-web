@@ -1,19 +1,30 @@
 <!--
 	@component
-	Section heading with a small monospace index (like the clock labels on the homepage) and a one line description.
+	Section heading: Geist Black over a transparent wash of butter pigment (the painted bloom from the homepage),
+	slightly rotated, like a highlighter stroke on watercolor paper. One line description below.
 -->
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
 
-	let { id, index, title, description, icon }: { id: string; index: string; title: string; description?: string; icon?: Snippet } = $props();
+	let { id, title, description, tilt = -2 }: { id: string; title: string; description?: string; tilt?: number } = $props();
 </script>
 
-<header class="grid gap-1.5">
-	<p class="flex items-center gap-2 font-mono text-[0.7rem] tracking-clock text-muted-foreground" aria-hidden="true">
-		<span class="text-foreground">{index}</span><span class="h-px w-8 bg-border"></span>
-	</p>
-	<h2 {id} class="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-		{#if icon}<span class="text-muted-foreground">{@render icon()}</span>{/if}{title}
-	</h2>
-	{#if description}<p class="max-w-prose text-sm text-muted-foreground sm:text-base">{description}</p>{/if}
+<header class="grid gap-2">
+	<div class="relative isolate w-fit">
+		<span
+			class="bloom pointer-events-none absolute top-[38%] -left-4 -z-10 block h-[105%] w-[72%] max-w-80 opacity-55 mix-blend-multiply dark:opacity-25 dark:mix-blend-normal"
+			style:background-image="url({bloom.img.src})"
+			style:transform="rotate({tilt}deg)"
+			aria-hidden="true"
+		></span>
+		<h2 {id} class="font-display text-4xl leading-none font-black tracking-wordmark text-balance sm:text-5xl">{title}</h2>
+	</div>
+	{#if description}<p class="max-w-prose text-pretty text-muted-foreground sm:text-lg">{description}</p>{/if}
 </header>
+
+<style>
+	.bloom {
+		background-size: 100% 100%;
+		background-repeat: no-repeat;
+	}
+</style>

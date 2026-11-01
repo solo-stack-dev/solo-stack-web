@@ -1,6 +1,6 @@
 /**
  * MOCK DATA for the /stats page. Every number here is made up (seeded, deterministic, so builds are stable).
- * Replace `createMockStats()` in `stats.remote.ts` with real API calls once the platforms are connected; the shape is
+ * Replace `createMockStats()` in `source.server.ts` with real API calls once the platforms are connected; the shape is
  * `Stats` from `schema.ts`. The example video titles come from gpt-6.1-sol (docs/copy/stats-mock-videos-*.md).
  */
 import { HISTORY_DAYS, STAT_PLATFORM_IDS, type Stats, type StatPlatformId, type TopVideo } from './schema.ts';
@@ -15,7 +15,7 @@ const MOCK_VIDEO_TITLES: readonly string[] = [
 	'Zwischen Kundenarbeit und meinen eigenen Projekten'
 ];
 
-/** Fixed last day of the mock series, so prerendered output does not change from build to build. */
+/** Fixed last day of the mock series, so the mock page looks the same on every request. */
 export const MOCK_AS_OF = '2026-10-31';
 
 /** Followers 180 days ago → today, per platform. */
