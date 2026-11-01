@@ -62,11 +62,18 @@
 	--border: #e6dcc3;
 	--input: #e6dcc3;
 	--ring: #e2a93b;
-	--chart-1: #e2a93b;
-	--chart-2: #2a2723;
-	--chart-3: #fcd772;
-	--chart-4: #8a7f6a;
-	--chart-5: #b8601f;
+	/*
+	 * Charts: watercolor pigments (yellow ochre, prussian blue, burnt sienna, violet, sap green). Categorical order is
+	 * fixed and validated per surface (lightness band, chroma, CVD and contrast): keep the order when editing.
+	 * `--chart-accent` is the single series line (ochre on paper, butter at night), `--chart-wash` its area fill.
+	 */
+	--chart-1: #b97d10;
+	--chart-2: #2468a0;
+	--chart-3: #d0602c;
+	--chart-4: #7c56a8;
+	--chart-5: #4f8a3a;
+	--chart-accent: #b97d10;
+	--chart-wash: #fcd772;
 	--sidebar: #f8f1de;
 	--sidebar-foreground: #18191b;
 	--sidebar-primary: #18191b;
@@ -96,11 +103,13 @@
 	--border: rgb(251 243 221 / 0.1);
 	--input: rgb(251 243 221 / 0.15);
 	--ring: #fcd772;
-	--chart-1: #fcd772;
-	--chart-2: #e2a93b;
-	--chart-3: #fbf3dd;
-	--chart-4: #8a7f6a;
-	--chart-5: #f08a4b;
+	--chart-1: #c0861e;
+	--chart-2: #3f86c8;
+	--chart-3: #d96a35;
+	--chart-4: #9370cc;
+	--chart-5: #5f9e46;
+	--chart-accent: #fcd772;
+	--chart-wash: #fcd772;
 	--sidebar: #141517;
 	--sidebar-foreground: #fbf3dd;
 	--sidebar-primary: #fcd772;
@@ -139,6 +148,8 @@
 	--color-chart-3: var(--chart-3);
 	--color-chart-4: var(--chart-4);
 	--color-chart-5: var(--chart-5);
+	--color-chart-accent: var(--chart-accent);
+	--color-chart-wash: var(--chart-wash);
 	--color-sidebar: var(--sidebar);
 	--color-sidebar-foreground: var(--sidebar-foreground);
 	--color-sidebar-primary: var(--sidebar-primary);
