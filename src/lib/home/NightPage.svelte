@@ -14,6 +14,7 @@
 	import type { Snippet } from 'svelte';
 	import { on } from 'svelte/events';
 	import { m } from '#lib/paraglide/messages.js';
+	import Eggs from './eggs/Eggs.svelte';
 	import { NIGHT_HOURS, NIGHT_HOUR_ATTR, type SectionId } from './night.ts';
 	import PaperGrain from './shared/PaperGrain.svelte';
 	import ShootingStars from './shared/ShootingStars.svelte';
@@ -182,6 +183,8 @@
 	<main id="main" class="night-main">
 		{@render children()}
 	</main>
+
+	<Eggs />
 
 	<PaperGrain />
 </div>

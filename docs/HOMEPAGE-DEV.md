@@ -245,3 +245,48 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 - `TODO(launch)`: remove or protect `/lab/games`.
 - `TODO(sunrise agent)`: legal links (Impressum, Datenschutz, Kontakt) once the pages exist.
 - The YouTube feed is currently empty (no public video yet), so the cinema shows the channel fallback until the first upload and the next build.
+
+## 11. Easter eggs (`src/lib/home/eggs/`)
+
+`NightPage` mounts `<Eggs />` once. `Eggs.svelte` is the only egg code in the initial bundle (a few window listeners and dice rolls); every effect is its own lazy chunk, loaded on its trigger, rendered as a fixed `pointer-events: none` overlay (z-index 2: over the content, under the paper grain and the nav), and unmounted when done. Escape removes running eggs. Copy keys: `egg_*`.
+
+| Egg            | Trigger                                                                                                                  | Folder            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------- |
+| Crescent slash | hero `night:moon-phase` reaches `crescent`; at most once per 10 s; off under reduced motion                              | `crescent-slash/` |
+| Moon presence  | hero `night:moon-full-clicks` count 10, 20, 30 …; positioned over `[data-egg-moon]`                                      | `moon-presence/`  |
+| ARISE          | Konami code (ignored while typing in inputs, textareas, contenteditable), `arise()` in the console, `night:egg-arise`    | `arise/`          |
+| Three stars    | 1 in 6 page views after 30–90 s without input while a dark section (21:00–04:00) is centered, or `night:egg-three-stars` | `three-stars/`    |
+| Shiny mascot   | 1 in 4096 sessions (12-bit draw, cached in `sessionStorage`), `?shiny=1` forces it, `?shiny=0` forces it off             | `shiny/`          |
+| Console        | idle after load (production too): ASCII moon + message once per session, defines `window.arise()`                        | `console/`        |
+
+Reduced motion: eggs that would move render a calm opacity-only variant (`fade.ts`, Web Animations, because the global guard in `layout.css` collapses CSS animations); the crescent slash is skipped.
+
+**Triggering from your section.** Import the event names from `#lib/home/eggs/events.ts` (tiny, no egg code):
+
+```ts
+import { THREE_STARS_EVENT } from '#lib/home/eggs/events.ts';
+window.dispatchEvent(new CustomEvent(THREE_STARS_EVENT)); // e.g. a game milestone
+```
+
+**Shiny mascot.** While the visitor rolled shiny, `[data-night-page]` has `data-shiny`. Every element with class `mascot` then gets a fallback golden filter and a tiny sparkle (`::after`, so the `.mascot` element must be positioned and must not use `::after` itself). To show real golden art instead (model sheet v2 golden variant, `docs/art/mascot/mascot-golden.png`), render both variants and swap them in CSS, and put `data-shiny-art` on the `.mascot` element to opt out of the filter:
+
+```svelte
+<div class="mascot" data-shiny-art>
+	<enhanced:img class="mascot-normal" src={mascot} alt="" />
+	<enhanced:img class="mascot-golden" src={mascotGolden} alt="" loading="lazy" />
+</div>
+
+<style>
+	.mascot-golden {
+		display: none;
+	}
+	:global([data-shiny]) .mascot-golden {
+		display: block;
+	}
+	:global([data-shiny]) .mascot-normal {
+		display: none;
+	}
+</style>
+```
+
+`loading="lazy"` plus `display: none` keeps the golden image from downloading for the 4095 other visitors. Test with `?shiny=1`.
