@@ -13,6 +13,7 @@ Status: initial scaffold. This describes what is set up and the intended directi
 | Styling    | Tailwind CSS 4 (CSS first config)                                                                                  | `src/routes/layout.css`         |
 | Content    | mdsvex: `.md` and `.svx` files are Svelte components with frontmatter                                              | `vite.config.ts`                |
 | Images     | `@sveltejs/enhanced-img` for build time optimized images                                                           |                                 |
+| 3D         | Threlte (`@threlte/core` 8, `@threlte/extras` 9) + `three`, lazy chunks only (hero moon, maybe a game)             |                                 |
 | i18n       | Paraglide JS, locales `de` (base, unprefixed URLs) and `en` (`/en/…`), URL strategy                                | `project.inlang/`, `messages/`  |
 | SEO        | super-sitemap for `sitemap.xml`                                                                                    |                                 |
 | Font       | Geist variable, self hosted and preloaded                                                                          | `static/fonts/`, `src/app.html` |
@@ -99,3 +100,7 @@ Recommended shape:
 - Games and canvas experiments load on interaction or when scrolled into view, and pause when off screen.
 - Every animation has a `prefers-reduced-motion` fallback.
 - Run `pnpm analyze` after adding dependencies and read the bundle analyzer report (`.svelte-kit/output/client/analyze-data.md`). Deploy builds never include it.
+
+## Homepage code
+
+The homepage lives in `src/lib/home/` (one folder per section, shared components, data remote functions) and is composed by `src/routes/+page.svelte`. Folder ownership, the `--night` scroll contract, shared component APIs, the game module contract, message key rules, and asset conventions are in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md). `docs/mockups/` holds design artifacts and is excluded from oxfmt and oxlint.

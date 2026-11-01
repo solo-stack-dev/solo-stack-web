@@ -8,5 +8,5 @@
 	"sortTailwindcss": {
 		"stylesheet": "./src/routes/layout.css"
 	},
-	"ignorePatterns": ["pnpm-lock.yaml", "src/lib/paraglide", "worker-configuration.d.ts", "/static/"]
+	"ignorePatterns": ["pnpm-lock.yaml", "src/lib/paraglide", "worker-configuration.d.ts", "/static/", "docs/mockups/"]
 }

@@ -53,22 +53,41 @@ All visitor facing text is generated with `gpt-6.1-sol` (see [AGENTS.md](../AGEN
 
 Scrolling the homepage is one night passing. Every section is an hour with a small monospace clock label, and the whole page is one continuous painted world: the sky darkens after the hero and brightens again toward the sunrise footer, which ends on the butter yellow paper where the banner begins. Full specs, assets, build approach, and the implementation plan are in [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md). Mockups: [docs/mockups/round-2/index.html](mockups/round-2/index.html).
 
-| Time  | Section                    | Decided direction                                                                                                                                                                                  | Reference mockup                                                         |
-| ----- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| 20:00 | Hero: moonrise             | Huge painted moon, wordmark split light on night / dark on moon, mascot sitting on the moon's rim with a laptop, real portrait in a torn paper frame, shooting stars, clickable moon phases.       | `round-2/02-hero/05-painted-moon-desktop.png`, `06-…-mobile`, `07-…strip` |
-| 21:00 | What I make                | One continuous ink line, scrubbed by scroll, morphs lightbulb → prompt → `</>` → phone → chart → moon over the cliff; each shape blooms with yellow pigment; the four pillars as a nav row.        | `round-2/03-what-i-make/01-ink-morph-desktop-context.png`, `02-storyboard-*` |
-| 22:00 | Game (open)                | Not decided. Three playable prototypes get built: A moon planet (radial gravity, squash bugs), B stack to the moon (stack tool blocks), C constellation hunt (trace tool star signs, Svelte as the signature). The owner playtests them at `/lab/games` and picks. | `round-2/04-game/*`, seed for C: `round-2/03-what-i-make/04-constellations-desktop.png` |
-| 01:00 | Night shift                | Painted desk scene from one fixed view: mascot coding with headphones, real git commits on the monitor, coffee steam, dumbbells, manga shelf, original handheld console, golden bonsai egg.       | `round-2/05-night-shift-radio/01-…`, `02-night-shift-bonsai-hover.png`    |
-| 02:00 | Night radio                | Painted (not photoreal) vintage radio; social platforms are the stations and must be much more visible (logo preset keys, logo on the dial glass); own track plays, horizon becomes the waveform. | `round-2/05-night-shift-radio/06-…` to `11-…`                             |
-| 04:00 | Latest video               | Open air cinema: the laptop on the cliff projects the newest video onto the night sky; YouTube iframe loads on click.                                                                             | `round-2/06-video-sunrise/01-…`, `02-…`, `03-…`                          |
-| 06:00 | Sunrise footer             | Night melts into butter yellow paper, mascot walks off with the laptop, steaming coffee, footer links.                                                                                           | `round-2/06-video-sunrise/05-…`, `06-…`, `07-…`                          |
-| ⌁     | Whole page flow            | Painted night throughout, sections blend into each other like one landscape.                                                                                                                     | `round-2/07-full-page/01-painted-night-lightbox-desktop.png`             |
+| Time  | Section         | Decided direction                                                                                                                                                                                                                                                  | Reference mockup                                                                        |
+| ----- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| 20:00 | Hero: moonrise  | Huge painted moon, wordmark split light on night / dark on moon, mascot sitting on the moon's rim with a laptop, real portrait in a torn paper frame, shooting stars, clickable moon phases.                                                                       | `round-2/02-hero/05-painted-moon-desktop.png`, `06-…-mobile`, `07-…strip`               |
+| 21:00 | What I make     | One continuous ink line, scrubbed by scroll, morphs lightbulb → prompt → `</>` → phone → chart → moon over the cliff; each shape blooms with yellow pigment; the four pillars as a nav row.                                                                        | `round-2/03-what-i-make/01-ink-morph-desktop-context.png`, `02-storyboard-*`            |
+| 22:00 | Game (open)     | Not decided. Three playable prototypes get built: A moon planet (radial gravity, squash bugs), B stack to the moon (stack tool blocks), C constellation hunt (trace tool star signs, Svelte as the signature). The owner playtests them at `/lab/games` and picks. | `round-2/04-game/*`, seed for C: `round-2/03-what-i-make/04-constellations-desktop.png` |
+| 01:00 | Night shift     | Painted desk scene from one fixed view: mascot coding with headphones, real git commits on the monitor, coffee steam, dumbbells, manga shelf, original handheld console, golden bonsai egg.                                                                        | `round-2/05-night-shift-radio/01-…`, `02-night-shift-bonsai-hover.png`                  |
+| 02:00 | Night radio     | Painted (not photoreal) vintage radio; social platforms are the stations and must be much more visible (logo preset keys, logo on the dial glass); own track plays, horizon becomes the waveform.                                                                  | `round-2/05-night-shift-radio/06-…` to `11-…`                                           |
+| 04:00 | Latest video    | Open air cinema: the laptop on the cliff projects the newest video onto the night sky; YouTube iframe loads on click.                                                                                                                                              | `round-2/06-video-sunrise/01-…`, `02-…`, `03-…`                                         |
+| 06:00 | Sunrise footer  | Night melts into butter yellow paper, mascot walks off with the laptop, steaming coffee, footer links.                                                                                                                                                             | `round-2/06-video-sunrise/05-…`, `06-…`, `07-…`                                         |
+| ⌁     | Whole page flow | Painted night throughout, sections blend into each other like one landscape.                                                                                                                                                                                       | `round-2/07-full-page/01-painted-night-lightbox-desktop.png`                            |
 
 **Easter eggs (decided, build after the main sections):** moon phase crescent slash, a mysterious presence on the full moon, Konami code "ARISE" ink shadows, golden bonsai, three stars forming triangles, a 1 in 4096 shiny golden mascot, DevTools console message with an ASCII moon and `arise()`, 404 as an ink void "domain expansion", 500 with a giant peeking over a wall, and later a hidden radio station. Mockups in `round-2/01-mascot-easter-eggs/`.
 
 **Star signs / zodiac:** the owner likes the idea of the tools as constellations (Svelte as the signature sign) and wants it somewhere on the site even if the constellation game does not win, e.g. hidden constellations in the night sky, a zodiac wheel on `/uses`, or a dev horoscope.
 
 **Rejected or parked:** round 1 HTML concepts (too generic), paper cut lightbox hero and "moon tear" hero (parked; the moon tear could return as a transition), isometric room, anime "next episode" video card (parked), automatic site wide theme switching by time of day (dropped in favor of the fixed night journey).
+
+## Links
+
+Public profiles, verified by the owner on 2026-10-31 (source: `D:\repos\Solo Stack\produktion\SOCIAL-MEDIA-EINRICHTUNG-2026-10-27.md` and `PROFILPRUEFUNG-2026-10-31.md`). Code reads them from `src/lib/home/data/socials.ts`.
+
+| Platform  | URL                                                    | Handle                  |
+| --------- | ------------------------------------------------------ | ----------------------- |
+| YouTube   | https://www.youtube.com/@solostack_dev                 | @solostack_dev          |
+| GitHub    | https://github.com/solo-stack-dev                      | solo-stack-dev          |
+| Instagram | https://www.instagram.com/solostack.dev/               | solostack.dev           |
+| TikTok    | https://www.tiktok.com/@solo_stack                     | @solo_stack             |
+| X         | https://x.com/solostack_dev                            | @solostack_dev          |
+| Bluesky   | https://bsky.app/profile/solo-stack.bsky.social        | @solo-stack.bsky.social |
+| Threads   | https://www.threads.com/@solostack.dev                 | @solostack.dev          |
+| Twitch    | https://www.twitch.tv/solo_stack                       | solo_stack              |
+| Facebook  | https://www.facebook.com/profile.php?id=61595766765047 | (profile, no handle)    |
+| Discord   | open: needs a permanent invite from the owner          |                         |
+
+YouTube channel ID: `UCv6ihOMjTq6zdJC7IbCdpKQ` (feed: `https://www.youtube.com/feeds/videos.xml?channel_id=UCv6ihOMjTq6zdJC7IbCdpKQ`). Not listed: Spotify (show has no cover and no episode yet), LinkedIn (deferred).
 
 ## Pages (planned)
 

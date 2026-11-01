@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**solo-stack.dev** is the personal homepage and video blog for the Solo Stack YouTube channel. It is a playful, branded landing page plus a blog that turns each YouTube video into an SEO-friendly article. Read [docs/PROJECT.md](docs/PROJECT.md) for the full picture and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before making structural changes. Homepage work follows [docs/HANDOFF-HOMEPAGE.md](docs/HANDOFF-HOMEPAGE.md).
+**solo-stack.dev** is the personal homepage and video blog for the Solo Stack YouTube channel. It is a playful, branded landing page plus a blog that turns each YouTube video into an SEO-friendly article. Read [docs/PROJECT.md](docs/PROJECT.md) for the full picture and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before making structural changes. Homepage work follows [docs/HANDOFF-HOMEPAGE.md](docs/HANDOFF-HOMEPAGE.md); code in `src/lib/home/` follows [docs/HOMEPAGE-DEV.md](docs/HOMEPAGE-DEV.md) (folder ownership, shared APIs, message keys).
 
 ## Hard rule: public text comes from `gpt-6.1-sol`
 
