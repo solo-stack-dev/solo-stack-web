@@ -1,18 +1,35 @@
 <!--
 	@component
-	STUB (Phase 0): proves Threlte loads as a lazy chunk. The hero agent replaces it with the painted, rotating moon
-	with phases (docs/HANDOFF-HOMEPAGE.md §5.1). `renderMode="on-demand"` renders only when something changes.
+	The Threlte moon (lazy chunk, loaded by Hero.svelte only after hydration + idle, with WebGL, motion allowed,
+	and not on narrow or low-end devices). Fills its parent, which has exactly the size of the moon circle.
+	Rendering is driven by a RafLoop at 30 fps that stops off screen, in hidden tabs, and when unmounted.
 -->
 <script lang="ts">
-	import { Canvas, T } from '@threlte/core';
+	import { Canvas } from '@threlte/core';
+	import { NoToneMapping } from 'three';
+	import MoonBody from './MoonBody.svelte';
+
+	type Props = {
+		/** Phase angle in degrees (see moon.ts). */
+		angle: number;
+		/** First frame with the texture is on screen. */
+		onready?: () => void;
+		/** WebGL context lost: the hero falls back to the painted image. */
+		onlost?: () => void;
+	};
+
+	let { angle, onready, onlost }: Props = $props();
 </script>
 
-<Canvas renderMode="on-demand">
-	<T.PerspectiveCamera makeDefault position={[0, 0, 4]} fov={40} />
-	<T.AmbientLight intensity={0.15} />
-	<T.DirectionalLight position={[3, 1.5, 3]} intensity={2.4} />
-	<T.Mesh>
-		<T.SphereGeometry args={[1.3, 64, 32]} />
-		<T.MeshToonMaterial color="#fcd772" />
-	</T.Mesh>
-</Canvas>
+<div class="moon-scene">
+	<Canvas renderMode="on-demand" dpr={[1, 1.5]} toneMapping={NoToneMapping}>
+		<MoonBody {angle} {onready} {onlost} />
+	</Canvas>
+</div>
+
+<style>
+	.moon-scene {
+		position: absolute;
+		inset: 0;
+	}
+</style>
