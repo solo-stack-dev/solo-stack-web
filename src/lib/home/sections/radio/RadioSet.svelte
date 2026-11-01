@@ -4,21 +4,20 @@
 	variants and CSS shows the matching one (no layout shift at hydration); the hidden one is `display: none`, so it is
 	out of the tab order and the accessibility tree, and its lazy images are never fetched.
 
-	Layers, back to front: body (empty glass, strip window, key recess) → printed scale + mini logos (SVG in body
-	units) → needle → big station logo / name / handle → dial slider (transparent range input over the glass) →
-	display strip (snippet) → preset keys → knob.
+	Layers, back to front: body (painted glass, strip window, key recess) → printed slide-rule scale + mini logos (SVG
+	in body pixels) → needle (slides along the scale) → big station logo, name, handle and live content on the glass →
+	dial slider (transparent range input over the glass) → display strip (snippet) → preset keys → knobs.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { m } from '#lib/paraglide/messages.js';
-	import bodyTall from './assets/radio-body-mobile.png?enhanced';
-	import bodyWide from './assets/radio-body.png?enhanced';
-	import keyPressed from './assets/radio-key-pressed.png?enhanced';
-	import keyUp from './assets/radio-key.png?enhanced';
-	import knobImage from './assets/radio-knob.png?enhanced';
-	import needleImage from './assets/radio-needle.png?enhanced';
+	import keyPressed from './assets/radio-key-pressed.webp?enhanced';
+	import keyUp from './assets/radio-key.webp?enhanced';
+	import knobImage from './assets/radio-knob.webp?enhanced';
+	import needleImage from './assets/radio-needle.webp?enhanced';
 	import BrandIcon from './BrandIcon.svelte';
-	import { RADIO_LAYOUT, keySlots, toPercent, type RadioLayout } from './layout.ts';
+	import StationContent from './StationContent.svelte';
+	import { RADIO_LAYOUT, keySlots, toPercent, type Knob, type RadioLayout, type Rect } from './layout.ts';
 	import { DIAL_MAX, type Station } from './stations.ts';
 
 	interface Props {
@@ -33,71 +32,64 @@
 		/** Needle follows the pointer without easing. */
 		dragging: boolean;
 		reduced: boolean;
+		/** Music volume 0…1 (turns the left knob). */
+		volume: number;
 		onpreset: (station: Station) => void;
 		ondialinput: (value: number) => void;
 		ondialcommit: () => void;
 		ondialkey: (event: KeyboardEvent) => void;
-		strip: Snippet;
+		strip: Snippet<['wide' | 'tall']>;
 	}
 
-	let { variant, stations, dial, tuned, selected, dragging, reduced, onpreset, ondialinput, ondialcommit, ondialkey, strip }: Props = $props();
+	let { variant, stations, dial, tuned, selected, dragging, reduced, volume, onpreset, ondialinput, ondialcommit, ondialkey, strip }: Props = $props();
 
 	const layout: RadioLayout = $derived(RADIO_LAYOUT[variant]);
-	const body = $derived(variant === 'wide' ? bodyWide : bodyTall);
 	const slots = $derived(keySlots(layout, stations.length));
-	const pct = (rect: { x: number; y: number; w: number; h: number }) => toPercent(layout, rect);
+	const pct = (rect: Rect) => toPercent(layout, rect);
 
-	const angleAt = (position: number) => -layout.needle.sweep + position * 2 * layout.needle.sweep;
-	const needleAngle = $derived(angleAt(dial / DIAL_MAX));
-	const polar = (angle: number, radius: number) => {
-		const radians = ((angle - 90) * Math.PI) / 180;
-		return { x: layout.needle.pivot.x + Math.cos(radians) * radius, y: layout.needle.pivot.y + Math.sin(radians) * radius };
-	};
+	const xAt = (position: number) => layout.needle.x0 + position * (layout.needle.x1 - layout.needle.x0);
 
-	const needleBox = $derived.by(() => {
-		const { pivot, box, pivotFromBottom } = layout.needle;
-		return {
-			...pct({ x: pivot.x - box.w / 2, y: pivot.y - (box.h - pivotFromBottom), w: box.w, h: box.h }),
-			origin: `50% ${((box.h - pivotFromBottom) / box.h) * 100}%`
-		};
-	});
+	/** The needle box at dial 0; it slides by a transform (percent of its own width), never by layout. */
+	const needleBox = $derived(pct({ x: layout.needle.x0 - layout.needle.w / 2, y: layout.needle.top, w: layout.needle.w, h: layout.needle.h }));
+	const needleShift = $derived(((dial / DIAL_MAX) * (layout.needle.x1 - layout.needle.x0) * 100) / layout.needle.w);
 
-	/** Minor ticks every 2° plus the scale arc. */
+	/** Printed rule with a minor tick every 2 % of the dial, a longer one every 10 %. */
 	const scale = $derived.by(() => {
-		const { sweep } = layout.needle;
-		const { tickRadius } = layout.scale;
+		const { rule, minorTick } = layout.scale;
 		const ticks: string[] = [];
-		for (let angle = -sweep; angle <= sweep + 0.01; angle += 2) {
-			const a = polar(angle, tickRadius - 6);
-			const b = polar(angle, tickRadius);
-			ticks.push(`M${a.x.toFixed(1)} ${a.y.toFixed(1)}L${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+		for (let step = 0; step <= 50; step++) {
+			const x = xAt(step / 50).toFixed(1);
+			ticks.push(`M${x} ${rule - (step % 5 === 0 ? minorTick * 1.7 : minorTick)}V${rule}`);
 		}
-		const start = polar(-sweep, tickRadius);
-		const end = polar(sweep, tickRadius);
-		const arc = `M${start.x.toFixed(1)} ${start.y.toFixed(1)}A${tickRadius} ${tickRadius} 0 0 1 ${end.x.toFixed(1)} ${end.y.toFixed(1)}`;
-		return { ticks: ticks.join(''), arc };
+		return { ticks: ticks.join(''), rule: `M${layout.needle.x0 - 30} ${rule}H${layout.needle.x1 + 30}` };
 	});
 
 	const stationMarks = $derived(
 		stations.map((station) => {
-			const angle = angleAt(station.position);
-			const { tickRadius, logoRadius, logoSize } = layout.scale;
-			const a = polar(angle, tickRadius - 14);
-			const b = polar(angle, tickRadius + 4);
-			const logo = polar(angle, logoRadius);
-			return { station, tick: `M${a.x} ${a.y}L${b.x} ${b.y}`, logo: { x: logo.x - logoSize / 2, y: logo.y - logoSize / 2, size: logoSize } };
+			const x = xAt(station.position);
+			const { rule, markTop, logoY, logoSize } = layout.scale;
+			return { station, tick: `M${x} ${markTop}V${rule + 8}`, logo: { x: x - logoSize / 2, y: logoY - logoSize / 2, size: logoSize } };
 		})
 	);
 
-	const glassShown = $derived(tuned ?? null);
+	const knobs = $derived([
+		{ id: 'volume', knob: layout.knobs.volume, angle: volume * 300 - 150 },
+		{ id: 'tuning', knob: layout.knobs.tuning, angle: (dial / DIAL_MAX) * 300 - 150 }
+	]);
+	const knobBox = (knob: Knob) => pct({ x: knob.cx - knob.r, y: knob.cy - knob.r, w: knob.r * 2, h: knob.r * 2 });
 </script>
 
 <div class={['set', `set-${variant}`]} style:aspect-ratio="{layout.size.w} / {layout.size.h}">
-	<enhanced:img src={body} alt="" class="layer body" sizes={variant === 'wide' ? '(min-width: 80rem) 56rem, 62vw' : '94vw'} loading="lazy" />
+	<!-- Static sources so enhanced-img emits width candidates (sizes = 2× of the largest CSS width) -->
+	{#if variant === 'wide'}
+		<enhanced:img src="./assets/radio-body.webp?w=1800;1200;900" alt="" class="layer body" sizes="(min-width: 40rem) min(56rem, 88vw), 1px" loading="lazy" />
+	{:else}
+		<enhanced:img src="./assets/radio-body-mobile.webp?w=1200;800" alt="" class="layer body" sizes="(min-width: 40rem) 1px, min(25rem, 100vw)" loading="lazy" />
+	{/if}
 
-	<!-- Printed scale on the glass -->
+	<!-- Printed slide-rule scale on the glass -->
 	<svg class="layer scale" viewBox="0 0 {layout.size.w} {layout.size.h}" aria-hidden="true">
-		<path d={scale.arc} class="scale-arc" />
+		<path d={scale.rule} class="scale-rule" />
 		<path d={scale.ticks} class="scale-ticks" />
 		{#each stationMarks as mark (mark.station.id)}
 			<g class={['mark', tuned?.id === mark.station.id && 'on', mark.station.kind === 'music' && 'music']}>
@@ -114,13 +106,12 @@
 		style:top={needleBox.top}
 		style:width={needleBox.width}
 		style:height={needleBox.height}
-		style:transform-origin={needleBox.origin}
-		style:rotate="{needleAngle}deg"
+		style:translate="{needleShift}% 0"
 	>
-		<enhanced:img src={needleImage} alt="" class="fill" sizes="2rem" loading="lazy" />
+		<enhanced:img src={needleImage} alt="" class="fill" sizes="1rem" loading="lazy" />
 	</div>
 
-	<!-- Big station logo, name, handle on the glass -->
+	<!-- Big station logo, name, handle, live content on the glass -->
 	<div
 		class="glass"
 		style:left={pct(layout.glassContent).left}
@@ -128,12 +119,23 @@
 		style:width={pct(layout.glassContent).width}
 		style:height={pct(layout.glassContent).height}
 	>
-		{#if glassShown}
-			{#key glassShown.id}
+		{#if tuned}
+			{#key tuned.id}
 				<div class="glass-station">
-					<BrandIcon path={glassShown.icon} class="glass-logo" />
-					<p class="glass-name">{glassShown.name}</p>
-					{#if glassShown.handle}<p class="glass-handle font-mono">{glassShown.handle}</p>{/if}
+					<BrandIcon path={tuned.icon} class="glass-logo" />
+					<div class="glass-text">
+						<p class="glass-name">{tuned.name}</p>
+						{#if tuned.handle}<p class="glass-handle font-mono">{tuned.handle}</p>{/if}
+						{#if tuned.id === 'youtube' || tuned.id === 'github'}
+							<p class="glass-content">
+								<svelte:boundary>
+									<StationContent kind={tuned.id} />
+									{#snippet pending()}<span class="font-mono" aria-hidden="true">· · ·</span>{/snippet}
+									{#snippet failed()}{/snippet}
+								</svelte:boundary>
+							</p>
+						{/if}
+					</div>
 				</div>
 			{/key}
 		{:else}
@@ -141,7 +143,7 @@
 		{/if}
 	</div>
 
-	<!-- Tuning dial: a real slider over the glass -->
+	<!-- Tuning dial: a real slider over the glass; its focus ring is drawn around the glass -->
 	<input
 		type="range"
 		class="dial"
@@ -159,6 +161,13 @@
 		onchange={ondialcommit}
 		onkeydown={ondialkey}
 	/>
+	<div
+		class="glass-focus"
+		style:left={pct(layout.dialGlass).left}
+		style:top={pct(layout.dialGlass).top}
+		style:width={pct(layout.dialGlass).width}
+		style:height={pct(layout.dialGlass).height}
+	></div>
 
 	<!-- Display strip -->
 	<div
@@ -168,7 +177,7 @@
 		style:width={pct(layout.displayStrip).width}
 		style:height={pct(layout.displayStrip).height}
 	>
-		{@render strip()}
+		{@render strip(variant)}
 	</div>
 
 	<!-- Preset keys -->
@@ -187,7 +196,7 @@
 				aria-label={m.home_radio_preset_label({ name: station.name })}
 				onclick={() => onpreset(station)}
 			>
-				<enhanced:img src={down ? keyPressed : keyUp} alt="" class="fill" sizes="6rem" loading="lazy" />
+				<enhanced:img src={down ? keyPressed : keyUp} alt="" class="fill" sizes="8rem" loading="lazy" />
 				<span class="key-face">
 					<BrandIcon path={station.icon} class="key-logo" />
 					<span class="key-name" aria-hidden="true">{station.name}</span>
@@ -196,19 +205,20 @@
 		{/each}
 	</div>
 
-	{#if layout.knob}
-		{@const knob = layout.knob}
+	{#each knobs as { id, knob, angle } (id)}
+		{@const box = knobBox(knob)}
 		<div
 			class={['knob', (dragging || reduced) && 'instant']}
-			style:left="{((knob.cx - knob.r) / layout.size.w) * 100}%"
-			style:top="{((knob.cy - knob.r) / layout.size.h) * 100}%"
-			style:width="{((knob.r * 2) / layout.size.w) * 100}%"
-			style:rotate="{(dial / DIAL_MAX) * 300 - 150}deg"
+			style:left={box.left}
+			style:top={box.top}
+			style:width={box.width}
+			style:height={box.height}
+			style:rotate="{angle}deg"
 			aria-hidden="true"
 		>
-			<enhanced:img src={knobImage} alt="" class="fill" sizes="5rem" loading="lazy" />
+			<enhanced:img src={knobImage} alt="" class="fill" sizes="6rem" loading="lazy" />
 		</div>
-	{/if}
+	{/each}
 </div>
 
 <style>
@@ -219,6 +229,16 @@
 		/* Ink and light used on the art */
 		--ink: #1b1713;
 		--glow: var(--color-butter);
+		/* Type on the glass, in radio widths (cqw): the tall radio is drawn ~2.3× smaller, so it gets larger factors */
+		--logo: 8.4cqw;
+		--name: max(0.85rem, 2.3cqw);
+		--small: max(0.68rem, 1.35cqw);
+	}
+
+	.set-tall {
+		--logo: 13cqw;
+		--name: max(0.85rem, 4.4cqw);
+		--small: max(0.62rem, 2.9cqw);
 	}
 
 	.layer,
@@ -238,12 +258,12 @@
 		user-select: none;
 	}
 
-	/* Scale printed on the glass */
+	/* Slide-rule scale printed on the glass */
 	.scale {
 		color: var(--color-cream);
 	}
 
-	.scale-arc,
+	.scale-rule,
 	.scale-ticks,
 	.mark-tick {
 		fill: none;
@@ -251,102 +271,115 @@
 		stroke-linecap: round;
 	}
 
-	.scale-arc {
-		stroke-width: 1.2;
-		opacity: 0.45;
+	.scale-rule {
+		stroke-width: 2;
+		opacity: 0.4;
 	}
 
 	.scale-ticks {
-		stroke-width: 1;
-		opacity: 0.35;
+		stroke-width: 1.6;
+		opacity: 0.3;
 	}
 
 	.mark {
-		opacity: 0.5;
+		opacity: 0.55;
 		transition: opacity 0.3s;
 	}
 
 	.mark-tick {
-		stroke-width: 2;
+		stroke-width: 3;
 	}
 
 	.mark.on {
 		opacity: 1;
 		color: var(--color-butter);
-		filter: drop-shadow(0 0 3px rgb(252 215 114 / 0.9));
+		filter: drop-shadow(0 0 4px rgb(252 215 114 / 0.9));
 	}
 
-	/* Needle: eased sweep with a small overshoot, instant while dragging or under reduced motion */
+	/* Needle: eased slide with a small overshoot, instant while dragging or under reduced motion */
 	.needle {
 		position: absolute;
 		pointer-events: none;
-		transition: rotate 0.75s cubic-bezier(0.34, 1.45, 0.52, 1);
-		filter: drop-shadow(2px 3px 2px rgb(0 0 0 / 0.45));
+		transition: translate 0.75s cubic-bezier(0.34, 1.45, 0.52, 1);
+		filter: drop-shadow(0 0 4px rgb(252 215 114 / 0.55)) drop-shadow(2px 3px 2px rgb(0 0 0 / 0.5));
 	}
 
 	.knob {
 		position: absolute;
-		aspect-ratio: 1;
 		pointer-events: none;
 		transition: rotate 0.75s cubic-bezier(0.34, 1.45, 0.52, 1);
-		filter: drop-shadow(2px 3px 3px rgb(0 0 0 / 0.4));
 	}
 
 	.instant {
 		transition: none;
 	}
 
-	/* Station on the glass */
+	/* Station on the glass: logo left, name / handle / live content right */
 	.glass {
 		position: absolute;
 		display: grid;
 		place-items: center;
 		pointer-events: none;
-		text-align: center;
 		color: var(--color-cream);
 	}
 
 	.glass-station {
-		display: grid;
-		justify-items: center;
-		gap: 0.3cqw;
+		display: flex;
+		align-items: center;
+		gap: calc(var(--logo) * 0.3);
+		max-width: 100%;
 		animation: tune-in 0.45s ease-out;
 	}
 
 	.glass :global(.glass-logo) {
-		width: 12cqw;
-		height: 12cqw;
+		flex: none;
+		width: var(--logo);
+		height: var(--logo);
 		color: #fff7e2;
-		filter: drop-shadow(0 0 0.6cqw rgb(252 215 114 / 0.95)) drop-shadow(0 0 2.4cqw rgb(252 215 114 / 0.55));
+		filter: drop-shadow(0 0 0.5cqw rgb(252 215 114 / 0.95)) drop-shadow(0 0 2cqw rgb(252 215 114 / 0.55));
 	}
 
-	.set-tall .glass :global(.glass-logo) {
-		width: 17cqw;
-		height: 17cqw;
+	.glass-text {
+		display: grid;
+		gap: 0.15em;
+		min-width: 0;
 	}
 
 	.glass-name {
-		margin: 0.8cqw 0 0;
+		margin: 0;
 		font-weight: 800;
-		font-size: max(0.85rem, 2.6cqw);
+		font-size: var(--name);
 		line-height: 1.1;
 		text-shadow: 0 0 1.2cqw rgb(252 215 114 / 0.6);
 	}
 
 	.glass-handle {
 		margin: 0;
-		font-size: max(0.7rem, 1.7cqw);
+		font-size: var(--small);
 		color: color-mix(in oklab, var(--color-butter) 85%, white);
-		opacity: 0.85;
+		opacity: 0.9;
+	}
+
+	/* Live content (StationContent: label + line). Links inside stay clickable over the dial. */
+	.glass-content {
+		display: flex;
+		align-items: baseline;
+		gap: 0.45rem;
+		min-width: 0;
+		margin: 0.2em 0 0;
+		font-size: var(--small);
+		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+		pointer-events: auto;
 	}
 
 	.glass-idle {
 		margin: 0;
 		max-width: 80%;
-		font-size: max(0.7rem, 1.6cqw);
+		font-size: var(--small);
 		letter-spacing: 0.12em;
+		text-align: center;
 		color: var(--color-cream);
-		opacity: 0.55;
+		opacity: 0.6;
 	}
 
 	@keyframes tune-in {
@@ -364,7 +397,7 @@
 		}
 	}
 
-	/* The slider covers the glass; it is invisible but focusable, the focus ring is drawn around the glass. */
+	/* The slider covers the glass; it is invisible but focusable. */
 	.dial {
 		position: absolute;
 		margin: 0;
@@ -388,12 +421,15 @@
 		background: transparent;
 	}
 
-	.set:has(.dial:focus-visible) .glass::after {
-		content: '';
+	.glass-focus {
 		position: absolute;
-		inset: -24% -12% -6%;
-		border: 2px solid var(--color-butter);
-		border-radius: 40% 40% 0.8rem 0.8rem;
+		pointer-events: none;
+		border-radius: 1.6cqw;
+	}
+
+	.set:has(.dial:focus-visible) .glass-focus {
+		outline: 2px solid var(--color-butter);
+		outline-offset: 3px;
 	}
 
 	/* Display strip */
@@ -419,11 +455,11 @@
 	}
 
 	.key:hover:not(.down) {
-		translate: 0 -2%;
+		translate: 0 -3%;
 	}
 
 	.key:active {
-		translate: 0 4%;
+		translate: 0 3%;
 	}
 
 	.key:focus-visible {
@@ -437,9 +473,10 @@
 		inset: 0;
 	}
 
+	/* The painted key face: x 14…118, y 6…90 of the 128 × 112 art (pressed: 10 % lower) */
 	.key-face {
 		position: absolute;
-		inset: 6% 6% 22%;
+		inset: 6% 9% 21% 12%;
 		display: grid;
 		place-items: center;
 		align-content: center;
@@ -448,15 +485,15 @@
 	}
 
 	.key.down .key-face {
-		translate: 0 15%;
+		translate: 0 13%;
 	}
 
 	/* Printed ink logo: unmodified shape, one ink color, a touch of print texture through multiply */
 	.key :global(.key-logo) {
-		width: min(52cqw, 3rem);
-		height: min(52cqw, 3rem);
+		width: min(50cqw, 3.4rem);
+		height: min(50cqw, 3.4rem);
 		mix-blend-mode: multiply;
-		opacity: 0.9;
+		opacity: 0.92;
 	}
 
 	.key-name {
@@ -470,7 +507,12 @@
 		opacity: 0.8;
 	}
 
-	@container key (min-width: 4.4rem) {
+	@container key (min-width: 5.5rem) {
+		.key :global(.key-logo) {
+			width: 40cqw;
+			height: 40cqw;
+		}
+
 		.key-name {
 			display: block;
 		}

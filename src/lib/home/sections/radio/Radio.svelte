@@ -22,11 +22,8 @@
 	import { inView, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
-	import landscapeTall from './assets/radio-landscape-mobile.png?enhanced';
-	import landscapeWide from './assets/radio-landscape.png?enhanced';
 	import FrequencyChart from './FrequencyChart.svelte';
 	import RadioSet from './RadioSet.svelte';
-	import StationContent from './StationContent.svelte';
 	import Waveform from './Waveform.svelte';
 	import { LANDSCAPE, RADIO_LAYOUT, WAVEFORM_BAND } from './layout.ts';
 	import { DIAL_IDLE, STATIONS, dialValue, nearestStation, stationAt, type Station } from './stations.ts';
@@ -159,8 +156,20 @@
 	<div class="scene">
 		<!-- Landscape plate, aligned so its horizon crosses the radio (top row of the scene) at layout.horizonAt -->
 		<div class="stage" aria-hidden="true">
-			<enhanced:img src={landscapeWide} alt="" class="plate plate-wide" sizes="(min-width: 40rem) 140vw, 1px" loading="lazy" />
-			<enhanced:img src={landscapeTall} alt="" class="plate plate-tall" sizes="(min-width: 40rem) 1px, 120vw" loading="lazy" />
+			<enhanced:img
+				src="./assets/radio-landscape.webp?w=1920;1440;960"
+				alt=""
+				class="plate plate-wide"
+				sizes="(min-width: 40rem) max(110vw, calc((100vh + 4rem) * 1.78)), 1px"
+				loading="lazy"
+			/>
+			<enhanced:img
+				src="./assets/radio-landscape-mobile.webp?w=1080;720"
+				alt=""
+				class="plate plate-tall"
+				sizes="(min-width: 40rem) 1px, max(118vw, calc(100vh / 2.17))"
+				loading="lazy"
+			/>
 			<div class="sky-stars">
 				<StarField density={0.8} brightness={0.9} seed={202} />
 			</div>
@@ -179,6 +188,7 @@
 					{selected}
 					{dragging}
 					{reduced}
+					{volume}
 					{onpreset}
 					{ondialinput}
 					{ondialcommit}
@@ -195,6 +205,7 @@
 					{selected}
 					{dragging}
 					{reduced}
+					{volume}
 					{onpreset}
 					{ondialinput}
 					{ondialcommit}
@@ -224,11 +235,20 @@
 	{/if}
 </section>
 
-{#snippet stripContent()}
+{#snippet stripContent(variant: 'wide' | 'tall')}
+	<!-- Wide radio: one row in the long window. Tall radio: two short rows. -->
+	<div class={['strip-body', `strip-${variant}`]}>
+		{@render stripRows()}
+	</div>
+{/snippet}
+
+{#snippet stripRows()}
 	{@const station = tuned ?? selected}
 	{#if !station}
 		<div class="strip-row">
 			<span class="strip-dash font-mono" aria-hidden="true">— — —</span>
+		</div>
+		<div class="strip-row strip-sub">
 			<span class="strip-hint font-mono">{m.home_radio_strip_idle()}</span>
 		</div>
 	{:else if station.kind === 'music'}
@@ -267,15 +287,6 @@
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
 					<span class="sr-only">{m.home_radio_opens_new_tab()}</span>
 				</a>
-			{/if}
-			{#if station.id === 'youtube' || station.id === 'github'}
-				<span class="strip-content">
-					<svelte:boundary>
-						<StationContent kind={station.id} />
-						{#snippet pending()}<span class="strip-dash font-mono" aria-hidden="true">· · ·</span>{/snippet}
-						{#snippet failed()}{/snippet}
-					</svelte:boundary>
-				</span>
 			{/if}
 		</div>
 	{/if}
@@ -370,7 +381,31 @@
 		display: none;
 	}
 
-	/* Station strip contents */
+	/* Station strip contents: one row in the wide radio's long window, two rows in the tall radio's */
+	.strip-body {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.9rem;
+		min-width: 0;
+	}
+
+	/* The handle (or station name) keeps its width up to 55 %; the button or line takes the rest and truncates */
+	.strip-wide > :first-child {
+		flex: 0 0 auto;
+		max-width: 55%;
+	}
+
+	.strip-wide > .strip-sub {
+		flex: 1 1 auto;
+	}
+
+	.strip-tall {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.25rem;
+	}
+
 	.strip-row {
 		display: flex;
 		align-items: center;
@@ -380,10 +415,27 @@
 	}
 
 	.strip-sub {
-		justify-content: flex-start;
-		margin-top: 0.35rem;
+		justify-content: flex-end;
 		font-size: 0.78rem;
 		color: color-mix(in oklab, var(--color-cream) 75%, transparent);
+	}
+
+	.strip-tall .strip-sub {
+		justify-content: flex-start;
+		font-size: 0.7rem;
+	}
+
+	.strip-tall .strip-handle {
+		font-size: 0.85rem;
+	}
+
+	.strip-tall .strip-button {
+		padding: 0.25rem 0.55rem;
+		font-size: 0.68rem;
+	}
+
+	.strip-tall button.strip-button {
+		padding: 0.25rem;
 	}
 
 	.strip-dash {
@@ -392,9 +444,12 @@
 	}
 
 	.strip-hint {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		font-size: 0.72rem;
 		opacity: 0.7;
-		text-align: right;
 	}
 
 	.strip-handle {
@@ -415,13 +470,6 @@
 		opacity: 0.7;
 	}
 
-	.strip-content {
-		display: flex;
-		align-items: baseline;
-		gap: 0.45rem;
-		min-width: 0;
-	}
-
 	.strip-button-text {
 		min-width: 0;
 		overflow: hidden;
@@ -437,8 +485,8 @@
 	}
 
 	.strip-button {
-		flex: none;
-		max-width: 60%;
+		flex: 0 1 auto;
+		min-width: 0;
 		white-space: nowrap;
 		display: inline-flex;
 		align-items: center;
@@ -536,10 +584,6 @@
 		.scene :global(.chart) {
 			width: 100%;
 			rotate: -0.6deg;
-		}
-
-		.strip-handle {
-			font-size: 1rem;
 		}
 	}
 </style>
