@@ -14,7 +14,7 @@
 	import { DEFAULT_TUNING, advance, createGame, drop, progress, type Game, type GameEvent, type Tuning } from './engine.ts';
 	import { Renderer } from './render.ts';
 
-	let { paused, tuning, input, reducedMotion, onScore, onGameOver }: GameProps = $props();
+	let { paused, tuning, input, reducedMotion, onScore, onGameOver, onRestart }: GameProps = $props();
 
 	interface Toast {
 		id: number;
@@ -80,6 +80,7 @@
 		toasts = [];
 		announcement = '';
 		onScore?.(0);
+		onRestart?.();
 	}
 
 	function handleAction() {

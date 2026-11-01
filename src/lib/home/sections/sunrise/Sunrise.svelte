@@ -139,7 +139,7 @@
 		</div>
 	</div>
 
-	<div class="night" aria-hidden="true">
+	<div class="night" data-night-edge aria-hidden="true">
 		<enhanced:img src="./assets/sunrise-night-edge.webp?w=1920;1440;1080;720" alt="" sizes="(min-width: 48rem) 100vw, 260vw" loading="lazy" decoding="async" />
 	</div>
 

@@ -16,7 +16,7 @@
 	import { ConstellationEngine, type Box, type Mode, type Rect } from './engine.ts';
 	import { SIGNS, signPath, type SignDef, type SignId } from './signs.ts';
 
-	let { paused, tuning, input, reducedMotion, onScore, onGameOver }: GameProps = $props();
+	let { paused, tuning, input, reducedMotion, onScore, onGameOver, onRestart }: GameProps = $props();
 
 	const modeOf = (value: number | undefined): Mode => ((value ?? 0) >= 0.5 ? 'explore' : 'trace');
 
@@ -67,6 +67,14 @@
 			allFound: (value) => {
 				ended = 'done';
 				onGameOver?.(value);
+			},
+			restarted: () => {
+				current = null;
+				card = null;
+				found = [];
+				ended = null;
+				exploreHint = engine.mode === 'explore';
+				onRestart?.();
 			},
 			wrong: () => {
 				wrongs += 1;

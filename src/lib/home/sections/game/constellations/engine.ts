@@ -38,6 +38,8 @@ export interface EngineHooks {
 	over(score: number): void;
 	/** Explore: every sign is found. */
 	allFound(score: number): void;
+	/** The engine started a new game by itself (Space/Enter after the end). */
+	restarted?(): void;
 	/** A wrong link was made. */
 	wrong(): void;
 	/** Trace: remaining time 0…1. */
@@ -619,7 +621,11 @@ export class ConstellationEngine {
 	/** Space / Enter: connect at the cursor, continue after a card, or restart after the end. */
 	action(): void {
 		if (this.#phase === 'card') return this.next();
-		if (this.#phase === 'over' || this.#phase === 'done') return this.start(this.mode);
+		if (this.#phase === 'over' || this.#phase === 'done') {
+			this.start(this.mode);
+			this.#hooks.restarted?.();
+			return;
+		}
 		this.#keyboard = true;
 		if (this.#cursor < 0) {
 			this.#cursor = this.#nearestToView();

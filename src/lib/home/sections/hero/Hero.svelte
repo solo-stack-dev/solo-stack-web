@@ -809,7 +809,7 @@
 		position: absolute;
 		z-index: 7;
 		left: 50%;
-		bottom: clamp(1rem, 3.5cqh, 2.25rem);
+		bottom: clamp(2.5rem, 6cqh, 4rem);
 		translate: -50% 0;
 		display: inline-flex;
 		align-items: center;

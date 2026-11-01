@@ -12,7 +12,7 @@
 	import { createGame, pressJump, step, STEP, type Game } from './sim.ts';
 	import { readTuning } from './tuning.ts';
 
-	let { paused, tuning, input, reducedMotion, onScore, onGameOver }: GameProps = $props();
+	let { paused, tuning, input, reducedMotion, onScore, onGameOver, onRestart }: GameProps = $props();
 
 	const GAME_ID = 'moon-planet';
 	const MAX_STEPS = 12;
@@ -38,6 +38,7 @@
 		reportedScore = 0;
 		reportedOver = false;
 		onScore?.(0);
+		onRestart?.();
 	}
 
 	function frame(dt: number) {
