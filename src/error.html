@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<title>%sveltekit.status% · SOLO STACK</title>
+		<style>
+			html {
+				background: #0e0f10;
+				color: #fbf3dd;
+				font-family: ui-sans-serif, system-ui, sans-serif;
+			}
+			body {
+				display: grid;
+				place-content: center;
+				gap: 1.5rem;
+				min-height: 100svh;
+				margin: 0;
+				text-align: center;
+			}
+			p {
+				margin: 0;
+				font:
+					800 clamp(5rem, 20vw, 10rem) / 0.9 ui-monospace,
+					'SF Mono',
+					'Cascadia Mono',
+					Menlo,
+					Consolas,
+					monospace;
+				letter-spacing: -0.06em;
+				color: #fcd772;
+			}
+			a {
+				color: #fbf3dd;
+				font-weight: 900;
+				letter-spacing: -0.045em;
+				text-decoration: none;
+				font-size: 1.25rem;
+			}
+			a:focus-visible {
+				outline: 2px solid #fcd772;
+				outline-offset: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<p>%sveltekit.status%</p>
+		<a href="/">SOLO STACK</a>
+	</body>
+</html>
