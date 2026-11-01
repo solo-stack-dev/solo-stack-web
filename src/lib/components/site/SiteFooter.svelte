@@ -20,7 +20,11 @@
 <footer class="site-footer border-t border-border">
 	<div class="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-8 md:grid-cols-2 md:items-end">
 		<div class="grid gap-2">
-			<a href={localizeHref('/')} class="w-fit font-display text-lg font-black tracking-wordmark uppercase" aria-label={m.site_nav_wordmark_label()}>SOLO STACK</a>
+			<a
+				href={localizeHref('/')}
+				class="-my-2 inline-flex min-h-11 w-fit items-center font-display text-lg font-black tracking-wordmark uppercase"
+				aria-label={m.site_nav_wordmark_label()}>SOLO STACK</a
+			>
 			<p class="text-sm text-muted-foreground">{m.site_footer_tagline()}</p>
 			<p class="font-mono text-xs tracking-clock text-muted-foreground tabular-nums">© {year} SOLO STACK</p>
 		</div>

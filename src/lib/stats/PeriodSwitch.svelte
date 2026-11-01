@@ -22,7 +22,9 @@
 	class="rounded-lg bg-card"
 >
 	{#each PERIODS as days (days)}
-		<ToggleGroup.Item value={String(days)} class="px-3 tabular-nums data-[state=on]:bg-foreground data-[state=on]:text-background"
+		<ToggleGroup.Item
+			value={String(days)}
+			class="relative px-3 tabular-nums after:absolute after:inset-x-0 after:-inset-y-1.5 data-[state=on]:bg-foreground data-[state=on]:text-background"
 			>{m.stats_period_days({ days })}</ToggleGroup.Item
 		>
 	{/each}

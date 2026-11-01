@@ -48,8 +48,12 @@
 			aria-label={m.stats_growth_view_label()}
 			class="shrink-0"
 		>
-			<ToggleGroup.Item value="total" class="px-3 data-[state=on]:bg-muted">{m.stats_growth_view_total()}</ToggleGroup.Item>
-			<ToggleGroup.Item value="platforms" class="px-3 data-[state=on]:bg-muted">{m.stats_growth_view_platforms()}</ToggleGroup.Item>
+			<ToggleGroup.Item value="total" class="relative px-3 after:absolute after:inset-x-0 after:-inset-y-2 data-[state=on]:bg-muted"
+				>{m.stats_growth_view_total()}</ToggleGroup.Item
+			>
+			<ToggleGroup.Item value="platforms" class="relative px-3 after:absolute after:inset-x-0 after:-inset-y-2 data-[state=on]:bg-muted"
+				>{m.stats_growth_view_platforms()}</ToggleGroup.Item
+			>
 		</ToggleGroup.Root>
 	</Card.Header>
 
@@ -71,7 +75,7 @@
 	</Card.Content>
 
 	<details class="group border-t border-border px-4 py-3 text-sm sm:px-6">
-		<summary class="cursor-pointer text-muted-foreground select-none hover:text-foreground">{m.stats_table_show()}</summary>
+		<summary class="-my-3 cursor-pointer py-3 text-muted-foreground select-none hover:text-foreground">{m.stats_table_show()}</summary>
 		<div class="mt-3 max-h-72 overflow-auto">
 			<table class="w-full text-left text-xs tabular-nums">
 				<thead class="sticky top-0 bg-card text-muted-foreground">
