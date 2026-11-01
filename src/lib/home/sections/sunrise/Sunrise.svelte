@@ -7,8 +7,10 @@
 	Scroll: `--sunrise` (0 → 1) is driven by a CSS scroll-driven animation (`view()` timeline of this footer, from its
 	top entering the viewport to the page end). Fallback without `animation-timeline` support: ScrollProgress writes it.
 	Reduced motion (or neither): the registered initial value 1 = the final sunrise, static.
-	The mascot steps through a 4-frame walk cycle by scroll distance while the page is scrolling, and rests on frame 1.
-	All rects live in ./layout.ts.
+	The mascot walks the painted cliff path as you scroll: one clean frame (walk frame 1) translated along the path with a
+	scroll-stepped bob and sway while the page is scrolling; at rest he stands still. The four painted walk frames are
+	not used as a loop: frames 1 and 3 lead with the same leg, which reads as a hitch (docs/art/mascot/README.md).
+	All rects live in ./layout.ts; optimized assets come from tools/build-assets.mjs.
 -->
 <script lang="ts">
 	import { on } from 'svelte/events';
@@ -17,21 +19,10 @@
 	import { linkedSocials } from '#lib/home/data/socials.ts';
 	import { InView, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
-	import walk1 from './assets/mascot-sunrise-walk@1.png?enhanced';
-	import walk2 from './assets/mascot-sunrise-walk@2.png?enhanced';
-	import walk3 from './assets/mascot-sunrise-walk@3.png?enhanced';
-	import walk4 from './assets/mascot-sunrise-walk@4.png?enhanced';
-	import cliffPath from './assets/sunrise-cliff-path.png?enhanced';
-	import coffee from './assets/sunrise-coffee.png?enhanced';
-	import nightEdge from './assets/sunrise-night-edge.png?enhanced';
-	import skyMobile from './assets/sunrise-sky-mobile.png?enhanced';
-	import sky from './assets/sunrise-sky.png?enhanced';
-	import valley from './assets/sunrise-valley.png?enhanced';
 	import { SOCIAL_ICON_PATHS } from './icons.ts';
-	import { LEGAL_LINKS, SUNRISE_LAYOUT, WALK, nightEdgeVars, placeVars } from './layout.ts';
+	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars, rootVars } from './layout.ts';
 
 	const socials = linkedSocials();
-	const walkFrames = [walk1, walk2, walk3, walk4];
 	const legalLabels = {
 		imprint: m.home_sunrise_legal_imprint,
 		privacy: m.home_sunrise_legal_privacy,
@@ -40,14 +31,15 @@
 
 	const { desktop: d, mobile: mo } = SUNRISE_LAYOUT;
 	const place = {
-		sun: placeVars(d.sun, mo.sun),
+		sky: placeVars(d.sky, mo.sky),
+		sunGlow: placeVars(d.sunGlow, mo.sunGlow),
 		valley: placeVars(d.valley, mo.valley),
 		cliffPath: placeVars(d.cliffPath, mo.cliffPath),
 		coffee: placeVars(d.coffee, mo.coffee),
 		steam: placeVars(d.steam, mo.steam),
 		mascot: placeVars(d.mascot, mo.mascot)
 	};
-	const rootVars = `--walk-start: ${WALK.start}; --walk-distance: ${WALK.distance}%; --walk-steps: ${WALK.steps}; ${nightEdgeVars()}`;
+	const rootStyle = rootVars();
 
 	let root: HTMLElement;
 	const near = new InView();
@@ -67,7 +59,7 @@
 		return () => root.style.removeProperty('--sunrise');
 	});
 
-	// The walk cycle only steps while the page is scrolling; at rest the mascot stands on frame 1.
+	// The walk bob only plays while the page is scrolling; at rest the mascot stands still.
 	let walking = $state(false);
 	$effect(() => {
 		if (reducedMotion.current || !near.current) return;
@@ -95,40 +87,63 @@
 	id="sunrise"
 	data-night-hour="06:00"
 	class={['sunrise', near.current && 'is-near', walking && 'is-walking']}
-	style={rootVars}
+	style={rootStyle}
 	aria-labelledby="home-sunrise-title"
 	{@attach through.attach}
 	{@attach near.attach}
 >
 	<h2 id="home-sunrise-title" class="sr-only">{m.home_sunrise_title()}</h2>
 
-	<div class="sky" aria-hidden="true">
-		<enhanced:img src={sky} alt="" class="is-desktop" sizes="100vw" loading="lazy" decoding="async" />
-		<enhanced:img src={skyMobile} alt="" class="is-mobile" sizes="100vw" loading="lazy" decoding="async" />
-	</div>
+	<div class="paper" aria-hidden="true"></div>
 
 	<div class="stage" aria-hidden="true">
-		<div class="placed sun" style={place.sun}></div>
-		<enhanced:img src={valley} alt="" class="placed art" style={place.valley} sizes="(min-width: 48rem) 100vw, 200vw" loading="lazy" decoding="async" />
-		<enhanced:img src={cliffPath} alt="" class="placed art" style={place.cliffPath} sizes="(min-width: 48rem) 66vw, 140vw" loading="lazy" decoding="async" />
-		<enhanced:img src={coffee} alt="" class="placed art" style={place.coffee} sizes="(min-width: 48rem) 9vw, 17vw" loading="lazy" decoding="async" />
+		<div class="placed sky" style={place.sky}>
+			<enhanced:img src="./assets/sunrise-sky.webp?w=1920;1440;1080;720" alt="" class="is-desktop" sizes="100vw" loading="lazy" decoding="async" />
+			<enhanced:img src="./assets/sunrise-sky-mobile.webp?w=1080;780;540" alt="" class="is-mobile" sizes="100vw" loading="lazy" decoding="async" />
+			<div class="placed sun-glow" style={place.sunGlow}></div>
+		</div>
+		<enhanced:img
+			src="./assets/sunrise-valley.webp?w=1920;1440;1080;720"
+			alt=""
+			class="placed art valley"
+			style={place.valley}
+			sizes="(min-width: 48rem) 100vw, 205vw"
+			loading="lazy"
+			decoding="async"
+		/>
+		<enhanced:img
+			src="./assets/sunrise-cliff-path.webp?w=1920;1440;1080;720"
+			alt=""
+			class="placed art path"
+			style={place.cliffPath}
+			sizes="(min-width: 48rem) 108vw, 150vw"
+			loading="lazy"
+			decoding="async"
+		/>
+		<enhanced:img
+			src="./assets/sunrise-coffee.webp?w=592;400;240"
+			alt=""
+			class="placed art"
+			style={place.coffee}
+			sizes="(min-width: 48rem) 9vw, 22vw"
+			loading="lazy"
+			decoding="async"
+		/>
 		<svg class="placed steam" style={place.steam} viewBox="0 0 40 120" preserveAspectRatio="none">
 			<path d="M15 118 C 7 100, 23 88, 15 70 S 7 40, 17 18" />
 			<path d="M25 118 C 33 98, 17 84, 27 64 S 35 36, 25 10" />
 			<path d="M20 118 C 14 104, 26 92, 20 78 S 14 56, 21 38" />
 		</svg>
 		<div class="placed mascot" style={place.mascot}>
-			<div class="strip">
-				{#each walkFrames as frame, index (index)}
-					<enhanced:img src={frame} alt="" sizes="(min-width: 48rem) 11vw, 24vw" loading="lazy" decoding="async" />
-				{/each}
-			</div>
+			<enhanced:img src="./assets/mascot-sunrise-walk@1.webp?w=547;400;280" alt="" sizes="(min-width: 48rem) 13vw, 30vw" loading="lazy" decoding="async" />
 		</div>
 	</div>
 
 	<div class="night" aria-hidden="true">
-		<enhanced:img src={nightEdge} alt="" sizes="(min-width: 48rem) 100vw, 260vw" loading="lazy" decoding="async" />
+		<enhanced:img src="./assets/sunrise-night-edge.webp?w=1920;1440;1080;720" alt="" sizes="(min-width: 48rem) 100vw, 260vw" loading="lazy" decoding="async" />
 	</div>
+
+	<div class="seam" aria-hidden="true"></div>
 
 	<NightClock time="06:00" />
 
@@ -172,10 +187,13 @@
 		justify-content: flex-end;
 		overflow: clip;
 		color: var(--color-night);
+		/* the bottom of the 04:00 cinema (its --ink-fade), continued above the painted night edge */
 		--ink-fade: #1c1d1d;
 		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
 		--night-clock-top: clamp(9rem, 30svh, 16rem);
 		--walk-t: clamp(0, (var(--sunrise) - var(--walk-start)) / (1 - var(--walk-start)), 1);
+		--walk-x: var(--d-walk-x);
+		--walk-y: var(--d-walk-y);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -197,20 +215,36 @@
 		}
 	}
 
-	.sky {
+	/* Butter paper behind everything: matches the bottom band of the sky plates (#fcd772) and the banner. */
+	.paper {
 		position: absolute;
 		inset: 0;
+		background: var(--color-butter);
 		opacity: clamp(0, var(--sunrise) * 1.6, 1);
 	}
 
-	.sky :global(img) {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
+	/* The painted sky plate. Its top fades into the paper; it sinks a little as the night retreats, so the baked sun
+	   rises behind the valley. */
+	.sky {
+		opacity: clamp(0, var(--sunrise) * 1.6, 1);
+		translate: 0 calc((1 - var(--sunrise)) * 6%);
+		mask-image: linear-gradient(to bottom, transparent, black 14%);
 	}
 
-	.is-mobile {
+	.sky :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.sky :global(img.is-mobile) {
 		display: none;
+	}
+
+	.sun-glow {
+		border-radius: 50%;
+		background: radial-gradient(circle, rgb(255 249 226 / 0.6) 0 18%, rgb(255 240 196 / 0.28) 38%, rgb(255 236 170 / 0) 70%);
+		opacity: calc(0.2 + 0.8 * var(--sunrise));
 	}
 
 	.stage {
@@ -229,23 +263,25 @@
 		top: var(--dy);
 		width: var(--dw);
 		height: var(--dh);
+		/* layers wider than the stage (Tailwind's preflight caps images at 100%) */
+		max-width: none;
 	}
 
 	.art {
 		height: auto;
 	}
 
-	/* The sun climbs a little behind the valley as the night retreats. */
-	.sun {
-		border-radius: 50%;
-		background: radial-gradient(circle, #fff6d6 0 52%, rgb(255 241 196 / 0.75) 60%, rgb(255 236 170 / 0) 71%);
-		box-shadow: 0 0 120px 50px rgb(255 238 180 / 0.35);
-		translate: 0 calc((1 - var(--sunrise)) * 55%);
-		opacity: calc(0.4 + 0.6 * var(--sunrise));
-	}
-
 	.stage > :global(img) {
 		position: absolute;
+	}
+
+	/* The valley's misty lower edge and the lowest rocks dissolve into the paper above the footer bar. */
+	.valley {
+		mask-image: linear-gradient(to bottom, black 62%, transparent 96%);
+	}
+
+	.path {
+		mask-image: linear-gradient(to bottom, black 68%, transparent 100%);
 	}
 
 	.steam {
@@ -296,44 +332,51 @@
 		}
 	}
 
-	/* Mascot: walks `--walk-distance` of his width while --sunrise goes walk-start → 1. */
+	/* Mascot: walks the path (translate along its slope) while --sunrise goes walk-start → 1. */
 	.mascot {
 		height: auto;
-		aspect-ratio: 280 / 495;
-		overflow: hidden;
-		translate: calc((var(--walk-t) - 1) * var(--walk-distance)) 0;
+		translate: calc((1 - var(--walk-t)) * var(--walk-x)) calc((1 - var(--walk-t)) * var(--walk-y));
 	}
 
-	.strip {
-		display: flex;
-		width: 400%;
-		--frame: 0;
-		translate: calc(var(--frame) * -25%) 0;
-	}
-
-	.is-walking .strip {
-		/* frame-stepping by scroll distance: a new frame every 1 / walk-steps of the walk */
-		--frame: mod(round(down, var(--walk-t) * var(--walk-steps), 1), 4);
-	}
-
-	/* enhanced:img renders <picture><img></picture>: the picture is the flex item */
-	.strip > :global(picture) {
-		flex: none;
-		width: 25%;
-	}
-
-	.strip :global(img) {
+	.mascot :global(img) {
 		display: block;
 		width: 100%;
 		height: auto;
+		/* the foot pivot of the frame */
+		transform-origin: 49% 99%;
+		--bob: 0;
+		--sway: 0;
+		translate: 0 calc(var(--bob) * -2.4%);
+		rotate: calc(var(--sway) * 1.6deg);
+		transition:
+			translate 260ms ease-out,
+			rotate 260ms ease-out;
+	}
+
+	/* Shiny egg (docs/HOMEPAGE-DEV.md §11): no golden walk art exists, so the shared filter fallback applies. On butter
+	   paper its butter glow and cream sparkle vanish, so this section deepens the gold and outlines the sparkle in ochre. */
+	:global([data-shiny]) .sunrise .mascot {
+		filter: sepia(0.85) saturate(2.4) hue-rotate(-14deg) brightness(1.1) drop-shadow(0 0 0.6rem rgb(226 169 59 / 0.85));
+	}
+
+	:global([data-shiny]) .sunrise .mascot::after {
+		filter: drop-shadow(0 0 0.12rem rgb(122 78 18 / 0.9)) drop-shadow(0 0 0.4rem rgb(226 169 59 / 0.9));
+	}
+
+	/* One bob per footfall, stepped by scroll distance; settles back onto the path when scrolling stops. */
+	.is-walking .mascot :global(img) {
+		--phase: calc(var(--walk-t) * var(--walk-steps) * 6.2832);
+		--bob: calc((1 - cos(var(--phase))) / 2);
+		--sway: sin(var(--phase));
+		transition: none;
 	}
 
 	/* The night retreats upward: a ragged watercolor wash, solid ink above it. */
 	.night {
 		position: absolute;
 		top: 0;
-		left: var(--dx);
-		width: var(--dw);
+		left: var(--d-night-x);
+		width: var(--d-night-w);
 		translate: 0 calc(var(--d-from) + (var(--d-to) - var(--d-from)) * var(--sunrise));
 		pointer-events: none;
 	}
@@ -350,6 +393,25 @@
 		inset: auto 0 calc(100% - 2px);
 		height: 100svh;
 		background: var(--ink-fade);
+	}
+
+	/* blends the painted wash (#151719 at its top) into the fill above, so no line shows at the section top */
+	.night::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 14%;
+		background: linear-gradient(to bottom, var(--ink-fade), transparent);
+	}
+
+	/* Softens the section's top edge into the flat bottom of the 04:00 section, so the painted night is never cut by a
+	   straight line while it scrolls past. */
+	.seam {
+		position: absolute;
+		inset: 0 0 auto;
+		height: 10svh;
+		background: linear-gradient(to bottom, var(--ink-fade), transparent);
+		pointer-events: none;
 	}
 
 	.bar {
@@ -425,13 +487,15 @@
 	@media (max-width: 47.99rem) {
 		.sunrise {
 			--night-clock-top: clamp(8rem, 22svh, 12rem);
+			--walk-x: var(--m-walk-x);
+			--walk-y: var(--m-walk-y);
 		}
 
-		.is-desktop {
+		.sky :global(img.is-desktop) {
 			display: none;
 		}
 
-		.is-mobile {
+		.sky :global(img.is-mobile) {
 			display: block;
 		}
 
@@ -458,8 +522,8 @@
 		}
 
 		.night {
-			left: var(--mx);
-			width: var(--mw);
+			left: var(--m-night-x);
+			width: var(--m-night-w);
 			translate: 0 calc(var(--m-from) + (var(--m-to) - var(--m-from)) * var(--sunrise));
 		}
 
