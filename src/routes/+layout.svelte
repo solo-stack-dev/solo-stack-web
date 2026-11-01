@@ -11,11 +11,14 @@
 	// Google requires to be fully qualified. The prerender crawler also follows these links,
 	// so every locale variant of a prerendered page gets built.
 	const alternateHref = (locale: Locale) => new URL(localizeHref(page.url.pathname, { locale }), page.url.origin).href;
+
+	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]).
+	const ownAlternates = $derived(page.route.id === '/(site)/blog/[slug]');
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	{#if page.status === 200}
+	{#if page.status === 200 && !ownAlternates}
 		{#each locales as locale (locale)}
 			<link rel="alternate" hreflang={locale} href={alternateHref(locale)} />
 		{/each}
