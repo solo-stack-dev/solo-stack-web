@@ -1,11 +1,12 @@
 import { m } from '#lib/paraglide/messages.js';
 import { deLocalizeHref, localizeHref } from '#lib/paraglide/runtime.js';
 
-/** Top level pages in the site navigation. `path` is unlocalized; `/stats` is the public social media dashboard. */
+/** Top level pages in the site navigation. `path` is unlocalized; `/stats` is the public social media dashboard, `/kontakt` the contact form. */
 export const SITE_LINKS = [
 	{ id: 'home', path: '/', label: m.site_nav_home },
 	{ id: 'blog', path: '/blog', label: m.site_nav_blog },
-	{ id: 'stats', path: '/stats', label: m.site_nav_stats }
+	{ id: 'stats', path: '/stats', label: m.site_nav_stats },
+	{ id: 'contact', path: '/kontakt', label: m.site_nav_contact }
 ] as const;
 
 export type SiteLink = (typeof SITE_LINKS)[number];

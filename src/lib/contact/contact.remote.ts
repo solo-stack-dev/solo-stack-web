@@ -1,0 +1,30 @@
+/* oxlint-disable no-console -- server logs end up in Workers Logs (observability), the only place to see form failures */
+import { error, invalid } from '@sveltejs/kit';
+import { form, getRequestEvent } from '$app/server';
+import { deliverContactMessage } from './deliver.server.ts';
+import { ContactSchema } from './schema.ts';
+import { TurnstileNotConfiguredError, verifyTurnstile } from './turnstile.server.ts';
+
+/**
+ * The /kontakt form. The page itself is prerendered; this runs in the Worker (`/_app/remote/…`), so it needs
+ * JavaScript in the browser, which the Turnstile widget needs anyway.
+ *
+ * Validation issues use the codes from `ContactSchema` (`turnstile` for a rejected token); the page maps them to
+ * localized messages. A bot that fills the honeypot gets the normal success answer and its message is dropped.
+ */
+export const sendContact = form(ContactSchema, async ({ website, turnstile, ...message }, issue) => {
+	if (website) return { sent: true } as const;
+
+	const { url, getClientAddress } = getRequestEvent();
+	let verified: boolean;
+	try {
+		verified = await verifyTurnstile(turnstile, { ip: getClientAddress(), hostname: url.hostname });
+	} catch (cause) {
+		console.error(cause instanceof TurnstileNotConfiguredError ? cause.message : 'Turnstile siteverify failed', cause);
+		error(503, 'Contact form unavailable');
+	}
+	if (!verified) invalid(issue.turnstile('turnstile'));
+
+	await deliverContactMessage(message);
+	return { sent: true } as const;
+});

@@ -166,8 +166,8 @@
 		<nav class="legal" aria-label={m.home_sunrise_footer_label()}>
 			<ul>
 				{#each LEGAL_LINKS as link (link.id)}
-					<!-- TODO(lead): the legal routes do not exist yet. rel="external" keeps the prerender crawler from failing on them; drop it once the pages exist. -->
-					<li><a href={localizeHref(link.path)} rel="external">{legalLabels[link.id]()}</a></li>
+					<!-- TODO(lead): imprint and privacy do not exist yet. rel="external" keeps the prerender crawler from failing on them; drop it once the pages exist (/kontakt exists). -->
+					<li><a href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'}>{legalLabels[link.id]()}</a></li>
 				{/each}
 			</ul>
 		</nav>
