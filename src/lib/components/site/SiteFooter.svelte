@@ -11,7 +11,7 @@
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 
 	const socials = linkedSocials();
-	// TODO(owner): the legal pages and the contact page do not exist yet (same as in the sunrise footer). rel="external"
+	// TODO(owner): the imprint and privacy pages do not exist yet (same as in the sunrise footer; /kontakt does). rel="external"
 	// keeps the prerender crawler from failing on them; drop it once the pages exist.
 	const legalLabels = { imprint: m.site_footer_imprint, privacy: m.site_footer_privacy, contact: m.site_footer_contact };
 	const year = new Date().getFullYear();
@@ -51,7 +51,11 @@
 			<nav aria-label={m.site_footer_legal_label()}>
 				<ul class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
 					{#each LEGAL_LINKS as link (link.id)}
-						<li><a href={localizeHref(link.path)} rel="external" class="inline-flex min-h-11 items-center hover:text-foreground">{legalLabels[link.id]()}</a></li>
+						<li>
+							<a href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'} class="inline-flex min-h-11 items-center hover:text-foreground"
+								>{legalLabels[link.id]()}</a
+							>
+						</li>
 					{/each}
 				</ul>
 			</nav>
