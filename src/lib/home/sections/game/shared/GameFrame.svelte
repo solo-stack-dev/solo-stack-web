@@ -1,11 +1,11 @@
 <!--
 	@component
-	The shared game frame used by the 22:00 section and the /lab/games playtest route.
+	The game frame of the 22:00 section.
 
 	Poster state (your `poster` snippet + play button) → click loads the game chunk (dynamic import via `load`) →
 	playing. The frame owns: pause (button, P/Escape, off screen, hidden tab), instant restart (remounts the game),
-	score + local high score in mono (games that restart themselves call `onRestart`), keyboard focus on the game surface, on-screen touch buttons, and (with `debug`)
-	a slider panel for the game's `tuning` defs.
+	score + local high score in mono (games that restart themselves call `onRestart`), keyboard focus on the game surface, and on-screen touch buttons.
+	Games receive their default `tuning` values.
 
 	```svelte
 	<GameFrame gameId="stack-to-moon" load={() => import('../stack-to-moon/index.ts')} label="…">
@@ -29,16 +29,12 @@
 		load: GameLoader;
 		/** Accessible name of the game surface (a message). */
 		label: string;
-		/** Show the tuning slider panel (lab only). */
-		debug?: boolean;
 		/** Painted poster shown before play (fills the frame). */
 		poster?: Snippet;
-		/** Always show touch buttons (lab testing on desktop). */
-		touchAlways?: boolean;
 		class?: string;
 	}
 
-	let { gameId, load, label, debug = false, poster, touchAlways = false, class: className = '' }: Props = $props();
+	let { gameId, load, label, poster, class: className = '' }: Props = $props();
 
 	type Status = 'poster' | 'loading' | 'playing' | 'error';
 
@@ -162,7 +158,7 @@
 				</button>
 			{/if}
 
-			<TouchControls {input} buttons={controls} always={touchAlways} />
+			<TouchControls {input} buttons={controls} />
 		{:else}
 			<div class="poster">{@render poster?.()}</div>
 			<div class="overlay is-static">
@@ -180,22 +176,6 @@
 			</div>
 		{/if}
 	</div>
-
-	{#if debug && module}
-		<section class="debug font-mono text-xs" aria-labelledby="{gameId}-debug-title">
-			<header>
-				<h3 id="{gameId}-debug-title" class="tracking-clock uppercase">{m.lab_games_debug_title()}</h3>
-				<button type="button" class="debug-reset" onclick={() => (tuning = defaultTuning(module!.tuning))}>{m.lab_games_debug_reset()}</button>
-			</header>
-			{#each module.tuning as def (def.key)}
-				<label>
-					<span>{def.key}</span>
-					<input type="range" min={def.min} max={def.max} step={def.step} bind:value={tuning[def.key]} />
-					<output class="tabular-nums">{tuning[def.key]}</output>
-				</label>
-			{/each}
-		</section>
-	{/if}
 </div>
 
 <style>
@@ -304,37 +284,5 @@
 		background: var(--color-butter);
 		color: var(--color-night);
 		box-shadow: 0 0 40px color-mix(in oklab, var(--color-butter) 55%, transparent);
-	}
-
-	.debug {
-		display: grid;
-		gap: 0.6rem;
-		padding: 1rem;
-		border-radius: 0.75rem;
-		background: color-mix(in oklab, var(--color-ink) 80%, transparent);
-	}
-
-	.debug header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.debug label {
-		display: grid;
-		grid-template-columns: minmax(8rem, 12rem) 1fr 4rem;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.debug input {
-		accent-color: var(--color-butter);
-	}
-
-	.debug-reset {
-		padding: 0.25rem 0.6rem;
-		border-radius: 999px;
-		border: 1px solid color-mix(in oklab, var(--color-cream) 30%, transparent);
-		cursor: pointer;
 	}
 </style>

@@ -17,7 +17,10 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<!-- The navbar crescent on a night tile. static/favicon.ico and static/apple-touch-icon.png are renders of the same SVG. -->
+	<link rel="icon" href="/favicon.ico" sizes="48x48" />
+	<link rel="icon" href={favicon} type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 	{#if page.status === 200 && !ownAlternates}
 		{#each locales as locale (locale)}
 			<link rel="alternate" hreflang={locale} href={alternateHref(locale)} />

@@ -1,7 +1,6 @@
 <!--
 	@component
-	On-screen buttons that feed a GameInput (pointer events, multi-touch safe). Shown on coarse pointers only by
-	default (`always` to force). Buttons are not focusable: keyboard users use the keys on the game surface.
+	On-screen buttons that feed a GameInput (pointer events, multi-touch safe). Shown on coarse pointers only. Buttons are not focusable: keyboard users use the keys on the game surface.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -10,10 +9,9 @@
 	interface Props {
 		input: GameInput;
 		buttons?: GameButton[];
-		always?: boolean;
 	}
 
-	let { input, buttons = ['left', 'right', 'action'], always = false }: Props = $props();
+	let { input, buttons = ['left', 'right', 'action'] }: Props = $props();
 
 	const labels: Record<GameButton, () => string> = {
 		left: m.home_game_touch_left,
@@ -45,7 +43,7 @@
 	}
 </script>
 
-<div class={['touch-controls', always && 'is-always']} role="group" aria-label={m.home_game_controls_label()}>
+<div class="touch-controls" role="group" aria-label={m.home_game_controls_label()}>
 	{#each buttons as button (button)}
 		<button type="button" tabindex="-1" class={['touch-button', `is-${button}`, input.held[button] && 'is-held']} aria-label={labels[button]()} {...bind(button)}>
 			<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
@@ -73,10 +71,6 @@
 		.touch-controls {
 			display: flex;
 		}
-	}
-
-	.is-always {
-		display: flex;
 	}
 
 	.touch-button {
