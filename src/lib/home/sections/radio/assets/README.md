@@ -1,23 +1,28 @@
 # Night radio art layers
 
-All files here are **placeholders** painted by `placeholders/make-placeholders.ts` (SVG watercolor filters for the radio parts, the round-2 mockup patched for the landscapes). The final paintings replace them **with the same file names**; then re-tune the numbers in [`../layout.ts`](../layout.ts) and nothing else.
+Optimized from the painted masters in [`docs/art/radio/`](../../../../../../docs/art/radio/README.md) by [`build-art.ts`](build-art.ts) (uses the `sharp` that `@sveltejs/enhanced-img` installs). Re-run it after a master changes, then copy the rects it prints into [`../layout.ts`](../layout.ts):
 
-| File                         | Size (px)   | What                                                                                                   | Rects in `layout.ts`                                       |
-| ---------------------------- | ----------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| `radio-landscape.png`        | 2560 × 1440 | Desktop plate: sky, moon top right, hills, lake. **Empty horizon band** (the waveform draws the line). | `LANDSCAPE.wide.horizonY` (lake line, fraction of height)  |
-| `radio-landscape-mobile.png` | 1080 × 2340 | Phone plate, moon closer to the horizon, bottom fades to `#0e0f10` (the link chart sits there).        | `LANDSCAPE.tall.horizonY`                                  |
-| `radio-body.png`             | 2000 × 1240 | Wide radio, transparent. Empty dial glass (arch), empty display strip window, key recess, knob seat.   | `RADIO_LAYOUT.wide.*`                                      |
-| `radio-body-mobile.png`      | 1200 × 1880 | Tall radio for phones (glass on top, strip, 2 rows of keys).                                           | `RADIO_LAYOUT.tall.*`                                      |
-| `radio-needle.png`           | 120 × 1160  | Needle, transparent, pointing up; pivot cap centered `pivotFromBottom` above the bottom edge.          | `needle.box`, `needle.pivotFromBottom`                     |
-| `radio-key.png`              | 200 × 260   | One blank preset key, up. Logos are drawn in code (ink, monochrome) on the upper ~75 %.                | key slots are computed from `keyBank`, `keyRows`, `keyGap` |
-| `radio-key-pressed.png`      | 200 × 260   | Same key pressed down (face lower, warm glow).                                                         |                                                            |
-| `radio-knob.png`             | 200 × 200   | Tuning knob, transparent, pointer mark at 12 o'clock (rotated in code with the dial).                  | `knob`                                                     |
+    node src/lib/home/sections/radio/assets/build-art.ts
 
-Notes for the painter:
+`<enhanced:img>` derives the responsive AVIF/WebP sizes from these files at build time. All layers are `loading="lazy"`.
 
-- Same watercolor + ink style as the rest of the page; **not photoreal** (owner feedback). Cream/butter body, ink outline.
-- The radio body has **one long key recess**, not a fixed number of slots: there are currently 10 stations (9 linkable platforms + Solo Stack FM; Discord makes 11 once its invite exists). If you paint discrete slots, paint 10 (wide: one row; tall: 5 + 5) and replace `keySlots()` with explicit rects.
-- Key art: keep the face plain (logos are printed in code). Keep the key aspect close to the slot aspect (wide ≈ 0.94:1, tall ≈ 0.78:1 width:height; the placeholder is 0.77:1) or the image stretches.
-- Moon belongs to the landscape plate. No text anywhere in the art.
+| File                          | Size (px)   | What                                                                                                                         |
+| ----------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `radio-landscape.webp`        | 1920 × 1080 | Desktop plate (master 2560 × 1440, painted at ~1670 px). Mist band = waveform line at 748 / 1440 (`LANDSCAPE.wide.horizonY`) |
+| `radio-landscape-mobile.webp` | 1080 × 2340 | Phone plate. Mist band at 950 / 2340 (`LANDSCAPE.tall.horizonY`)                                                             |
+| `radio-body.webp`             | 1800 × 1081 | Wide radio, cropped to content: grille, glass, knobs + display strip window, one long key recess (`RADIO_LAYOUT.wide`)       |
+| `radio-body-mobile.webp`      | 1200 × 1187 | Phone radio: same body without the grille, taller strip window, key recess for two rows (`RADIO_LAYOUT.tall`)                |
+| `radio-needle.webp`           | 32 × 640    | Needle (as delivered), drawn short in the scale band of the glass                                                            |
+| `radio-key.webp`              | 128 × 112   | Blank preset key; logos are printed in code (ink, multiply)                                                                  |
+| `radio-key-pressed.webp`      | 128 × 112   | Same key pressed (same registration, face ~10 % lower)                                                                       |
+| `radio-knob.webp`             | 256 × 256   | Knob overlay, pointer at 12 o'clock: left = volume, right = tuning                                                           |
 
-Regenerate the placeholders (only while no final art exists): `node src/lib/home/sections/radio/assets/placeholders/make-placeholders.ts`.
+## Why the bodies are re-assembled
+
+The painted body has six preset slots; the radio has one key per station (10 now, 11 once Discord has an invite). `build-art.ts` re-assembles the body from its own painted pixels, no new paint:
+
+- The six-slot plate between the knobs becomes one long dark window, the display strip (9-slice of the painted slot rims, dial-glass wash inside).
+- A band is inserted below the knob row with one long key recess across the radio: side walls copied from the straight part of the painted sides (outline kept round), cream wash tiled from clean patches of the face, recess rims tiled from the six painted slot rims, dial-glass wash inside.
+- Phones: the speaker grille columns are cut out (seams cross-faded on plain cream), the strip window is taller, the key recess holds two rows.
+
+`keySlots()` in `layout.ts` spreads any number of keys over the recess and keeps the key art's aspect, so an 11th station needs no art change.
