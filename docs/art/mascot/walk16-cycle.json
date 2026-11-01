@@ -1,0 +1,459 @@
+{
+	"frames": 16,
+	"canvas": [1152, 1600],
+	"baseline": 1500,
+	"stepLength": 340,
+	"cycleLength": 680,
+	"advancePerFrame": 42.5,
+	"contactFrames": [0, 8],
+	"poses": [
+		{
+			"frame": 1,
+			"phase": 0,
+			"translateY": 35,
+			"arm": 13,
+			"bounds": {
+				"left": 248,
+				"top": 135,
+				"width": 679,
+				"height": 1366
+			},
+			"near": {
+				"hip": -31.805458328016137,
+				"knee": 28.157059024870616,
+				"ankle": -4.351600696854479,
+				"footTarget": [710, 1419],
+				"footLift": 0,
+				"footPitch": -8
+			},
+			"far": {
+				"hip": 16.287839235879083,
+				"knee": 22.27541690476665,
+				"ankle": -30.563256140645734,
+				"footTarget": [335, 1403],
+				"footLift": 0,
+				"footPitch": 8
+			}
+		},
+		{
+			"frame": 2,
+			"phase": 0.0625,
+			"translateY": 43.1,
+			"arm": 11.3125,
+			"bounds": {
+				"left": 260,
+				"top": 143,
+				"width": 622,
+				"height": 1358
+			},
+			"near": {
+				"hip": -33.498175083136296,
+				"knee": 43.12282715690427,
+				"ankle": -13.812152073767976,
+				"footTarget": [667.5, 1421],
+				"footLift": 0,
+				"footPitch": -4.1875
+			},
+			"far": {
+				"hip": -0.3788926855815828,
+				"knee": 61.28820471427284,
+				"ankle": -52.409312028691254,
+				"footTarget": [347.94047947308127, 1364],
+				"footLift": 38,
+				"footPitch": 8.5
+			}
+		},
+		{
+			"frame": 3,
+			"phase": 0.125,
+			"translateY": 45,
+			"arm": 8,
+			"bounds": {
+				"left": 298,
+				"top": 145,
+				"width": 537,
+				"height": 1356
+			},
+			"near": {
+				"hip": -30.704008871397647,
+				"knee": 49.49128391527917,
+				"ankle": -18.78727504388152,
+				"footTarget": [625, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -11.316496918542237,
+				"knee": 77.14745386113457,
+				"ankle": -57.83095694259233,
+				"footTarget": [384.7918471982869, 1347.4],
+				"footLift": 55.6,
+				"footPitch": 8
+			}
+		},
+		{
+			"frame": 4,
+			"phase": 0.1875,
+			"translateY": 33.8,
+			"arm": 4.1875,
+			"bounds": {
+				"left": 300,
+				"top": 133,
+				"width": 493,
+				"height": 1369
+			},
+			"near": {
+				"hip": -22.412337796387742,
+				"knee": 44.51223156981301,
+				"ankle": -22.09989377342527,
+				"footTarget": [582.5, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -21.372584152725885,
+				"knee": 79.57232902314242,
+				"ankle": -53.88724487041653,
+				"footTarget": [439.94381649793473, 1350.1],
+				"footLift": 61.9,
+				"footPitch": 4.3125
+			}
+		},
+		{
+			"frame": 5,
+			"phase": 0.25,
+			"translateY": 20,
+			"arm": 0,
+			"bounds": {
+				"left": 300,
+				"top": 120,
+				"width": 480,
+				"height": 1381
+			},
+			"near": {
+				"hip": -11.421594101386072,
+				"knee": 33.07135038292494,
+				"ankle": -21.64975628153887,
+				"footTarget": [540, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -29.388219165096338,
+				"knee": 73.52466791325233,
+				"ankle": -44.13644874815599,
+				"footTarget": [505, 1361.7],
+				"footLift": 59.3,
+				"footPitch": 0
+			}
+		},
+		{
+			"frame": 6,
+			"phase": 0.3125,
+			"translateY": 11.9,
+			"arm": -4.1875,
+			"bounds": {
+				"left": 300,
+				"top": 112,
+				"width": 480,
+				"height": 1389
+			},
+			"near": {
+				"hip": -4.421321493505857,
+				"knee": 30.07216773745486,
+				"ankle": -21.650846243949,
+				"footTarget": [497.5, 1411],
+				"footLift": 0,
+				"footPitch": 4
+			},
+			"far": {
+				"hip": -35.21729510937889,
+				"knee": 64.86136420731114,
+				"ankle": -32.45656909793225,
+				"footTarget": [570.0561835020652, 1371.2],
+				"footLift": 49.8,
+				"footPitch": -2.8125
+			}
+		},
+		{
+			"frame": 7,
+			"phase": 0.375,
+			"translateY": 10,
+			"arm": -8,
+			"bounds": {
+				"left": 300,
+				"top": 110,
+				"width": 525,
+				"height": 1391
+			},
+			"near": {
+				"hip": 1.8579281258624536,
+				"knee": 28.79944713054934,
+				"ankle": -22.657375256411793,
+				"footTarget": [455, 1401],
+				"footLift": 0,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -36.450328040800166,
+				"knee": 51.35148769474252,
+				"ankle": -19.90115965394235,
+				"footTarget": [625.2081528017131, 1384.5],
+				"footLift": 35.5,
+				"footPitch": -5
+			}
+		},
+		{
+			"frame": 8,
+			"phase": 0.4375,
+			"translateY": 21.3,
+			"arm": -11.3125,
+			"bounds": {
+				"left": 300,
+				"top": 121,
+				"width": 563,
+				"height": 1381
+			},
+			"near": {
+				"hip": 8.443558248938002,
+				"knee": 27.102185101628756,
+				"ankle": -27.04574335056676,
+				"footTarget": [412.5, 1400],
+				"footLift": 0,
+				"footPitch": 8.5
+			},
+			"far": {
+				"hip": -36.72971608614777,
+				"knee": 41.761049471160625,
+				"ankle": -12.343833385012857,
+				"footTarget": [662.0595205269187, 1399.7],
+				"footLift": 18.3,
+				"footPitch": -7.3125
+			}
+		},
+		{
+			"frame": 9,
+			"phase": 0.5,
+			"translateY": 35,
+			"arm": -13,
+			"bounds": {
+				"left": 295,
+				"top": 135,
+				"width": 582,
+				"height": 1366
+			},
+			"near": {
+				"hip": 17.53836109793975,
+				"knee": 19.851150448181293,
+				"ankle": -29.389511546121042,
+				"footTarget": [370, 1401],
+				"footLift": 0,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -35.14639745928821,
+				"knee": 35.141863941558746,
+				"ankle": -7.995466482270537,
+				"footTarget": [675, 1417],
+				"footLift": 0,
+				"footPitch": -8
+			}
+		},
+		{
+			"frame": 10,
+			"phase": 0.5625,
+			"translateY": 43.1,
+			"arm": -11.3125,
+			"bounds": {
+				"left": 300,
+				"top": 143,
+				"width": 532,
+				"height": 1358
+			},
+			"near": {
+				"hip": 1.5689381173432673,
+				"knee": 57.4303623555838,
+				"ankle": -50.49930047292707,
+				"footTarget": [382.94047947308127, 1362],
+				"footLift": 38,
+				"footPitch": 8.5
+			},
+			"far": {
+				"hip": -36.12466210072595,
+				"knee": 48.68657475617032,
+				"ankle": -16.749412655444374,
+				"footTarget": [632.5, 1420],
+				"footLift": 0,
+				"footPitch": -4.1875
+			}
+		},
+		{
+			"frame": 11,
+			"phase": 0.625,
+			"translateY": 45,
+			"arm": -8,
+			"bounds": {
+				"left": 300,
+				"top": 145,
+				"width": 485,
+				"height": 1356
+			},
+			"near": {
+				"hip": -9.319300535172943,
+				"knee": 73.18259383272445,
+				"ankle": -55.86329329755151,
+				"footTarget": [419.7918471982869, 1345.4],
+				"footLift": 55.6,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -32.968201777377026,
+				"knee": 54.33896158592596,
+				"ankle": -21.370759808548932,
+				"footTarget": [590, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			}
+		},
+		{
+			"frame": 12,
+			"phase": 0.6875,
+			"translateY": 33.8,
+			"arm": -4.1875,
+			"bounds": {
+				"left": 300,
+				"top": 133,
+				"width": 480,
+				"height": 1369
+			},
+			"near": {
+				"hip": -19.293453448014994,
+				"knee": 75.23111043145056,
+				"ankle": -51.625156983435566,
+				"footTarget": [474.94381649793473, 1349.1],
+				"footLift": 61.9,
+				"footPitch": 4.3125
+			},
+			"far": {
+				"hip": -24.690967998257282,
+				"knee": 49.391256182054136,
+				"ankle": -24.700288183796854,
+				"footTarget": [547.5, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			}
+		},
+		{
+			"frame": 13,
+			"phase": 0.75,
+			"translateY": 20,
+			"arm": 0,
+			"bounds": {
+				"left": 300,
+				"top": 120,
+				"width": 480,
+				"height": 1381
+			},
+			"near": {
+				"hip": -27.160966942476886,
+				"knee": 68.75792320594967,
+				"ankle": -41.59695626347278,
+				"footTarget": [540, 1361.7],
+				"footLift": 59.3,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -13.749194916992098,
+				"knee": 38.056199718016025,
+				"ankle": -24.30700480102393,
+				"footTarget": [505, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			}
+		},
+		{
+			"frame": 14,
+			"phase": 0.8125,
+			"translateY": 11.9,
+			"arm": 4.1875,
+			"bounds": {
+				"left": 300,
+				"top": 112,
+				"width": 518,
+				"height": 1389
+			},
+			"near": {
+				"hip": -32.72804402165611,
+				"knee": 59.548594523844955,
+				"ankle": -29.633050502188844,
+				"footTarget": [605.0561835020652, 1372.2],
+				"footLift": 49.8,
+				"footPitch": -2.8125
+			},
+			"far": {
+				"hip": -6.3297750269955335,
+				"knee": 34.10744454423696,
+				"ankle": -23.777669517241428,
+				"footTarget": [462.5, 1412],
+				"footLift": 0,
+				"footPitch": 4
+			}
+		},
+		{
+			"frame": 15,
+			"phase": 0.875,
+			"translateY": 10,
+			"arm": 8,
+			"bounds": {
+				"left": 300,
+				"top": 110,
+				"width": 575,
+				"height": 1391
+			},
+			"near": {
+				"hip": -33.85108350941143,
+				"knee": 45.84182095978065,
+				"ankle": -16.990737450369217,
+				"footTarget": [660.2081528017131, 1385.5],
+				"footLift": 35.5,
+				"footPitch": -5
+			},
+			"far": {
+				"hip": 0.3907712193292299,
+				"knee": 31.784595498144753,
+				"ankle": -24.175366717473985,
+				"footTarget": [420, 1403],
+				"footLift": 0,
+				"footPitch": 8
+			}
+		},
+		{
+			"frame": 16,
+			"phase": 0.9375,
+			"translateY": 21.3,
+			"arm": 11.3125,
+			"bounds": {
+				"left": 290,
+				"top": 121,
+				"width": 624,
+				"height": 1380
+			},
+			"near": {
+				"hip": -34.014603365390194,
+				"knee": 36.02527223944631,
+				"ankle": -9.323168874056115,
+				"footTarget": [697.0595205269187, 1400.7],
+				"footLift": 18.3,
+				"footPitch": -7.3125
+			},
+			"far": {
+				"hip": 6.966801013138937,
+				"knee": 30.055767815015418,
+				"ankle": -28.522568828154355,
+				"footTarget": [377.5, 1402],
+				"footLift": 0,
+				"footPitch": 8.5
+			}
+		}
+	]
+}

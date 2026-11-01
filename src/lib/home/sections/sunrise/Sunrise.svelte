@@ -7,20 +7,23 @@
 	Scroll: `--sunrise` (0 → 1) is driven by a CSS scroll-driven animation (`view()` timeline of this footer, from its
 	top entering the viewport to the page end). Fallback without `animation-timeline` support: ScrollProgress writes it.
 	Reduced motion (or neither): the registered initial value 1 = the final sunrise, static.
-	The mascot walks the painted cliff path as you scroll: one clean frame (walk frame 1) translated along the path with a
-	scroll-stepped bob and sway while the page is scrolling; at rest he stands still. The four painted walk frames are
-	not used as a loop: frames 1 and 3 lead with the same leg, which reads as a hitch (docs/art/mascot/README.md).
+	The mascot walks the painted cliff path as you scroll: a 16-frame cycle baked from the walk puppet, layered as legs
+	atlas (far leg, body, near leg, arm, like the bake). ./walk.ts keys it to scroll distance, one frame per stride
+	fraction so the planted foot never skates; at rest he settles on a contact pose and breathes. Skewed to the path
+	slope (stays upright, both feet on the line). Reduced motion or no JS: the end pose (contact frame), static.
 	All rects live in ./layout.ts; optimized assets come from tools/build-assets.mjs.
 -->
 <script lang="ts">
-	import { on } from 'svelte/events';
+	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import { linkedSocials } from '#lib/home/data/socials.ts';
 	import { InView, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { SOCIAL_ICON_PATHS } from './icons.ts';
-	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars, rootVars } from './layout.ts';
+	import { ART_BOXES } from './art.ts';
+	import { LEGAL_LINKS, MASCOT_PARTS, SUNRISE_LAYOUT, WALK_FEET_START, mascotSizes, placeVars, rootVars } from './layout.ts';
+	import { Walker } from './walk.ts';
 
 	const socials = linkedSocials();
 	const legalLabels = {
@@ -59,34 +62,32 @@
 		return () => root.style.removeProperty('--sunrise');
 	});
 
-	// The walk bob only plays while the page is scrolling; at rest the mascot stands still.
-	let walking = $state(false);
+	// The walk follows the scroll only while the section is on screen and motion is allowed.
+	// Progress: 0 when his feet (at the end spot) come into view near the viewport bottom, 1 at the page end, linear
+	// in scroll. Measured on the stage, which has no transform.
+	const mobile = new MediaQuery('(max-width: 47.99rem)');
+	let stage: HTMLElement;
+	const walker = new Walker(() => {
+		const rect = stage.getBoundingClientRect();
+		const feet = rect.top + rect.height * (mobile.current ? mo.walkFeet : d.walkFeet);
+		const left = Math.max(0, document.documentElement.scrollHeight - window.innerHeight - window.scrollY);
+		// at least a quarter viewport of walking, even if the page end leaves his feet low in the viewport
+		const from = Math.min(window.innerHeight * WALK_FEET_START, feet - left + window.innerHeight * 0.25);
+		return (from - feet) / Math.max(1, from - feet + left);
+	});
 	$effect(() => {
 		if (reducedMotion.current || !near.current) return;
-		let timer = 0;
-		const off = on(
-			window,
-			'scroll',
-			() => {
-				walking = true;
-				clearTimeout(timer);
-				timer = window.setTimeout(() => (walking = false), 160);
-			},
-			{ passive: true }
-		);
-		return () => {
-			off();
-			clearTimeout(timer);
-			walking = false;
-		};
+		walker.start(mobile.current ? mo.walkFrames : d.walkFrames);
+		return () => walker.stop();
 	});
+	const sizes = { legs: mascotSizes(ART_BOXES.walkLegs, 16), body: mascotSizes(ART_BOXES.walkBody), arm: mascotSizes(ART_BOXES.walkArm) };
 </script>
 
 <footer
 	bind:this={root}
 	id="sunrise"
 	data-night-hour="06:00"
-	class={['sunrise', near.current && 'is-near', walking && 'is-walking']}
+	class={['sunrise', near.current && 'is-near']}
 	style={rootStyle}
 	aria-labelledby="home-sunrise-title"
 	{@attach through.attach}
@@ -96,7 +97,7 @@
 
 	<div class="paper" aria-hidden="true"></div>
 
-	<div class="stage" aria-hidden="true">
+	<div class="stage" aria-hidden="true" bind:this={stage}>
 		<div class="placed sky" style={place.sky}>
 			<enhanced:img src="./assets/sunrise-sky.webp?w=1920;1440;1080;720" alt="" class="is-desktop" sizes="100vw" loading="lazy" decoding="async" />
 			<enhanced:img src="./assets/sunrise-sky-mobile.webp?w=1080;780;540" alt="" class="is-mobile" sizes="100vw" loading="lazy" decoding="async" />
@@ -134,8 +135,21 @@
 			<path d="M25 118 C 33 98, 17 84, 27 64 S 35 36, 25 10" />
 			<path d="M20 118 C 14 104, 26 92, 20 78 S 14 56, 21 38" />
 		</svg>
-		<div class="placed mascot" style={place.mascot}>
-			<enhanced:img src="./assets/mascot-sunrise-walk@1.webp?w=547;400;280" alt="" sizes="(min-width: 48rem) 13vw, 30vw" loading="lazy" decoding="async" />
+		<div class="placed mascot" style={place.mascot} {@attach walker.attach}>
+			<div class="figure">
+				<div class="leg" style={MASCOT_PARTS.legs}>
+					<enhanced:img src="./assets/mascot-walk-legs.webp?w=4000;3120;2240&quality=42" alt="" sizes={sizes.legs} loading="lazy" decoding="async" />
+				</div>
+				<div class="torso">
+					<enhanced:img src="./assets/mascot-walk-body.webp?w=248;200;140;100" alt="" style={MASCOT_PARTS.body} sizes={sizes.body} loading="lazy" decoding="async" />
+				</div>
+				<div class="leg near" style={MASCOT_PARTS.legs}>
+					<enhanced:img src="./assets/mascot-walk-legs.webp?w=4000;3120;2240&quality=42" alt="" sizes={sizes.legs} loading="lazy" decoding="async" />
+				</div>
+				<div class="torso">
+					<enhanced:img src="./assets/mascot-walk-arm.webp?w=98;80;56;40" alt="" class="arm" style={MASCOT_PARTS.arm} sizes={sizes.arm} loading="lazy" decoding="async" />
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -191,9 +205,9 @@
 		--ink-fade: #1c1d1d;
 		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
 		--night-clock-top: clamp(9rem, 30svh, 16rem);
-		--walk-t: clamp(0, (var(--sunrise) - var(--walk-start)) / (1 - var(--walk-start)), 1);
 		--walk-x: var(--d-walk-x);
 		--walk-y: var(--d-walk-y);
+		--walk-skew: var(--d-walk-skew);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -332,25 +346,73 @@
 		}
 	}
 
-	/* Mascot: walks the path (translate along its slope) while --sunrise goes walk-start → 1. */
+	/* Mascot: his full walk canvas at the end of the walk. ./walk.ts writes --walk-p (0 → 1 along the path), --f (atlas
+	   column), --dir (facing), --bob and --arm; the defaults on the root are the end pose. Upright on the slope: skewY
+	   around the feet keeps verticals vertical and puts both feet on the path line. */
 	.mascot {
-		height: auto;
-		translate: calc((1 - var(--walk-t)) * var(--walk-x)) calc((1 - var(--walk-t)) * var(--walk-y));
+		translate: calc((1 - var(--walk-p)) * var(--walk-x)) calc((1 - var(--walk-p)) * var(--walk-y));
+		transform-origin: var(--pivot);
+		transform: skewY(var(--walk-skew)) scaleX(var(--dir));
 	}
 
-	.mascot :global(img) {
+	.figure,
+	.torso {
+		position: absolute;
+		inset: 0;
+	}
+
+	.figure {
+		transform-origin: var(--pivot);
+	}
+
+	.figure :global(img) {
+		position: absolute;
 		display: block;
-		width: 100%;
-		height: auto;
-		/* the foot pivot of the frame */
-		transform-origin: 49% 99%;
-		--bob: 0;
-		--sway: 0;
-		translate: 0 calc(var(--bob) * -2.4%);
-		rotate: calc(var(--sway) * 1.6deg);
-		transition:
-			translate 260ms ease-out,
-			rotate 260ms ease-out;
+		max-width: none;
+	}
+
+	/* bob in master px (the canvas is 1600 px tall); the legs atlas has it baked in */
+	.torso {
+		translate: 0 calc(var(--bob) * 100% / 1600);
+	}
+
+	.torso :global(img.arm) {
+		rotate: calc(var(--arm) * 1deg);
+	}
+
+	/* One atlas cell: row 0 the far leg (behind the body), row 1 the near leg; one column per frame. */
+	.leg {
+		position: absolute;
+		overflow: hidden;
+	}
+
+	.leg :global(img) {
+		left: 0;
+		top: 0;
+		width: 1600%;
+		height: 200%;
+		translate: calc(var(--f) * -6.25%) 0;
+	}
+
+	.leg.near :global(img) {
+		translate: calc(var(--f) * -6.25%) -50%;
+	}
+
+	/* At rest: a slow breath from the feet (≈ 1–2 px at the head). */
+	@media (prefers-reduced-motion: no-preference) {
+		.mascot:global(.is-idle) .figure {
+			animation: breathe 3.6s ease-in-out infinite;
+		}
+
+		.sunrise:not(.is-near) .figure {
+			animation-play-state: paused;
+		}
+	}
+
+	@keyframes breathe {
+		50% {
+			scale: 1 1.006;
+		}
 	}
 
 	/* Shiny egg (docs/HOMEPAGE-DEV.md §11): no golden walk art exists, so the shared filter fallback applies. On butter
@@ -360,15 +422,10 @@
 	}
 
 	:global([data-shiny]) .sunrise .mascot::after {
+		/* the walk canvas is wider than the figure: keep the sparkle by his head */
+		top: 9%;
+		right: 38%;
 		filter: drop-shadow(0 0 0.12rem rgb(122 78 18 / 0.9)) drop-shadow(0 0 0.4rem rgb(226 169 59 / 0.9));
-	}
-
-	/* One bob per footfall, stepped by scroll distance; settles back onto the path when scrolling stops. */
-	.is-walking .mascot :global(img) {
-		--phase: calc(var(--walk-t) * var(--walk-steps) * 6.2832);
-		--bob: calc((1 - cos(var(--phase))) / 2);
-		--sway: sin(var(--phase));
-		transition: none;
 	}
 
 	/* The night retreats upward: a ragged watercolor wash, solid ink above it. */
@@ -489,6 +546,7 @@
 			--night-clock-top: clamp(8rem, 22svh, 12rem);
 			--walk-x: var(--m-walk-x);
 			--walk-y: var(--m-walk-y);
+			--walk-skew: var(--m-walk-skew);
 		}
 
 		.sky :global(img.is-desktop) {
@@ -516,8 +574,7 @@
 			height: var(--mh);
 		}
 
-		.art,
-		.mascot {
+		.art {
 			height: auto;
 		}
 

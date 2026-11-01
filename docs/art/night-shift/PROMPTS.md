@@ -130,7 +130,6 @@ Mechanical export steps (all coordinates in final desktop pixels unless stated):
 
 Each generated image was inspected, followed by the final PNGs and desktop normal/golden and mobile composites. Temporary composites and export/audit scripts were removed before committing; only the seven PNGs and two handoff documents are deliverables.
 
-
 ## Coherent scene and localized typing revision — 2026-11-01
 
 Built-in `image_gen.imagegen`, highest available quality requested. No explicit quality/model or mask parameter is exposed. No CLI/API fallback. All six generated images were inspected; the two scene edits and four hand variants were retained. No visitor copy was generated. The owner's live-result screenshot and all three previous mascot typing PNGs were inspected to diagnose the duplicated chair and misplaced hands, but were not used as composition targets.

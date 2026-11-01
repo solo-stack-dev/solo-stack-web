@@ -12,7 +12,7 @@
  *
  * Scroll: `--sunrise` goes 0 → 1 while the section scrolls in (top edge at the viewport bottom → the page end).
  */
-import { ART_BOXES, type ArtBox } from './art.ts';
+import { ART_BOXES, WALK_CYCLE, type ArtBox } from './art.ts';
 
 export interface Rect {
 	x: number;
@@ -37,8 +37,9 @@ const PATH_SURFACE: [number, number][] = [
 	[2560, 386]
 ];
 
-/** Mascot walk frame (`mascot-sunrise-walk@1.png`, 1152×1600): the measured foot baseline pivot. */
-const MASCOT_PIVOT = { x: 590, y: 1500 };
+/** Walk puppet canvas (1152×1600, docs/art/mascot/walk-rig.json): placement anchor (near hip x, ground line) and shoulder. */
+const MASCOT_PIVOT = { x: 570, y: 1500 };
+const MASCOT_SHOULDER = { x: 477, y: 646 };
 /** Coffee master (600×600): where the rock meets the ground, and the box above the cup mouth for the steam. */
 const COFFEE_BASE = { x: 300, y: 530 };
 const COFFEE_STEAM: Rect = { x: 222, y: -230, w: 150, h: 420 };
@@ -59,14 +60,14 @@ interface Placement {
 	cliffPath: Place;
 	/** Coffee rock: center x on the path and canvas width; `sink` pushes it into the ground (stage %). */
 	coffee: { x: number; w: number; sink: number };
-	/** Mascot at rest (end of the walk): foot x on the path and canvas width; `sink` like the coffee. */
+	/** Mascot at rest (end of the walk): hip x on the path and canvas width; `sink` like the coffee. */
 	mascot: { x: number; w: number; sink: number };
+	/** Steps (half cycles) he walks while the section scrolls in; the travel is steps × his stride on screen. */
+	steps: number;
 	/** Night edge: width/left in % of the section; vertical travel in % of its own height (from → to). */
 	nightEdge: { x: number; w: number; from: number; to: number };
 	/** Diameter of the warm glow over the baked sun (stage % of width). */
 	sunGlow: number;
-	/** Distance (stage % of width) the mascot walks while the section scrolls in. */
-	walk: number;
 }
 
 const PLACEMENT: Record<Breakpoint, Placement> = {
@@ -78,7 +79,7 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		mascot: { x: 38, w: 16, sink: 0.4 },
 		nightEdge: { x: 0, w: 100, from: 30, to: -52 },
 		sunGlow: 22,
-		walk: 13
+		steps: 3
 	},
 	mobile: {
 		sky: { x: 0, y: -66, w: 100 },
@@ -88,12 +89,12 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		mascot: { x: 54, w: 34, sink: 0.6 },
 		nightEdge: { x: -80, w: 260, from: 55, to: -50 },
 		sunGlow: 46,
-		walk: 20
+		steps: 2
 	}
 };
 
-/** Walk timing: starts at this `--sunrise` value and bobs `steps` times on the way (one bob per footfall). */
-export const WALK = { start: 0.3, steps: 7 } as const;
+/** The walk starts when his feet (at the end spot) rise past this fraction of the viewport height, ends at the page end. */
+export const WALK_FEET_START = 0.96;
 
 const stageAspect = (bp: Breakpoint) => STAGE[bp].width / STAGE[bp].height;
 const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -145,9 +146,16 @@ export interface SunriseLayout {
 	cliffPath: Rect;
 	coffee: Rect;
 	steam: Rect;
+	/** The mascot's full canvas at the end of the walk; its layers are placed in % of it (see `MASCOT_PARTS`). */
 	mascot: Rect;
 	/** Walk offset at the start, in % of the mascot's own box (translate units). */
 	walkFrom: { x: number; y: number };
+	/** Path slope under the walk as a skewY angle (deg): keeps the figure upright while both feet follow the path. */
+	walkSkew: number;
+	/** Number of frames (positions) in the whole walk: steps × frames / 2. */
+	walkFrames: number;
+	/** His ground line at the end of the walk, as a fraction of the stage height (drives the walk's scroll range). */
+	walkFeet: number;
 	nightEdge: Placement['nightEdge'];
 }
 
@@ -160,8 +168,11 @@ function build(bp: Breakpoint): SunriseLayout {
 	const glowH = ((place.sunGlow * stageAspect(bp)) / sky.h) * 100;
 	const pathCanvas = canvasRect(bp, place.cliffPath, ART_BOXES.cliffPath);
 	const coffeeCanvas = standOn(bp, pathCanvas, ART_BOXES.coffee, COFFEE_BASE, place.coffee);
-	const mascot = cropRect(standOn(bp, pathCanvas, ART_BOXES.mascot, MASCOT_PIVOT, place.mascot), ART_BOXES.mascot);
-	const rise = groundAt(pathCanvas, place.mascot.x) - groundAt(pathCanvas, place.mascot.x - place.walk);
+	const mascotBox = { canvas: ART_BOXES.walkBody.canvas, crop: { x: 0, y: 0, ...ART_BOXES.walkBody.canvas } };
+	const mascot = standOn(bp, pathCanvas, mascotBox, MASCOT_PIVOT, place.mascot);
+	// travel = steps × stride, so the planted foot stays put while the figure advances one frame at a time
+	const walk = (place.steps * WALK_CYCLE.stepLength * place.mascot.w) / mascotBox.canvas.width;
+	const rise = groundAt(pathCanvas, place.mascot.x) - groundAt(pathCanvas, place.mascot.x - walk);
 	return {
 		sky,
 		sunGlow: { x: SKY_SUN[bp].x * 100 - glowW / 2, y: SKY_SUN[bp].y * 100 - glowH / 2, w: glowW, h: glowH },
@@ -170,7 +181,10 @@ function build(bp: Breakpoint): SunriseLayout {
 		coffee: cropRect(coffeeCanvas, ART_BOXES.coffee),
 		steam: subRect(coffeeCanvas, ART_BOXES.coffee, COFFEE_STEAM),
 		mascot,
-		walkFrom: { x: (-place.walk / mascot.w) * 100, y: (-rise / mascot.h) * 100 },
+		walkFrom: { x: (-walk / mascot.w) * 100, y: (-rise / mascot.h) * 100 },
+		walkSkew: (Math.atan((rise * STAGE[bp].height) / (walk * STAGE[bp].width)) * 180) / Math.PI,
+		walkFrames: (place.steps * WALK_CYCLE.frames) / 2,
+		walkFeet: (mascot.y + (mascot.h * MASCOT_PIVOT.y) / mascotBox.canvas.height) / 100,
 		nightEdge: place.nightEdge
 	};
 }
@@ -178,6 +192,31 @@ function build(bp: Breakpoint): SunriseLayout {
 export const SUNRISE_LAYOUT: Record<Breakpoint, SunriseLayout> = { desktop: build('desktop'), mobile: build('mobile') };
 
 const pct = (value: number) => `${round(value)}%`;
+
+/** The mascot's layers in % of his canvas (`left/top/width/height`), and the arm's shoulder pivot in % of the arm. */
+const part = (box: ArtBox): Rect => ({
+	x: (box.crop.x / box.canvas.width) * 100,
+	y: (box.crop.y / box.canvas.height) * 100,
+	w: (box.crop.width / box.canvas.width) * 100,
+	h: (box.crop.height / box.canvas.height) * 100
+});
+const rectVars = (rect: Rect) => `left: ${pct(rect.x)}; top: ${pct(rect.y)}; width: ${pct(rect.w)}; height: ${pct(rect.h)}`;
+export const MASCOT_PARTS = {
+	body: rectVars(part(ART_BOXES.walkBody)),
+	arm: `${rectVars(part(ART_BOXES.walkArm))}; transform-origin: ${pct(((MASCOT_SHOULDER.x - ART_BOXES.walkArm.crop.x) / ART_BOXES.walkArm.crop.width) * 100)} ${pct(((MASCOT_SHOULDER.y - ART_BOXES.walkArm.crop.y) / ART_BOXES.walkArm.crop.height) * 100)}`,
+	legs: rectVars(part(ART_BOXES.walkLegs)),
+	/** transform-origin of the whole figure: the placement anchor (turns and the slope skew pivot there). */
+	pivot: `${pct((MASCOT_PIVOT.x / ART_BOXES.walkBody.canvas.width) * 100)} ${pct((MASCOT_PIVOT.y / ART_BOXES.walkBody.canvas.height) * 100)}`
+};
+
+/**
+ * `sizes` for a mascot layer: its rendered width in vw on each stage (both stages span the viewport width). `columns`
+ * multiplies for the legs atlas, which is that many cells wide.
+ */
+export function mascotSizes(box: ArtBox, columns = 1): string {
+	const vw = (bp: Breakpoint) => round(((SUNRISE_LAYOUT[bp].mascot.w * box.crop.width) / box.canvas.width) * columns);
+	return `(min-width: 48rem) ${vw('desktop')}vw, ${vw('mobile')}vw`;
+}
 
 /** Inline CSS vars for an element placed on both stages: `--dx --dy --dw --dh` (desktop) and `--mx …` (mobile). */
 export function placeVars(desktop: Rect, mobile: Rect): string {
@@ -187,12 +226,14 @@ export function placeVars(desktop: Rect, mobile: Rect): string {
 	].join('; ');
 }
 
-/** Root CSS vars: walk timing and offsets, and the night edge (section-relative left/width, travel in % of its own height). */
+/** Root CSS vars: walk offsets, slope and end pose, and the night edge (section-relative left/width, travel in % of its own height). */
 export function rootVars(): string {
 	const { desktop: d, mobile: m } = SUNRISE_LAYOUT;
 	return [
-		`--walk-start: ${WALK.start}; --walk-steps: ${WALK.steps}`,
 		`--d-walk-x: ${pct(d.walkFrom.x)}; --d-walk-y: ${pct(d.walkFrom.y)}; --m-walk-x: ${pct(m.walkFrom.x)}; --m-walk-y: ${pct(m.walkFrom.y)}`,
+		`--d-walk-skew: ${round(d.walkSkew)}deg; --m-walk-skew: ${round(m.walkSkew)}deg; --pivot: ${MASCOT_PARTS.pivot}`,
+		// the end pose (reduced motion, no JS, off screen): contact frame 0, facing right; ./walk.ts overrides on the mascot
+		`--walk-p: 1; --f: 0; --dir: 1; --bob: ${WALK_CYCLE.bob[0]}; --arm: ${WALK_CYCLE.arm[0]}`,
 		`--d-night-x: ${pct(d.nightEdge.x)}; --d-night-w: ${pct(d.nightEdge.w)}; --d-from: ${pct(d.nightEdge.from)}; --d-to: ${pct(d.nightEdge.to)}`,
 		`--m-night-x: ${pct(m.nightEdge.x)}; --m-night-w: ${pct(m.nightEdge.w)}; --m-from: ${pct(m.nightEdge.from)}; --m-to: ${pct(m.nightEdge.to)}`
 	].join('; ');

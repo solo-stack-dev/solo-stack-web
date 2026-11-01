@@ -7,10 +7,15 @@
 //   art.ts records where the crop sits on the master canvas, layout.ts places everything in master coordinates.
 // - Sources are high quality WebP (alpha kept); the lossy delivery encode happens in enhanced-img.
 //
+// - The walk: the 16-frame cycle baked by docs/art/mascot/build-walk.mjs --frames=16. Only the legs change shape
+//   between frames (the body is only translated, the near arm only rotated), so the legs ship as one atlas (row 0 the
+//   far leg, row 1 the near leg, one column per frame, every cell the union box of all leg frames) and body and arm as
+//   two static cutouts; Sunrise.svelte layers them like the bake did. A full-figure sheet costs ~2× the bytes.
+//
 // Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs
 // Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
-import { rmSync, writeFileSync } from 'node:fs';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../../../../../', import.meta.url));
@@ -24,6 +29,9 @@ const MAX_WIDTH = 1920;
 const ALPHA_THRESHOLD = 6;
 const PAD = 8;
 const WEBP = { quality: 92, alphaQuality: 100, effort: 6, smartSubsample: true };
+/** Walk sources: master px → source px. 0.5 covers the largest render (desktop 1920 px at 2×, ~0.53). */
+const WALK_SCALE = 0.5;
+const WALK_FRAMES = 16;
 
 /**
  * Layers: `scale` shrinks the cropped content (the masters are upsampled from smaller native renders, so a smaller
@@ -36,8 +44,8 @@ const LAYERS = [
 	{ key: 'valley', src: 'sunrise/sunrise-valley.png', out: 'sunrise-valley.webp', crop: true },
 	{ key: 'cliffPath', src: 'sunrise/sunrise-cliff-path.png', out: 'sunrise-cliff-path.webp', crop: true },
 	{ key: 'coffee', src: 'sunrise/sunrise-coffee.png', out: 'sunrise-coffee.webp', crop: true },
-	// Walk frame 1 only: the four-frame loop is not clean (frames 1 and 3 share the leading leg), see ../README.md.
-	{ key: 'mascot', src: 'mascot/mascot-sunrise-walk@1.png', out: 'mascot-sunrise-walk@1.webp', crop: true, scale: 0.64 }
+	{ key: 'walkBody', src: 'mascot/walk-puppet-body.png', out: 'mascot-walk-body.webp', crop: true, scale: WALK_SCALE },
+	{ key: 'walkArm', src: 'mascot/walk-puppet-arm-near.png', out: 'mascot-walk-arm.webp', crop: true, scale: WALK_SCALE }
 ];
 
 /** Placeholder files this script replaces. */
@@ -49,6 +57,7 @@ const STALE = [
 	'sunrise-cliff-path.png',
 	'sunrise-coffee.png',
 	'mascot-sunrise-walk@1.png',
+	'mascot-sunrise-walk@1.webp',
 	'mascot-sunrise-walk@2.png',
 	'mascot-sunrise-walk@3.png',
 	'mascot-sunrise-walk@4.png',
@@ -91,6 +100,44 @@ for (const layer of LAYERS) {
 	);
 }
 
+// Walk legs atlas: 2 rows (far, near) × WALK_FRAMES columns, every cell the same master box.
+const cycle = JSON.parse(readFileSync(master(`mascot/walk${WALK_FRAMES}-cycle.json`), 'utf8'));
+const legFrames = ['far', 'near'].flatMap((side) => Array.from({ length: WALK_FRAMES }, (_, i) => master(`mascot/walk${WALK_FRAMES}-leg-${side}@${i + 1}.png`)));
+const legBoxes = await Promise.all(legFrames.map(alphaBox));
+const cellLeft = Math.min(...legBoxes.map((b) => b.left));
+const cellTop = Math.min(...legBoxes.map((b) => b.top));
+const cell = {
+	left: cellLeft,
+	top: cellTop,
+	width: Math.max(...legBoxes.map((b) => b.left + b.width)) - cellLeft,
+	height: Math.max(...legBoxes.map((b) => b.top + b.height)) - cellTop
+};
+const cellW = Math.round(cell.width * WALK_SCALE);
+const cellH = Math.round(cell.height * WALK_SCALE);
+const atlas = Buffer.alloc(cellW * WALK_FRAMES * cellH * 2 * 4);
+for (const [index, path] of legFrames.entries()) {
+	const row = Math.floor(index / WALK_FRAMES);
+	const column = index % WALK_FRAMES;
+	const pixels = await sharp(path).extract(cell).resize(cellW, cellH, { kernel: 'lanczos3' }).raw().toBuffer();
+	for (let y = 0; y < cellH; y++) pixels.copy(atlas, ((row * cellH + y) * cellW * WALK_FRAMES + column * cellW) * 4, y * cellW * 4, (y + 1) * cellW * 4);
+}
+const atlasInfo = await sharp(atlas, { raw: { width: cellW * WALK_FRAMES, height: cellH * 2, channels: 4 } })
+	.webp(WEBP)
+	.toFile(assets('mascot-walk-legs.webp'));
+art.walkLegs = { canvas: { width: cycle.canvas[0], height: cycle.canvas[1] }, crop: { x: cell.left, y: cell.top, width: cell.width, height: cell.height } };
+console.log(
+	`${'mascot-walk-legs.webp'.padEnd(28)} ${atlasInfo.width}×${atlasInfo.height}  ${(atlasInfo.size / 1024).toFixed(0).padStart(5)} kB  cell ${cell.left},${cell.top} ${cell.width}×${cell.height}`
+);
+
+const round = (value) => Math.round(value * 100) / 100;
+const walk = {
+	frames: WALK_FRAMES,
+	stepLength: cycle.stepLength,
+	advance: cycle.advancePerFrame,
+	bob: cycle.poses.map((pose) => round(pose.translateY)),
+	arm: cycle.poses.map((pose) => round(pose.arm))
+};
+
 for (const name of STALE) rmSync(assets(name), { force: true });
 
 const body = Object.entries(art)
@@ -112,6 +159,20 @@ export interface ArtBox {
 export const ART_BOXES = {
 ${body}
 } as const satisfies Record<string, ArtBox>;
+
+/**
+ * The baked walk cycle (docs/art/mascot/walk${WALK_FRAMES}-cycle.json), in master px. Frame 0 and frames / 2 are the
+ * contact poses (both feet down). The planted foot moves back by \`advance\` per frame, so moving the figure forward by
+ * exactly that much per frame keeps it in place; \`stepLength\` = frames / 2 × advance. Per frame: \`bob\` (body and legs
+ * translateY, baked into the legs atlas) and \`arm\` (near arm rotation in degrees around the shoulder).
+ */
+export const WALK_CYCLE = {
+	frames: ${walk.frames},
+	stepLength: ${walk.stepLength},
+	advance: ${walk.advance},
+	bob: [${walk.bob.join(', ')}],
+	arm: [${walk.arm.join(', ')}]
+} as const;
 `
 );
 console.log('wrote art.ts');

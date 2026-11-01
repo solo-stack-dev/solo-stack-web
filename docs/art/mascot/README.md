@@ -58,7 +58,6 @@ All painted content came from image generation. Local dependency-free PNG proces
 
 Per handoff §6.4, keep these large PNG masters outside the runtime bundle. Export responsive alpha-preserving WebP/AVIF derivatives through the project image pipeline. Assemble the three typing frames into one optimized sprite sheet; do the same for walking only after animation cleanup. Preserve full frame canvases so anchors do not shift. Lazy-load below-fold art, pause animation off screen, and use the documented still frames for reduced motion. No source components, public copy, dependencies or deployment settings were changed.
 
-
 ## Walk replacement package — 2026-11-01
 
 This section supersedes the four-frame walk's readiness note **only for the new files below**. The original files remain unchanged. New paintings were made with the built-in image generation tool using model sheet v2, the style-lock scene and the old contact drawing as references. The final body explicitly places the laptop under the **left/far arm**, mostly hidden behind the right-facing torso; the near/right arm is empty and separate.
@@ -131,3 +130,9 @@ Rebuild with an already installed Sharp: `node docs/art/mascot/build-walk.mjs`. 
 - `walk-source-far.png`: 1064×1478, 701,029 bytes.
 - `walk-source-near.png`: 1064×1478, 781,043 bytes.
 - `walk-validation.json`: 1,850 bytes.
+
+### C: sixteen-frame cycle for the sunrise footer (2026-11-01)
+
+`node docs/art/mascot/build-walk.mjs <sharp module path> --frames=16` bakes a 16-frame cycle from the same puppet and leaves every file above untouched. Differences from B: the support foot moves back at a **constant** speed relative to the hip during stance (140 → −200 px over half a cycle; B's eight keys were uneven: 95/110/80/55 px), so a runtime that advances the figure by exactly `cycleLength / frames` = 42.5 px per frame keeps the planted foot fixed. Swing x is cosine-eased, lift is `62·sin(π·t^0.75)` (fits B's 0/55/60/35), pitch, bob and arm angle are periodic Catmull-Rom through B's eight keys.
+
+Outputs: `mascot-walk16@1…16.png` (full frames, review only; not committed, the command regenerates them), `walk16-leg-far@1…16.png` and `walk16-leg-near@1…16.png` (each leg alone, bob baked in; the production source), `walk16-cycle.json` (step length 340 px, per-frame bob, arm angle, IK joint angles, bounds). Frames 1 and 9 are the contact poses. The sunrise section (`src/lib/home/sections/sunrise/tools/build-assets.mjs`) packs the legs into one atlas and layers it with the static body (translateY by bob) and near arm (rotated around the shoulder), which costs about half the bytes of a full-figure sheet.
