@@ -1,0 +1,561 @@
+<!--
+	@component
+	04:00 Open air cinema (docs/HANDOFF-HOMEPAGE.md §5.6). The mascot sits on the cliff next to his laptop, which projects
+	the latest video into a painted frame in the sky.
+
+	- Facade: self-hosted thumbnail (see ./thumbnail.ts) + moon-shaped play button. No request to YouTube before the click.
+	- Click: the window swaps to a youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
+	- No video (empty feed or build without network): an empty, softly lit screen and a link to the channel.
+	- Dust motes drift in the beam (CSS), paused off screen; reduced motion: no motes, no beam animation.
+	- All rects live in ./layout.ts. Dev only: `?cinema=demo` shows a public demo video, `?cinema=empty` the empty state.
+-->
+<script lang="ts">
+	import { dev } from '$app/env';
+	import { m } from '#lib/paraglide/messages.js';
+	import { YOUTUBE_CHANNEL_URL } from '#lib/home/data/socials.ts';
+	import type { LatestVideo } from '#lib/home/data/youtube.ts';
+	import { getLatestVideo } from '#lib/home/data/youtube.remote.ts';
+	import { InView } from '#lib/home/shared/motion.svelte.ts';
+	import { NIGHT_HOURS } from '#lib/home/night.ts';
+	import NightClock from '#lib/home/shared/NightClock.svelte';
+	import StarField from '#lib/home/shared/StarField.svelte';
+	import { CINEMA_LAYOUT, beamMask, placeVars } from './layout.ts';
+	import { thumbnailPath } from './thumbnail.ts';
+
+	const latest = $derived(await getLatestVideo());
+
+	// Dev-only preview switch (the feed may be empty while building the section). Tree-shaken from production builds.
+	let preview = $state<string | null>(null);
+	$effect(() => {
+		if (dev) preview = new URLSearchParams(window.location.search).get('cinema');
+	});
+	const DEV_DEMO: LatestVideo = {
+		id: 'jNQXAC9IVRw',
+		title: 'Me at the zoo',
+		url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
+		publishedAt: '2005-04-24T03:31:52+00:00',
+		thumbnail: 'https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg'
+	};
+	const video = $derived(dev && preview === 'demo' ? DEV_DEMO : dev && preview === 'empty' ? null : latest);
+
+	let playing = $state(false);
+	let thumbnailFailed = $state(false);
+	const near = new InView({ rootMargin: '10% 0px' });
+
+	const { desktop: d, mobile: mo } = CINEMA_LAYOUT;
+	const place = {
+		window: placeVars(d.window, mo.window),
+		frame: placeVars(d.frame, mo.frame),
+		caption: placeVars(d.caption, mo.caption),
+		cliff: placeVars(d.cliff, mo.cliff),
+		mascot: placeVars(d.mascot, mo.mascot)
+	};
+	const beamStyle = [
+		`--d-mask: ${beamMask('desktop')}`,
+		`--m-mask: ${beamMask('mobile')}`,
+		`--d-apex: ${d.beam.apex.x}% ${d.beam.apex.y}%`,
+		`--m-apex: ${mo.beam.apex.x}% ${mo.beam.apex.y}%`
+	].join('; ');
+	const beamArtStyle = [
+		`--dw: ${d.beamTexture.w}%`,
+		`--dh: ${d.beamTexture.h}%`,
+		`--d-transform: ${d.beamTexture.transform}`,
+		`--mw: ${mo.beamTexture.w}%`,
+		`--mh: ${mo.beamTexture.h}%`,
+		`--m-transform: ${mo.beamTexture.transform}`
+	].join('; ');
+	const dust = d.dust.map((mote, index) => {
+		const mobile = mo.dust[index];
+		return `${placeVars(mote, mobile)}; --size: ${mote.size}px; --delay: ${mote.delay}s; --duration: ${mote.duration}s; --drift-x: ${mote.drift.x}px; --drift-y: ${mote.drift.y}px`;
+	});
+
+	// The 04:00 sky color, held through the section (see the backdrop note in the styles).
+	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'cinema')!.sky;
+
+	const embedUrl = (id: string) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
+
+	function play() {
+		playing = true;
+	}
+</script>
+
+<section
+	id="cinema"
+	data-night-hour="04:00"
+	class={['cinema', playing && 'is-playing', near.current && 'is-near']}
+	aria-labelledby="home-cinema-title"
+	style:--cinema-sky={SKY}
+>
+	<div class="backdrop" aria-hidden="true">
+		<StarField density={0.45} brightness={0.85} seed={404} />
+	</div>
+	<h2 id="home-cinema-title" class="sr-only">{m.home_cinema_title()}</h2>
+	<NightClock time="04:00" />
+
+	<div class="stage" {@attach near.attach}>
+		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
+		<enhanced:img src="./assets/cinema-landscape-mobile.webp?w=1080;828;640" alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
+		<enhanced:img
+			src="./assets/cinema-cliff.webp?w=1582;1100;760"
+			alt=""
+			class="placed cliff"
+			style={place.cliff}
+			sizes="(min-width: 48rem) 41vw, 81vw"
+			loading="lazy"
+			decoding="async"
+		/>
+		<!-- The shiny egg's golden filter fallback and sparkle apply to this .mascot wrapper (there is no golden sitting art). -->
+		<div class="placed mascot" style={place.mascot}>
+			<enhanced:img src="./assets/mascot-cinema-sitting.webp?w=480;300" alt="" class="mascot-art" sizes="(min-width: 48rem) 10vw, 19vw" loading="lazy" decoding="async" />
+		</div>
+
+		<div class="beam" style={beamStyle} aria-hidden="true">
+			<div class="beam-light"></div>
+			<div class="beam-art" style={beamArtStyle}>
+				<enhanced:img src="./assets/cinema-beam.webp?w=700;450" alt="" class="beam-texture" sizes="40vw" loading="lazy" decoding="async" />
+			</div>
+			{#each dust as style, index (index)}
+				<span class="dust" {style}></span>
+			{/each}
+		</div>
+		<div class="landscape-fade" aria-hidden="true"></div>
+
+		<div class="placed screen" style={place.window}>
+			{#if video && playing}
+				<iframe
+					class="player"
+					src={embedUrl(video.id)}
+					title={video.title}
+					allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
+					referrerpolicy="strict-origin-when-cross-origin"
+					{@attach (element) => element.focus()}
+				></iframe>
+			{:else if video}
+				<button type="button" class="facade" aria-label={m.home_cinema_play_label({ title: video.title })} onclick={play}>
+					{#if !thumbnailFailed}
+						<img
+							class="thumbnail"
+							src={thumbnailPath(video.id)}
+							alt=""
+							width="1280"
+							height="720"
+							loading="lazy"
+							decoding="async"
+							onerror={() => (thumbnailFailed = true)}
+						/>
+					{/if}
+					<span class="moon" aria-hidden="true"><span class="moon-play"></span></span>
+				</button>
+			{:else}
+				<div class="empty">
+					<span class="moon is-small" aria-hidden="true"></span>
+					<p class="empty-line font-mono text-xs tracking-clock md:text-sm">{m.home_cinema_empty()}</p>
+				</div>
+			{/if}
+		</div>
+		<enhanced:img
+			src="./assets/cinema-frame.webp?w=1925;1400;1000;700"
+			alt=""
+			class="placed frame"
+			style={place.frame}
+			sizes="(min-width: 48rem) 61vw, 97vw"
+			loading="lazy"
+			decoding="async"
+		/>
+
+		<div class={['placed caption font-mono', d.caption.align === 'center' && 'd-center', mo.caption.align === 'center' && 'm-center']} style={place.caption}>
+			{#if video}
+				<p class="title text-sm tracking-wide md:text-base">{video.title}</p>
+				<a class="link text-xs tracking-clock" href={video.url} target="_blank" rel="noopener">
+					{m.home_cinema_watch_link()}<span aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+				</a>
+			{:else}
+				<a class="link text-xs tracking-clock" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
+					{m.home_cinema_channel_link()}<span aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+				</a>
+			{/if}
+		</div>
+	</div>
+</section>
+
+<style>
+	.cinema {
+		position: relative;
+		/* The 16:9 stage fits the width; taller viewports get extra sky above it (the landscape's sky is transparent). */
+		min-height: max(100svh, 56.25vw);
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+		overflow-x: clip;
+		--ink-fade: #1c1d1d;
+	}
+
+	/*
+	 * Own night backdrop in the 04:00 color (NIGHT_HOURS), faded in at the top so it meets the 02:00 sky without a seam.
+	 * Without it the global sky is already blending toward butter here (its 06:00 stop is the page end), and the
+	 * mockups keep 04:00 dark until the sunrise's night edge passes. The global stars fade out in this range too,
+	 * so the backdrop carries a sparse local star field.
+	 */
+	.backdrop {
+		position: absolute;
+		inset: 0;
+		background: var(--cinema-sky);
+		mask-image: linear-gradient(to bottom, transparent, black 18%);
+		pointer-events: none;
+	}
+
+	.stage {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 2560 / 1440;
+	}
+
+	.layer {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		user-select: none;
+	}
+
+	/* Elements placed on the stage by layout.ts (desktop vars, mobile vars below) */
+	.placed {
+		position: absolute;
+		left: var(--dx);
+		top: var(--dy);
+		width: var(--dw);
+		height: var(--dh);
+	}
+
+	.is-mobile {
+		display: none;
+	}
+
+	/* The landscape plate is opaque: its top melts into the section's own night backdrop above the stage. */
+	.landscape {
+		mask-image: linear-gradient(to bottom, transparent, black 9%);
+	}
+
+	/* The bottom melts into the night edge that opens the sunrise section. */
+	.landscape-fade {
+		position: absolute;
+		inset: auto 0 0;
+		height: 14%;
+		background: linear-gradient(to bottom, transparent, var(--ink-fade));
+		pointer-events: none;
+	}
+
+	.cliff,
+	.frame {
+		height: auto;
+		pointer-events: none;
+		user-select: none;
+	}
+
+	.mascot {
+		pointer-events: none;
+	}
+
+	.mascot-art {
+		display: block;
+		width: 100%;
+		height: 100%;
+		user-select: none;
+	}
+
+	/* Light cone from the laptop to the frame: a soft CSS glow plus the painted beam, both added with screen. */
+	.beam {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		mix-blend-mode: screen;
+		opacity: 0.62;
+		transition:
+			opacity 900ms ease,
+			filter 900ms ease;
+	}
+
+	.beam-light {
+		position: absolute;
+		inset: 0;
+		mask-image: var(--d-mask);
+		mask-size: 100% 100%;
+		mask-repeat: no-repeat;
+		opacity: 0.55;
+		background: radial-gradient(circle at var(--d-apex), rgb(255 238 186 / 0.95) 0, rgb(252 215 114 / 0.75) 12%, rgb(226 169 59 / 0.35) 45%, rgb(226 169 59 / 0.18) 70%);
+	}
+
+	/* The painted beam (cropped canvas at the stage origin), mapped onto the cone by layout.ts's affine transform */
+	.beam-art {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: var(--dw);
+		height: var(--dh);
+		transform-origin: 0 0;
+		transform: var(--d-transform);
+		opacity: 0.75;
+	}
+
+	.beam-texture {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.cinema:has(.facade:hover, .facade:focus-visible) .beam {
+		opacity: 0.75;
+	}
+
+	.is-playing .beam {
+		opacity: 0.95;
+		filter: brightness(1.12);
+	}
+
+	.dust {
+		position: absolute;
+		left: var(--dx);
+		top: var(--dy);
+		width: var(--size);
+		height: var(--size);
+		border-radius: 50%;
+		background: #fff6d8;
+		box-shadow: 0 0 6px 1px rgb(255 232 160 / 0.8);
+		opacity: 0;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.beam-light {
+			animation: beam-breathe 7s ease-in-out infinite alternate;
+		}
+
+		.dust {
+			animation: drift var(--duration) ease-in-out var(--delay) infinite alternate;
+		}
+
+		/* Paused while the section is off screen */
+		.cinema:not(.is-near) :is(.beam-light, .dust) {
+			animation-play-state: paused;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.dust {
+			display: none;
+		}
+	}
+
+	@keyframes beam-breathe {
+		from {
+			opacity: 0.85;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes drift {
+		0% {
+			transform: translate(0, 0);
+			opacity: 0;
+		}
+		35% {
+			opacity: 0.95;
+		}
+		100% {
+			transform: translate(var(--drift-x), var(--drift-y));
+			opacity: 0.15;
+		}
+	}
+
+	/* The video window: thumbnail facade, iframe, or the empty screen. Always exactly 16:9. */
+	.screen {
+		height: auto;
+		aspect-ratio: 16 / 9;
+		background: var(--color-ink);
+		overflow: hidden;
+	}
+
+	.player,
+	.facade,
+	.thumbnail,
+	.empty {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+
+	.facade {
+		position: relative;
+		padding: 0;
+		background: var(--color-ink);
+		cursor: pointer;
+	}
+
+	.facade:focus-visible {
+		outline-offset: -6px;
+	}
+
+	.thumbnail {
+		/* hqdefault fallbacks are 4:3 with letterbox bars: cover crops them away */
+		object-fit: cover;
+	}
+
+	.moon {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: clamp(3.25rem, 12%, 6.5rem);
+		aspect-ratio: 1;
+		translate: -50% -50%;
+		border-radius: 50%;
+		background:
+			radial-gradient(circle at 34% 30%, rgb(255 246 214 / 0.9) 0 12%, transparent 13%),
+			radial-gradient(circle at 64% 62%, rgb(226 169 59 / 0.45) 0 10%, transparent 11%), radial-gradient(circle at 30% 68%, rgb(226 169 59 / 0.35) 0 7%, transparent 8%),
+			radial-gradient(circle at 70% 30%, rgb(226 169 59 / 0.3) 0 6%, transparent 7%),
+			radial-gradient(circle at 40% 38%, #ffe9a6, var(--color-butter) 55%, var(--color-ochre));
+		box-shadow:
+			0 0 0 2px rgb(255 238 186 / 0.35),
+			0 0 28px 8px rgb(252 215 114 / 0.55),
+			0 0 70px 20px rgb(252 215 114 / 0.25);
+		transition:
+			scale 300ms ease,
+			box-shadow 300ms ease;
+	}
+
+	.moon-play {
+		position: absolute;
+		inset: 30% 26% 30% 38%;
+		background: var(--color-night);
+		clip-path: polygon(0 0, 100% 50%, 0 100%);
+		opacity: 0.88;
+	}
+
+	.facade:hover .moon,
+	.facade:focus-visible .moon {
+		scale: 1.08;
+		box-shadow:
+			0 0 0 2px rgb(255 238 186 / 0.5),
+			0 0 36px 12px rgb(252 215 114 / 0.7),
+			0 0 90px 30px rgb(252 215 114 / 0.35);
+	}
+
+	.empty {
+		position: relative;
+		display: grid;
+		place-content: center;
+		justify-items: center;
+		gap: 1.25rem;
+		padding: 1.5rem;
+		text-align: center;
+		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+		background: radial-gradient(ellipse at 50% 45%, rgb(252 215 114 / 0.16), transparent 70%), var(--color-ink);
+	}
+
+	.moon.is-small {
+		position: relative;
+		left: auto;
+		top: auto;
+		translate: none;
+		width: clamp(2.5rem, 9%, 4.5rem);
+		opacity: 0.85;
+	}
+
+	.caption {
+		height: auto;
+		display: grid;
+		gap: 0.6rem;
+		justify-items: start;
+		color: var(--color-cream);
+	}
+
+	.caption.d-center {
+		justify-items: center;
+		text-align: center;
+	}
+
+	.title {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+
+	.link {
+		color: var(--color-butter);
+		padding-bottom: 0.3rem;
+		border-bottom: 1px solid currentColor;
+	}
+
+	.link:hover {
+		color: var(--color-cream);
+	}
+
+	@media (max-width: 47.99rem) {
+		.cinema {
+			/* a little sky above the portrait stage keeps the moon clear of the clock */
+			min-height: max(100svh, calc(216.67vw + 3rem));
+		}
+
+		.stage {
+			aspect-ratio: 1080 / 2340;
+		}
+
+		.is-desktop {
+			display: none;
+		}
+
+		.is-mobile {
+			display: block;
+		}
+
+		.placed {
+			left: var(--mx);
+			top: var(--my);
+			width: var(--mw);
+			height: var(--mh);
+		}
+
+		.cliff,
+		.frame,
+		.screen,
+		.caption {
+			height: auto;
+		}
+
+		.beam-art {
+			width: var(--mw);
+			height: var(--mh);
+			transform: var(--m-transform);
+		}
+
+		.beam-light {
+			mask-image: var(--m-mask);
+		}
+
+		.dust {
+			left: var(--mx);
+			top: var(--my);
+		}
+
+		.beam-light {
+			background: radial-gradient(
+				ellipse 70% 40% at var(--m-apex),
+				rgb(255 238 186 / 0.95) 0,
+				rgb(252 215 114 / 0.7) 20%,
+				rgb(226 169 59 / 0.3) 70%,
+				rgb(226 169 59 / 0.18) 100%
+			);
+		}
+
+		.caption {
+			justify-items: start;
+			text-align: start;
+		}
+
+		.caption.m-center {
+			justify-items: center;
+			text-align: center;
+		}
+	}
+</style>

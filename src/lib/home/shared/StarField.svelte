@@ -1,0 +1,192 @@
+<!--
+	@component
+	One cheap canvas star field with twinkle. Fills its positioned parent (`position: absolute; inset: 0`).
+	The loop is capped at 20 fps, pauses off screen and in hidden tabs, and draws one static frame under reduced motion.
+	Stars are deterministic per `seed`, so resizing does not reshuffle them. The few bright stars (~3 %) are drawn with
+	the painted star sprites (materials.ts, < 4 kB together) once they have decoded; until then (or with
+	`sprites={false}`) they are plain dots.
+
+	NightPage renders the global sky stars. Sections may add their own, e.g. denser stars behind the radio:
+
+	```svelte
+	<div class="relative h-svh">
+		<StarField density={1.6} brightness={0.8} seed={42} />
+	</div>
+	```
+-->
+<script lang="ts">
+	import { untrack } from 'svelte';
+	import { STAR_SPRITES } from './materials.ts';
+	import { RafLoop, reducedMotion } from './motion.svelte.ts';
+
+	interface Props {
+		/** Multiplier on the base density (~1 star per 7000 px²). Default 1. */
+		density?: number;
+		/** Multiplier on star alpha, 0…1+. Default 1. */
+		brightness?: number;
+		/** PRNG seed. Different seeds give different skies. Default 7. */
+		seed?: number;
+		/** Animate twinkle (ignored under reduced motion). Default true. */
+		twinkle?: boolean;
+		/** Draw the bright stars with the painted sprites. Default true. */
+		sprites?: boolean;
+		class?: string;
+	}
+
+	let { density = 1, brightness = 1, seed = 7, twinkle = true, sprites = true, class: className = '' }: Props = $props();
+
+	interface Star {
+		x: number;
+		y: number;
+		r: number;
+		alpha: number;
+		warm: boolean;
+		speed: number;
+		phase: number;
+		twinkles: boolean;
+		/** Index into STAR_SPRITES for bright stars, -1 for dots. */
+		sprite: number;
+	}
+
+	/** Sprite box per star radius: the painted sprites have transparent margins, the glint is ~half the box. */
+	const SPRITE_SCALE = 6.5;
+
+	const MAX_STARS = 700;
+	let canvas: HTMLCanvasElement;
+
+	function mulberry32(value: number) {
+		let a = value >>> 0;
+		return () => {
+			a = (a + 0x6d2b79f5) >>> 0;
+			let t = a;
+			t = Math.imul(t ^ (t >>> 15), t | 1);
+			t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+
+	function createStars(seedValue: number): Star[] {
+		const random = mulberry32(seedValue);
+		return Array.from({ length: MAX_STARS }, () => {
+			const size = random();
+			const bright = size > 0.97;
+			return {
+				x: random(),
+				y: random(),
+				// mostly tiny, a few bright ones
+				r: bright ? 1.6 + random() : size > 0.8 ? 1 + random() * 0.5 : 0.5 + random() * 0.4,
+				alpha: 0.35 + random() * 0.65,
+				warm: random() > 0.82,
+				speed: 0.6 + random() * 1.8,
+				phase: random() * Math.PI * 2,
+				twinkles: random() > 0.55,
+				// derived from `size` (no extra random draw), so every star keeps its position for a given seed
+				sprite: bright ? Math.floor((size - 0.97) / 0.0075) % STAR_SPRITES.length : -1
+			};
+		});
+	}
+
+	const stars = $derived(createStars(seed));
+	let visible: Star[] = [];
+	let width = 0;
+	let height = 0;
+	let time = 0;
+	let devicePixelRatioCapped = 1;
+	let spriteImages: HTMLImageElement[] = [];
+
+	// Decode the sprites off the main thread, then redraw once (a static frame needs it under reduced motion).
+	$effect(() => {
+		if (!sprites) {
+			spriteImages = [];
+			draw();
+			return;
+		}
+		let cancelled = false;
+		const images = STAR_SPRITES.map((src) => Object.assign(new Image(), { src, decoding: 'async' as const }));
+		Promise.all(images.map((image) => image.decode()))
+			.then(() => {
+				if (cancelled) return;
+				spriteImages = images;
+				draw();
+			})
+			.catch(() => {
+				// keep the dots
+			});
+		return () => {
+			cancelled = true;
+		};
+	});
+
+	function draw() {
+		const context = canvas?.getContext('2d');
+		if (!context) return;
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		// Untracked: draw() is called from effects, which must not re-run (and reallocate the canvas) whenever the loop
+		// starts or stops on scroll.
+		const animate = untrack(() => loop.running);
+		for (const star of visible) {
+			const flicker = animate && star.twinkles ? 0.6 + 0.4 * Math.sin(time * star.speed + star.phase) : 1;
+			context.globalAlpha = Math.min(1, star.alpha * flicker * brightness);
+			context.fillStyle = star.warm ? '#fcd772' : '#fbf3dd';
+			const radius = star.r * devicePixelRatioCapped;
+			const x = star.x * width;
+			const y = star.y * height;
+			const sprite = star.sprite >= 0 ? spriteImages[star.sprite] : undefined;
+			if (sprite) {
+				const box = radius * SPRITE_SCALE;
+				context.drawImage(sprite, x - box / 2, y - box / 2, box, box);
+			} else if (radius < 1.2) context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+			else {
+				context.beginPath();
+				context.arc(x, y, radius, 0, Math.PI * 2);
+				context.fill();
+			}
+		}
+		context.globalAlpha = 1;
+	}
+
+	const loop = new RafLoop(
+		(dt) => {
+			time += dt;
+			draw();
+		},
+		{ fps: 20 }
+	);
+
+	$effect(() => {
+		loop.paused = reducedMotion.current || !twinkle;
+		draw();
+	});
+
+	$effect(() => {
+		const starList = stars;
+		const area = density;
+		const resize = () => {
+			const rect = canvas.getBoundingClientRect();
+			devicePixelRatioCapped = Math.min(window.devicePixelRatio || 1, 2);
+			width = Math.round(rect.width * devicePixelRatioCapped);
+			height = Math.round(rect.height * devicePixelRatioCapped);
+			canvas.width = width;
+			canvas.height = height;
+			const count = Math.min(MAX_STARS, Math.round(((rect.width * rect.height) / 7000) * area));
+			visible = starList.slice(0, count);
+			draw();
+		};
+		const observer = new ResizeObserver(resize);
+		observer.observe(canvas);
+		resize();
+		return () => observer.disconnect();
+	});
+</script>
+
+<canvas bind:this={canvas} aria-hidden="true" class={['star-field', className]} {@attach loop.attach}></canvas>
+
+<style>
+	.star-field {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+	}
+</style>

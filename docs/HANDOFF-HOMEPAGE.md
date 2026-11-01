@@ -46,14 +46,14 @@ This document is the complete brief for building the solo-stack.dev homepage. It
 
 Sampled from the banner. Define in `src/routes/layout.css` via Tailwind 4 `@theme`:
 
-| Token            | Value (start) | Use                                                        |
-| ---------------- | ------------- | ---------------------------------------------------------- |
-| `--color-butter` | `#FCD772`     | Moon, light, primary accent, paper                         |
-| `--color-ochre`  | ~`#E2A93B`    | Pigment blooms, granulation, hover (verify against art)    |
-| `--color-cream`  | ~`#FBF3DD`    | Light text on night, paper highlights, wordmark "SOLO"     |
-| `--color-night`  | `#18191B`     | Anthracite night, dark text, wordmark "STACK" on the moon  |
-| `--color-ink`    | ~`#0E0F10`    | Deepest shadows, ink lines on paper                        |
-| `--color-dusk`   | ~`#2A2723`    | Warm transition tone between night and paper               |
+| Token            | Value (start) | Use                                                       |
+| ---------------- | ------------- | --------------------------------------------------------- |
+| `--color-butter` | `#FCD772`     | Moon, light, primary accent, paper                        |
+| `--color-ochre`  | ~`#E2A93B`    | Pigment blooms, granulation, hover (verify against art)   |
+| `--color-cream`  | ~`#FBF3DD`    | Light text on night, paper highlights, wordmark "SOLO"    |
+| `--color-night`  | `#18191B`     | Anthracite night, dark text, wordmark "STACK" on the moon |
+| `--color-ink`    | ~`#0E0F10`    | Deepest shadows, ink lines on paper                       |
+| `--color-dusk`   | ~`#2A2723`    | Warm transition tone between night and paper              |
 
 Yellow is warm light, never neon. No pure black, no pure white.
 
@@ -340,18 +340,18 @@ The game is **not decided**. A game has to be played to judge, so build **three 
 
 References in `01-mascot-easter-eggs/` (mascot style there is outdated; use model sheet v2).
 
-| Egg                     | Trigger                                              | Effect                                                                                   | Mockup                                  |
-| ----------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------- |
-| Crescent slash          | Moon phase reaches the crescent (hero)               | A black ink crescent shaped slash sweeps across the sky with ink droplets                | `04-egg-crescent-slash-desktop.png`     |
-| Presence on the moon    | Click the full moon ~10 times                        | A faint, ambiguous giant silhouette appears on the moon for a moment                     | `05-egg-moon-presence-desktop.png`      |
-| ARISE                   | Konami code anywhere                                 | Ink shadow figures rise from the cliff behind the mascot, then dissolve                  | `06-egg-arise-shadows-desktop.png`      |
-| Golden tree             | Hover or focus the bonsai (01:00)                    | The bonsai glows gold and its canopy grows into a luminous tree                          | `09-…`, `12-…`                          |
-| Three stars             | Rare at random in the star field, or a game milestone | Three stars align into stacked triangles for a moment                                    | `10-egg-three-stars-desktop.png`        |
-| Shiny mascot            | 1 in 4096 page loads                                 | The mascot appears in a golden variant everywhere on the page, with a tiny sparkle       | model sheet v2 (golden variant)         |
-| Console                 | Opening DevTools                                     | ASCII moon, a short message (copy via sol), and a hidden `arise()` function that triggers ARISE | `11-egg-devtools-arise-console-desktop.png` |
-| 404                     | Unknown route                                        | "Domain expansion": the page collapses into an infinite ink void around the lost mascot  | `07-error-404-ink-void-desktop.png`     |
-| 500                     | Server error                                         | A huge faceless giant peeks over a wall at the studio                                    | `08-error-500-giant-at-wall-desktop.png` |
-| Hidden radio station    | Later                                                | Secret station on the dial                                                               | to be designed                          |
+| Egg                  | Trigger                                               | Effect                                                                                          | Mockup                                      |
+| -------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Crescent slash       | Moon phase reaches the crescent (hero)                | A black ink crescent shaped slash sweeps across the sky with ink droplets                       | `04-egg-crescent-slash-desktop.png`         |
+| Presence on the moon | Click the full moon ~10 times                         | A faint, ambiguous giant silhouette appears on the moon for a moment                            | `05-egg-moon-presence-desktop.png`          |
+| ARISE                | Konami code anywhere                                  | Ink shadow figures rise from the cliff behind the mascot, then dissolve                         | `06-egg-arise-shadows-desktop.png`          |
+| Golden tree          | Hover or focus the bonsai (01:00)                     | The bonsai glows gold and its canopy grows into a luminous tree                                 | `09-…`, `12-…`                              |
+| Three stars          | Rare at random in the star field, or a game milestone | Three stars align into stacked triangles for a moment                                           | `10-egg-three-stars-desktop.png`            |
+| Shiny mascot         | 1 in 4096 page loads                                  | The mascot appears in a golden variant everywhere on the page, with a tiny sparkle              | model sheet v2 (golden variant)             |
+| Console              | Opening DevTools                                      | ASCII moon, a short message (copy via sol), and a hidden `arise()` function that triggers ARISE | `11-egg-devtools-arise-console-desktop.png` |
+| 404                  | Unknown route                                         | "Domain expansion": the page collapses into an infinite ink void around the lost mascot         | `07-error-404-ink-void-desktop.png`         |
+| 500                  | Server error                                          | A huge faceless giant peeks over a wall at the studio                                           | `08-error-500-giant-at-wall-desktop.png`    |
+| Hidden radio station | Later                                                 | Secret station on the dial                                                                      | to be designed                              |
 
 All eggs are lazy (dynamic import on trigger), harmless, and disabled or reduced in reduced motion. Copy for eggs comes from `gpt-6.1-sol`.
 
@@ -428,6 +428,7 @@ One implementation agent per section, each with `isolation: "worktree"` from the
 - I3d (small, can be done by any of the three or by the lead first): the shared game shell (`Game.svelte`, `game/shared/`) and the `/lab/games` playtest route. Do this before or alongside I3a–c so the three agents plug into one frame.
 
 **Playtest gate:** when I3a–c are merged into the feature branch, run `pnpm dev` (or `pnpm preview`) and ask the owner to play all three at `/lab/games` on desktop and phone. Collect feedback, iterate if asked, and get a decision: which game ships (and whether star signs should appear elsewhere, §5.3). Then the winner gets its art pass and is integrated into the 22:00 section.
+
 - I4 Night shift (01:00).
 - I5 Radio (02:00), including Web Audio.
 - I6 Cinema (04:00) + Sunrise (06:00).

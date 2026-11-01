@@ -10,7 +10,7 @@
 		"browser": true,
 		"es2024": true
 	},
-	"ignorePatterns": [".svelte-kit", "build", "node_modules", ".wrangler", "src/lib/paraglide", "worker-configuration.d.ts"],
+	"ignorePatterns": [".svelte-kit", "build", "node_modules", ".wrangler", "src/lib/paraglide", "worker-configuration.d.ts", "docs/mockups"],
 	"rules": {
 		"no-console": "warn",
 		"import/no-unassigned-import": "off",

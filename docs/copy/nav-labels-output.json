@@ -1,0 +1,20 @@
+{
+	"de": {
+		"home_nav_section_hero": "Bei Solo Stack",
+		"home_nav_section_making": "Was hier entsteht",
+		"home_nav_section_game": "Eine Runde spielen",
+		"home_nav_section_nightshift": "Nachts am Schreibtisch",
+		"home_nav_section_radio": "Musik und Gesellschaft",
+		"home_nav_section_cinema": "Kino unter Sternen",
+		"home_nav_section_sunrise": "Kontakt und Rechtliches"
+	},
+	"en": {
+		"home_nav_section_hero": "Meet Solo Stack",
+		"home_nav_section_making": "What I'm building",
+		"home_nav_section_game": "Play a round",
+		"home_nav_section_nightshift": "Late night coding",
+		"home_nav_section_radio": "Music and company",
+		"home_nav_section_cinema": "Cinema under the stars",
+		"home_nav_section_sunrise": "Contact and legal"
+	}
+}

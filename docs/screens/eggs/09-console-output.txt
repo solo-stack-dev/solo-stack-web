@@ -1,0 +1,13 @@
+
+        _.--''~~
+      .'  .'
+     /  .'      *
+    |  |    .
+    |  |           +
+     \  '.
+      '.  '.   .
+        ~'--..__
+
+SOLO STACK  TODO(copy): short greeting printed next to SOLO STACK in the browser DevTools console for curious developers; a few words, playful, night themed
+TODO(copy): one or two sentences in the DevTools console under the ASCII moon: you found the backstage of the night studio, the site is built with SvelteKit, nod to fellow builders; casual, no marketing
+TODO(copy): one short line in the DevTools console hinting that typing arise() summons something; must contain the literal arise()
