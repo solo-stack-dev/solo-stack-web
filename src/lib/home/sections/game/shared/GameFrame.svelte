@@ -4,7 +4,7 @@
 
 	Poster state (your `poster` snippet + play button) → click loads the game chunk (dynamic import via `load`) →
 	playing. The frame owns: pause (button, P/Escape, off screen, hidden tab), instant restart (remounts the game),
-	score + local high score in mono, keyboard focus on the game surface, on-screen touch buttons, and (with `debug`)
+	score + local high score in mono (games that restart themselves call `onRestart`), keyboard focus on the game surface, on-screen touch buttons, and (with `debug`)
 	a slider panel for the game's `tuning` defs.
 
 	```svelte
@@ -94,6 +94,12 @@
 		over = true;
 	}
 
+	// The game started a new round on its own (tap/jump after game over): same frame state as a restart, no remount.
+	function onRestart() {
+		score = 0;
+		over = false;
+	}
+
 	function onkeydown(event: KeyboardEvent) {
 		if (status !== 'playing') return;
 		if (event.code === 'KeyP' || event.code === 'Escape') {
@@ -115,7 +121,7 @@
 			<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
 			<div bind:this={surface} class="surface" tabindex="0" role="application" aria-label={label} {onkeydown} {@attach input.attach}>
 				{#key run}
-					<module.default paused={pause.paused} {tuning} {input} reducedMotion={reducedMotion.current} {onScore} {onGameOver} />
+					<module.default paused={pause.paused} {tuning} {input} reducedMotion={reducedMotion.current} {onScore} {onGameOver} {onRestart} />
 				{/key}
 			</div>
 

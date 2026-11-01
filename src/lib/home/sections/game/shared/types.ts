@@ -27,6 +27,11 @@ export interface GameProps {
 	onScore?: (score: number) => void;
 	/** Report the end of a round. GameFrame highlights restart. Restart remounts the component (fresh state). */
 	onGameOver?: (score: number) => void;
+	/**
+	 * Report that the game started a new round by itself (e.g. jump or tap after game over), without the frame's restart
+	 * button. GameFrame clears the game-over highlight and resets the shown score. Not needed when the frame remounts you.
+	 */
+	onRestart?: () => void;
 }
 
 /**
