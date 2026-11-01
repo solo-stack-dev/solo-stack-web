@@ -125,7 +125,7 @@ interface GameProps {
 - Drive your loop with `RafLoop` and set `loop.paused = paused` in an `$effect`. Keep a round between 30 and 90 seconds, instant restart, no network.
 - Each candidate folder currently holds a stub wrapping `game/shared/PlaceholderGame.svelte`. Replace your folder's files; do not edit the placeholder. The lead deletes it once all three are replaced.
 - Message keys: `home_game_moon_*` (A), `home_game_stack_*` (B), `home_game_stars_*` (C). Each already has a `_title` key.
-- `HOMEPAGE_GAME` in `candidates.ts` picks the game shown at 22:00 (placeholder: `stack-to-moon` until the playtest decision).
+- The 22:00 section shows all three games as tabs. `HOMEPAGE_DEFAULT_GAME` in `candidates.ts` picks the tab selected first (`moon-planet`). Only the selected tab's frame is mounted.
 - `/lab/games` shows all three in tabs with debug sliders; `noindex, nofollow`, not linked. If a sitemap is added, exclude `^/lab/` (super-sitemap `excludeRoutePatterns`). Remove or protect before launch.
 
 ## 6. Shared components and helpers (`src/lib/home/shared/`)
@@ -255,7 +255,6 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 
 - `TODO(copy)`: every message value.
 - `TODO(owner)`: permanent Discord invite (`DISCORD_INVITE_URL` in `socials.ts`); optional `GITHUB_TOKEN` if CI builds hit the GitHub rate limit.
-- `TODO(playtest)`: `HOMEPAGE_GAME` in `candidates.ts`.
 - `TODO(launch)`: remove or protect `/lab/games`.
 - `TODO(sunrise agent)`: legal links (Impressum, Datenschutz, Kontakt) once the pages exist.
 - The YouTube feed is currently empty (no public video yet), so the cinema shows the channel fallback until the first upload and the next build.

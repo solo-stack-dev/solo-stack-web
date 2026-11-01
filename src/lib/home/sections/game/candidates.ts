@@ -15,5 +15,5 @@ export type CandidateId = keyof typeof GAME_CANDIDATES;
 
 export const CANDIDATE_IDS = Object.keys(GAME_CANDIDATES) as CandidateId[];
 
-/** TODO(playtest): the owner picks the shipped game at the playtest gate. Until then the homepage shows candidate B. */
-export const HOMEPAGE_GAME: CandidateId = 'stack-to-moon';
+/** All three games ship on the homepage as tabs (owner decision after the playtest). This one is selected first. */
+export const HOMEPAGE_DEFAULT_GAME: CandidateId = 'moon-planet';
