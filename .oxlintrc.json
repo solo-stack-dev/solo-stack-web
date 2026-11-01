@@ -24,6 +24,12 @@
 			}
 		},
 		{
+			"files": ["src/lib/components/ui/**"],
+			"rules": {
+				"shadcn/no-arbitrary-values": "off"
+			}
+		},
+		{
 			"files": ["src/lib/index.ts"],
 			"rules": {
 				"unicorn/no-empty-file": "off"

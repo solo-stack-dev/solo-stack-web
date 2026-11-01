@@ -4,20 +4,21 @@ Status: initial scaffold. This describes what is set up and the intended directi
 
 ## Stack
 
-| Area       | Choice                                                                                                             | Where                           |
-| ---------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
-| Framework  | SvelteKit 3, Svelte 5 with runes and experimental `async` components                                               | `vite.config.ts`                |
-| Data layer | SvelteKit **remote functions** (`experimental.remoteFunctions`)                                                    | `*.remote.ts` files             |
-| Validation | valibot (schemas for remote functions and frontmatter)                                                             |                                 |
-| Hosting    | Cloudflare Workers via `@sveltejs/adapter-cloudflare`, static assets through the `ASSETS` binding                  | `wrangler.jsonc`                |
-| Styling    | Tailwind CSS 4 (CSS first config)                                                                                  | `src/routes/layout.css`         |
-| Content    | mdsvex: `.md` and `.svx` files are Svelte components with frontmatter                                              | `vite.config.ts`                |
-| Images     | `@sveltejs/enhanced-img` for build time optimized images                                                           |                                 |
-| 3D         | Threlte (`@threlte/core` 8, `@threlte/extras` 9) + `three`, lazy chunks only (hero moon, maybe a game)             |                                 |
-| i18n       | Paraglide JS, locales `de` (base, unprefixed URLs) and `en` (`/en/…`), URL strategy                                | `project.inlang/`, `messages/`  |
-| SEO        | super-sitemap for `sitemap.xml`                                                                                    |                                 |
-| Font       | Geist variable, self hosted and preloaded                                                                          | `static/fonts/`, `src/app.html` |
-| Tooling    | pnpm, oxlint (`.oxlintrc.json`), oxfmt (`.oxfmtrc.jsonc`), svelte-check, rolldown bundle analyzer (`pnpm analyze`) |                                 |
+| Area       | Choice                                                                                                                                                                                              | Where                                       |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Framework  | SvelteKit 3, Svelte 5 with runes and experimental `async` components                                                                                                                                | `vite.config.ts`                            |
+| Data layer | SvelteKit **remote functions** (`experimental.remoteFunctions`)                                                                                                                                     | `*.remote.ts` files                         |
+| Validation | valibot (schemas for remote functions and frontmatter)                                                                                                                                              |                                             |
+| Hosting    | Cloudflare Workers via `@sveltejs/adapter-cloudflare`, static assets through the `ASSETS` binding                                                                                                   | `wrangler.jsonc`                            |
+| Styling    | Tailwind CSS 4 (CSS first config)                                                                                                                                                                   | `src/routes/layout.css`                     |
+| UI kit     | shadcn-svelte (style `nova`, bits-ui, lucide) for blog and stats pages; tokens mapped to the brand; light/dark via mode-watcher. Add components with `sfw pnpm dlx shadcn-svelte@latest add <name>` | `components.json`, `src/lib/components/ui/` |
+| Content    | mdsvex: `.md` and `.svx` files are Svelte components with frontmatter                                                                                                                               | `vite.config.ts`                            |
+| Images     | `@sveltejs/enhanced-img` for build time optimized images                                                                                                                                            |                                             |
+| 3D         | Threlte (`@threlte/core` 8, `@threlte/extras` 9) + `three`, lazy chunks only (hero moon, maybe a game)                                                                                              |                                             |
+| i18n       | Paraglide JS, locales `de` (base, unprefixed URLs) and `en` (`/en/…`), URL strategy                                                                                                                 | `project.inlang/`, `messages/`              |
+| SEO        | super-sitemap for `sitemap.xml`                                                                                                                                                                     |                                             |
+| Font       | Geist variable, self hosted and preloaded                                                                                                                                                           | `static/fonts/`, `src/app.html`             |
+| Tooling    | pnpm, oxlint (`.oxlintrc.json`), oxfmt (`.oxfmtrc.jsonc`), svelte-check, rolldown bundle analyzer (`pnpm analyze`)                                                                                  |                                             |
 
 Node `>=24.18`. `paths.origin` in `vite.config.ts` is set per build mode (`staging`, `production`); it is the origin used for absolute URLs while prerendering and the trusted origin for CSRF checks.
 
