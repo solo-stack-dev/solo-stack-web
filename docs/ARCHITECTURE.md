@@ -93,7 +93,7 @@ Recommended shape:
 
 ## Performance budget (Proposed)
 
-- Homepage: Lighthouse 95+ on mobile, LCP under 2 s, near zero CLS.
+- Homepage: the owner accepts a richer homepage (painted art, Threlte hero, audio) in exchange for some speed. Targets: LCP ≤ 2.5 s on mobile, CLS < 0.05, INP < 200 ms, initial JS ≤ ~120 kB gzip with Threlte, audio, and games in lazy chunks. Details in [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md#8-performance-and-quality-budgets). Other pages: Lighthouse 95+ on mobile.
 - Prerender everything that does not need live data.
 - Prefer CSS (scroll driven animations, View Transitions API, `@starting-style`) over JS animation libraries. If a library is added later, import it only in the component that needs it.
 - Games and canvas experiments load on interaction or when scrolled into view, and pause when off screen.

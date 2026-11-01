@@ -1,0 +1,304 @@
+# Exact image generation prompts
+
+Tool: built-in image_gen.imagegen. Opaque output throughout. No CLI, API fallback, HTML screenshot generation or manual image compositing was used. The tool exposes no quality setting; high fidelity was specified in the prompts. Preferred sizes in prompts are requests; actual export dimensions are in README.md.
+
+The listed source paths identify the precise immutable generation output used as the reference, even where its copy in this folder was later replaced by a revision. All image references were inspected. The banner and profile were read for brand context; only the banner and generated images below were passed as image inputs.
+
+## 01-lightbulb
+
+Output: 02-storyboard-01-lightbulb.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-20080f6d-5793-457c-a064-8b66f7935794.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is a recognisable large lightbulb, continuous loop around bulb and folded base, a connected filament inside. Small watercolor bloom in its lower bowl. Active pillar AI. First of six progress dots active.
+~~~~
+
+## 02-chat-prompt
+
+Output: 02-storyboard-02-chat-prompt.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-858f48ce-e7b4-4a6c-9a1e-92965c3acbcc.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is a wide rounded chat prompt balloon with a small speech tail and a connected short prompt caret and underscore inside. Small watercolor bloom on the lower left inside the balloon. Active pillar AI. Second of six progress dots active.
+~~~~
+
+## 03-code
+
+Output: 02-storyboard-03-code.png
+
+Status: rejected; retained in rejects/code-disconnected.png
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is large readable code glyph </> made as one continuous drawn line using subtle horizontal connecting return strokes across the lower points. Small watercolor pools nestle inside the bracket angles. Active pillar CODE. Third of six progress dots active.
+~~~~
+
+## 04-phone
+
+Output: 02-storyboard-04-phone.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-b33af4f0-024f-4a51-a8dd-9eba18d49ff5.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is an upright phone with one app tile inside, recognisable rounded phone silhouette. The app tile is linked by a fine return stroke to the outer phone contour, no disconnected marks or notch. Small watercolor bloom inside lower half of screen. Active pillar SIDE PROJECTS. Fourth of six progress dots active.
+~~~~
+
+## 05-chart
+
+Output: 02-storyboard-05-chart.png
+
+Status: superseded by targeted edit; original remains in generator output
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is a rising business chart, with a hand-drawn horizontal baseline, left vertical axis and an ascending zigzag ending in an upward arrow, all joined as a single flowing pen stroke. No units, no numerals, purely symbolic. Small butter-yellow watercolor bloom below the rising line, within the chart shape. Active pillar BUSINESS. Fifth of six progress dots active.
+~~~~
+
+## 06-moon
+
+Output: 02-storyboard-06-moon.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-be4b4e61-696d-48f2-8a8d-d4cd178bd3d4.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate one 16:9 desktop website screenshot, part of a six-frame scroll storyboard. Reference image is the approved visual style and layout. Preserve its exact warm anthracite watercolor paper, yellow pigment bleeding in at top-left, small SOLO STACK top-left, minimal navigation marks top-right, 21:00 and TODO(copy) small at left, very sparse stars, understated tiny rocky ledge at bottom-right. Remove the separate background moon and laptop: the SINGLE central morphing icon must be the only subject. Reduce top-left yellow wash to the upper-left 15% so it does not compete. Consistent composition across all frames: central icon centered at 50% horizontal, 44% vertical, 28% screen height; one pale butter-yellow organic ink stroke comes from left at 62% height, flows into and outlines the icon and exits right at 62% height. It should be visibly ONE continuous, hand-drawn path, with connected return strokes where necessary, never unrelated decorative symbols. Inside the icon a SMALL translucent butter-yellow watercolor fill is blooming, with irregular bleeding ochre granulation, but plenty of negative space. Fine ink, neither electric light nor neon. Beneath the icon place its short active pillar label in heavy geometric sans. Bottom-left navigation AI · CODE · SIDE PROJECTS · BUSINESS; underline only the active pillar with a small painted stroke. Bottom-right six small progress dots and down arrow. No additional words or numbers except SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. All text is design placeholder, not production copy. Authentic premium hand painted night, paper texture, art-directed empty space. No cards, no flat vector design, no dashboard, no photographic device.
+STATE: The central icon is a large simple crescent moon made from a single connected outlined ink stroke joined to the incoming and outgoing baseline. Warm watercolor pigment blooms inside the crescent bowl, gentle ochre pooling, no face or craters drawn with separate strokes. Active pillar BUSINESS stays below: this is an ending transition after the business state, NOT a fifth pillar. Sixth of six progress dots active.
+~~~~
+
+## main
+
+Output: 01-ink-morph-desktop-context.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Reference image(s):
+- D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Create one exceptionally high fidelity generated desktop website section screen, 16:9 landscape, preferably 2560x1440. This is the 21:00 WHAT I MAKE section of solo-stack.dev, in a continuous one-night-in-the-studio homepage. Input image is a BRAND MATERIAL REFERENCE: match its butter-yellow watercolor, real absorbent paper fibers, rich warm anthracite pigment, sparse yellow stars, ochre blooms and dark rocky cliff. Do not copy the banner layout. Art dominates, typography is restrained. Original hand-painted artwork, not flat UI, not a dashboard, not a generic landing page.
+Composition: full bleed warm charcoal watercolor night on visibly granulated cold-press paper. A little fading butter-yellow moonrise wash enters from the upper left and a dark crag with a very tiny laptop sits at lower right. Sparse stars, lots of calm open sky. Top left small heavy geometric sans wordmark SOLO STACK; top right two very small neutral nav placeholder strokes and a two-line menu icon. Tiny monospace 21:00 at x8%,y22%; beneath it a discreet small uppercase placeholder TODO(copy). Across the middle a single continuous pale butter-yellow hand-drawn INK LINE arrives from left edge, curves upward into one large outlined smartphone with subtly irregular corners, traces a simple app tile within it via connected continuous strokes, returns to the baseline and exits at the right edge into an understated downward curve. This must visually read as ONE uninterrupted line sculpting the icon, not a row of symbols. Smartphone large and central, about 32% of screen height. A translucent butter-yellow watercolor bloom spreads INSIDE the phone, deeper ochre at its lower edge, with visibly uneven wet pigment, leaving linework legible.
+Under the phone a short heavy geometric label SIDE PROJECTS. Bottom-left to bottom-middle a quiet navigation of four tiny labels AI · CODE · SIDE PROJECTS · BUSINESS; SIDE PROJECTS warm yellow and underlined by a handmade short stroke, the others off-white. Along bottom-right a delicate six-dot scroll progress indicator, fourth dot active, and small down arrow. No paragraph, no invented statistics, no extra title, no cards, no glassmorphism, no neon, no blue, no photoreal device render, no browser or computer bezel. The only text allowed is SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. Keep all placeholder text sharp and accurately spelled. This image is a design mockup, not production copy. Premium, intimate painted night with tactile pigment detail, restrained asymmetry and memorable continuous-line concept.
+~~~~
+
+## code-fix
+
+Output: 02-storyboard-03-code.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-bf22b4a7-a978-46be-9f8c-b9d1026da0cf.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Edit the supplied desktop frame. Keep absolutely everything in the image unchanged EXCEPT the central </> symbol. It is critical that the entire central illustration is ONE connected pen stroke. Currently three glyphs are detached. Redraw them as thin single-line angular handwritten less-than, slash, greater-than signs with a faint continuous looping baseline linking all three at their lower tips, connected to the long line entering from left and exiting right. All three glyphs MUST touch that connecting baseline. Avoid thick outlined block symbols. Keep tiny watercolor blooms in the angles, yellow ink on charcoal watercolor paper. Keep label CODE, all UI, all grain, positions and overall composition unchanged. This is a still from one single continuous line morph animation; no isolated segments.
+~~~~
+
+## mobile
+
+Output: 03-ink-morph-mobile.png
+
+Status: superseded by targeted edit; original remains in generator output
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Create a high fidelity mobile website screenshot in a tall 9:19.5 aspect ratio, target 1080x2340. Use reference as the precise painted material and visual direction for the mobile counterpart of this 21:00 section. No device bezel. Keep warm anthracite granulated watercolor paper night, butter-yellow bleeding pigment at top left, a few tiny stars, original drawn rocky ledge and small glowing moon near lower right. Small SOLO STACK wordmark top-left and menu icon top-right. At 20% height small monospace 21:00 with TODO(copy) under it. At 45% height a large hand-drawn smartphone icon in pale yellow ink, formed by the single continuous stroke entering from left and exiting right. One app tile connects into the phone outline with a thin return stroke. Yellow watercolor blooms inside the phone. Under it SIDE PROJECTS bold geometric type. Below, generous negative space and six progress dots with fourth active. At 78% height, the four pillar labels in a spacious two-by-two arrangement, AI, CODE, SIDE PROJECTS, BUSINESS, SIDE PROJECTS underlined. Enough room for large tap targets, no tiny compressed desktop navigation. Down arrow at very bottom. Art dominates. ONLY allowed text SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. No paragraphs, no invented facts, no cards, no neon. Premium restrained painterly material, visually consistent with reference.
+~~~~
+
+## constellations-desktop
+
+Output: 04-constellations-desktop.png
+
+Status: superseded by targeted edit; original remains in generator output
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+
+Reference image(s):
+- D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate a beautifully crafted high fidelity 16:9 desktop website section screenshot for solo-stack.dev 21:00. Supplied image is a BRAND MATERIAL REFERENCE only: warm butter-yellow watercolor, charcoal ink pigment, tactile cold-press paper and ochre bloom. Create a new composition, not the banner. Full bleed painted anthracite NIGHT SKY with uneven washed pigment, sparse stars, a small soft crescent moon near upper-right and low irregular painted ridge. Tiny SOLO STACK geometric wordmark top-left, minimal menu icon top-right. At left near top small monospace 21:00 and TODO(copy). Four large separate constellations spread asymmetrically across the sky in a flowing arc, NOT boxed cards or four equal columns. Each has bright butter-yellow star nodes joined by fine hand-drawn irregular lines that form instantly readable icons: speech bubble for AI at x18%,y41%; code </> at x39%,y32%; phone with app tile for SIDE PROJECTS at x61%,y40%; rising chart for BUSINESS at x83%,y32%. Short labels immediately below each constellation, accurate and legible heavy geometric sans. Three have a tiny, faint watercolor bloom inside; SIDE PROJECTS is the active hovered constellation, fully drawn with a soft butter-yellow pigment fill spreading in the phone silhouette, its label underlined by hand. Subtle pointer near the active phone. Below that phone only, reveal exactly TWO example video cards as warm off-white handmade PAPER NOTES suspended at slightly different angles, with real torn deckle edges and faint shadows, each about 17% screen width. Each note has a rough watercolor thumbnail (one shows small generic app screens, other a developer laptop); a small play triangle; and only TODO(copy) as title. No people. Notes are a small supporting hover detail; the open star-filled night and four constellations are the main scene. Little handmade four-dot progress hint at bottom, down arrow. Palette warm charcoal, butter-yellow, off-white, hint of ochre only. No blue, purple, neon, glass UI, panels, glossy 3D or generic stock art. Text limited to SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. Original illustrated website mockup, richly tactile, calm, premium.
+~~~~
+
+## paper-desktop
+
+Output: 06-paper-folio-desktop.png
+
+Status: superseded by targeted edit; original remains in generator output
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+
+Reference image(s):
+- D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Generate a high fidelity 16:9 desktop website section screenshot, an original alternative for the 21:00 content pillars of solo-stack.dev called the unfolding studio folio. Input image is a BRAND MATERIAL REFERENCE only: real watercolor pigment on cold-press paper, butter-yellow, warm anthracite, ochre pooling. Do not copy its composition. A dark warm anthracite painted night sky with a few pinprick stars and modest partial moon high right. Top left small SOLO STACK wordmark, top right minimal menu. Small 21:00 and TODO(copy) at upper left beneath nav.
+The central illustration is ONE impressive sculptural stack of four irregular deckle-edged WATERCOLOR PAPER SHEETS hovering above a dark ink-painted rock ledge, viewed from a gentle three-quarter angle, oriented diagonally lower-left to upper-right. The sheets are splitting vertically open like an exploded handmade artist folio: four visible softly bent paper planes, separated by generous air gaps, connected subtly by one ink thread along their left edges. Light leaks warmly between sheets, real soft cast shadows create tangible depth, achievable as layered planes. Each sheet has a different small hand-inked emblem and its own exact small label integrated on its visible left/front edge: highest paper speech-bubble AI, next paper code </> CODE, third and active paper phone SIDE PROJECTS, bottom paper upward chart BUSINESS. The active SIDE PROJECTS sheet slides slightly towards the viewer, opening out into a broad luminous butter-yellow watercolor page with a bold thin black hand-drawn smartphone icon. Other sheets off-white, grey warm shadow, tiny ochre paint smudges, visibly paper fibers. Four separate layers must each be readable and recognisable, no duplicate labels. There are no conventional website cards, no panels or grids. Leave roomy night sky around the sculpture. A tiny four-dot control at bottom-left with third active, down arrow bottom-right. Art dominates. All text limited to SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. Hand-painted cut-paper lightbox feeling, not clean vector, no photoreal glossy device, no neon or blue.
+~~~~
+
+## constellations-mobile
+
+Output: 05-constellations-mobile.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ee8facad-dff2-43a4-8cf9-5271d3d38f0c.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Adapt this approved constellation website section to one tall mobile viewport 9:19.5 aspect ratio, 1080 pixels wide by 2340 pixels high. Preserve the warm charcoal painted night, soft butter-yellow constellation light, authentic watercolor paper grain, rock ridge, four icons, deckle-edged note cards. No device bezel. Small SOLO STACK wordmark and menu at top. 21:00 and TODO(copy) below. In upper-middle place four constellations in a spacious slightly staggered two-by-two group, not cards: speech bubble AI upper-left, </> CODE upper-right, phone SIDE PROJECTS lower-left, rising chart BUSINESS lower-right. Correct labels below each. Phone is selected, with watercolor bloom, other symbols faint pigment, all star nodes clearly visible. Below this group show exactly TWO cream handmade-paper video notes vertically stacked with generous tappable play buttons, each about 70% viewport width. First watercolor thumbnail app screens, second watercolor laptop. Each has only TODO(copy) below. Use paper note proportions like 16:9 thumbnails with small bottom strip, no giant card gutters. No cursor: on mobile this is the expanded tap state, not hover. A small x close affordance by the two-note group and small downward arrow near bottom. No extra progress dots. Full bleed night, plenty of breathing space, lightweight visible controls, art dominates. Allowed text only SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. No neon, blue, sterile dashboard, photoreal UI or invented stats. Make the whole image distinctly extra-tall mobile ratio 9:19.5, with both complete notes visible and safe outer margins.
+~~~~
+
+## paper-mobile
+
+Output: 07-paper-folio-mobile.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-2635fcdb-1ac1-43bd-8a63-9f3675693840.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+
+Exact prompt:
+
+~~~~text
+Use case: ui-mockup. Adapt the reference unfolding watercolor folio website section into one extra-tall mobile screenshot 9:19.5 aspect ratio, 1080 pixels wide by 2340 pixels high. No device bezel. Match exact tactile warm charcoal watercolor night, off-white deckle edge papers, soft moonlit butter-yellow pigment and rock. Small SOLO STACK wordmark upper-left, menu upper-right, then small monospace 21:00 and TODO(copy) with breathing room. Four paper layers hover vertically arranged through middle of screen like one bound unfolding folio, all four inside the screen safe margins. The upper small sheet carries a hand drawn speech bubble and AI, second small sheet code glyph </> and CODE, third largest active sheet comes forward toward viewer and carries one smartphone icon and SIDE PROJECTS, fourth small sheet shows rising chart and BUSINESS. All four are joined at left by the same delicate binding thread, true layered plane depth, irregular cut fibers, soft shadows and moonlight leaking through the spaces. The active paper saturated BUTTER YELLOW watercolor, other papers muted off-white. Do not add a fifth paper. No detached conventional web cards. Small crescent high in negative sky right. Low ink ridge at foot. At bottom a single horizontal navigation of FOUR small dots, THIRD active, with no additional dots; down arrow below. No paragraph. All text limited to SOLO STACK, 21:00, TODO(copy), AI, CODE, SIDE PROJECTS, BUSINESS. Each label exactly once except wordmark. Premium hand crafted material, no neon, no glossy device, no generic templated UI. Wide tap targets represented by paper fronts. Extra tall mobile 9:19.5 composition.
+~~~~
+
+## chart-fix
+
+Output: 02-storyboard-05-chart.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-5ce244de-f422-4a39-8abd-696b4e41b86e.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
+
+Exact prompt:
+
+~~~~text
+Edit only the central rising-chart ink line in this image. Join the bottom-left beginning of the rising zigzag directly to the left axis, eliminating the tiny dark gap. Add a very fine retraced yellow return stroke from the arrow tip down along the rising line to the axis, so the whole drawing can be traced by one pen without lifting. Everything else including pigment, labels, navigation, clock and background must be identical. Do not add text.
+~~~~
+
+## mobile-fix
+
+Output: 03-ink-morph-mobile.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-f7e134fa-ec4b-47d0-b939-7ebba45cdb68.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
+
+Exact prompt:
+
+~~~~text
+Expand this generated mobile website mockup into a true 9:19.5 aspect ratio canvas, approximately 900x1950. Keep all existing design elements, their proportions and spelling. Add breathing room of the same warm anthracite watercolor sky between the active SIDE PROJECTS title and the lower navigation. Do not stretch the image. Keep the wordmark and clock towards top, phone in upper-middle and four pillar controls near bottom with six dots and arrow. Also make the app tile inside the main phone touch its outer left outline through a short pale yellow ink connector, keeping it part of the continuous line. Nothing else changes, no new text.
+~~~~
+
+## constellations-fix
+
+Output: 04-constellations-desktop.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-cc745808-b2f2-4611-857c-4793a633da6b.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+
+Exact prompt:
+
+~~~~text
+Edit this website image only to remove the tiny four-dot progress indicator just above the down arrow at bottom center. Fill that small area with matching painted landscape. Keep the down arrow. Keep every other pixel composition, all four constellations, two paper note cards, text and watercolor unchanged.
+~~~~
+
+## paper-fix
+
+Output: 06-paper-folio-desktop.png
+
+Status: final
+
+Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-643a3091-a7db-474a-94fd-ed6ac7f76adf.png
+
+Reference image(s):
+- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+
+Exact prompt:
+
+~~~~text
+Edit this website image only to remove the five tiny progress dots at the bottom-left. Fill that small area with matching dark painted rock and paper texture. Keep every other element, all four paper layers, every label and icon, lighting, composition, wordmark, clock, menu, and down arrow exactly unchanged. Do not add any content.
+~~~~
+
