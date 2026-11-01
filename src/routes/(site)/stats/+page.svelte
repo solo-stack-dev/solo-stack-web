@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { SOCIALS } from '#lib/home/data/socials.ts';
 	import { m } from '#lib/paraglide/messages.js';
 	import ActivityCalendar from '#lib/stats/ActivityCalendar.svelte';
@@ -20,13 +21,19 @@
 
 	const platformStats = (id: string) => stats.platforms.find((platform) => platform.id === id);
 	const weeks = $derived(Math.round(stats.posts.length / 7));
+	const canonical = $derived(new URL(page.url.pathname, page.url.origin).href);
 </script>
 
 <svelte:head>
 	<title>{m.stats_meta_title()}</title>
 	<meta name="description" content={m.stats_meta_description()} />
+	<link rel="canonical" href={canonical} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="SOLO STACK" />
 	<meta property="og:title" content={m.stats_meta_title()} />
 	<meta property="og:description" content={m.stats_meta_description()} />
+	<meta property="og:url" content={canonical} />
+	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
 <!-- `bg-background` duplicates the (site) layout surface on purpose: the page also reads right on its own. -->
