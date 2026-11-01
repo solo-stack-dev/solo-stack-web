@@ -119,7 +119,6 @@ The same polygons in canvas percentages:
 - No requested layer remains missing or unusable. The sky requires the documented clip; the mobile props require the documented transforms. The room is intentionally a combined furniture/background plate, not independently movable lamp, chair, desk and book cutouts.
 - These are large source masters outside the website bundle. Create optimized AVIF/WebP imports in the implementation task and respect the section download budget. No application code, dependencies, other art folders, deployment or push was changed by this task.
 
-
 ## Coherent scene revision — 2026-11-01
 
 This revision supersedes the separate mascot/seat-reservation instructions above **when using the new `nightshift-scene*.png` files**. The original seven layers and all files in `docs/art/mascot/` are retained unchanged. The new bases already contain the mascot and exactly one chair: do not overlay `mascot-nightshift-typing@*.png` on them. Replace the base-room import with the corresponding scene and animate only the small hand patch. Source/component integration is outside this art-only change.

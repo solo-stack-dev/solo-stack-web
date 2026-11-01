@@ -1,272 +1,195 @@
 {
-  "canvas": [
-    1152,
-    1600
-  ],
-  "baseline": 1500,
-  "units": "source pixels from top left",
-  "near": {
-    "hip": [
-      570,
-      970
-    ],
-    "knee": [
-      569,
-      1210
-    ],
-    "ankle": [
-      570,
-      1420
-    ],
-    "kneeRadius": 56,
-    "ankleRadius": 42
-  },
-  "far": {
-    "hip": [
-      535,
-      970
-    ],
-    "knee": [
-      525,
-      1210
-    ],
-    "ankle": [
-      535,
-      1420
-    ],
-    "kneeRadius": 52,
-    "ankleRadius": 42
-  },
-  "shoulder": [
-    477,
-    646
-  ],
-  "order": [
-    "leg-far",
-    "body",
-    "leg-near",
-    "arm-near"
-  ],
-  "meshBlend": {
-    "knee": 150,
-    "ankle": 70
-  },
-  "poses": [
-    {
-      "phase": "contact",
-      "arm": 13,
-      "translateY": 35,
-      "near": {
-        "hip": -31.805458328016137,
-        "knee": 28.157059024870616,
-        "ankle": -4.351600696854479,
-        "footTarget": [
-          710,
-          1419
-        ],
-        "footLift": 0,
-        "footPitch": -8
-      },
-      "far": {
-        "hip": 16.287839235879083,
-        "knee": 22.27541690476665,
-        "ankle": -30.563256140645734,
-        "footTarget": [
-          335,
-          1403
-        ],
-        "footLift": 0,
-        "footPitch": 8
-      }
-    },
-    {
-      "phase": "down",
-      "arm": 8,
-      "translateY": 45,
-      "near": {
-        "hip": -29.658282430245265,
-        "knee": 50.24041318452462,
-        "ankle": -20.582130754279355,
-        "footTarget": [
-          615,
-          1421
-        ],
-        "footLift": 0,
-        "footPitch": 0
-      },
-      "far": {
-        "hip": -11.294728540308519,
-        "knee": 76.94651810331038,
-        "ankle": -57.65178956300186,
-        "footTarget": [
-          385,
-          1348
-        ],
-        "footLift": 55,
-        "footPitch": 8
-      }
-    },
-    {
-      "phase": "passing",
-      "arm": 0,
-      "translateY": 20,
-      "near": {
-        "hip": -5.108936482875084,
-        "knee": 29.369893112019582,
-        "ankle": -24.2609566291445,
-        "footTarget": [
-          505,
-          1421
-        ],
-        "footLift": 0,
-        "footPitch": 0
-      },
-      "far": {
-        "hip": -27.799273610789907,
-        "knee": 73.4147468913773,
-        "ankle": -45.615473280587395,
-        "footTarget": [
-          495,
-          1361
-        ],
-        "footLift": 60,
-        "footPitch": 0
-      }
-    },
-    {
-      "phase": "up",
-      "arm": -8,
-      "translateY": 10,
-      "near": {
-        "hip": 10.989020963482114,
-        "knee": 17.184723829480518,
-        "ankle": -20.17374479296263,
-        "footTarget": [
-          425,
-          1401
-        ],
-        "footLift": 0,
-        "footPitch": 8
-      },
-      "far": {
-        "hip": -34.69071719957626,
-        "knee": 53.537079555610795,
-        "ankle": -23.846362356034533,
-        "footTarget": [
-          605,
-          1385
-        ],
-        "footLift": 35,
-        "footPitch": -5
-      }
-    },
-    {
-      "phase": "opposite contact",
-      "arm": -13,
-      "translateY": 35,
-      "near": {
-        "hip": 17.53836109793975,
-        "knee": 19.851150448181293,
-        "ankle": -29.389511546121042,
-        "footTarget": [
-          370,
-          1401
-        ],
-        "footLift": 0,
-        "footPitch": 8
-      },
-      "far": {
-        "hip": -35.14639745928821,
-        "knee": 35.141863941558746,
-        "ankle": -7.995466482270537,
-        "footTarget": [
-          675,
-          1417
-        ],
-        "footLift": 0,
-        "footPitch": -8
-      }
-    },
-    {
-      "phase": "opposite down",
-      "arm": -8,
-      "translateY": 45,
-      "near": {
-        "hip": -9.298926809766241,
-        "knee": 72.98340445125626,
-        "ankle": -55.68447764149002,
-        "footTarget": [
-          420,
-          1346
-        ],
-        "footLift": 55,
-        "footPitch": 8
-      },
-      "far": {
-        "hip": -31.920540970153294,
-        "knee": 55.0838826806868,
-        "ankle": -23.163341710533505,
-        "footTarget": [
-          580,
-          1421
-        ],
-        "footLift": 0,
-        "footPitch": 0
-      }
-    },
-    {
-      "phase": "opposite passing",
-      "arm": 0,
-      "translateY": 20,
-      "near": {
-        "hip": -25.57186551736808,
-        "knee": 68.64765694880609,
-        "ankle": -43.075791431438006,
-        "footTarget": [
-          530,
-          1361
-        ],
-        "footLift": 60,
-        "footPitch": 0
-      },
-      "far": {
-        "hip": -7.460300845478927,
-        "knee": 34.405937749045215,
-        "ankle": -26.94563690356629,
-        "footTarget": [
-          470,
-          1421
-        ],
-        "footLift": 0,
-        "footPitch": 0
-      }
-    },
-    {
-      "phase": "opposite up",
-      "arm": 8,
-      "translateY": 10,
-      "near": {
-        "hip": -32.114648872633666,
-        "knee": 48.06308712476688,
-        "ankle": -20.948438252133215,
-        "footTarget": [
-          640,
-          1386
-        ],
-        "footLift": 35,
-        "footPitch": -5
-      },
-      "far": {
-        "hip": 10.060839084737095,
-        "knee": 18.98884510207254,
-        "ankle": -21.049684186809635,
-        "footTarget": [
-          390,
-          1403
-        ],
-        "footLift": 0,
-        "footPitch": 8
-      }
-    }
-  ]
+	"canvas": [1152, 1600],
+	"baseline": 1500,
+	"units": "source pixels from top left",
+	"near": {
+		"hip": [570, 970],
+		"knee": [569, 1210],
+		"ankle": [570, 1420],
+		"kneeRadius": 56,
+		"ankleRadius": 42
+	},
+	"far": {
+		"hip": [535, 970],
+		"knee": [525, 1210],
+		"ankle": [535, 1420],
+		"kneeRadius": 52,
+		"ankleRadius": 42
+	},
+	"shoulder": [477, 646],
+	"order": ["leg-far", "body", "leg-near", "arm-near"],
+	"meshBlend": {
+		"knee": 150,
+		"ankle": 70
+	},
+	"poses": [
+		{
+			"phase": "contact",
+			"arm": 13,
+			"translateY": 35,
+			"near": {
+				"hip": -31.805458328016137,
+				"knee": 28.157059024870616,
+				"ankle": -4.351600696854479,
+				"footTarget": [710, 1419],
+				"footLift": 0,
+				"footPitch": -8
+			},
+			"far": {
+				"hip": 16.287839235879083,
+				"knee": 22.27541690476665,
+				"ankle": -30.563256140645734,
+				"footTarget": [335, 1403],
+				"footLift": 0,
+				"footPitch": 8
+			}
+		},
+		{
+			"phase": "down",
+			"arm": 8,
+			"translateY": 45,
+			"near": {
+				"hip": -29.658282430245265,
+				"knee": 50.24041318452462,
+				"ankle": -20.582130754279355,
+				"footTarget": [615, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -11.294728540308519,
+				"knee": 76.94651810331038,
+				"ankle": -57.65178956300186,
+				"footTarget": [385, 1348],
+				"footLift": 55,
+				"footPitch": 8
+			}
+		},
+		{
+			"phase": "passing",
+			"arm": 0,
+			"translateY": 20,
+			"near": {
+				"hip": -5.108936482875084,
+				"knee": 29.369893112019582,
+				"ankle": -24.2609566291445,
+				"footTarget": [505, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -27.799273610789907,
+				"knee": 73.4147468913773,
+				"ankle": -45.615473280587395,
+				"footTarget": [495, 1361],
+				"footLift": 60,
+				"footPitch": 0
+			}
+		},
+		{
+			"phase": "up",
+			"arm": -8,
+			"translateY": 10,
+			"near": {
+				"hip": 10.989020963482114,
+				"knee": 17.184723829480518,
+				"ankle": -20.17374479296263,
+				"footTarget": [425, 1401],
+				"footLift": 0,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -34.69071719957626,
+				"knee": 53.537079555610795,
+				"ankle": -23.846362356034533,
+				"footTarget": [605, 1385],
+				"footLift": 35,
+				"footPitch": -5
+			}
+		},
+		{
+			"phase": "opposite contact",
+			"arm": -13,
+			"translateY": 35,
+			"near": {
+				"hip": 17.53836109793975,
+				"knee": 19.851150448181293,
+				"ankle": -29.389511546121042,
+				"footTarget": [370, 1401],
+				"footLift": 0,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -35.14639745928821,
+				"knee": 35.141863941558746,
+				"ankle": -7.995466482270537,
+				"footTarget": [675, 1417],
+				"footLift": 0,
+				"footPitch": -8
+			}
+		},
+		{
+			"phase": "opposite down",
+			"arm": -8,
+			"translateY": 45,
+			"near": {
+				"hip": -9.298926809766241,
+				"knee": 72.98340445125626,
+				"ankle": -55.68447764149002,
+				"footTarget": [420, 1346],
+				"footLift": 55,
+				"footPitch": 8
+			},
+			"far": {
+				"hip": -31.920540970153294,
+				"knee": 55.0838826806868,
+				"ankle": -23.163341710533505,
+				"footTarget": [580, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			}
+		},
+		{
+			"phase": "opposite passing",
+			"arm": 0,
+			"translateY": 20,
+			"near": {
+				"hip": -25.57186551736808,
+				"knee": 68.64765694880609,
+				"ankle": -43.075791431438006,
+				"footTarget": [530, 1361],
+				"footLift": 60,
+				"footPitch": 0
+			},
+			"far": {
+				"hip": -7.460300845478927,
+				"knee": 34.405937749045215,
+				"ankle": -26.94563690356629,
+				"footTarget": [470, 1421],
+				"footLift": 0,
+				"footPitch": 0
+			}
+		},
+		{
+			"phase": "opposite up",
+			"arm": 8,
+			"translateY": 10,
+			"near": {
+				"hip": -32.114648872633666,
+				"knee": 48.06308712476688,
+				"ankle": -20.948438252133215,
+				"footTarget": [640, 1386],
+				"footLift": 35,
+				"footPitch": -5
+			},
+			"far": {
+				"hip": 10.060839084737095,
+				"knee": 18.98884510207254,
+				"ankle": -21.049684186809635,
+				"footTarget": [390, 1403],
+				"footLift": 0,
+				"footPitch": 8
+			}
+		}
+	]
 }

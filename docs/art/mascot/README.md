@@ -58,7 +58,6 @@ All painted content came from image generation. Local dependency-free PNG proces
 
 Per handoff §6.4, keep these large PNG masters outside the runtime bundle. Export responsive alpha-preserving WebP/AVIF derivatives through the project image pipeline. Assemble the three typing frames into one optimized sprite sheet; do the same for walking only after animation cleanup. Preserve full frame canvases so anchors do not shift. Lazy-load below-fold art, pause animation off screen, and use the documented still frames for reduced motion. No source components, public copy, dependencies or deployment settings were changed.
 
-
 ## Walk replacement package — 2026-11-01
 
 This section supersedes the four-frame walk's readiness note **only for the new files below**. The original files remain unchanged. New paintings were made with the built-in image generation tool using model sheet v2, the style-lock scene and the old contact drawing as references. The final body explicitly places the laptop under the **left/far arm**, mostly hidden behind the right-facing torso; the near/right arm is empty and separate.
