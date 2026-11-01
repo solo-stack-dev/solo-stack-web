@@ -25,13 +25,63 @@
 		"ip": "0.0.0.0",
 		"port": 8787
 	},
+	// Storage for /stats (docs/ARCHITECTURE.md#stats-page): D1 keeps the full daily history (source of truth,
+	// schema in `migrations/`), KV holds the finished `Stats` snapshot the page reads (`stats:v1`).
+	// The top-level bindings are for local dev only (`pnpm dev`, `pnpm preview`, `--local`): they are simulated
+	// in `.wrangler/state`, so the ids here are dummies and never touch a real resource.
+	"d1_databases": [
+		{
+			"binding": "STATS_DB",
+			"database_name": "solo-stack-stats-local",
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "STATS_KV",
+			"id": "00000000000000000000000000000000"
+		}
+	],
 	// Bindings and `vars` are not inherited: repeat them in every environment.
 	"env": {
 		"staging": {
-			"routes": [{ "pattern": "staging.solo-stack.dev", "custom_domain": true }]
+			"routes": [{ "pattern": "staging.solo-stack.dev", "custom_domain": true }],
+			"d1_databases": [
+				{
+					"binding": "STATS_DB",
+					"database_name": "solo-stack-stats-staging",
+					// TODO(cloudflare): id of the D1 database `solo-stack-stats-staging` (dashboard or `wrangler d1 create`)
+					"database_id": "TODO-staging-d1-database-id",
+					"migrations_dir": "migrations"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "STATS_KV",
+					// TODO(cloudflare): id of the KV namespace `solo-stack-stats-staging`
+					"id": "TODO-staging-kv-namespace-id"
+				}
+			]
 		},
 		"production": {
-			"routes": [{ "pattern": "solo-stack.dev", "custom_domain": true }]
+			"routes": [{ "pattern": "solo-stack.dev", "custom_domain": true }],
+			"d1_databases": [
+				{
+					"binding": "STATS_DB",
+					"database_name": "solo-stack-stats",
+					// TODO(cloudflare): id of the D1 database `solo-stack-stats`
+					"database_id": "TODO-production-d1-database-id",
+					"migrations_dir": "migrations"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "STATS_KV",
+					// TODO(cloudflare): id of the KV namespace `solo-stack-stats`
+					"id": "TODO-production-kv-namespace-id"
+				}
+			]
 		}
 	}
 }
