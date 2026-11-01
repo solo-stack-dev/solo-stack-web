@@ -5,10 +5,14 @@
 
 	- `variant="site"` (blog, stats, …): sticky bar on `bg-background` with a hairline border and a light blur. The
 	  (site) layout passes the theme toggle and the phone menu as `actions`; links collapse into that menu below `sm`.
-	- `variant="night"` (homepage): fixed and transparent over the painted night, cream ink with a soft halo, mono
-	  links like the clock labels. NightPage passes its section menu button as `actions` and lists the site links in
-	  that overlay on phones, so the homepage keeps a single header. `tone="paper"` switches to anthracite ink once the
-	  sunrise paper is under the bar; `hideWordmark` hides the small wordmark while the hero shows the giant one.
+	- `variant="night"` (homepage): fixed over the painted night, wordmark in cream ink with a soft halo; the links and
+	  the actions sit in one smoked-glass "dock" capsule with the current page as a lit butter pill, so they read over
+	  the moon and the stars. NightPage passes its section menu button as `actions` and lists the site links in that
+	  overlay on phones (the dock then holds only the button), so the homepage keeps a single header. `tone="paper"`
+	  switches to anthracite ink once the sunrise paper is under the bar; `hideWordmark` hides the small wordmark while
+	  the hero shows the giant one.
+
+	Easter egg: `eclipse-moon.ts` swaps the crescent (and the favicon) for the eclipse moon; restored here on mount.
 
 	The heavy pieces (dropdown, sheet) are never imported here, so the homepage does not ship them.
 -->
@@ -17,6 +21,7 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
+	import { restoreEclipseMoon } from './eclipse-moon.ts';
 	import { SITE_LINKS, siteCurrent, siteHref } from './links.ts';
 
 	interface Props {
@@ -36,6 +41,8 @@
 	let { variant = 'site', tone = 'night', hideWordmark = false, wordmarkHref, actions, ref = $bindable() }: Props = $props();
 
 	const pathname = $derived(page.url.pathname);
+
+	$effect(restoreEclipseMoon);
 </script>
 
 <header bind:this={ref} class={['site-nav', `is-${variant}`]} data-tone={variant === 'night' ? tone : undefined}>
@@ -45,17 +52,20 @@
 			<span class="font-display font-black tracking-wordmark uppercase">SOLO STACK</span>
 		</a>
 
-		<nav class="links" aria-label={m.site_nav_label()}>
-			<ul>
-				{#each SITE_LINKS as link (link.id)}
-					<li><a href={siteHref(link)} aria-current={siteCurrent(link, pathname)}>{link.label()}</a></li>
-				{/each}
-			</ul>
-		</nav>
+		<!-- Site look: `display: contents`. Night look: one floating capsule holding the links and the menu button. -->
+		<div class="dock">
+			<nav class="links" aria-label={m.site_nav_label()}>
+				<ul>
+					{#each SITE_LINKS as link (link.id)}
+						<li><a href={siteHref(link)} aria-current={siteCurrent(link, pathname)}>{link.label()}</a></li>
+					{/each}
+				</ul>
+			</nav>
 
-		{#if actions}
-			<div class="actions">{@render actions()}</div>
-		{/if}
+			{#if actions}
+				<div class="actions">{@render actions()}</div>
+			{/if}
+		</div>
 	</div>
 </header>
 
@@ -92,6 +102,27 @@
 		rotate: -20deg;
 	}
 
+	/*
+	 * Easter egg (eclipse-moon.ts): the eclipse moon. Its halo already fills the box, so it is drawn larger with a
+	 * negative margin (the wordmark does not shift). On light paper it sits on a small night disc to stay visible.
+	 */
+	:global(html[data-eclipse-moon]) .site-nav .moon {
+		width: 1.3em;
+		height: 1.3em;
+		margin: -0.225em;
+		border-radius: 0;
+		background: url('../../assets/moon-eclipse.svg') center / contain no-repeat;
+		box-shadow: none;
+		rotate: none;
+	}
+
+	:global(html[data-eclipse-moon]:not(.dark)) .is-site .moon,
+	:global(html[data-eclipse-moon]) .is-night[data-tone='paper'] .moon {
+		background:
+			url('../../assets/moon-eclipse.svg') center / 92% no-repeat,
+			radial-gradient(circle, var(--color-night) 0 64%, transparent 66%);
+	}
+
 	.links ul {
 		display: flex;
 		align-items: center;
@@ -111,6 +142,10 @@
 	}
 
 	/* Site look ---------------------------------------------------------------------------------------------- */
+
+	.is-site .dock {
+		display: contents;
+	}
 
 	.is-site {
 		position: sticky;
@@ -227,7 +262,51 @@
 			visibility 0s 250ms;
 	}
 
-	/* On phones the night bar keeps only the wordmark and the menu button; the overlay lists the site links */
+	/*
+	 * The dock: a smoked-glass capsule over the art, so the site links read on any background (moon, stars, paper).
+	 * The current page is a lit butter pill with the moon's glow. Its own background replaces the halo filter
+	 * (a filter would also break the backdrop blur).
+	 */
+	.is-night .bar > .dock {
+		filter: none;
+	}
+
+	.is-night .dock {
+		--dock-ink: var(--color-cream);
+		--dock-glass: color-mix(in oklab, var(--color-ink) 58%, transparent);
+		--dock-edge: color-mix(in oklab, var(--color-butter) 28%, transparent);
+		--dock-hover: color-mix(in oklab, var(--color-cream) 12%, transparent);
+		--dock-lit: var(--color-butter);
+		--dock-lit-ink: var(--color-night);
+		display: flex;
+		align-items: center;
+		gap: 0.25rem;
+		padding: 0.25rem;
+		border: 1px solid var(--dock-edge);
+		border-radius: 999px;
+		background: var(--dock-glass);
+		color: var(--dock-ink);
+		box-shadow:
+			0 0.5rem 1.75rem -0.5rem color-mix(in oklab, var(--color-ink) 60%, transparent),
+			inset 0 1px 0 color-mix(in oklab, var(--color-cream) 10%, transparent);
+		backdrop-filter: blur(14px) saturate(1.3);
+		-webkit-backdrop-filter: blur(14px) saturate(1.3);
+		transition:
+			background-color 300ms ease,
+			border-color 300ms ease,
+			color 300ms ease;
+	}
+
+	.is-night[data-tone='paper'] .dock {
+		--dock-ink: var(--color-night);
+		--dock-glass: color-mix(in oklab, var(--color-cream) 62%, transparent);
+		--dock-edge: color-mix(in oklab, var(--color-night) 16%, transparent);
+		--dock-hover: color-mix(in oklab, var(--color-night) 9%, transparent);
+		--dock-lit: var(--color-night);
+		--dock-lit-ink: var(--color-butter);
+	}
+
+	/* On phones the dock holds only the menu button; the overlay lists the site links */
 	.is-night .links {
 		display: none;
 	}
@@ -236,44 +315,61 @@
 		.is-night .links {
 			display: block;
 		}
+
+		/* A hairline between the pages and the section menu */
+		.is-night .links + .actions {
+			padding-left: 0.25rem;
+			border-left: 1px solid var(--dock-edge);
+		}
+	}
+
+	.is-night .links ul {
+		gap: 0.125rem;
 	}
 
 	.is-night .links a {
-		padding: 0 0.7rem;
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		letter-spacing: var(--tracking-clock);
+		padding: 0 1.05rem;
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		opacity: 0.78;
-	}
-
-	.is-night .links a:hover,
-	.is-night .links a[aria-current] {
-		opacity: 1;
+		transition:
+			color 160ms ease,
+			background-color 160ms ease,
+			box-shadow 160ms ease;
 	}
 
 	.is-night .links a:hover {
-		color: var(--color-butter);
+		background: var(--dock-hover);
 	}
 
-	.is-night[data-tone='paper'] .links a:hover {
-		color: var(--color-ink);
+	.is-night .links a[aria-current] {
+		background: var(--dock-lit);
+		color: var(--dock-lit-ink);
+		box-shadow: 0 0 1.1rem -0.1rem color-mix(in oklab, var(--color-butter) 55%, transparent);
 	}
 
-	.is-night .links a[aria-current]::before {
-		content: '';
-		position: absolute;
-		left: 50%;
-		bottom: 0.45rem;
-		width: 0.3rem;
-		height: 0.3rem;
-		translate: -50% 0;
-		border-radius: 999px;
-		background: currentColor;
+	.is-night[data-tone='paper'] .links a[aria-current] {
+		box-shadow: none;
 	}
 
 	.is-night .actions {
 		display: flex;
 		align-items: center;
+	}
+
+	.is-night .actions :global(button:hover) {
+		background: var(--dock-hover);
+	}
+
+	@media (prefers-reduced-transparency: reduce) {
+		.is-night .dock {
+			--dock-glass: color-mix(in oklab, var(--color-ink) 92%, transparent);
+		}
+
+		.is-night[data-tone='paper'] .dock {
+			--dock-glass: var(--color-cream);
+		}
 	}
 </style>

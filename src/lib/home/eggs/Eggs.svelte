@@ -9,6 +9,7 @@
 	| Egg            | Trigger                                                                  |
 	| -------------- | ------------------------------------------------------------------------ |
 	| crescent slash | `night:moon-phase` with `crescent` (hero), at most once per 10 s          |
+	| eclipse moon   | 3rd crescent of a visit, `?eclipse=1` / `?eclipse=0` (site/eclipse-moon.ts) |
 	| moon presence  | `night:moon-full-clicks` count 10, 20, 30 …                              |
 	| ARISE          | Konami code (not while typing), `arise()` in the console, `night:egg-arise` |
 	| three stars    | 1 in 6 page views after 30–90 s idle in a dark section, `night:egg-three-stars` |
@@ -20,6 +21,7 @@
 	import { on } from 'svelte/events';
 	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import { MOON_FULL_CLICKS_EVENT, MOON_PHASE_EVENT, type MoonFullClicksDetail, type MoonPhaseDetail } from '#lib/home/sections/hero/moon.ts';
+	import { ECLIPSE_AFTER_SLASHES, wakeEclipseMoon } from '#lib/components/site/eclipse-moon.ts';
 	import { ARISE_EVENT, EGG_MOON_ATTR, SHINY_ATTR, THREE_STARS_EVENT, type EggProps } from './events.ts';
 
 	type EggId = 'slash' | 'presence' | 'arise' | 'stars';
@@ -109,8 +111,12 @@
 	// Hero moon: crescent slash and presence
 	$effect(() => {
 		let lastSlash = -Infinity;
+		let crescents = 0;
 		const offPhase = on(window, MOON_PHASE_EVENT, (event) => {
-			if ((event as CustomEvent<MoonPhaseDetail>).detail?.phase !== 'crescent' || reducedMotion.current) return;
+			if ((event as CustomEvent<MoonPhaseDetail>).detail?.phase !== 'crescent') return;
+			// The eclipse moon is static, so it wakes under reduced motion too
+			if (++crescents === ECLIPSE_AFTER_SLASHES) wakeEclipseMoon();
+			if (reducedMotion.current) return;
 			const now = performance.now();
 			if (now - lastSlash < SLASH_COOLDOWN) return;
 			lastSlash = now;

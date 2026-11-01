@@ -8,8 +8,7 @@ Read this before touching `src/lib/home/`. It describes the Phase 0 foundation t
 
 ```
 src/routes/+page.svelte            composes <NightPage> + 7 sections (lead)
-src/routes/+page.ts                prerender = true (lead)
-src/routes/lab/games/              playtest lab, noindex (game shell owner / lead)
+src/routes/+layout.ts              prerender = true for the whole site (lead)
 src/lib/home/
   night.ts                         NIGHT_HOURS: order, ids, clock times, sky colors (lead)
   NightPage.svelte                 sky, --night, stars, grain, nav (SiteNav night variant), menu, hour rail (lead)
@@ -95,7 +94,7 @@ Use them with top level `await` (Svelte experimental async):
 
 Socials: `SOCIALS` / `linkedSocials()` / `getSocial(id)` from `#lib/home/data/socials.ts` (`{ id, name, url, handle, icon }`, `icon` is the Simple Icons slug). Discord has `url: null` until the owner provides a permanent invite, so always render `linkedSocials()`.
 
-## 5. Game contract (22:00 and `/lab/games`)
+## 5. Game contract (22:00)
 
 A candidate is a folder with `index.ts` exporting the `GameModule` shape from `game/shared/types.ts`:
 
@@ -109,7 +108,7 @@ export const controls: GameButton[] = ['left', 'right', 'action']; // optional, 
 ```ts
 interface GameProps {
 	paused: boolean; // pause button, frame < 25 % on screen, or hidden tab: stop your loop
-	tuning: Record<string, number>; // live slider values in the lab, defaults on the homepage
+	tuning: Record<string, number>; // the defaults of your tuning defs
 	input: GameInput; // keyboard + touch, already wired
 	reducedMotion: boolean; // offer a calmer mode (less shake, no flashes)
 	onScore?: (score: number) => void; // absolute score; the frame stores the local high score
@@ -120,13 +119,12 @@ interface GameProps {
 
 - `GameInput`: `isDown(button)`, `consume(button)` (true once per press), `axisX`, `axisY`, `held` (reactive). Buttons: `left` (←, A), `right` (→, D), `up` (↑, W), `down` (↓, S), `action` (Space). Uses `KeyboardEvent.code`, so WASD works on QWERTZ.
 - Restart by the game itself: if your game restarts without the frame (e.g. jump or tap after game over), call `onRestart?.()` at that moment. GameFrame then resets the shown score and drops the restart highlight. The frame's own restart (button, R) remounts you and needs no call.
-- `GameFrame` owns: poster + play button, lazy load on click, focus on the game surface, pause (button, P, Escape, off screen, hidden tab), restart (button or R, remounts the game), score and high score in mono, touch buttons (coarse pointers, or the lab's touch toggle), debug sliders (`debug` prop, lab only). High scores: `localStorage` key `solostack:game:<id>:highscore`.
+- `GameFrame` owns: poster + play button, lazy load on click, focus on the game surface, pause (button, P, Escape, off screen, hidden tab), restart (button or R, remounts the game), score and high score in mono, touch buttons (coarse pointers). High scores: `localStorage` key `solostack:game:<id>:highscore`.
 - Fill your canvas/scene to the parent box. The stage is 16:9 (4:5 below 40 rem); override with `--game-aspect` / `--game-aspect-mobile` on the frame if your game needs it (tell the lead).
 - Drive your loop with `RafLoop` and set `loop.paused = paused` in an `$effect`. Keep a round between 30 and 90 seconds, instant restart, no network.
 - Each candidate folder currently holds a stub wrapping `game/shared/PlaceholderGame.svelte`. Replace your folder's files; do not edit the placeholder. The lead deletes it once all three are replaced.
 - Message keys: `home_game_moon_*` (A), `home_game_stack_*` (B), `home_game_stars_*` (C). Each already has a `_title` key.
 - The 22:00 section shows all three games as tabs. `HOMEPAGE_DEFAULT_GAME` in `candidates.ts` picks the tab selected first (`moon-planet`). Only the selected tab's frame is mounted.
-- `/lab/games` shows all three in tabs with debug sliders; `noindex, nofollow`, not linked. If a sitemap is added, exclude `^/lab/` (super-sitemap `excludeRoutePatterns`). Remove or protect before launch.
 
 ## 6. Shared components and helpers (`src/lib/home/shared/`)
 
@@ -231,7 +229,7 @@ API: `audio.unlock(): AudioContext`, `audio.context`, `audio.output` (master `Ga
 ## 7. Messages
 
 - Files: `messages/de.json` (base locale) and `messages/en.json`. **Both files always get the same keys.** Values are `TODO(copy): <intent>` until the lead generates copy with `gpt-6.1-sol` in Phase 3. The intent is a brief for the copywriter model: what the text is, where it appears, length, tone hints. No draft copy.
-- Prefixes (§4.4 of the handoff): `home_meta_*`, `home_nav_*` (lead), `home_hero_*`, `home_making_*`, `home_game_*` (shell), `home_game_moon_*`, `home_game_stack_*`, `home_game_stars_*` (candidates), `home_nightshift_*`, `home_radio_*`, `home_cinema_*`, `home_sunrise_*`, `lab_games_*` (lab), later `error_*`, `egg_*`.
+- Prefixes (§4.4 of the handoff): `home_meta_*`, `home_nav_*` (lead), `home_hero_*`, `home_making_*`, `home_game_*` (shell), `home_game_moon_*`, `home_game_stack_*`, `home_game_stars_*` (candidates), `home_nightshift_*`, `home_radio_*`, `home_cinema_*`, `home_sunrise_*`, later `error_*`, `egg_*`.
 - Naming: `<prefix>_<thing>[_<variant>]` in snake case, e.g. `home_radio_preset_label`, `home_cinema_play_label`. Parameters use Paraglide inputs: `"home_radio_station_label": "TODO(copy): … {name} …"` → `m.home_radio_station_label({ name })`.
 - **Merge rule:** the files are ordered in one contiguous block per owner. Add your keys **inside your own block, right after its last existing key**, never at the end of the file and never inside another block. That keeps parallel branches from touching the same lines, so merges are conflict free.
 - Use: `import { m } from '#lib/paraglide/messages.js';` then `{m.home_radio_title()}`. `src/lib/paraglide/` is generated (`pnpm check` or the Vite plugin recompiles); never edit it.
@@ -249,13 +247,12 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 
 ## 9. Before you commit
 
-`pnpm check`, `pnpm lint`, `pnpm format`, `pnpm build` green; `pnpm dev` without console errors at `/` (and `/lab/games` for games); reduced motion checked (DevTools → Rendering → `prefers-reduced-motion`); heavy parts lazy (three only in a lazy chunk: the prerendered `index.html` must not modulepreload it). `docs/mockups/` is excluded from oxfmt and oxlint (design artifacts).
+`pnpm check`, `pnpm lint`, `pnpm format`, `pnpm build` green; `pnpm dev` without console errors at `/`; reduced motion checked (DevTools → Rendering → `prefers-reduced-motion`); heavy parts lazy (three only in a lazy chunk: the prerendered `index.html` must not modulepreload it). `docs/mockups/` is excluded from oxfmt and oxlint (design artifacts).
 
 ## 10. Open TODOs from Phase 0
 
 - `TODO(copy)`: every message value.
 - `TODO(owner)`: permanent Discord invite (`DISCORD_INVITE_URL` in `socials.ts`); optional `GITHUB_TOKEN` if CI builds hit the GitHub rate limit.
-- `TODO(launch)`: remove or protect `/lab/games`.
 - `TODO(sunrise agent)`: legal links (Impressum, Datenschutz, Kontakt) once the pages exist.
 - The YouTube feed is currently empty (no public video yet), so the cinema shows the channel fallback until the first upload and the next build.
 
