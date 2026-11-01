@@ -57,5 +57,17 @@
 	"lab_games_tabs_label": "TODO(copy): accessible name of the tab list that switches between game prototypes",
 	"lab_games_debug_title": "TODO(copy): tiny heading of the debug tuning slider panel",
 	"lab_games_debug_reset": "TODO(copy): button text that resets all tuning sliders to their defaults",
-	"lab_games_touch_toggle": "TODO(copy): tiny label of a checkbox that always shows the on screen touch buttons, for testing on desktop"
+	"lab_games_touch_toggle": "TODO(copy): tiny label of a checkbox that always shows the on screen touch buttons, for testing on desktop",
+	"error_page_title": "TODO(copy): browser tab title of an error page; must contain the status code {status} and the brand name SOLO STACK, very short",
+	"error_404_title": "TODO(copy): h1 of the 404 page; playful, the visitor (and the little mascot) got lost in an endless ink void, at most 6 words",
+	"error_404_body": "TODO(copy): one or two short sentences under the 404 heading; this page does not exist, calm and friendly, points to the way home below, no blame",
+	"error_500_title": "TODO(copy): h1 of the 500 page; something huge is peeking over the wall and the server stumbled, playful but reassuring, at most 6 words",
+	"error_500_body": "TODO(copy): one or two short sentences under the 500 heading; something broke on our side, it is not the visitor's fault, try again in a moment or go home",
+	"error_other_title": "TODO(copy): h1 of a generic error page for any other status code (shown next to the number), something went wrong with this request, at most 6 words",
+	"error_other_body": "TODO(copy): one short sentence under the generic error heading; suggest going back to the homepage",
+	"error_home_link": "TODO(copy): text of the main link back to the homepage on error pages, 2 to 4 words",
+	"error_retry": "TODO(copy): text of the button that reloads the page after a server error, 1 to 3 words",
+	"error_sections_label": "TODO(copy): accessible name and tiny visible heading of the list of homepage sections offered as ways out on error pages, 2 to 4 words",
+	"error_404_mascot_alt": "TODO(copy): alt text of the small lost mascot (a chibi of the channel owner scratching his head, confused) floating in the ink void on the 404 page",
+	"error_500_scene_alt": "TODO(copy): alt text of the 500 illustration: a huge faceless ink giant peeks over a stone wall at a tiny lit studio while the mascot sits outside and looks up at it"
 }
