@@ -7,6 +7,13 @@
 }
 
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+ * shadcn-svelte (components.json, style "nova"). Class based dark mode driven by mode-watcher on the non-home pages
+ * (blog, stats). The homepage ignores these tokens and stays in its fixed night.
+ */
+@custom-variant dark (&:is(.dark *));
 
 /*
  * Design tokens (docs/HANDOFF-HOMEPAGE.md §3). Starting values sampled from the banner; refine against the final art.
@@ -29,6 +36,117 @@
 	--tracking-clock: 0.32em;
 	/* Wordmark: Geist 900, tight */
 	--tracking-wordmark: -0.045em;
+}
+
+/*
+ * shadcn-svelte semantic tokens, mapped onto the brand: light = warm paper with anthracite ink and butter accents,
+ * dark = the night with cream text and butter as the primary. Charts use the butter/ochre family plus calm contrasts.
+ */
+:root {
+	--radius: 0.75rem;
+	--background: #fdf9ee;
+	--foreground: #18191b;
+	--card: #fffdf6;
+	--card-foreground: #18191b;
+	--popover: #fffdf6;
+	--popover-foreground: #18191b;
+	--primary: #18191b;
+	--primary-foreground: #fbf3dd;
+	--secondary: #f3ead2;
+	--secondary-foreground: #2a2723;
+	--muted: #f3ead2;
+	--muted-foreground: #6b6458;
+	--accent: #fcd772;
+	--accent-foreground: #18191b;
+	--destructive: #c2410c;
+	--border: #e6dcc3;
+	--input: #e6dcc3;
+	--ring: #e2a93b;
+	--chart-1: #e2a93b;
+	--chart-2: #2a2723;
+	--chart-3: #fcd772;
+	--chart-4: #8a7f6a;
+	--chart-5: #b8601f;
+	--sidebar: #f8f1de;
+	--sidebar-foreground: #18191b;
+	--sidebar-primary: #18191b;
+	--sidebar-primary-foreground: #fbf3dd;
+	--sidebar-accent: #f3ead2;
+	--sidebar-accent-foreground: #18191b;
+	--sidebar-border: #e6dcc3;
+	--sidebar-ring: #e2a93b;
+}
+
+.dark {
+	--background: #18191b;
+	--foreground: #fbf3dd;
+	--card: #1f2022;
+	--card-foreground: #fbf3dd;
+	--popover: #1f2022;
+	--popover-foreground: #fbf3dd;
+	--primary: #fcd772;
+	--primary-foreground: #18191b;
+	--secondary: #2a2723;
+	--secondary-foreground: #fbf3dd;
+	--muted: #26272a;
+	--muted-foreground: #b3ab98;
+	--accent: #2f2b22;
+	--accent-foreground: #fcd772;
+	--destructive: #f97316;
+	--border: rgb(251 243 221 / 0.1);
+	--input: rgb(251 243 221 / 0.15);
+	--ring: #fcd772;
+	--chart-1: #fcd772;
+	--chart-2: #e2a93b;
+	--chart-3: #fbf3dd;
+	--chart-4: #8a7f6a;
+	--chart-5: #f08a4b;
+	--sidebar: #141517;
+	--sidebar-foreground: #fbf3dd;
+	--sidebar-primary: #fcd772;
+	--sidebar-primary-foreground: #18191b;
+	--sidebar-accent: #2a2723;
+	--sidebar-accent-foreground: #fbf3dd;
+	--sidebar-border: rgb(251 243 221 / 0.1);
+	--sidebar-ring: #fcd772;
+}
+
+@theme inline {
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
 }
 
 /*
