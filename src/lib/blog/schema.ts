@@ -58,6 +58,8 @@ export type PostFrontmatter = v.InferOutput<typeof PostFrontmatterSchema>;
 /** A post as the pages see it: frontmatter plus derived values. */
 export interface Post extends PostFrontmatter {
 	readingMinutes: number;
+	/** The `##` sections of the body, for the table of contents. */
+	outline: { id: string; title: string }[];
 }
 
 /** Card data for the index (no transcript, links or takeaways). */

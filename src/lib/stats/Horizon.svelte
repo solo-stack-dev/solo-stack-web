@@ -76,7 +76,9 @@
 		</div>
 	</div>
 
-	<Ridge {values} {dates} class="mt-4 h-[clamp(12rem,27vw,22rem)] w-full sm:-mt-28" />
+	<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+		<Ridge {values} {dates} class="mt-6 h-[clamp(12rem,27vw,22rem)] w-full sm:-mt-24" />
+	</div>
 
 	<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 		<details class="group text-sm text-muted-foreground">

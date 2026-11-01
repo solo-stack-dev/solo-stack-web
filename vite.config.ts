@@ -6,6 +6,7 @@ import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { bundleAnalyzerPlugin } from 'rolldown/experimental';
 import { defineConfig, type Plugin } from 'vite';
+import { rehypeHeadingIds } from './src/lib/blog/outline.ts';
 
 // Public origin per build mode (`vite build --mode <mode>`). SvelteKit uses it as `page.url.origin` while
 // prerendering (absolute hreflang/canonical/OG URLs) and as the trusted origin for CSRF checks on forms and
@@ -50,7 +51,7 @@ export default defineConfig(({ mode }) => ({
 				experimental: { async: true }
 			},
 			adapter: adapter(),
-			preprocess: [mdsvex({ extensions: ['.svx', '.md'] })],
+			preprocess: [mdsvex({ extensions: ['.svx', '.md'], rehypePlugins: [rehypeHeadingIds] })],
 			extensions: ['.svelte', '.svx', '.md'],
 			experimental: { remoteFunctions: true },
 			paths: { origin: origins[mode] },
