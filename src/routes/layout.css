@@ -94,3 +94,8 @@
 		scroll-behavior: auto !important;
 	}
 }
+
+/* Sections receive programmatic focus from the menu; the focus ring would outline the whole painted scene. */
+[data-night-page] section[tabindex="-1"]:focus-visible {
+	outline: none;
+}

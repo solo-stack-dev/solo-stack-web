@@ -221,6 +221,17 @@
 	function closeMenu() {
 		menu.close();
 	}
+
+	/** Close the menu and move keyboard focus to the chosen section (the anchor's default action scrolls to it). */
+	function goToSection(id: string) {
+		closeMenu();
+		requestAnimationFrame(() => {
+			const section = document.getElementById(id);
+			if (!section) return;
+			if (!section.hasAttribute('tabindex')) section.setAttribute('tabindex', '-1');
+			section.focus({ preventScroll: true });
+		});
+	}
 </script>
 
 <div
@@ -261,7 +272,7 @@
 				<ol class="menu-list">
 					{#each NIGHT_HOURS as hour (hour.id)}
 						<li>
-							<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={closeMenu}>
+							<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
 								<span class="font-mono text-xs tracking-clock text-cream/60 tabular-nums">{hour.time}</span>
 								<span class="font-display text-2xl font-black tracking-wordmark md:text-4xl">{labels[hour.id]()}</span>
 							</a>
