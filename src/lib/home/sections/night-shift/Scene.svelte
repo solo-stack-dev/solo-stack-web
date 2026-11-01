@@ -10,7 +10,7 @@
 	import LazyMount from '#lib/home/shared/LazyMount.svelte';
 	import Hotspot from './Hotspot.svelte';
 	import Monitor from './Monitor.svelte';
-	import type { SceneLayout, SpotId } from './layout.ts';
+	import { polygonMask, type Rect, type SceneLayout, type SpotId } from './layout.ts';
 	import type { Terminal } from './terminal.svelte.ts';
 
 	interface Props {
@@ -30,6 +30,9 @@
 	let { variant, layout, terminal, reduced, markers, labels, sceneAlt, spotsLabel, onexplore }: Props = $props();
 
 	const pct = (value: number) => `${value}%`;
+	const box = (rect: Rect) => `left: ${rect.x}%; top: ${rect.y}%; width: ${rect.w}%; height: ${rect.h}%`;
+	/** `sizes` for a layer `w` percent of the stage wide (the stage is ~103vw: cover crop plus parallax overscan). */
+	const vw = (w: number) => `${Math.ceil(w * 1.03)}vw`;
 
 	// ── Stage size for the monitor's matrix3d ───────────────────────────────────────────────────────────────
 	let stage = $state({ width: 0, height: 0 });
@@ -105,7 +108,11 @@
 		};
 	}
 
-	const bonsaiOrigin = $derived(`${layout.bonsai.x}% ${layout.bonsai.y}%`);
+	// The golden tree crossfades with the green one once its image has loaded (the pots are pixel-identical).
+	let goldenReady = $state(false);
+	const art = $derived(layout.props);
+	const goldenOrigin = $derived(`${((layout.bonsai.x - art.golden.x) / art.golden.w) * 100}% ${((layout.bonsai.y - art.golden.y) / art.golden.h) * 100}%`);
+	const skyMask = $derived(polygonMask(layout.sky.panes));
 	// Particle box around the bonsai, in canvas percentages
 	const motesBox = $derived({ x: layout.bonsai.x - 14, y: layout.bonsai.y - 36, w: 24, h: 40 });
 	const stageVars = $derived(`--cw: ${layout.canvas.width}; --ch: ${layout.canvas.height}; --fx: ${layout.focal.x}; --fy: ${layout.focal.y}`);
@@ -117,54 +124,50 @@
 <div class="scene" data-variant={variant} {onpointerdown} onpointerenter={want} role="presentation" style={stageVars}>
 	<div class="frame art">
 		<div class="stage" {@attach measure}>
+			<!-- 1 · opaque room plate (complete static fallback, moonless window) -->
 			{#if variant === 'desktop'}
-				{#if layout.sky}
-					<div class="sky" style:left={pct(layout.sky.x)} style:top={pct(layout.sky.y)} style:width={pct(layout.sky.w)} style:height={pct(layout.sky.h)}>
-						<enhanced:img src="./assets/nightshift-window-sky.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="fill" />
-					</div>
-				{/if}
-				<enhanced:img src="./assets/nightshift-room.png?w=2560;1920;1280" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
+				<enhanced:img src="./assets/nightshift-room.webp?w=1920;1536;1080" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
 			{:else}
-				<enhanced:img src="./assets/nightshift-room-mobile.png?w=1080;720" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
+				<enhanced:img src="./assets/nightshift-room-mobile.webp?w=1080;828;640" alt={sceneAlt} loading="lazy" sizes="103vw" class="layer" />
 			{/if}
+
+			<!-- 2 · sky with the moon, shown only through the two upper glass panes, drifting with the scroll -->
+			<div class="panes" aria-hidden="true" style:mask-image={skyMask}>
+				<div class="sky" style={box(layout.sky.rect)}>
+					<enhanced:img src="./assets/nightshift-window-sky.webp?w=1100;800;550" alt="" loading="lazy" sizes={vw(layout.sky.rect.w)} class="fill" />
+				</div>
+			</div>
 
 			<span class="lamp" aria-hidden="true" style:left={pct(layout.lamp.x)} style:top={pct(layout.lamp.y)} style:width={pct(layout.lamp.radius * 2)}></span>
 
 			<Monitor monitor={layout.monitor} {terminal} {stage} blink={!reduced} />
 
-			{#if layout.layers.bonsai}
-				<enhanced:img src="./assets/nightshift-bonsai.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="layer" />
-				{#if goldenWanted}
+			<!-- 3 · typing mascot: body + hand patch sprite (frames 1…3), hidden behind the desk below its back edge -->
+			<div class="mascot" data-frame={reduced ? 1 : terminal.frame} aria-hidden="true" style="{box(layout.mascot.rect)}; clip-path: {layout.mascot.clip}">
+				<enhanced:img src="./assets/mascot-nightshift-typing.webp?w=903;640;450" alt="" loading="lazy" sizes={vw(layout.mascot.rect.w)} class="fill" />
+				<div class="hands" style={box(layout.mascot.hands)}>
 					<enhanced:img
-						src="./assets/nightshift-bonsai-golden.png?w=2560;1920;1280"
+						src="./assets/mascot-nightshift-hands.webp?w=286;200"
 						alt=""
-						sizes="103vw"
-						class={['layer', 'golden', golden && 'lit']}
-						style="transform-origin: {bonsaiOrigin}"
+						loading="lazy"
+						sizes={vw((layout.mascot.rect.w * layout.mascot.hands.w) / 100)}
+						class="sprite"
 					/>
-				{/if}
-			{:else}
-				<span
-					class={['golden-wash', golden && 'lit']}
-					aria-hidden="true"
-					style:left={pct(layout.bonsai.x - 13)}
-					style:top={pct(layout.bonsai.y - 15)}
-					style:width={pct(26)}
-					style:height={pct(17)}
-				></span>
-			{/if}
+				</div>
+			</div>
 
-			{#if layout.layers.mascot}
-				<div class="mascot" data-frame={reduced ? 1 : terminal.frame} aria-hidden="true">
-					<enhanced:img src="./assets/mascot-nightshift-typing@1.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="layer f1" />
-					<enhanced:img src="./assets/mascot-nightshift-typing@2.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="layer f2" />
-					<enhanced:img src="./assets/mascot-nightshift-typing@3.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="layer f3" />
+			<!-- 4 · props: bonsai (crossfades to the golden tree), handheld -->
+			<div class={['prop', 'bonsai', golden && goldenReady && 'out']} style={box(art.bonsai)}>
+				<enhanced:img src="./assets/nightshift-bonsai.webp?w=419;300" alt="" loading="lazy" sizes={vw(art.bonsai.w)} class="fill" />
+			</div>
+			{#if goldenWanted}
+				<div class={['prop', 'golden', golden && goldenReady && 'lit']} style="{box(art.golden)}; transform-origin: {goldenOrigin}">
+					<enhanced:img src="./assets/nightshift-bonsai-golden.webp?w=492;350" alt="" sizes={vw(art.golden.w)} class="fill" onload={() => (goldenReady = true)} />
 				</div>
 			{/if}
-
-			{#if layout.layers.handheld}
-				<enhanced:img src="./assets/nightshift-handheld.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class={['layer', 'handheld', handheldLit && 'lit']} />
-			{/if}
+			<div class={['prop', 'handheld', handheldLit && 'lit']} style={box(art.handheld)}>
+				<enhanced:img src="./assets/nightshift-handheld.webp?w=361;250" alt="" loading="lazy" sizes={vw(art.handheld.w)} class="fill" />
+			</div>
 
 			<svg
 				class="steam"
@@ -192,8 +195,10 @@
 				</div>
 			{/if}
 
-			{#if layout.layers.foreground}
-				<enhanced:img src="./assets/nightshift-foreground.png?w=2560;1920;1280" alt="" loading="lazy" sizes="103vw" class="layer foreground" />
+			{#if art.foreground}
+				<div class="prop foreground" style={box(art.foreground)}>
+					<enhanced:img src="./assets/nightshift-foreground.webp?w=255" alt="" loading="lazy" sizes={vw(art.foreground.w)} class="fill" />
+				</div>
 			{/if}
 
 			<div class="dust" aria-hidden="true" style:left={pct(layout.lamp.x - 4)} style:top={pct(layout.lamp.y - 6)}>
@@ -264,10 +269,24 @@
 		user-select: none;
 	}
 
-	/* ── 1 · sky behind the window: pointer parallax plus a slow drift with the scroll (the moon sinks as the night goes on) ── */
-	.sky {
+	/* Cropped layers, placed in canvas percentages by layout.ts */
+	.prop,
+	.mascot {
 		position: absolute;
 		pointer-events: none;
+	}
+
+	/* ── 2 · sky in the glass panes: pointer parallax plus a slow drift with the scroll (the moon sinks as the night goes on) ── */
+	.panes {
+		position: absolute;
+		inset: 0;
+		mask-size: 100% 100%;
+		mask-repeat: no-repeat;
+		pointer-events: none;
+	}
+
+	.sky {
+		position: absolute;
 		translate: calc(var(--px, 0) * 9px) calc(var(--py, 0) * 6px);
 	}
 
@@ -288,31 +307,26 @@
 		pointer-events: none;
 	}
 
-	/* ── golden tree egg ── */
-	.stage :global(.golden) {
+	/* ── golden tree egg: crossfade to the grown golden canopy, which grows out of the (identical) pot ── */
+	.bonsai {
+		transition: opacity 600ms ease;
+	}
+
+	.bonsai.out {
 		opacity: 0;
+	}
+
+	.golden {
+		opacity: 0;
+		scale: 0.94;
 		transition:
 			opacity 600ms ease,
 			scale 1400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 	}
 
-	.stage :global(.golden.lit) {
+	.golden.lit {
 		opacity: 1;
-		scale: 1.07;
-	}
-
-	.golden-wash {
-		position: absolute;
-		border-radius: 50%;
-		background: radial-gradient(closest-side, rgb(255 226 140 / 0.55), rgb(252 215 114 / 0.22) 50%, transparent);
-		mix-blend-mode: screen;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 600ms ease;
-	}
-
-	.golden-wash.lit {
-		opacity: 1;
+		scale: 1;
 	}
 
 	.motes {
@@ -326,23 +340,36 @@
 		height: 100%;
 	}
 
-	/* ── mascot typing: frame swap, no transition ── */
-	.mascot :global(.f2),
-	.mascot :global(.f3) {
-		opacity: 0;
+	/* ── mascot typing: the hand patch sprite (3 cells stacked) steps per frame, no transition ── */
+	.hands {
+		position: absolute;
+		overflow: hidden;
 	}
 
-	.mascot[data-frame='2'] :global(.f2),
-	.mascot[data-frame='3'] :global(.f3) {
-		opacity: 1;
+	.hands :global(.sprite) {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 300%;
+		max-width: none;
+		user-select: none;
+	}
+
+	.mascot[data-frame='2'] :global(.sprite) {
+		translate: 0 -33.3333%;
+	}
+
+	.mascot[data-frame='3'] :global(.sprite) {
+		translate: 0 -66.6667%;
 	}
 
 	/* ── handheld contour on hover/focus ── */
-	.stage :global(.handheld) {
+	.handheld {
 		transition: filter 240ms ease;
 	}
 
-	.stage :global(.handheld.lit) {
+	.handheld.lit {
 		filter: drop-shadow(0 0 1.5px rgb(252 215 114 / 0.95)) drop-shadow(0 0 10px rgb(252 215 114 / 0.55));
 	}
 
@@ -377,10 +404,10 @@
 		opacity: 0.35;
 	}
 
-	/* ── 3 · foreground and 4 · dust in the lamp light: strongest parallax ── */
-	.stage :global(.foreground) {
+	/* ── 5 · foreground leaf and dust in the lamp light: strongest parallax (the art contract allows ±6 px for the leaf) ── */
+	.foreground {
 		z-index: 3;
-		translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -7px);
+		translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
 	}
 
 	.dust {
@@ -504,14 +531,14 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.stage :global(.golden),
-		.stage :global(.golden.lit) {
+		.golden,
+		.golden.lit {
 			transition: none;
 			scale: none;
 		}
 
-		.golden-wash,
-		.stage :global(.handheld) {
+		.bonsai,
+		.handheld {
 			transition: none;
 		}
 	}
