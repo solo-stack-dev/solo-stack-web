@@ -127,7 +127,6 @@
 					src={embedUrl(video.id)}
 					title={video.title}
 					allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
-					allowfullscreen
 					referrerpolicy="strict-origin-when-cross-origin"
 					{@attach (element) => element.focus()}
 				></iframe>

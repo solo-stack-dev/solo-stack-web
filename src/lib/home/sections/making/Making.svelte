@@ -364,6 +364,11 @@
 		letter-spacing: 0.12em;
 		line-height: 1.6;
 		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
+		/* ink halo: on portrait layouts the heading sits on the butter pigment cloud */
+		text-shadow:
+			0 0 2px var(--color-ink),
+			0 0 6px var(--color-ink),
+			0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
 	}
 
 	.titles {

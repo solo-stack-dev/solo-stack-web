@@ -15,6 +15,7 @@
 	```
 -->
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { STAR_SPRITES } from './materials.ts';
 	import { RafLoop, reducedMotion } from './motion.svelte.ts';
 
@@ -120,7 +121,9 @@
 		const context = canvas?.getContext('2d');
 		if (!context) return;
 		context.clearRect(0, 0, canvas.width, canvas.height);
-		const animate = loop.running;
+		// Untracked: draw() is called from effects, which must not re-run (and reallocate the canvas) whenever the loop
+		// starts or stops on scroll.
+		const animate = untrack(() => loop.running);
 		for (const star of visible) {
 			const flicker = animate && star.twinkles ? 0.6 + 0.4 * Math.sin(time * star.speed + star.phase) : 1;
 			context.globalAlpha = Math.min(1, star.alpha * flicker * brightness);

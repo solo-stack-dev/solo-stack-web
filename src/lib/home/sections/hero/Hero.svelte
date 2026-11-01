@@ -758,6 +758,11 @@
 		font-size: clamp(0.95rem, 1.2cqw, 1.2rem);
 		line-height: 1.45;
 		color: color-mix(in oklab, var(--color-cream) 78%, transparent);
+		/* ink halo: the line crosses the butter clouds, where cream alone has too little contrast */
+		text-shadow:
+			0 0 2px var(--color-ink),
+			0 0 6px var(--color-ink),
+			0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
 	}
 
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
