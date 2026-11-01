@@ -1,7 +1,8 @@
 <!--
 	@component
-	Posting activity: one cell per day (all platforms), weeks as columns, Monday on top. A one hue ramp from the
-	surface to the accent pigment. Plain HTML/CSS with one shared hover tooltip, no chart library.
+	Posting activity as a sky: one star per day (all platforms), weeks as columns, Monday on top. Days without a post
+	are faint specks; the more posts, the bigger and brighter the star. Total and longest streak are set big next to
+	it, no boxes. Plain HTML/CSS with one shared hover tooltip.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -19,7 +20,7 @@
 	const weeks = $derived.by(() => {
 		const cells: (Cell | null)[] = stats.posts.map((count, index) => ({ date: dateAt(stats.asOf, index), count }));
 		// Monday = 0. Pad the first week so every column starts on a Monday.
-		const lead = ((cells[0]!.date.getUTCDay() + 6) % 7) as number;
+		const lead = (cells[0]!.date.getUTCDay() + 6) % 7;
 		const padded = [...Array.from({ length: lead }, () => null), ...cells];
 		const columns: (Cell | null)[][] = [];
 		for (let index = 0; index < padded.length; index += 7) columns.push(padded.slice(index, index + 7));
@@ -33,19 +34,15 @@
 	const around = (message: (marker: string) => string) =>
 		message('\u0000')
 			.split('\u0000')
-			.map((part) => part.replace(/^[:\s]+|[:\s]+$/g, '')) as [string, string?];
+			.map((part) => part.replace(/^[:\s]+|[:\s]+$/g, ''))
+			.filter(Boolean)
+			.join(' ');
 	const totalLabel = $derived(around((count) => m.stats_activity_total({ count })));
 	const streakLabel = $derived(around((days) => m.stats_activity_streak({ days })));
 
-	/** Ramp step 0…4 (0 = no post). */
+	/** Star level 0…4 (0 = no post). */
 	const level = (count: number) => Math.min(4, count);
-	const LEVEL_CLASS = [
-		'bg-foreground/[0.07]',
-		'bg-[color-mix(in_oklab,var(--chart-accent)_28%,var(--card))]',
-		'bg-[color-mix(in_oklab,var(--chart-accent)_52%,var(--card))]',
-		'bg-[color-mix(in_oklab,var(--chart-accent)_76%,var(--card))]',
-		'bg-(--chart-accent)'
-	];
+	const LEVELS = [0, 1, 2, 3, 4] as const;
 
 	const monthLabels = $derived(
 		weeks.map((week, index) => {
@@ -59,7 +56,7 @@
 
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
 
-	function show(event: PointerEvent | FocusEvent) {
+	function show(event: PointerEvent) {
 		const target = event.target as HTMLElement;
 		const index = target.dataset.index;
 		if (index === undefined) return void (tip = null);
@@ -75,18 +72,18 @@
 	}
 </script>
 
-<div class="grid gap-6 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-10" style:--cell="clamp(0.5rem, calc((100vw - 7rem) / {weeks.length} - 3px), 1.125rem)">
+<div class="grid gap-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-16" style:--cell="clamp(0.6rem, calc((100vw - 6rem) / {weeks.length}), 1.4rem)">
 	<div class="relative max-w-full min-w-0 overflow-x-auto pb-1 lg:overflow-visible">
-		<div class="mb-1.5 ml-7 grid gap-[3px] text-[0.65rem] text-muted-foreground" style:grid-template-columns="repeat({weeks.length}, var(--cell))" aria-hidden="true">
+		<div class="mb-2 ml-7 grid font-mono text-[0.65rem] text-muted-foreground" style:grid-template-columns="repeat({weeks.length}, var(--cell))" aria-hidden="true">
 			{#each monthLabels as label, index (index)}<span class="overflow-visible whitespace-nowrap">{label}</span>{/each}
 		</div>
 		<div class="flex gap-1.5">
-			<div class="grid w-5.5 shrink-0 grid-rows-[repeat(7,var(--cell))] gap-[3px] text-[0.6rem] leading-none text-muted-foreground" aria-hidden="true">
+			<div class="grid w-5.5 shrink-0 grid-rows-[repeat(7,var(--cell))] font-mono text-[0.6rem] leading-none text-muted-foreground" aria-hidden="true">
 				{#each weekdayDates as date, index (index)}<span class="flex items-center">{index % 2 === 0 ? formatWeekdayShort(date) : ''}</span>{/each}
 			</div>
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<div
-				class="grid grid-flow-col grid-rows-7 gap-[3px]"
+				class="grid grid-flow-col grid-rows-7"
 				style:grid-template-columns="repeat({weeks.length}, var(--cell))"
 				role="img"
 				aria-label="{m.stats_activity_total({ count: formatNumber(total) })}. {m.stats_activity_streak({ days: formatNumber(streak) })}"
@@ -97,7 +94,9 @@
 					{#each { length: 7 }, d (d)}
 						{@const cell = week[d]}
 						{#if cell}
-							<span class="size-(--cell) rounded-[3px] {LEVEL_CLASS[level(cell.count)]}" data-index="{w}:{d}"></span>
+							<span class="grid size-(--cell) place-items-center" data-index="{w}:{d}">
+								<span class="star pointer-events-none" data-level={level(cell.count)}></span>
+							</span>
 						{:else}
 							<span class="size-(--cell)"></span>
 						{/if}
@@ -107,28 +106,83 @@
 		</div>
 		{#if tip}
 			<div
-				class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-md bg-popover px-2 py-1 text-xs whitespace-nowrap text-popover-foreground shadow-lg ring-1 ring-foreground/10"
-				style:left="{tip.x + 28}px"
-				style:top="{tip.y + 16}px"
+				class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-full bg-night px-2.5 py-0.5 font-mono text-[0.7rem] whitespace-nowrap text-cream shadow-lg dark:bg-cream dark:text-night"
+				style:left="{tip.x}px"
+				style:top="{tip.y - 4}px"
 				aria-hidden="true"
 			>
 				{tip.text}
 			</div>
 		{/if}
-		<div class="mt-3 ml-7 flex items-center gap-1.5 text-[0.65rem] text-muted-foreground" aria-hidden="true">
+		<div class="mt-3 ml-7 flex items-center gap-2 font-mono text-[0.65rem] text-muted-foreground" aria-hidden="true">
 			<span>{m.stats_activity_less()}</span>
-			{#each LEVEL_CLASS as cls (cls)}<span class="size-2.5 rounded-[2px] {cls}"></span>{/each}
+			{#each LEVELS as value (value)}<span class="grid size-3.5 place-items-center"><span class="star" data-level={value}></span></span>{/each}
 			<span>{m.stats_activity_more()}</span>
 		</div>
 	</div>
-	<dl class="grid grid-cols-2 gap-3 lg:max-w-md">
-		<div class="rounded-lg bg-muted/50 p-3">
-			<dt class="text-xs text-muted-foreground">{totalLabel.filter(Boolean).join(' ')}</dt>
-			<dd class="text-2xl font-semibold tracking-tight">{formatNumber(total)}</dd>
+
+	<dl class="grid grid-cols-2 gap-x-8 gap-y-6 lg:grid-cols-1">
+		<div class="grid gap-1">
+			<dt class="text-sm text-muted-foreground">{totalLabel}</dt>
+			<dd class="font-display text-5xl leading-none font-black tracking-tight tabular-nums sm:text-6xl">{formatNumber(total)}</dd>
 		</div>
-		<div class="rounded-lg bg-muted/50 p-3">
-			<dt class="text-xs text-muted-foreground">{streakLabel.filter(Boolean).join(' ')}</dt>
-			<dd class="text-2xl font-semibold tracking-tight">{formatNumber(streak)}</dd>
+		<div class="grid gap-1">
+			<dt class="text-sm text-muted-foreground">{streakLabel}</dt>
+			<dd class="font-display text-5xl leading-none font-black tracking-tight tabular-nums sm:text-6xl">{formatNumber(streak)}</dd>
 		</div>
 	</dl>
 </div>
+
+<style>
+	.star {
+		display: block;
+		border-radius: 50%;
+		background: var(--star);
+		--star: var(--color-ochre);
+	}
+
+	:global(.dark) .star {
+		--star: var(--color-butter);
+	}
+
+	.star[data-level='0'] {
+		width: 18%;
+		height: 18%;
+		min-width: 2px;
+		min-height: 2px;
+		background: color-mix(in oklab, var(--foreground) 22%, transparent);
+	}
+
+	.star[data-level='1'] {
+		width: 34%;
+		height: 34%;
+		opacity: 0.55;
+	}
+
+	.star[data-level='2'] {
+		width: 48%;
+		height: 48%;
+		opacity: 0.75;
+	}
+
+	.star[data-level='3'] {
+		width: 62%;
+		height: 62%;
+	}
+
+	.star[data-level='4'] {
+		width: 76%;
+		height: 76%;
+		box-shadow: 0 0 0 2px color-mix(in oklab, var(--star) 25%, transparent);
+	}
+
+	:global(.dark) .star[data-level='3'] {
+		box-shadow: 0 0 6px rgb(252 215 114 / 0.45);
+	}
+
+	:global(.dark) .star[data-level='4'] {
+		box-shadow:
+			0 0 10px rgb(252 215 114 / 0.7),
+			0 0 2px #fff8e0;
+	}
+</style>
