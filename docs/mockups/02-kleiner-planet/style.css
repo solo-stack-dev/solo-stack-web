@@ -1,0 +1,304 @@
+.planet-hero {
+	padding: 54px 0 72px;
+	display: grid;
+	grid-template-columns: 1.5fr 0.7fr;
+	gap: 80px;
+	align-items: center;
+	border-bottom: 1px solid var(--line);
+}
+.planet-hero h1 {
+	font-size: clamp(70px, 8.2vw, 116px);
+}
+.planet-hero h1 span {
+	display: block;
+	font-weight: 430;
+}
+.planet-hero p {
+	margin-top: 30px;
+	max-width: 460px;
+}
+.portrait-orbit {
+	position: relative;
+	padding: 24px;
+}
+.portrait-orbit:before {
+	content: '';
+	position: absolute;
+	inset: -5px;
+	border-radius: 50%;
+	border: 1px solid var(--line);
+	transform: rotate(-20deg) scaleX(1.15);
+}
+.portrait-orbit img {
+	border-radius: 50%;
+	aspect-ratio: 1;
+	object-fit: cover;
+}
+.orbit-note {
+	position: absolute;
+	bottom: -20px;
+	left: 25px;
+	font:
+		11px Consolas,
+		monospace;
+	transform: rotate(-8deg);
+	background: var(--paper);
+	padding: 10px;
+}
+.orbit-plus {
+	position: absolute;
+	top: 10px;
+	right: 0;
+	font-size: 28px;
+}
+.editorial-videos {
+	display: grid;
+	grid-template-columns: 1.5fr 1fr;
+	gap: 50px;
+}
+.editorial-videos .video-card:last-child {
+	padding-top: 50px;
+}
+.game-section {
+	padding-top: 72px;
+	padding-bottom: 72px;
+}
+.game-heading {
+	display: flex;
+	justify-content: space-between;
+	gap: 40px;
+	align-items: end;
+}
+.game-heading p {
+	max-width: 300px;
+	color: var(--muted);
+	font-size: 14px;
+}
+.game-shell {
+	margin-top: 42px;
+	position: relative;
+	border: 1px solid #454744;
+	border-radius: 8px;
+	background: #252729;
+	overflow: hidden;
+}
+.game-topbar {
+	padding: 16px 24px;
+	border-bottom: 1px solid #454744;
+	display: flex;
+	justify-content: space-between;
+	font:
+		11px Consolas,
+		monospace;
+	letter-spacing: 0.08em;
+}
+.game-stage {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 2/1;
+	max-height: 540px;
+	min-height: 300px;
+	background: radial-gradient(ellipse at center, #353739 0%, #252729 70%);
+}
+.game-stage canvas {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+.planet-poster {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+}
+.poster-orbit {
+	position: absolute;
+	width: 350px;
+	height: 350px;
+	border: 1px dashed #626257;
+	border-radius: 50%;
+	max-width: 90%;
+}
+.poster-moon {
+	position: absolute;
+	width: 220px;
+	height: 220px;
+	border-radius: 50%;
+	background: var(--butter);
+	box-shadow: inset -20px -10px 0 #ddbf61;
+}
+.poster-moon:before,
+.poster-moon:after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	background: #d9b64b55;
+}
+.poster-moon:before {
+	width: 45px;
+	height: 45px;
+	left: 30px;
+	top: 40px;
+}
+.poster-moon:after {
+	width: 28px;
+	height: 28px;
+	right: 35px;
+	bottom: 40px;
+}
+.chibi {
+	position: absolute;
+	left: calc(50% - 15px);
+	top: calc(50% - 158px);
+	width: 30px;
+	height: 36px;
+	background: #16191b;
+	border-radius: 10px 10px 2px 2px;
+	z-index: 1;
+}
+.chibi:before {
+	content: '';
+	position: absolute;
+	width: 28px;
+	height: 27px;
+	left: 1px;
+	top: -19px;
+	border-radius: 40% 40% 48% 48%;
+	background: #e4b593;
+	border-top: 9px solid #302a28;
+}
+.chibi:after {
+	content: '';
+	position: absolute;
+	bottom: -10px;
+	width: 10px;
+	height: 13px;
+	left: 3px;
+	background: #989990;
+	box-shadow: 14px 0 #989990;
+}
+.planet-poster .btn {
+	position: relative;
+	z-index: 2;
+	background: #202124;
+	color: #fff4d1;
+	border-color: #202124;
+	box-shadow: 0 5px 25px #0002;
+}
+.poster-star {
+	position: absolute;
+	font-size: 20px;
+	color: var(--butter);
+}
+.poster-star.a {
+	left: 20%;
+	top: 20%;
+}
+.poster-star.b {
+	right: 19%;
+	bottom: 25%;
+}
+.poster-star.c {
+	left: 28%;
+	bottom: 19%;
+	font-size: 12px;
+}
+.game-controls {
+	padding: 18px 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	border-top: 1px solid #454744;
+}
+.game-controls p {
+	font-size: 12px;
+	color: #c2c1b6;
+}
+.touch-controls {
+	display: flex;
+	gap: 8px;
+}
+.touch-controls button,
+.pause-button {
+	color: var(--paper);
+	background: #36383b;
+	border: 1px solid #696a5e;
+	min-width: 44px;
+	min-height: 44px;
+	border-radius: 3px;
+	touch-action: none;
+}
+.pause-button {
+	padding: 8px 16px;
+	font-size: 12px;
+	touch-action: manipulation;
+}
+.planet-about {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 80px;
+}
+.planet-about p {
+	margin-top: 25px;
+}
+.planet-about .social-list {
+	margin-top: 0;
+	grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 700px) {
+	.planet-hero {
+		grid-template-columns: 1fr;
+		gap: 50px;
+		padding-top: 30px;
+	}
+	.planet-hero h1 {
+		font-size: 62px;
+	}
+	.portrait-orbit {
+		max-width: 230px;
+		justify-self: center;
+	}
+	.editorial-videos {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	.editorial-videos .video-card:last-child {
+		padding-top: 0;
+	}
+	.game-heading {
+		flex-direction: column;
+		align-items: start;
+		gap: 20px;
+	}
+	.game-stage {
+		aspect-ratio: 1/1.1;
+		min-height: 340px;
+	}
+	.game-topbar {
+		font-size: 9px;
+		padding: 12px;
+	}
+	.poster-orbit {
+		width: 290px;
+		height: 290px;
+	}
+	.game-controls {
+		flex-wrap: wrap;
+		padding: 15px;
+	}
+	.game-controls p {
+		width: 100%;
+		font-size: 11px;
+	}
+	.planet-about {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+	.game-section {
+		padding: 55px 0;
+	}
+}
+
+.game-stage canvas{object-fit:cover}
+@media(max-width:700px){.game-stage{aspect-ratio:1;min-height:300px}}

@@ -1,0 +1,12 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"singleQuote": true,
+	"trailingComma": "none",
+	"printWidth": 170,
+	"svelte": true,
+	"sortTailwindcss": {
+		"stylesheet": "./src/routes/layout.css"
+	},
+	"ignorePatterns": ["pnpm-lock.yaml", "src/lib/paraglide", "worker-configuration.d.ts", "/static/"]
+}

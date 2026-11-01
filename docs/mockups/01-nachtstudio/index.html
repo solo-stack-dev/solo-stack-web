@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="robots" content="noindex,nofollow" />
+		<title>01 / Nachtstudio · Solo Stack Designstudie</title>
+		<link rel="stylesheet" href="../assets/base.css" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body class="studio">
+		<a class="skip-link" href="#main">Zum Inhalt</a>
+		<div class="demo-note">Designstudie · Alle Texte, Episoden & Zeitangaben sind Platzhalter</div>
+		<div class="studio-top grain" id="sky">
+			<header class="site-nav wrap">
+				<a class="brand" href="index.html" aria-label="Solo Stack Startseite">SOLO<span>STACK</span></a
+				><button class="nav-toggle" aria-expanded="false" aria-controls="navigation">Menü +</button>
+				<nav class="nav-links" id="navigation" aria-label="Hauptnavigation">
+					<a href="index.html#videos">Videos</a><a href="index.html#about">Über mich</a><a href="../01-nachtstudio/contact.html">Kontakt ↗</a>
+				</nav>
+			</header>
+			<main id="main">
+				<div class="studio-hero wrap">
+					<div class="hero-copy">
+						<span class="eyebrow"><i class="status-dot"></i> AI · Code · Side Projects · Business</span>
+						<h1>Ideen am Tag.<br /><em>Code bei Nacht.</em></h1>
+						<p>Ich baue eigene Apps mit AI.<br />Und nehme dich mit in mein Studio.</p>
+						<div class="actions">
+							<a class="btn" href="#videos">Die neuesten Videos <span>↘</span></a
+							><a class="text-link" href="#about">Wer hier baut ↗</a>
+						</div>
+					</div>
+					<div class="sky-scene" aria-label="Illustration: Mond über einem Laptop">
+						<div class="orbit-line"></div>
+						<span class="star s1">✦</span><span class="star s2">✧</span><span class="star s3">✦</span><span class="star s4">+</span
+						><button class="moon-toggle" id="theme-toggle" aria-label="Zwischen Tag und Nacht wechseln" aria-pressed="false"></button
+						><span class="moon-label">↖ DEIN SCHALTER ZUM MOND</span>
+						<div class="laptop" aria-hidden="true">&lt;/&gt;</div>
+						<div class="cliff"></div>
+						<span class="sky-caption">Ein kleines Studio. Viele offene Tabs.</span>
+					</div>
+				</div>
+				<div class="sky-controls wrap">
+					<label for="time-slider">STUDIOZEIT / DEMO</label
+					><input id="time-slider" type="range" min="0" max="23.99" step=".1" aria-label="Lokale Uhrzeit simulieren" /><output id="clock-label"></output
+					><button id="time-play">Zeitraffer ▶</button><button id="time-auto">Echtzeit ↻</button><span id="sky-mode" aria-live="polite">Automatisch</span>
+				</div>
+			</main>
+		</div>
+		<div class="bleed grain" aria-hidden="true"></div>
+		<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+			<filter id="edge">
+				<feTurbulence type="fractalNoise" baseFrequency=".025" numOctaves="3" result="noise" />
+				<feDisplacementMap in="SourceGraphic" in2="noise" scale="15" />
+			</filter>
+		</svg>
+		<section class="section night night-videos grain" id="videos">
+			<div class="rising-moon" aria-hidden="true"></div>
+			<div class="wrap">
+				<div class="section-head">
+					<div>
+						<span class="eyebrow">Frisch aus dem Studio</span>
+						<h2>Ausprobiert.<br />Gebaut. Festgehalten.</h2>
+					</div>
+					<a class="text-link" href="https://www.youtube.com/@solostack_dev">Alles auf YouTube ↗</a>
+				</div>
+				<div class="video-grid">
+					<a class="video-card" href="../01-nachtstudio/blog-post.html"
+						><div class="video-art">
+							<img src="../assets/video-app.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Von 0 zur App" /><span class="play" aria-hidden="true"
+								>▶</span
+							><span class="duration">XX:XX</span>
+						</div>
+						<div class="video-meta"><span>Projektlog / 01</span><span>Beispielvideo ↗</span></div>
+						<h3>Vom ersten Prompt zur eigenen App.</h3>
+						<p>Ein Projekt, die ersten Hürden und ein neuer Versuch.</p></a
+					><a class="video-card" href="../01-nachtstudio/blog-post.html"
+						><div class="video-art">
+							<img src="../assets/video-ai.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Code mit AI?" /><span class="play" aria-hidden="true"
+								>▶</span
+							><span class="duration">XX:XX</span>
+						</div>
+						<div class="video-meta"><span>AI im Einsatz / 02</span><span>Beispielvideo ↗</span></div>
+						<h3>Wie gut baut AI wirklich mit?</h3>
+						<p>Ein kleiner Praxistest mit einer echten Aufgabe.</p></a
+					>
+				</div>
+			</div>
+		</section>
+		<section class="section wrap about" id="about">
+			<div class="about-photo">
+				<img src="../assets/profile.jpg" width="480" height="480" loading="lazy" alt="Der Entwickler hinter Solo Stack vor buttergelbem Papier" />
+			</div>
+			<div>
+				<span class="eyebrow">Ein Mensch hinter dem Stack</span>
+				<h2>Ich baue.<br />Du schaust mit.</h2>
+				<p>Eigene Apps, AI im Alltag und die Entscheidungen dazwischen. Hier zeige ich, was beim Bauen passiert.</p>
+				<p class="muted small">Entwurf: Kurzvorstellung des Kanalinhabers.</p>
+				<a class="text-link" style="margin-top: 24px" href="../01-nachtstudio/contact.html">Etwas zusammen machen <span>↗</span></a>
+			</div>
+		</section>
+		<section class="section studio-social grain" id="socials">
+			<div class="wrap">
+				<div class="section-head">
+					<div>
+						<span class="eyebrow">Auch außerhalb des Studios</span>
+						<h2>Ein Stack.<br />Viele Verbindungen.</h2>
+					</div>
+					<p class="small muted">Code, Gedanken und das nächste Projekt.<br />Such dir deinen Platz.</p>
+				</div>
+				<div class="social-list">
+					<a href="https://www.youtube.com/@solostack_dev">YouTube <span>↗</span></a
+					><a href="https://github.com/solo-stack-dev">GitHub <span>↗</span></a
+					><a href="https://x.com/solostack_dev">X <span>↗</span></a
+					><a href="https://www.instagram.com/solostack.dev/">Instagram <span>↗</span></a
+					><a href="https://www.threads.net/@solostack.dev">Threads <span>↗</span></a
+					><a href="https://www.tiktok.com/@solo_stack">TikTok <span>↗</span></a
+					><a href="https://bsky.app/profile/solo-stack.bsky.social">Bluesky <span>↗</span></a
+					><a href="https://www.twitch.tv/solo_stack">Twitch <span>↗</span></a
+					><button data-demo="Discord: Einladungslink folgt.">Discord <span>↗</span></button>
+				</div>
+			</div>
+		</section>
+		<footer class="footer wrap">
+			<span>© Solo Stack · Designstudie</span>
+			<div>
+				<a href="../index.html">Alle Konzepte ↗</a
+				><button style="border: 0; background: none; padding: 0; color: inherit; font: inherit" data-demo="Rechtstexte folgen in der echten Website.">
+					Impressum / Datenschutz
+				</button>
+			</div>
+		</footer>
+		<script src="../assets/common.js"></script>
+		<script src="studio.js"></script>
+	</body>
+</html>

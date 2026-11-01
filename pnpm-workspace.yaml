@@ -1,0 +1,18 @@
+allowBuilds:
+  sharp: true
+  workerd: true
+  esbuild: true
+
+engineStrict: true
+ignoreScripts: true
+
+minimumReleaseAge: 7200 # 5 days
+minimumReleaseAgeStrict: true
+minimumReleaseAgeExclude:
+  - workerd
+  - '@cloudflare/workerd-*'
+blockExoticSubdeps: true
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - chokidar@4.0.3
+  - undici-types@6.21.0

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="robots" content="noindex,nofollow" />
+		<title>03 / Stack · Solo Stack Designstudie</title>
+		<link rel="stylesheet" href="../assets/base.css" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body class="stack-page">
+		<a class="skip-link" href="#main">Zum Inhalt</a>
+		<div class="demo-note">Designstudie · Alle Texte, Episoden & Zeitangaben sind Platzhalter</div>
+		<header class="site-nav wrap">
+			<a class="brand" href="index.html" aria-label="Solo Stack Startseite">SOLO<span>STACK</span></a
+			><button class="nav-toggle" aria-expanded="false" aria-controls="navigation">Menü +</button>
+			<nav class="nav-links" id="navigation" aria-label="Hauptnavigation">
+				<a href="index.html#videos">Videos</a><a href="index.html#about">Über mich</a><a href="../01-nachtstudio/contact.html">Kontakt ↗</a>
+			</nav>
+		</header>
+		<main id="main">
+			<section class="stack-hero wrap">
+				<div>
+					<span class="eyebrow">Ein Projekt baut auf dem nächsten auf.</span>
+					<div class="block-wordmark" aria-label="Solo Stack"><span class="word-block">SOLO</span><span class="word-block">STACK</span></div>
+				</div>
+				<div class="stack-hero-copy">
+					<span class="mono">01 / Ideen werden Dinge</span>
+					<h1 style="margin-top: 22px">Schicht für Schicht.<br />Von mir gebaut.</h1>
+					<p>Eigene Apps, AI und alles, was sich beim Bauen so stapelt.</p>
+					<div class="actions"><a class="btn" href="#videos">Den Stapel durchsehen ↘</a></div>
+				</div>
+			</section>
+			<section class="section paper-section grain" id="videos">
+				<div class="wrap">
+					<div class="section-head">
+						<div>
+							<span class="eyebrow">Oben auf dem Stapel</span>
+							<h2>Die neuesten Versuche.</h2>
+						</div>
+						<button class="btn outline" id="fan-button" aria-expanded="false" aria-controls="card-pile">Karten auffächern ↔</button>
+					</div>
+					<div class="card-pile" id="card-pile">
+						<a class="video-card" href="../01-nachtstudio/blog-post.html"
+							><div class="video-art">
+								<img src="../assets/video-app.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Von 0 zur App" /><span class="play" aria-hidden="true"
+									>▶</span
+								><span class="duration">XX:XX</span>
+							</div>
+							<div class="video-meta"><span>Projektlog / 01</span><span>Beispielvideo ↗</span></div>
+							<h3>Vom ersten Prompt zur eigenen App.</h3>
+							<p>Ein Projekt, die ersten Hürden und ein neuer Versuch.</p></a
+						><a class="video-card" href="../01-nachtstudio/blog-post.html"
+							><div class="video-art">
+								<img src="../assets/video-ai.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Code mit AI?" /><span class="play" aria-hidden="true"
+									>▶</span
+								><span class="duration">XX:XX</span>
+							</div>
+							<div class="video-meta"><span>AI im Einsatz / 02</span><span>Beispielvideo ↗</span></div>
+							<h3>Wie gut baut AI wirklich mit?</h3>
+							<p>Ein kleiner Praxistest mit einer echten Aufgabe.</p></a
+						>
+					</div>
+				</div>
+			</section>
+			<section class="section night grain" id="toy">
+				<div class="wrap stack-play">
+					<div>
+						<span class="eyebrow">Ein kleines Gedankenspiel</span>
+						<h2>Was steckt in<br />deinem Stack?</h2>
+						<p>Such dir deine Werkzeuge aus.<br />Ein Klick, eine neue Schicht.</p>
+						<div class="tool-tray" aria-label="Werkzeuge hinzufügen">
+							<button data-tool="Svelte">+ Svelte</button><button data-tool="Cloudflare">+ Cloudflare</button><button data-tool="Claude">+ Claude</button
+							><button data-tool="GPT">+ GPT</button><button data-tool="Postgres">+ Postgres</button><button data-tool="TypeScript">+ TypeScript</button>
+						</div>
+						<p class="small muted" id="stack-status" aria-live="polite">Bis zu sechs Bausteine. Ohne richtige Antwort.</p>
+					</div>
+					<div>
+						<div class="stack-workspace">
+							<span class="mono">YOUR STACK / 001</span>
+							<div class="tower" id="tower" aria-label="Dein Tech Stack"></div>
+							<div class="tower-base"></div>
+						</div>
+						<div class="tower-actions">
+							<button id="undo-stack">↶ Letzten entfernen</button><button id="reset-stack">Neu bauen</button><button id="share-stack">Stack kopieren ↗</button>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="section wrap stack-about" id="about">
+				<div class="stack-profile">
+					<img src="../assets/profile.jpg" alt="Solo Stack Entwickler auf einer Papierkarte" width="480" height="480" loading="lazy" /><span
+						>Der Mensch unter den offenen Tabs.</span
+					>
+				</div>
+				<div>
+					<span class="eyebrow">Kein Team von zwanzig.</span>
+					<h2>Solo heißt nicht allein.</h2>
+					<p>Ich baue meine eigenen Projekte. Fragen, Umwege und Ideen teile ich unterwegs.</p>
+					<div class="social-list">
+						<a href="https://www.youtube.com/@solostack_dev">YouTube <span>↗</span></a
+						><a href="https://github.com/solo-stack-dev">GitHub <span>↗</span></a
+						><a href="https://x.com/solostack_dev">X <span>↗</span></a
+						><a href="https://www.instagram.com/solostack.dev/">Instagram <span>↗</span></a
+						><a href="https://www.threads.net/@solostack.dev">Threads <span>↗</span></a
+						><a href="https://www.tiktok.com/@solo_stack">TikTok <span>↗</span></a
+						><a href="https://bsky.app/profile/solo-stack.bsky.social">Bluesky <span>↗</span></a
+						><a href="https://www.twitch.tv/solo_stack">Twitch <span>↗</span></a
+						><button data-demo="Discord: Einladungslink folgt.">Discord <span>↗</span></button>
+					</div>
+				</div>
+			</section>
+		</main>
+		<footer class="footer wrap">
+			<span>© Solo Stack · Designstudie</span>
+			<div>
+				<a href="../index.html">Alle Konzepte ↗</a
+				><button style="border: 0; background: none; padding: 0; color: inherit; font: inherit" data-demo="Rechtstexte folgen in der echten Website.">
+					Impressum / Datenschutz
+				</button>
+			</div>
+		</footer>
+		<script src="../assets/common.js"></script>
+		<script src="stack.js"></script>
+	</body>
+</html>

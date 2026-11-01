@@ -1,0 +1,33 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["eslint", "typescript", "unicorn", "oxc", "import"],
+	"jsPlugins": ["@shadcn/lint"],
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn"
+	},
+	"env": {
+		"browser": true,
+		"es2024": true
+	},
+	"ignorePatterns": [".svelte-kit", "build", "node_modules", ".wrangler", "src/lib/paraglide", "worker-configuration.d.ts"],
+	"rules": {
+		"no-console": "warn",
+		"import/no-unassigned-import": "off",
+		"shadcn/no-arbitrary-values": "error"
+	},
+	"overrides": [
+		{
+			"files": ["*.d.ts"],
+			"rules": {
+				"unicorn/require-module-specifiers": "off"
+			}
+		},
+		{
+			"files": ["src/lib/index.ts"],
+			"rules": {
+				"unicorn/no-empty-file": "off"
+			}
+		}
+	]
+}

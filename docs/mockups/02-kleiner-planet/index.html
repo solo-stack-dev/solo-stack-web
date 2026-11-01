@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="robots" content="noindex,nofollow" />
+		<title>02 / Kleiner Planet · Solo Stack Designstudie</title>
+		<link rel="stylesheet" href="../assets/base.css" />
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body class="">
+		<a class="skip-link" href="#main">Zum Inhalt</a>
+		<div class="demo-note">Designstudie · Alle Texte, Episoden & Zeitangaben sind Platzhalter</div>
+		<header class="site-nav wrap">
+			<a class="brand" href="index.html" aria-label="Solo Stack Startseite">SOLO<span>STACK</span></a
+			><button class="nav-toggle" aria-expanded="false" aria-controls="navigation">Menü +</button>
+			<nav class="nav-links" id="navigation" aria-label="Hauptnavigation">
+				<a href="index.html#videos">Videos</a><a href="index.html#about">Über mich</a><a href="../01-nachtstudio/contact.html">Kontakt ↗</a>
+			</nav>
+		</header>
+		<main id="main">
+			<section class="planet-hero wrap">
+				<div>
+					<span class="eyebrow">Solo Entwickler. Eigenes Universum.</span>
+					<h1>Kleine Schritte.<span>Eigene Welten.</span></h1>
+					<p>Ich baue Apps mit AI. Mal geht es vorwärts, mal einmal um den ganzen Planeten.</p>
+					<div class="actions"><a class="btn" href="#videos">Was gerade entsteht ↘</a><a class="text-link" href="#spiel">Kleine Pause? ↓</a></div>
+				</div>
+				<div class="portrait-orbit">
+					<img src="../assets/profile.jpg" alt="Der Solo Stack Entwickler" width="480" height="480" /><span class="orbit-note">Ein Mensch. Viele Ideen.</span
+					><span class="orbit-plus">✦</span>
+				</div>
+			</section>
+			<section class="section wrap" id="videos">
+				<div class="section-head">
+					<div>
+						<span class="eyebrow">Das Entwicklungslog</span>
+						<h2>Vom Machen erzählt.</h2>
+					</div>
+					<a class="text-link" href="https://www.youtube.com/@solostack_dev">Zum Kanal ↗</a>
+				</div>
+				<div class="editorial-videos">
+					<a class="video-card" href="../01-nachtstudio/blog-post.html"
+						><div class="video-art">
+							<img src="../assets/video-app.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Von 0 zur App" /><span class="play" aria-hidden="true"
+								>▶</span
+							><span class="duration">XX:XX</span>
+						</div>
+						<div class="video-meta"><span>Projektlog / 01</span><span>Beispielvideo ↗</span></div>
+						<h3>Vom ersten Prompt zur eigenen App.</h3>
+						<p>Ein Projekt, die ersten Hürden und ein neuer Versuch.</p></a
+					><a class="video-card" href="../01-nachtstudio/blog-post.html"
+						><div class="video-art">
+							<img src="../assets/video-ai.jpg" width="1280" height="720" loading="lazy" alt="Thumbnail Entwurf: Code mit AI?" /><span class="play" aria-hidden="true"
+								>▶</span
+							><span class="duration">XX:XX</span>
+						</div>
+						<div class="video-meta"><span>AI im Einsatz / 02</span><span>Beispielvideo ↗</span></div>
+						<h3>Wie gut baut AI wirklich mit?</h3>
+						<p>Ein kleiner Praxistest mit einer echten Aufgabe.</p></a
+					>
+				</div>
+			</section>
+			<section class="game-section night grain" id="spiel">
+				<div class="wrap">
+					<div class="game-heading">
+						<div>
+							<span class="eyebrow">Ein kleiner Umweg / Canvas 2D</span>
+							<h2>Ein Mond.<br />Ein paar Bugs.</h2>
+						</div>
+						<p>Spring auf die Bugs, sammle Sterne und bring dein kleines Projekt voran.</p>
+					</div>
+					<div class="game-shell" id="game-shell" tabindex="-1">
+						<div class="game-topbar"><span>MOON / LOCAL BUILD</span><span id="score" aria-live="polite">0 ★ · 0 FEATURES</span></div>
+						<div class="game-stage">
+							<canvas
+								id="planet-canvas"
+								width="900"
+								height="500"
+								hidden
+								tabindex="0"
+								aria-label="Mondspiel. Pfeiltasten oder A und D zum Laufen, Leertaste zum Springen."
+							></canvas>
+							<div class="planet-poster" id="planet-poster">
+								<div class="poster-orbit"></div>
+								<div class="poster-moon grain"></div>
+								<div class="chibi"></div>
+								<span class="poster-star a">✦</span><span class="poster-star b">✧</span><span class="poster-star c">✦</span
+								><button class="btn" id="start-game">Spielen <span>↗</span></button>
+							</div>
+						</div>
+						<div class="game-controls">
+							<p id="game-help">← → / A D laufen · Leertaste springen<br />Erst beim Start wird das Spiel geladen.</p>
+							<div class="touch-controls" aria-label="Spielsteuerung">
+								<button data-key="left" aria-label="Links laufen" disabled>←</button><button data-key="right" aria-label="Rechts laufen" disabled>→</button
+								><button data-key="jump" aria-label="Springen" disabled>↑</button>
+							</div>
+							<button class="pause-button" id="pause-game" disabled>Pause Ⅱ</button>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="section wrap planet-about" id="about">
+				<div>
+					<span class="eyebrow">Hinter dem kleinen Planeten</span>
+					<h2>Code ist besser,<br />wenn man ihn teilt.</h2>
+					<p>Eigene Projekte, neue Modelle und offene Fragen. Auf YouTube erzähle ich davon, auf GitHub liegt der Code.</p>
+					<a class="text-link" style="margin-top: 24px" href="../01-nachtstudio/contact.html">Zusammen etwas bauen ↗</a>
+				</div>
+				<div>
+					<div class="social-list">
+						<a href="https://www.youtube.com/@solostack_dev">YouTube <span>↗</span></a
+						><a href="https://github.com/solo-stack-dev">GitHub <span>↗</span></a
+						><a href="https://x.com/solostack_dev">X <span>↗</span></a
+						><a href="https://www.instagram.com/solostack.dev/">Instagram <span>↗</span></a
+						><a href="https://www.threads.net/@solostack.dev">Threads <span>↗</span></a
+						><a href="https://www.tiktok.com/@solo_stack">TikTok <span>↗</span></a
+						><a href="https://bsky.app/profile/solo-stack.bsky.social">Bluesky <span>↗</span></a
+						><a href="https://www.twitch.tv/solo_stack">Twitch <span>↗</span></a
+						><button data-demo="Discord: Einladungslink folgt.">Discord <span>↗</span></button>
+					</div>
+				</div>
+			</section>
+		</main>
+		<footer class="footer wrap">
+			<span>© Solo Stack · Designstudie</span>
+			<div>
+				<a href="../index.html">Alle Konzepte ↗</a
+				><button style="border: 0; background: none; padding: 0; color: inherit; font: inherit" data-demo="Rechtstexte folgen in der echten Website.">
+					Impressum / Datenschutz
+				</button>
+			</div>
+		</footer>
+		<script src="../assets/common.js"></script>
+		<script src="loader.js"></script>
+	</body>
+</html>

@@ -1,0 +1,37 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "solo-stack-web",
+	"compatibility_date": "2026-10-30",
+	"compatibility_flags": ["nodejs_als"],
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	// Inherited by every environment: no public *.workers.dev or version/preview URLs,
+	// not even for an accidental `wrangler deploy` without `--env`.
+	"workers_dev": false,
+	"preview_urls": false,
+	"upload_source_maps": true,
+	"observability": {
+		"enabled": true
+	},
+	// Workers Cache only stores responses that set Cache-Control. Its key is the path
+	// (not cookies or Accept-Language), which is why i18n uses the URL strategy.
+	"cache": {
+		"enabled": true
+	},
+	"dev": {
+		"ip": "0.0.0.0",
+		"port": 8787
+	},
+	// Bindings and `vars` are not inherited: repeat them in every environment.
+	"env": {
+		"staging": {
+			"routes": [{ "pattern": "staging.solo-stack.dev", "custom_domain": true }]
+		},
+		"production": {
+			"routes": [{ "pattern": "solo-stack.dev", "custom_domain": true }]
+		}
+	}
+}
