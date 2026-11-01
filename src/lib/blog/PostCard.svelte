@@ -21,7 +21,8 @@
 	let { post, featured = false, eager = false }: Props = $props();
 </script>
 
-<article class={['post-card group', featured && 'is-featured']} lang={post.lang}>
+<!-- `lang` marks only the post's own text: the format, date and reading time are page UI in the page locale -->
+<article class={['post-card group', featured && 'is-featured']}>
 	<div class="thumb">
 		{#if post.youtubeId}
 			<img src={thumbnailPath(post.youtubeId)} alt="" width="1280" height="720" loading={eager ? 'eager' : 'lazy'} decoding="async" />
@@ -39,10 +40,10 @@
 			<span aria-hidden="true">·</span>
 			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
 		</p>
-		<h2 class="title">
-			<a href={postHref(post)}>{post.title}</a>
+		<h2 class="title" lang={post.lang}>
+			<a href={postHref(post)} hreflang={post.lang}>{post.title}</a>
 		</h2>
-		<p class="teaser">{post.description}</p>
+		<p class="teaser" lang={post.lang}>{post.description}</p>
 	</div>
 </article>
 

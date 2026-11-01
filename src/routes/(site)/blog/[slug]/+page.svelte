@@ -92,7 +92,7 @@
 	<meta property="og:locale" content={post.lang === 'de' ? 'de_DE' : 'en_US'} />
 	<meta property="article:published_time" content={post.publishedAt} />
 	{#if post.updatedAt}<meta property="article:modified_time" content={post.updatedAt} />{/if}
-	{#each post.tags as tag (tag)}<meta property="article:tag" content={tag} />{/each}
+	{#each post.tags as tag, index (index)}<meta property="article:tag" content={tag} />{/each}
 	{#if image}
 		<meta property="og:image" content={image} />
 		<meta property="og:image:width" content="1280" />
@@ -124,7 +124,7 @@
 		<h1 class="mt-4 font-display text-4xl leading-tight font-black tracking-tight text-balance sm:text-5xl">{post.title}</h1>
 		{#if post.tags.length}
 			<ul class="mt-5 flex flex-wrap gap-2" aria-label={m.blog_tags_label()}>
-				{#each post.tags as tag (tag)}
+				{#each post.tags as tag, index (index)}
 					<li class="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">{tag}</li>
 				{/each}
 			</ul>
@@ -156,7 +156,7 @@
 			<section aria-labelledby="chapters-title">
 				<h2 id="chapters-title" class="section-title">{m.blog_chapters_title()}</h2>
 				<ol class="chapters mt-4">
-					{#each post.chapters as chapter (chapter.start)}
+					{#each post.chapters as chapter, index (index)}
 						{@const time = formatTimestamp(chapter.start)}
 						<li>
 							<a
@@ -177,7 +177,7 @@
 			<section aria-labelledby="takeaways-title">
 				<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
 				<ul class="takeaways mt-4">
-					{#each post.takeaways as takeaway (takeaway)}
+					{#each post.takeaways as takeaway, index (index)}
 						<li>{takeaway}</li>
 					{/each}
 				</ul>
@@ -197,7 +197,7 @@
 						<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
 					</summary>
 					<div class="transcript-body">
-						{#each post.transcript as segment (segment.start)}
+						{#each post.transcript as segment, index (index)}
 							<p>
 								{#if watchUrl}
 									<a href={`${watchUrl}&t=${segment.start}s`} class="time" onclick={(event) => seek(event, segment.start)}>{formatTimestamp(segment.start)}</a>
@@ -214,7 +214,7 @@
 			<section aria-labelledby="links-title">
 				<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
 				<ul class="links mt-4">
-					{#each post.links as link (link.url)}
+					{#each post.links as link, index (index)}
 						<li>
 							<a href={link.url} target="_blank" rel="noopener">
 								<span>{link.label}</span>
