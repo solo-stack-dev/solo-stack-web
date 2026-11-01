@@ -7,6 +7,7 @@ Built-in `image_gen` was used for every original illustration and pose edit. Hig
 Status: rejected: legs too long
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
 - `D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg`
@@ -23,6 +24,7 @@ Use case: stylized-concept. Production character model sheet for solo-stack.dev,
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
 - `D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg`
@@ -40,6 +42,7 @@ CRITICAL PROPORTION CORRECTION: In every full-body turnaround, distance from cro
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
@@ -55,6 +58,7 @@ Asset: mascot-hero-moonrim.png. One full-body figure, three-quarter front facing
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
@@ -71,6 +75,7 @@ Asset: mascot-nightshift-typing@1.png, base frame for a three-frame typing loop.
 Status: selected; generated hand patch
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
 
@@ -85,6 +90,7 @@ Use case: precise-object-edit. Reference 1 is the fixed approved identity model 
 Status: selected; generated hand patch
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
 
@@ -99,6 +105,7 @@ Use case: precise-object-edit. Reference 1 is the approved identity model sheet.
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/06-video-sunrise/01-video-cinema-desktop-facade.png`
@@ -115,6 +122,7 @@ Asset: mascot-cinema-sitting.png. Third reference supplies the cinema pose and v
 Status: selected (retained drawing; full walk loop still requires animation cleanup)
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
@@ -130,6 +138,7 @@ Asset: mascot-sunrise-walk@1.png. FIRST frame of a four-frame side-view walk cyc
 Status: superseded: passing pose refined
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-sunrise-walk@1.png`
 
@@ -144,6 +153,7 @@ Use case: identity-preserve animation edit. Reference 1 is the approved model sh
 Status: rejected: near/far leg overlap did not reverse
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-sunrise-walk@1.png`
 
@@ -158,6 +168,7 @@ Use case: identity-preserve animation edit. Reference 1 approved character model
 Status: selected: opposite outer seam and arm swing (retained drawing; full walk loop still requires animation cleanup)
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-sunrise-walk@1.png`
 
@@ -172,6 +183,7 @@ Use case: precise-object-edit for an animation. Image 1 is mandatory identity mo
 Status: selected (retained drawing; full walk loop still requires animation cleanup)
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-sunrise-walk@1.png`
 
@@ -186,6 +198,7 @@ Use case: identity-preserve animation edit. Reference 1 approved model sheet. Re
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
@@ -201,6 +214,7 @@ Asset: mascot-404-lost.png. One small full-body standing mascot with a gently co
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-hero-moonrim.png`
 
@@ -215,6 +229,7 @@ Use case: lighting-weather and palette edit. Reference 1 is the approved mascot 
 Status: selected
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
@@ -229,6 +244,7 @@ Use case: stylized-concept. Highest available quality. Reference 1 is the approv
 Status: rejected: passing pose improved but upper-body scale drifted from padded reference
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-sunrise-walk@1.png`
 
@@ -243,6 +259,7 @@ Production animation drawing, maximum available quality. Image 1 is the approved
 Status: selected: revised passing pose (retained drawing; full walk loop still requires animation cleanup)
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:\Users\peter\.codex\generated_images\01a194d5-d01c-7912-9b90-bad12c5e63be\exec-528c43cb-6541-4a68-9dce-4b2f1c1c81e6.png`
 
@@ -257,6 +274,7 @@ Precise production animation edit. Reference 1 is the approved mascot identity m
 Status: rejected: extra arm; opposite leg overlap still unreliable
 
 Ordered reference image paths:
+
 - `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
 - `C:\Users\peter\.codex\generated_images\01a194d5-d01c-7912-9b90-bad12c5e63be\exec-528c43cb-6541-4a68-9dce-4b2f1c1c81e6.png`
 

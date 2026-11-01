@@ -12,22 +12,22 @@ The model sheet, hero, typing loop, cinema pose, 404 pose, golden variant and ga
 
 All byte counts are exact; dimensions describe the complete canvas, including transparent padding.
 
-| File | Pixels | Bytes | Background | Intended use |
-| --- | --- | ---: | --- | --- |
-| [`mascot-404-lost.png`](mascot-404-lost.png) | 1024 × 1536 | 2062494 | RGBA transparency | §5.8 — small confused figure for ink-void 404; bottom anchor approximately (535, 1489). |
-| [`mascot-cinema-sitting.png`](mascot-cinema-sitting.png) | 1254 × 1254 | 1280056 | RGBA transparency | §5.6 — behind/three-quarter spectator, looking right/up. Seat anchor approximately (530, 1115); cliff and laptop are separate. |
-| [`mascot-game-sprite-master.png`](mascot-game-sprite-master.png) | 1254 × 1254 | 870272 | RGBA transparency | §5.3 — native generated master retained for future size exports; not a runtime import. |
-| [`mascot-game-sprite.png`](mascot-game-sprite.png) | 64 × 64 | 4634 | RGBA transparency | §5.3 — actual 64×64 prototype sprite; figure is 30×60 inside the canvas, bottom-center anchor (32, 62). |
-| [`mascot-golden.png`](mascot-golden.png) | 1024 × 1536 | 2204507 | RGBA transparency | §5.8 / §5.1 — golden shiny hero replacement; same approximate seat anchor (740, 980). Includes small sparkle marks. |
-| [`mascot-hero-moonrim.png`](mascot-hero-moonrim.png) | 1024 × 1536 | 2151110 | RGBA transparency | §5.1 — hero, sitting on an independently rendered moon. Seat anchor approximately (740, 980). No rim is painted. |
-| [`mascot-model-sheet-v2.png`](mascot-model-sheet-v2.png) | 1536 × 1024 | 2852962 | Opaque paper | §3.4 / §6.2 — identity and palette reference; opaque cream paper. Four turnarounds, six expressions and unlabeled swatches. |
-| [`mascot-nightshift-typing@1.png`](mascot-nightshift-typing@1.png) | 1024 × 1536 | 2084332 | RGBA transparency | §5.4 — typing base and reduced-motion still; figure and complete chair only. |
-| [`mascot-nightshift-typing@2.png`](mascot-nightshift-typing@2.png) | 1024 × 1536 | 2604770 | RGBA transparency | §5.4 — second typing beat; generated hands assembled over frame 1. |
-| [`mascot-nightshift-typing@3.png`](mascot-nightshift-typing@3.png) | 1024 × 1536 | 2613299 | RGBA transparency | §5.4 — third typing beat; generated hands assembled over frame 1. |
-| [`mascot-sunrise-walk@1.png`](mascot-sunrise-walk@1.png) | 1152 × 1600 | 2611263 | RGBA transparency | §5.7 — first contact drawing; animation cleanup still required for the complete loop. |
-| [`mascot-sunrise-walk@2.png`](mascot-sunrise-walk@2.png) | 1152 × 1600 | 2496664 | RGBA transparency | §5.7 — revised passing drawing; animation cleanup still required for the complete loop. |
-| [`mascot-sunrise-walk@3.png`](mascot-sunrise-walk@3.png) | 1152 × 1600 | 2558103 | RGBA transparency | §5.7 — opposite-step candidate; leg overlap is not sufficiently distinct from frame 1. |
-| [`mascot-sunrise-walk@4.png`](mascot-sunrise-walk@4.png) | 1152 × 1600 | 2466100 | RGBA transparency | §5.7 — raised-knee passing candidate; knee lift is stronger than a relaxed walk. |
+| File                                                               | Pixels      |   Bytes | Background        | Intended use                                                                                                                   |
+| ------------------------------------------------------------------ | ----------- | ------: | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| [`mascot-404-lost.png`](mascot-404-lost.png)                       | 1024 × 1536 | 2062494 | RGBA transparency | §5.8 — small confused figure for ink-void 404; bottom anchor approximately (535, 1489).                                        |
+| [`mascot-cinema-sitting.png`](mascot-cinema-sitting.png)           | 1254 × 1254 | 1280056 | RGBA transparency | §5.6 — behind/three-quarter spectator, looking right/up. Seat anchor approximately (530, 1115); cliff and laptop are separate. |
+| [`mascot-game-sprite-master.png`](mascot-game-sprite-master.png)   | 1254 × 1254 |  870272 | RGBA transparency | §5.3 — native generated master retained for future size exports; not a runtime import.                                         |
+| [`mascot-game-sprite.png`](mascot-game-sprite.png)                 | 64 × 64     |    4634 | RGBA transparency | §5.3 — actual 64×64 prototype sprite; figure is 30×60 inside the canvas, bottom-center anchor (32, 62).                        |
+| [`mascot-golden.png`](mascot-golden.png)                           | 1024 × 1536 | 2204507 | RGBA transparency | §5.8 / §5.1 — golden shiny hero replacement; same approximate seat anchor (740, 980). Includes small sparkle marks.            |
+| [`mascot-hero-moonrim.png`](mascot-hero-moonrim.png)               | 1024 × 1536 | 2151110 | RGBA transparency | §5.1 — hero, sitting on an independently rendered moon. Seat anchor approximately (740, 980). No rim is painted.               |
+| [`mascot-model-sheet-v2.png`](mascot-model-sheet-v2.png)           | 1536 × 1024 | 2852962 | Opaque paper      | §3.4 / §6.2 — identity and palette reference; opaque cream paper. Four turnarounds, six expressions and unlabeled swatches.    |
+| [`mascot-nightshift-typing@1.png`](mascot-nightshift-typing@1.png) | 1024 × 1536 | 2084332 | RGBA transparency | §5.4 — typing base and reduced-motion still; figure and complete chair only.                                                   |
+| [`mascot-nightshift-typing@2.png`](mascot-nightshift-typing@2.png) | 1024 × 1536 | 2604770 | RGBA transparency | §5.4 — second typing beat; generated hands assembled over frame 1.                                                             |
+| [`mascot-nightshift-typing@3.png`](mascot-nightshift-typing@3.png) | 1024 × 1536 | 2613299 | RGBA transparency | §5.4 — third typing beat; generated hands assembled over frame 1.                                                              |
+| [`mascot-sunrise-walk@1.png`](mascot-sunrise-walk@1.png)           | 1152 × 1600 | 2611263 | RGBA transparency | §5.7 — first contact drawing; animation cleanup still required for the complete loop.                                          |
+| [`mascot-sunrise-walk@2.png`](mascot-sunrise-walk@2.png)           | 1152 × 1600 | 2496664 | RGBA transparency | §5.7 — revised passing drawing; animation cleanup still required for the complete loop.                                        |
+| [`mascot-sunrise-walk@3.png`](mascot-sunrise-walk@3.png)           | 1152 × 1600 | 2558103 | RGBA transparency | §5.7 — opposite-step candidate; leg overlap is not sufficiently distinct from frame 1.                                         |
+| [`mascot-sunrise-walk@4.png`](mascot-sunrise-walk@4.png)           | 1152 × 1600 | 2466100 | RGBA transparency | §5.7 — raised-knee passing candidate; knee lift is stronger than a relaxed walk.                                               |
 
 ## Transparency and inspection
 

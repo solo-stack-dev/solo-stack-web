@@ -11,7 +11,6 @@ All references were opened and inspected. Catalog numbers below are one-based; e
 5. `docs/mockups/round-2/07-full-page/01-painted-night-lightbox-desktop.png`
 6. `D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg`
 
-
 ## paper-grain.png
 
 References: catalog 1, catalog 6.
