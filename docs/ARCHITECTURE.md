@@ -63,6 +63,18 @@ Paraglide compiles `messages/*.json` into `src/lib/paraglide/` (generated, git i
 - Staging is publicly reachable and would be indexed. Put it behind Cloudflare Access (Zero Trust, free tier); that also covers prerendered pages and static assets, which the Worker's hooks never see.
 - Run `pnpm gen` after changing bindings in `wrangler.jsonc` to regenerate `worker-configuration.d.ts`. Keep `compatibility_date` at or below what the installed `workerd` supports, or `wrangler dev` refuses to start.
 
+## Site pages and blog (built)
+
+Every page except the homepage lives in the route group `src/routes/(site)/`. Its `+layout.svelte` is generic: `<ModeWatcher defaultMode="system">` (light/dark, choice in localStorage, head script against a theme flash), the sticky navbar, the footer, and the page surface (`bg-background`, marked `data-site-surface`). New pages (stats, contact, legal) just drop into the group and set their own `prerender`.
+
+- **Navbar:** one component, `src/lib/components/site/SiteNav.svelte`, links from `links.ts` (Start, Blog, Stats). `variant="site"` on the (site) pages (theme toggle and the phone sheet are passed in as `actions`, so the homepage never ships them); `variant="night"` is the transparent bar over the homepage night, rendered by `NightPage` with its section menu button as the action. On phones the night bar shows only the wordmark and the section menu; the menu overlay lists the site links. The Stats link has `rel="external"` until `src/routes/(site)/stats/+page.svelte` exists (detected at build time), so the prerender crawler does not fail on it.
+- **Theme scope:** `layout.css` switches `html` background and `color-scheme` to the theme only while `[data-site-surface]` is in the page; everywhere else (homepage, error pages) the night wins, also after a client side navigation from a light page.
+- **Posts:** `src/content/blog/<slug>.md` (mdsvex), frontmatter validated by `src/lib/blog/schema.ts` (an invalid post fails the build). `src/lib/blog/posts.remote.ts` has the prerendered `getPosts` / `getPost` remote functions (reading time from the raw Markdown); `content.ts` loads the rendered body as one lazy chunk per post. Drafts (`draft: true`) are only listed and built in dev.
+- **Pages:** `/blog` (newest first, client side format filter mirrored to `?format=`), `/blog/[slug]` (video facade, summary, chapters that seek the player, takeaways, body, collapsible transcript, links). Post links always point to the post's own language; the root layout skips its hreflang alternates on post pages, which emit their own canonical and hreflang.
+- **Video facade** (`src/lib/blog/VideoFacade.svelte`): self-hosted thumbnail via the cinema's prerendered `/media/video-thumbnail/[id].jpg`, youtube-nocookie iframe on click, chapter seeks via the IFrame API `postMessage` protocol (no API script). Without `youtubeId` the painted night with a "video follows" note is shown and no `VideoObject` is emitted.
+- **SEO:** `BlogPosting` (+ `VideoObject` with clips and transcript when a video exists) as one JSON-LD `@graph`, canonical, Open Graph, Twitter card.
+- **TODO:** `sitemap.xml` (super-sitemap, exclude `^/lab/`) and the RSS feed do not exist yet; add `/blog` and the posts there.
+
 ## Blog pipeline (Proposed)
 
 Goal: every published YouTube video becomes a blog post without manual writing.
@@ -81,7 +93,7 @@ Recommended shape:
 
 - **Posts are Markdown files in the repo** (`src/content/blog/*.md`, rendered by mdsvex). This keeps posts reviewable in Git, editable by hand, fully prerendered, and fast. No database needed.
 - **Generation runs outside the Worker**, as a script (`scripts/`) triggered by a scheduled GitHub Action or locally via Codex. It uses the OpenAI API with model `gpt-6.1-sol`. The Worker never calls the model at request time.
-- **Frontmatter schema** (draft): `title`, `slug`, `description`, `youtubeId`, `publishedAt`, `durationSeconds`, `format` (`project` | `ai-test` | `ai-news` | `business`), `chapters[]`, `tags[]`, `lang`, `generatedBy: gpt-6.1-sol`.
+- **Frontmatter schema** (implemented in `src/lib/blog/schema.ts`): `title`, `slug` (= file name), `description`, `summary`, `youtubeId` (`null` until public), `publishedAt`, `updatedAt`, `durationSeconds`, `format` (`project` | `ai-test` | `ai-news` | `business`), `chapters[]` (`{ start, title }`), `takeaways[]`, `links[]` (`{ url, label }`), `transcript[]` (`{ start, text }`), `tags[]`, `lang`, `generatedBy: gpt-6.1-sol`, `draft`.
 - **Idempotent:** the YouTube video ID is the key; existing posts are never overwritten without an explicit flag, so manual edits survive.
 - The owner's GitHub profile already lists videos via a daily GitHub Action; the same trigger pattern can be reused.
 

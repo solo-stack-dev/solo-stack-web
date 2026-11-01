@@ -22,6 +22,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { on } from 'svelte/events';
+	import { page } from '$app/state';
+	import SiteNav from '#lib/components/site/SiteNav.svelte';
+	import { SITE_LINKS, siteCurrent, siteHref, siteRel } from '#lib/components/site/links.ts';
 	import { m } from '#lib/paraglide/messages.js';
 	import Eggs from './eggs/Eggs.svelte';
 	import { NIGHT_HOURS, NIGHT_HOUR_ATTR, skyBackground, type NightHourDef, type SectionId } from './night.ts';
@@ -55,7 +58,7 @@
 	const last = NIGHT_HOURS.length - 1;
 
 	let wrapper: HTMLDivElement;
-	let header: HTMLElement;
+	let header = $state<HTMLElement>();
 	let menu: HTMLDialogElement;
 	let menuOpen = $state(false);
 	let active = $state<SectionId>('hero');
@@ -169,7 +172,7 @@
 			const box = edge?.getBoundingClientRect();
 			// The paper starts below the cleared part of the night edge (or at the section top without an edge).
 			const paperTop = Math.max(section.top, box ? box.top + box.height * clear : section.top);
-			navOnPaper = paperTop < header.offsetHeight * 0.75;
+			navOnPaper = paperTop < (header?.offsetHeight ?? 0) * 0.75;
 			railOnPaper = paperTop < window.innerHeight / 2 - 80;
 		};
 		const schedule = () => {
@@ -256,12 +259,13 @@
 
 	<a class="skip-link" href="#main">{m.home_nav_skip()}</a>
 
-	<header bind:this={header} class="nav" data-tone={navOnPaper ? 'paper' : undefined}>
-		<a class="wordmark font-display text-lg font-black tracking-wordmark uppercase md:text-xl" href="#hero">SOLO STACK</a>
-		<button type="button" class="menu-button" aria-haspopup="dialog" aria-expanded={menuOpen} aria-label={m.home_nav_menu_open()} onclick={openMenu}>
-			<span class="menu-icon" aria-hidden="true"></span>
-		</button>
-	</header>
+	<SiteNav variant="night" bind:ref={header} tone={navOnPaper ? 'paper' : 'night'} hideWordmark={heroCovers} wordmarkHref="#hero">
+		{#snippet actions()}
+			<button type="button" class="menu-button" aria-haspopup="dialog" aria-expanded={menuOpen} aria-label={m.home_nav_menu_open()} onclick={openMenu}>
+				<span class="menu-icon" aria-hidden="true"></span>
+			</button>
+		{/snippet}
+	</SiteNav>
 
 	<dialog bind:this={menu} class="menu" aria-label={m.home_nav_menu_title()} onclose={() => (menuOpen = false)}>
 		<div class="menu-inner">
@@ -279,6 +283,14 @@
 						</li>
 					{/each}
 				</ol>
+			</nav>
+			<!-- The site pages; the bar shows them inline from 48rem, on phones they live here -->
+			<nav class="menu-site" aria-label={m.site_nav_label()}>
+				<ul>
+					{#each SITE_LINKS as link (link.id)}
+						<li><a href={siteHref(link)} rel={siteRel(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
+					{/each}
+				</ul>
 			</nav>
 		</div>
 	</dialog>
@@ -389,51 +401,6 @@
 		translate: -50% 0;
 	}
 
-	.nav {
-		position: fixed;
-		z-index: 4;
-		inset: 0 0 auto;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: clamp(1rem, 2.5vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem);
-		pointer-events: none;
-		color: var(--color-cream);
-		/* A soft halo in the opposite ink keeps the nav readable where it crosses a ragged edge (e.g. the night edge) */
-		--nav-halo: color-mix(in oklab, var(--color-ink) 55%, transparent);
-		transition: color 300ms ease;
-	}
-
-	/* The sunrise paper is under the nav (tracked, see the script) */
-	.nav[data-tone='paper'] {
-		color: var(--color-night);
-		--nav-halo: color-mix(in oklab, var(--color-butter) 70%, transparent);
-	}
-
-	.nav > * {
-		pointer-events: auto;
-		filter: drop-shadow(0 0 0.4rem var(--nav-halo));
-	}
-
-	.wordmark {
-		line-height: 1;
-		transition:
-			opacity 350ms ease,
-			translate 350ms ease,
-			visibility 0s;
-	}
-
-	/* The hero shows the giant wordmark: the small one fades in once the hero has scrolled up */
-	[data-hero-covers] .wordmark {
-		opacity: 0;
-		translate: 0 -0.5rem;
-		visibility: hidden;
-		transition:
-			opacity 250ms ease,
-			translate 250ms ease,
-			visibility 0s 250ms;
-	}
-
 	.menu-button,
 	.menu-close {
 		display: grid;
@@ -536,6 +503,44 @@
 	.menu-list a:hover,
 	.menu-list a[aria-current] {
 		color: var(--color-butter);
+	}
+
+	/* The site pages under the hours, as quiet mono labels like the clock times */
+	.menu-site {
+		margin-top: clamp(1.5rem, 4vh, 3rem);
+		padding-top: clamp(0.75rem, 2vh, 1.25rem);
+		border-top: 1px solid color-mix(in oklab, var(--color-cream) 14%, transparent);
+	}
+
+	.menu-site ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.5rem;
+	}
+
+	.menu-site a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
+		font-family: var(--font-mono);
+		font-size: 0.8125rem;
+		letter-spacing: var(--tracking-clock);
+		text-transform: uppercase;
+	}
+
+	.menu-site a:hover,
+	.menu-site a[aria-current] {
+		color: var(--color-butter);
+	}
+
+	.menu-site a[aria-current]::before {
+		content: '';
+		width: 0.35rem;
+		height: 0.35rem;
+		border-radius: 999px;
+		background: currentColor;
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
