@@ -1,0 +1,4 @@
+{
+	"de": { "blog_links_title": "Links zum Artikel", "blog_generated_note": "Ich habe diesen Artikel mit künstlicher Intelligenz ({model}) geschrieben." },
+	"en": { "blog_links_title": "Links for this article", "blog_generated_note": "I wrote this article with the AI model {model}." }
+}

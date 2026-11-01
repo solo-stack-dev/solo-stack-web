@@ -12,7 +12,7 @@ src/routes/+page.ts                prerender = true (lead)
 src/routes/lab/games/              playtest lab, noindex (game shell owner / lead)
 src/lib/home/
   night.ts                         NIGHT_HOURS: order, ids, clock times, sky colors (lead)
-  NightPage.svelte                 sky, --night, stars, grain, nav, menu, hour rail (lead)
+  NightPage.svelte                 sky, --night, stars, grain, nav (SiteNav night variant), menu, hour rail (lead)
   shared/                          shared components and helpers (lead; see §6)
   data/                            socials.ts, youtube(.remote).ts, github(.remote).ts (lead)
   sections/

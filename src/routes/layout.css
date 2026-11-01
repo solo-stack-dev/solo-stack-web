@@ -75,6 +75,8 @@
 	--sidebar-accent-foreground: #18191b;
 	--sidebar-border: #e6dcc3;
 	--sidebar-ring: #e2a93b;
+	/* Not a shadcn token: keyboard focus outline on the site pages (≥ 3:1 on the paper) */
+	--focus-ring: #9a4f12;
 }
 
 .dark {
@@ -109,6 +111,7 @@
 	--sidebar-accent-foreground: #fbf3dd;
 	--sidebar-border: rgb(251 243 221 / 0.1);
 	--sidebar-ring: #fcd772;
+	--focus-ring: #fcd772;
 }
 
 @theme inline {
@@ -177,6 +180,31 @@
 	 */
 	html[data-night-end] {
 		background-color: var(--color-butter);
+	}
+
+	/*
+	 * Non-home pages (src/routes/(site)/, marked with `data-site-surface`): the canvas follows the light/dark theme, so
+	 * overscroll and the first paint match the page. mode-watcher writes an inline `color-scheme` on <html>; outside the
+	 * site surface (homepage, error pages) the night always wins, also after a client side navigation from a light page.
+	 */
+	html:has([data-site-surface]) {
+		background-color: var(--background);
+		color: var(--foreground);
+		color-scheme: light;
+	}
+
+	html.dark:has([data-site-surface]) {
+		color-scheme: dark;
+	}
+
+	html:not(:has([data-site-surface])) {
+		color-scheme: dark !important;
+	}
+
+	/* Butter is too pale for a focus ring on the light paper: `--focus-ring` is a deep ochre there, butter in dark mode */
+	[data-site-surface] :focus-visible,
+	[data-slot='sheet-content'] :focus-visible {
+		outline-color: var(--focus-ring);
 	}
 
 	::selection {
