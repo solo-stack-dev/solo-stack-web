@@ -12,7 +12,7 @@ Any text that ships to visitors must be generated with OpenAI **`gpt-6.1-sol`**.
 
 ## Stack in one glance
 
-SvelteKit 3 + Svelte 5 (runes, experimental `async`) on Cloudflare Workers, Tailwind CSS 4, mdsvex for `.md`/`.svx`, Paraglide for i18n, valibot for validation, super-sitemap. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+SvelteKit 3 + Svelte 5 (runes, experimental `async`) on Cloudflare Workers, D1 via Drizzle ORM (schema `src/lib/db/schema.ts`, `pnpm db:generate`) plus KV, Tailwind CSS 4, mdsvex for `.md`/`.svx`, Paraglide for i18n, valibot for validation, super-sitemap. Details in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Conventions
 
