@@ -8,7 +8,7 @@
  *    full history. Most APIs only return "now", so start collecting early.
  * 2. After each run it builds the `Stats` object from the last `HISTORY_DAYS` days and writes it to KV
  *    (`KV`, key `stats:v1`).
- * 3. This function reads the snapshot: `await platform.env.KV.get('stats:v1', { type: 'json', cacheTtl: 3600 })`.
+ * 3. This function reads the snapshot: `await env.KV.get('stats:v1', { type: 'json', cacheTtl: 3600 })` (`env` from `cloudflare:workers`).
  *    The `cacheTtl` keeps it in the edge cache for an hour, so page views rarely hit KV and never hit D1.
  * 4. Fall back to the last good value (or the mock) when KV is empty, so the page never breaks.
  *

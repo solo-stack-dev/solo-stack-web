@@ -25,6 +25,12 @@ export const sendContact = form(ContactSchema, async ({ website, turnstile, ...m
 	}
 	if (!verified) invalid(issue.turnstile('turnstile'));
 
-	await deliverContactMessage(message);
+	try {
+		await deliverContactMessage(message);
+	} catch (cause) {
+		// Keep the message in the logs so a failed mail does not lose it.
+		console.error('Contact mail failed', { cause, topic: message.topic, name: message.name, email: message.email, message: message.message });
+		error(503, 'Contact form unavailable');
+	}
 	return { sent: true } as const;
 });

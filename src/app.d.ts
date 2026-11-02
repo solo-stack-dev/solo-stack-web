@@ -2,13 +2,7 @@
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Platform {
-			env: Env;
-			ctx: ExecutionContext;
-			caches: CacheStorage;
-			cf?: IncomingRequestCfProperties;
-		}
-
+		// No `Platform`: SvelteKit 3 moved Cloudflare bindings to `import { env } from 'cloudflare:workers'`.
 		// interface Error {}
 		// interface Locals {}
 		// interface PageData {}

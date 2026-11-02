@@ -6,10 +6,9 @@
  * (`turnstile.server.ts`), so the whole form works locally without any setup.
  */
 
-// TODO(owner): paste the site key of the Turnstile widget (dashboard > Turnstile > Add widget, hostnames
-// solo-stack.dev and staging.solo-stack.dev, mode Managed). Site keys are public, committing it is fine.
-// The secret goes into `.env.staging` / `.env.production` as TURNSTILE_SECRET_KEY.
-const SITE_KEY = '';
+// Site key of the Turnstile widget (hostnames solo-stack.dev and staging.solo-stack.dev, mode Managed). Site keys are
+// public, committing it is fine. The secret goes into `.env.staging` / `.env.production` as TURNSTILE_SECRET_KEY.
+const SITE_KEY = '0x4AAAAAAFxPRdhFUZe1Puyr';
 
 /** Official Turnstile test site key: always passes, visible widget. */
 const TEST_SITE_KEY = '1x00000000000000000000AA';

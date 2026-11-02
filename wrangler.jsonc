@@ -45,16 +45,32 @@
 			"id": "00000000000000000000000000000000"
 		}
 	],
+	// Contact form mails (src/lib/contact/deliver.server.ts) via Cloudflare Email Sending, onboarded for solo-stack.dev.
+	// Pinned sender and recipient; business@ is forwarded to the owner's inbox by Email Routing. Locally the binding is
+	// simulated (mail printed to the console, nothing sent).
+	"send_email": [
+		{
+			"name": "CONTACT_EMAIL",
+			"destination_address": "business@solo-stack.dev",
+			"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+		}
+	],
 	// Bindings and `vars` are not inherited: repeat them in every environment.
 	"env": {
 		"staging": {
 			"routes": [{ "pattern": "staging.solo-stack.dev", "custom_domain": true }],
+			"send_email": [
+				{
+					"name": "CONTACT_EMAIL",
+					"destination_address": "business@solo-stack.dev",
+					"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+				}
+			],
 			"d1_databases": [
 				{
 					"binding": "DB",
 					"database_name": "solo-stack-web-staging",
-					// TODO(cloudflare): id of the D1 database `solo-stack-web-staging` (`wrangler d1 create solo-stack-web-staging`)
-					"database_id": "TODO-staging-d1-database-id",
+					"database_id": "3a2bf35c-80d6-4099-8bcd-91e11ecf4896",
 					"migrations_dir": "migrations",
 					"migrations_pattern": "migrations/*/migration.sql"
 				}
@@ -62,19 +78,24 @@
 			"kv_namespaces": [
 				{
 					"binding": "KV",
-					// TODO(cloudflare): id of the KV namespace `solo-stack-web-staging`
-					"id": "TODO-staging-kv-namespace-id"
+					"id": "9811bb0a672143eab3060fe08b8f531f"
 				}
 			]
 		},
 		"production": {
 			"routes": [{ "pattern": "solo-stack.dev", "custom_domain": true }],
+			"send_email": [
+				{
+					"name": "CONTACT_EMAIL",
+					"destination_address": "business@solo-stack.dev",
+					"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+				}
+			],
 			"d1_databases": [
 				{
 					"binding": "DB",
 					"database_name": "solo-stack-web",
-					// TODO(cloudflare): id of the D1 database `solo-stack-web`
-					"database_id": "TODO-production-d1-database-id",
+					"database_id": "8f3f99f9-1fca-4305-8ea2-0351cacefff9",
 					"migrations_dir": "migrations",
 					"migrations_pattern": "migrations/*/migration.sql"
 				}
@@ -82,8 +103,7 @@
 			"kv_namespaces": [
 				{
 					"binding": "KV",
-					// TODO(cloudflare): id of the KV namespace `solo-stack-web`
-					"id": "TODO-production-kv-namespace-id"
+					"id": "30915a3709f441728ec41a971122b7ca"
 				}
 			]
 		}
