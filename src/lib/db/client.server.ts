@@ -4,19 +4,14 @@
  * Usage inside a remote function or other request code:
  *   const db = getDb();
  *   const rows = await db.select().from(dailyMetrics).where(eq(dailyMetrics.metric, 'followers'));
- * Outside a request (e.g. a `scheduled` handler) pass the Worker env: `getDb(env)`.
+ * Works in requests and in `scheduled` handlers alike: bindings come from `cloudflare:workers` (SvelteKit 3 has no
+ * `platform.env`; `pnpm dev` emulates the module via the adapter). Pass an env only to override it, e.g. in tests.
  */
-import { getRequestEvent } from '$app/server';
+import { env } from 'cloudflare:workers';
 import { drizzle } from 'drizzle-orm/d1';
 
-export function getDb(env: Env = requestEnv()) {
-	return drizzle(env.DB);
+export function getDb(bindings: Pick<Env, 'DB'> = env) {
+	return drizzle(bindings.DB);
 }
 
 export type Db = ReturnType<typeof getDb>;
-
-function requestEnv(): Env {
-	const env = getRequestEvent().platform?.env;
-	if (!env) throw new Error('No Cloudflare platform env: run inside the Worker (`pnpm dev` emulates it via the adapter).');
-	return env;
-}
