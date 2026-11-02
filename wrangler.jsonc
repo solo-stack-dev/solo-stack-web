@@ -25,21 +25,23 @@
 		"ip": "0.0.0.0",
 		"port": 8787
 	},
-	// Storage for /stats (docs/ARCHITECTURE.md#stats-page): D1 keeps the full daily history (source of truth,
-	// schema in `migrations/`), KV holds the finished `Stats` snapshot the page reads (`stats:v1`).
+	// App storage (docs/ARCHITECTURE.md#database): D1 `DB` is the database of this app (Drizzle schema in
+	// `src/lib/db/schema.ts`, migrations generated into `migrations/`), KV `KV` holds caches and snapshots
+	// (e.g. the /stats snapshot `stats:v1`). One database and one namespace per app and environment.
 	// The top-level bindings are for local dev only (`pnpm dev`, `pnpm preview`, `--local`): they are simulated
 	// in `.wrangler/state`, so the ids here are dummies and never touch a real resource.
 	"d1_databases": [
 		{
-			"binding": "STATS_DB",
-			"database_name": "solo-stack-stats-local",
+			"binding": "DB",
+			"database_name": "solo-stack-web-local",
 			"database_id": "00000000-0000-0000-0000-000000000000",
-			"migrations_dir": "migrations"
+			"migrations_dir": "migrations",
+			"migrations_pattern": "migrations/*/migration.sql"
 		}
 	],
 	"kv_namespaces": [
 		{
-			"binding": "STATS_KV",
+			"binding": "KV",
 			"id": "00000000000000000000000000000000"
 		}
 	],
@@ -49,17 +51,18 @@
 			"routes": [{ "pattern": "staging.solo-stack.dev", "custom_domain": true }],
 			"d1_databases": [
 				{
-					"binding": "STATS_DB",
-					"database_name": "solo-stack-stats-staging",
-					// TODO(cloudflare): id of the D1 database `solo-stack-stats-staging` (dashboard or `wrangler d1 create`)
+					"binding": "DB",
+					"database_name": "solo-stack-web-staging",
+					// TODO(cloudflare): id of the D1 database `solo-stack-web-staging` (`wrangler d1 create solo-stack-web-staging`)
 					"database_id": "TODO-staging-d1-database-id",
-					"migrations_dir": "migrations"
+					"migrations_dir": "migrations",
+					"migrations_pattern": "migrations/*/migration.sql"
 				}
 			],
 			"kv_namespaces": [
 				{
-					"binding": "STATS_KV",
-					// TODO(cloudflare): id of the KV namespace `solo-stack-stats-staging`
+					"binding": "KV",
+					// TODO(cloudflare): id of the KV namespace `solo-stack-web-staging`
 					"id": "TODO-staging-kv-namespace-id"
 				}
 			]
@@ -68,17 +71,18 @@
 			"routes": [{ "pattern": "solo-stack.dev", "custom_domain": true }],
 			"d1_databases": [
 				{
-					"binding": "STATS_DB",
-					"database_name": "solo-stack-stats",
-					// TODO(cloudflare): id of the D1 database `solo-stack-stats`
+					"binding": "DB",
+					"database_name": "solo-stack-web",
+					// TODO(cloudflare): id of the D1 database `solo-stack-web`
 					"database_id": "TODO-production-d1-database-id",
-					"migrations_dir": "migrations"
+					"migrations_dir": "migrations",
+					"migrations_pattern": "migrations/*/migration.sql"
 				}
 			],
 			"kv_namespaces": [
 				{
-					"binding": "STATS_KV",
-					// TODO(cloudflare): id of the KV namespace `solo-stack-stats`
+					"binding": "KV",
+					// TODO(cloudflare): id of the KV namespace `solo-stack-web`
 					"id": "TODO-production-kv-namespace-id"
 				}
 			]
