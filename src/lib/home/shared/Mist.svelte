@@ -38,6 +38,9 @@
 		gaps?: [number, number];
 		/** Mirror the strip horizontally, to vary a reused strip. */
 		mirror?: boolean;
+		/** Shift the (horizontally seamless) painting sideways by this share of its width, in %, wrapping around, so a
+		 *  reused strip shows a different silhouette. Default 0. */
+		offset?: number;
 		/** Vertical parallax travel each way (CSS length). Default `2.5rem`. */
 		drift?: string;
 		class?: string;
@@ -50,6 +53,7 @@
 		opacity = 0.7,
 		gaps = [28, 74],
 		mirror = false,
+		offset = 0,
 		drift = '2.5rem',
 		class: className = ''
 	}: Props = $props();
@@ -63,9 +67,16 @@
 		style:--mist-drift={drift}
 		style:--gap-a="{gaps[0]}%"
 		style:--gap-b="{gaps[1]}%"
+		style:--mist-offset="{offset}%"
 		style:opacity
 	>
-		<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
+		<div class="tiles">
+			<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
+			{#if offset}
+				<!-- the wrapped-around remainder of the shifted painting (same source, decoded once) -->
+				<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
+			{/if}
+		</div>
 	</div>
 </div>
 
@@ -88,10 +99,19 @@
 		mask-image:
 			radial-gradient(ellipse 20% 95% at var(--gap-a) 50%, transparent 15%, #000 100%), radial-gradient(ellipse 16% 95% at var(--gap-b) 55%, transparent 10%, #000 100%);
 		mask-composite: intersect;
+		overflow: clip;
+	}
+
+	.tiles {
+		display: flex;
+		width: 100%;
+		height: 100%;
+		translate: calc(var(--mist-offset) * -1) 0;
 	}
 
 	.strip :global(img) {
 		display: block;
+		flex: none;
 		width: 100%;
 		height: 100%;
 		/* the strips are horizontally seamless, so a squeezed aspect on narrow screens is fine */

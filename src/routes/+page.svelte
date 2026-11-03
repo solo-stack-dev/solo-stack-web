@@ -28,9 +28,9 @@
 	<Making />
 	<Mist variant="dusk" height="clamp(7rem, 15vw, 14rem)" above={0.3} opacity={0.6} gaps={[18, 64]} />
 	<Game />
-	<Mist variant="night" height="clamp(8rem, 18vw, 16rem)" above={0.55} opacity={0.6} gaps={[40, 86]} mirror />
+	<Mist variant="night" height="clamp(8rem, 18vw, 16rem)" above={0.35} opacity={0.6} gaps={[40, 86]} mirror />
 	<NightShift />
-	<Mist variant="night" height="clamp(8rem, 17vw, 15rem)" above={0.5} opacity={0.55} gaps={[30, 72]} />
+	<Mist variant="night" height="clamp(8rem, 17vw, 15rem)" above={0.5} opacity={0.55} gaps={[30, 72]} offset={37} />
 	<Radio />
 	<Mist variant="predawn" height="clamp(8rem, 18vw, 16rem)" above={0.45} opacity={0.65} gaps={[24, 58]} mirror />
 	<Cinema />

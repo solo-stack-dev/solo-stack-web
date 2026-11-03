@@ -744,6 +744,29 @@
 		}
 	}
 
+	/* The tagline leaves over the first 40 % of the making wipe (Making.svelte: the wipe runs over the first
+	   100svh − 45svh of page scroll), so it never meets the 21:00 clock and heading that follow the wash up.
+	   Listed before `settle`, which wins while it runs. */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: scroll()) {
+			.tagline {
+				animation:
+					tagline-out linear both,
+					settle 650ms 550ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+				animation-timeline: scroll(root block), auto;
+				animation-range:
+					0 22svh,
+					normal;
+			}
+		}
+	}
+
+	@keyframes tagline-out {
+		to {
+			opacity: 0;
+		}
+	}
+
 	/* Scroll cue --------------------------------------------------------------------------------------------- */
 
 	.scroll-cue {

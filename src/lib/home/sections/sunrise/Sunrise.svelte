@@ -175,7 +175,13 @@
 		color: var(--color-night);
 		/* the bottom of the 04:00 cinema (its --ink-fade), continued by the retreating night */
 		--ink-fade: #1c1d1d;
-		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
+		/* The clock sits on the retreating night until its ink clears the clock (--sunrise ≈ 0.88 → 0.95, see .night),
+		   then on the paper: cream ink first, anthracite after, like the nav. */
+		--night-clock-color: color-mix(
+			in oklab,
+			color-mix(in oklab, var(--color-cream) 85%, transparent),
+			color-mix(in oklab, var(--color-night) 85%, transparent) calc(clamp(0, (var(--sunrise) - 0.88) / 0.07, 1) * 100%)
+		);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -342,42 +348,49 @@
 
 	/*
 	 * The night retreats upward (the 04:00 → 06:00 ink-wash wipe): solid ink in the color of the cinema's bottom, ending
-	 * in the painted drying wash with tide lines, plus a layer of the wet bloom wash at another size and offset (added;
-	 * shared/transitions.ts), so the front has lobes and changes shape as it moves. As --sunrise runs 0 → 1 it pulls
-	 * back by --night-travel (a translate, no layout) and dries: the wet ramp tightens from 42svh to 20svh. It always
-	 * covers the section's top line, so the cinema's bottom never meets the paper at a straight edge. Reduced motion /
-	 * no JS: the final state, static.
+	 * in the product (intersect) of the painted drying wash and the wet bloom wash at another size and offset
+	 * (shared/transitions.ts): the front has crisp lobes and tide lines, changes shape as it moves and never repeats
+	 * visibly, and the washes' soft even haze squares away instead of reading as fog. Both tile sideways near their
+	 * painted (square) aspect.
+	 *
+	 * As --sunrise runs 0 → 1 the night pulls back by --night-travel (a translate, no layout; it speeds up over the
+	 * last fifth) and dries: the ramp tightens from 55svh to 16svh. At the start the wash begins right under the
+	 * cinema's painted bottom (no flat ink block). The ramp's opaque top always covers the section's top line while
+	 * that line is more than ~5svh below the viewport top, so the cinema's ink bottom never meets the paper at a
+	 * straight edge; at the page end the ink is gone below ~6svh, clear of the 06:00 clock. Reduced motion / no JS:
+	 * the final state, static.
 	 */
 	.night {
-		--night-ramp: calc(42svh - 22svh * var(--sunrise));
-		--night-travel: -41svh;
+		--night-ramp: calc(55svh - 39svh * var(--sunrise));
+		--night-late: max(0, (var(--sunrise) - 0.8) * 5);
+		--night-travel: calc(-31svh * var(--sunrise) - 9svh * var(--night-late) * var(--night-late));
 		position: absolute;
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 65svh;
-		translate: 0 calc(var(--night-travel) * var(--sunrise));
+		height: 48svh;
+		translate: 0 var(--night-travel);
 		background: var(--ink-fade);
 		pointer-events: none;
 		mask-image: linear-gradient(#000 0 0), var(--wash-dry), var(--wash-spread-down);
-		/* the ramps tile sideways near their painted aspect instead of being squashed to the full width */
 		mask-repeat: no-repeat, repeat-x, repeat-x;
 		mask-size:
 			100% calc(100% - var(--night-ramp) * 0.9),
-			max(55%, var(--night-ramp) * 1.9) var(--night-ramp),
-			max(70%, var(--night-ramp) * 2.4) calc(var(--night-ramp) * 1.1);
+			calc(var(--night-ramp) * 1.2) var(--night-ramp),
+			calc(var(--night-ramp) * 1.5) calc(var(--night-ramp) * 1.1);
 		mask-position:
 			0 0,
-			0 100%,
-			calc(20% + var(--sunrise) * 40%) calc(100% + var(--night-ramp) * 0.1);
+			calc(var(--sunrise) * -18svh) 100%,
+			calc(37% + var(--sunrise) * 24svh) calc(100% + var(--night-ramp) * 0.1);
+		mask-composite: add, intersect, add;
 	}
 
-	/* The part of .night that still carries ink (above the transparent tail of the ramp): NightPage's nav/rail ink
-	   switch reads this box (data-night-edge, data-edge-clear="1"). */
+	/* The part of .night that still carries ink (down to where the ramp is about half transparent): NightPage's
+	   nav/rail ink switch reads this box (data-night-edge, data-edge-clear="1"). */
 	.night-clear {
 		position: absolute;
 		inset: 0 0 auto;
-		height: calc(100% - 6svh);
+		height: calc(100% - var(--night-ramp) * 0.45);
 	}
 
 	.bar {
