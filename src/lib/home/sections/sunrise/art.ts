@@ -12,5 +12,5 @@ export const ART_BOXES = {
 	valley: { canvas: { width: 2560, height: 900 }, crop: { x: 0, y: 256, width: 2560, height: 641 } },
 	cliffPath: { canvas: { width: 2560, height: 600 }, crop: { x: 0, y: 38, width: 2560, height: 534 } },
 	coffee: { canvas: { width: 600, height: 600 }, crop: { x: 5, y: 141, width: 592, height: 424 } },
-	laptop: { canvas: { width: 1200, height: 600 }, crop: { x: 89, y: 117, width: 995, height: 403 } }
+	laptop: { canvas: { width: 1400, height: 700 }, crop: { x: 35, y: 145, width: 1334, height: 487 } }
 } as const satisfies Record<string, ArtBox>;

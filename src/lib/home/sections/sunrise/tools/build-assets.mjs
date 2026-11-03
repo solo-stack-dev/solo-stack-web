@@ -9,8 +9,10 @@
 //
 // - `portrait` job (not part of the default run; its source is the owner photo outside the repo): the footer's
 //   ink print. Crop to head and shoulders, key out the butter backdrop, turn luminance into ink density (anthracite
-//   with alpha = density), feather the shoulders and sides into the paper, and break the ink a little with the shared
-//   paper grain. Sunrise.svelte multiplies it onto the butter paper.
+//   with alpha = density, mids pushed dark), then print it: the density is compressed to a few flat ink levels,
+//   dithered with the shared paper grain, and the bust ends in the shared painted soft edge (feather-down) instead
+//   of a grey gradient, so the fade dissolves into ink specks like a print. Sunrise.svelte multiplies it onto the
+//   butter paper.
 //
 // Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs [portrait]
 // Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
@@ -22,6 +24,7 @@ const root = fileURLToPath(new URL('../../../../../../', import.meta.url));
 const sharp = createRequire(`${root}node_modules/.pnpm/node_modules/`)('sharp');
 const assets = (name) => fileURLToPath(new URL(`../assets/${name}`, import.meta.url));
 const master = (path) => `${root}docs/art/${path}`;
+const shared = (name) => fileURLToPath(new URL(`../../../shared/assets/${name}`, import.meta.url));
 
 /** The paintings were generated at ~1670–2120 px and upsampled to the masters; 1920 keeps all native detail. */
 const MAX_WIDTH = 1920;
@@ -94,11 +97,18 @@ const PORTRAIT = {
 	/** Backdrop key on G − B (butter ≈ 70–110, skin ≈ −10–5, hair/shirt ≈ 0): fully paper above `to`. */
 	key: { from: 22, to: 48 },
 	/** Luminance → ink: L ≤ black is full ink, L ≥ paper is no ink; `gamma` > 1 keeps the skin tones light, like a print. */
-	tone: { black: 30, paper: 214, gamma: 1.3 },
-	/** Feather into the paper (fractions of the crop): bottom ramp, side ramps. */
-	feather: { bottom: 0.28, side: 0.14 },
-	/** How much the paper grain tile breaks up the ink (0…1). */
-	grain: 0.32,
+	tone: { black: 30, paper: 214, gamma: 1.45 },
+	/** Pushes the mid densities toward the anthracite (> 1 = darker mids; the hair and shirt print as solid ink). */
+	mids: 1.8,
+	/** The printed ink densities (alpha), lightest to darkest; a pixel snaps to the nearest one (or paper). */
+	levels: [0.32, 0.62, 0.9],
+	/** Extra headroom before the lightest level prints, so the lit skin stays clean paper. */
+	paper: 0.08,
+	/** Grain dither amplitude (in density units): how far the paper grain moves a pixel across a level boundary. */
+	dither: 0.2,
+	/** Feather into the paper: the painted bottom edge repeats `repeat` times across (its height follows its painted
+	 *  aspect), shifted by `shift` px; side ramps as fractions of the width. */
+	feather: { repeat: 2, shift: 57, side: 0.12 },
 	ink: [24, 25, 27]
 };
 
@@ -107,37 +117,69 @@ const smoothstep = (a, b, x) => {
 	return t * t * (3 - 2 * t);
 };
 
+/** One channel of an image as 0…1 floats, resized to width × height. */
+async function channel(file, index, width, height, extract) {
+	let image = sharp(file).ensureAlpha();
+	if (extract) image = image.extract(extract);
+	const data = await image.resize(width, height, { fit: 'fill', kernel: 'lanczos3' }).extractChannel(index).raw().toBuffer();
+	return Float32Array.from(data, (value) => value / 255);
+}
+
 async function portrait() {
 	if (!existsSync(PORTRAIT_SOURCE)) return console.warn('portrait source not found, skipped:', PORTRAIT_SOURCE);
 	const { width, height } = { width: PORTRAIT.width, height: Math.round((PORTRAIT.crop.height * PORTRAIT.width) / PORTRAIT.crop.width) };
 	const data = await sharp(PORTRAIT_SOURCE).removeAlpha().extract(PORTRAIT.crop).resize(width, height, { kernel: 'lanczos3' }).raw().toBuffer();
-	const grainFile = fileURLToPath(new URL('../../../shared/assets/paper-grain.png', import.meta.url));
+
+	// Dither noise: the painted paper grain's alpha, rank-normalized to an even 0…1 spread (the tile is bimodal).
+	const grainFile = shared('paper-grain.webp');
 	const grainInfo = await sharp(grainFile).metadata();
-	const grain = await sharp(grainFile).ensureAlpha().extractChannel(3).raw().toBuffer();
+	const grainRaw = await channel(grainFile, 3, grainInfo.width, grainInfo.height);
+	const order = Array.from(grainRaw.keys()).toSorted((a, b) => grainRaw[a] - grainRaw[b]);
+	const grain = new Float32Array(grainRaw.length);
+	order.forEach((index, rank) => (grain[index] = rank / (order.length - 1)));
+
+	// The shared painted wash edge (opaque above, transparent below; the sunrise night's drying wash): its ramp rows at
+	// their painted aspect, tiled twice across the bust, so the blooms and tide lines keep their shape.
+	const featherFile = shared('transitions/wash-dry.webp');
+	const featherInfo = await sharp(featherFile).metadata();
+	const ramp = { top: Math.round(featherInfo.height * 0.18), bottom: Math.round(featherInfo.height * 0.82) };
+	const tileWidth = Math.round(width / PORTRAIT.feather.repeat);
+	const bandHeight = Math.round((tileWidth * (ramp.bottom - ramp.top)) / featherInfo.width);
+	const feather = await channel(featherFile, 3, tileWidth, bandHeight, { left: 0, top: ramp.top, width: featherInfo.width, height: ramp.bottom - ramp.top });
+
 	const out = Buffer.alloc(width * height * 4);
-	const { key, tone, feather } = PORTRAIT;
+	const { key, tone, levels } = PORTRAIT;
 	for (let y = 0; y < height; y++) {
-		const fy = y / (height - 1);
-		const bottom = 1 - smoothstep(1 - feather.bottom, 1, fy);
+		const band = y - (height - bandHeight);
 		for (let x = 0; x < width; x++) {
 			const fx = x / (width - 1);
-			const side = smoothstep(0, feather.side, fx) * smoothstep(0, feather.side, 1 - fx);
+			const side = smoothstep(0, PORTRAIT.feather.side, fx) * smoothstep(0, PORTRAIT.feather.side, 1 - fx);
+			const bottom = band < 0 ? 1 : feather[band * tileWidth + ((x + PORTRAIT.feather.shift) % tileWidth)];
 			const i = (y * width + x) * 3;
 			const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
 			const backdrop = smoothstep(key.from, key.to, g - b);
 			const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 			const ink = Math.pow(1 - smoothstep(tone.black, tone.paper, lum), tone.gamma);
-			const paper = grain[(y % grainInfo.height) * grainInfo.width + (x % grainInfo.width)] / 255;
-			const density = ink * (1 - backdrop) * bottom * side * (1 - PORTRAIT.grain * paper);
+			const dark = 1 - Math.pow(1 - ink, PORTRAIT.mids);
+			const noise = grain[(y % grainInfo.height) * grainInfo.width + (x % grainInfo.width)] - 0.5;
+			const value = dark * (1 - backdrop) * bottom * side + noise * PORTRAIT.dither;
+			// print: snap to the nearest ink level (or paper)
+			let density = 0;
+			levels.forEach((level, index) => {
+				if (value >= (level + (levels[index - 1] ?? 0)) / 2 + (index === 0 ? PORTRAIT.paper : 0)) density = level;
+			});
 			const o = (y * width + x) * 4;
 			out.set(PORTRAIT.ink, o);
-			out[o + 3] = density < 3 / 255 ? 0 : Math.round(density * 255);
+			out[o + 3] = Math.round(density * 255);
 		}
 	}
-	const info = await sharp(out, { raw: { width, height, channels: 4 } })
-		.webp(WEBP)
-		.toFile(assets('sunrise-portrait.webp'));
-	console.log(`${'sunrise-portrait.webp'.padEnd(28)} ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0).padStart(5)} kB`);
+	// flat ink levels compress well losslessly (and must not get lossy ringing); via a buffer, since a running dev
+	// server may hold the old file open on Windows
+	const webp = await sharp(out, { raw: { width, height, channels: 4 } })
+		.webp({ lossless: true, effort: 6 })
+		.toBuffer();
+	writeFileSync(assets('sunrise-portrait.webp'), webp);
+	console.log(`${'sunrise-portrait.webp'.padEnd(28)} ${width}×${height}  ${(webp.length / 1024).toFixed(0).padStart(5)} kB`);
 }
 
 if (process.argv.includes('portrait')) {

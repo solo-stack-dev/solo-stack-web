@@ -165,7 +165,7 @@
 		>
 			<!-- Painted scene in plate coordinates: decorative only, the meaning lives in the titles and the pillar row. -->
 			<div class="scene" aria-hidden="true">
-				<div class="frame" data-feather {@attach loop.attach}>
+				<div class="frame" {@attach loop.attach}>
 					<!-- string src: enhanced-img derives a full width ladder from `sizes` (the plate covers the stage) -->
 					<enhanced:img class="plate plate-desktop" src="./assets/making-plate.webp" alt="" sizes="max(100vw, min(178vh, 107vw))" loading="lazy" />
 					<enhanced:img class="plate plate-mobile" src="./assets/making-plate-mobile.webp" alt="" sizes="100vw" loading="lazy" />
@@ -277,37 +277,47 @@
 		height: 560svh;
 		/* Static fallback (reduced motion, no scroll-driven animations): the overlap is one soft wash from hero to
 		   plate. The mask lives on the track, not the pinned stage, so it scrolls away before the stage pins.
-		   --wipe-b: where the plate turns solid; --wipe-w: height of the wash ramp above it (≤ --wipe-b, so the
-		   plate's straight top edge is always transparent while the hero is on screen). Two layers of the same
-		   painted ramp at different sizes and offsets (added) make the front change shape as it moves. */
+		   --wipe-b: the bottom of the wash ramp (the plate is solid below it); --wipe-w: the ramp's height. The ramp's
+		   top fifth is transparent, so --wipe-w ≤ 1.25 × --wipe-b keeps the track's straight top edge invisible while
+		   the hero is on screen. The front is the product (intersect) of two copies of the painted ramp at different
+		   widths and offsets: the shape changes as it moves, never repeats visibly, and the ramp's faint even haze
+		   (which would draw a straight line over the bright moon) squares away, leaving the blooms. Both tile
+		   sideways near the painted (square) aspect instead of being smeared into a straight line. The solid layer
+		   is added on top. */
 		--wipe-b: var(--wipe-overlap);
-		--wipe-w: var(--wipe-overlap);
+		--wipe-w: min(28svh, var(--wipe-overlap) * 1.25);
 		--wipe-x: 30%;
 		/* Backing in the overlap (the 21:00 sky color, fading out below it): the plate's soft top edge must show sky,
 		   not the hero underneath; only the wipe mask reveals the hero. */
 		background:
 			linear-gradient(var(--making-sky) 0 0) top / 100% var(--wipe-overlap) no-repeat,
 			linear-gradient(var(--making-sky), transparent) left 0 top var(--wipe-overlap) / 100% 30svh no-repeat;
-		mask-image: var(--wash-spread-up), var(--wash-spread-up), linear-gradient(#000 0 0);
-		mask-repeat: repeat-x, repeat-x, no-repeat;
-		/* the ramps tile sideways near their painted aspect instead of being squashed to the full width */
+		/* the solid layer starts inside the ramps' fully opaque bottom (last ~15 %), so its straight top never shows */
+		mask-image: linear-gradient(#000 0 0), var(--wash-spread-up), var(--wash-spread-up);
+		mask-repeat: no-repeat, repeat-x, repeat-x;
 		mask-size:
-			max(60%, var(--wipe-w) * 1.6) var(--wipe-w),
-			max(90%, var(--wipe-w) * 2.4) calc(var(--wipe-w) * 0.75),
-			100% 100%;
+			100% 100%,
+			calc(var(--wipe-w) * 1.8) var(--wipe-w),
+			calc(var(--wipe-w) * 1.3) var(--wipe-w);
 		mask-position:
-			0 calc(var(--wipe-b) - var(--wipe-w)),
-			var(--wipe-x) calc(var(--wipe-b) - var(--wipe-w) * 0.75),
-			0 calc(var(--wipe-b) - 1px);
+			0 calc(var(--wipe-b) - var(--wipe-w) * 0.1),
+			var(--wipe-x) calc(var(--wipe-b) - var(--wipe-w)),
+			0 calc(var(--wipe-b) - var(--wipe-w));
+		mask-composite: add, intersect, add;
 	}
 
 	/* The wipe: from the page top (the overlap's share of the entry range) until the section top reaches the
-	   viewport top, the front runs up from the viewport bottom ~1.4× faster than the page and widens as it spreads. */
+	   viewport top. The plate turns solid at --wipe-front, which starts at the hero's bottom edge (the end of the
+	   overlap: that edge must never show through the translucent ramp) and runs up ~1.8× faster than the page. The
+	   ramp above it is at least 28svh and only tightens near the top of the viewport, where the track's own top
+	   edge needs it. At scroll 0 only the ramp's faint first blooms touch the hero's bottom; the drawing and the
+	   controls fade in later (.stage below). */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: view()) {
 			.track {
-				--wipe-b: calc(var(--wipe-overlap) * (1 - var(--wipe)));
-				--wipe-w: min(calc(var(--wipe-overlap) * 0.15 + var(--wipe) * 45svh), var(--wipe-b));
+				--wipe-front: calc(var(--wipe-overlap) * (1 - var(--wipe)));
+				--wipe-w: min(calc(28svh + var(--wipe) * 20svh), calc(var(--wipe-front) * 1.1));
+				--wipe-b: calc(var(--wipe-front) + var(--wipe-w) * 0.1);
 				--wipe-x: calc(10% + var(--wipe) * 45%);
 				animation: making-wipe linear both;
 				animation-timeline: --making-wipe;
@@ -336,10 +346,12 @@
 		--s: max(100cqw / 2560, min(100cqh / 1440, 100cqw / 2400));
 	}
 
-	/* The 21:00 clock rides up with the plate during the wipe, over the washed-out hero tagline: it only fades in as
-	   the wipe completes (--wipe is 1 without scroll-driven animations, so the static fallback shows it). */
-	.stage :global(.night-clock) {
-		opacity: clamp(0, (var(--wipe) - 0.75) * 4, 1);
+	/* During the wipe only the painted plate floods in; the drawing, the clock, the titles and the controls follow
+	   once the front has passed the middle (without the animation --wipe is 1, so they simply show). */
+	.stage > :global(:not(.scene)),
+	.bloom-mask,
+	.ink {
+		opacity: clamp(0, (var(--wipe) - 0.35) / 0.3, 1);
 	}
 
 	/* ── scene ───────────────────────────────────────────────────────────── */
@@ -357,9 +369,24 @@
 		width: calc(var(--pw) * var(--s));
 		height: calc(var(--ph) * var(--s));
 		translate: -50% -50%;
-		/* painted soft edges (NightPage [data-feather]): the top meets the wipe, the bottom the 22:00 mist */
-		--feather-top: calc(var(--ph) * var(--s) * 0.08);
+		/* Painted soft edges. Bottom: the shared feather into the 22:00 mist. Top (meets the wipe, and sits behind the
+		   nav while pinned): the product of two bloom-wash copies at near their painted aspect, at least 18svh tall,
+		   so it is never a cut and never the feather's horizontal streaks stretched over the bright cloud. */
+		--feather-top: max(18svh, calc(var(--ph) * var(--s) * 0.08));
 		--feather-bottom: calc(var(--ph) * var(--s) * 0.18);
+		mask-image: linear-gradient(#000 0 0), var(--feather-down), var(--wash-spread-up), var(--wash-spread-up);
+		mask-repeat: no-repeat, no-repeat, repeat-x, repeat-x;
+		mask-size:
+			100% calc(100% - var(--feather-top) - var(--feather-bottom) + 2px),
+			100% var(--feather-bottom),
+			calc(var(--feather-top) * 1.8) var(--feather-top),
+			calc(var(--feather-top) * 1.3) var(--feather-top);
+		mask-position:
+			0 calc(var(--feather-top) - 1px),
+			0 100%,
+			37% 0,
+			0 0;
+		mask-composite: add, add, intersect, add;
 	}
 
 	.plate {
@@ -631,19 +658,18 @@
 			padding-inline: 12vw;
 		}
 
+		/* One row right above the cue: below the lit cliff top and the laptop (the plate's bottom right), on the dark
+		   rock, so the tabs never sit on the lit ledge or the screen. */
 		.pillars {
 			left: 50%;
-			bottom: calc(var(--bottom-gutter) + 4.75rem);
+			bottom: calc(clamp(0.5rem, 2vh, 1.25rem) + 2.75rem);
 			translate: -50% 0;
 		}
 
 		.pillars ul {
-			display: grid;
-			grid-template-columns: repeat(2, auto);
+			flex-wrap: nowrap;
 			justify-content: center;
-			column-gap: 1.75rem;
-			row-gap: 0;
-			margin-left: 0;
+			gap: 0;
 		}
 
 		.pillars li + li::before {
@@ -653,14 +679,15 @@
 		.pillar {
 			min-height: 2.75rem;
 			min-width: 2.75rem;
-			padding-inline: 0.5rem;
+			padding-inline: 0.45rem;
+			letter-spacing: 0.14em;
 		}
 
+		/* the dots share the cue's line, at the left gutter */
 		.progress {
 			right: auto;
-			left: 50%;
-			translate: -50% 0;
-			bottom: calc(var(--bottom-gutter) + 3.25rem);
+			left: var(--page-gutter);
+			bottom: calc(clamp(0.5rem, 2vh, 1.25rem) + 1.125rem);
 		}
 
 		.cue {

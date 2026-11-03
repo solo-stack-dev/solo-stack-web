@@ -18,6 +18,7 @@
 	import { InView } from '#lib/home/shared/motion.svelte.ts';
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
+	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { CINEMA_LAYOUT, beamMask, placeVars } from './layout.ts';
 	import VideoThumbnail from './VideoThumbnail.svelte';
@@ -95,6 +96,8 @@
 	<div class="stage" {@attach near.attach}>
 		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
 		<enhanced:img src="./assets/cinema-landscape-mobile.webp?w=1080;828;640" alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
+		<!-- Extra grain over the landscape's sky: the repainted sky (moon removed) is smoother than the original pigment. -->
+		<div class="sky-grain" aria-hidden="true"><PaperGrain fixed={false} opacity={0.08} /></div>
 		<enhanced:img
 			src="./assets/cinema-cliff.webp?w=1582;1200;1100;960;760"
 			alt=""
@@ -233,14 +236,29 @@
 			linear-gradient(#000 0 0) bottom / 100% 88.5% no-repeat;
 	}
 
-	/* The bottom melts into the solid night that opens the sunrise section (its ink-wash wipe), with the painted soft
-	   edge instead of a straight gradient. */
+	.sky-grain {
+		position: absolute;
+		inset: 0 0 55%;
+		pointer-events: none;
+		mask-image: linear-gradient(#000 70%, transparent);
+	}
+
+	/* The bottom melts into the solid night that opens the sunrise section (its ink-wash wipe): the product
+	   (intersect) of two copies of the wet wash at different widths and offsets, tiled sideways near the painted
+	   aspect, so the landscape ends in ink blooms instead of a straight horizontal fade (the wash's even haze squares
+	   away). Opaque at the bottom line, where the sunrise night continues. */
 	.landscape-fade {
 		position: absolute;
-		inset: auto 0 0;
-		height: 18%;
+		/* 2px past the stage bottom: no fractional last pixel row lets the cliff's lit bottom edge through */
+		inset: auto 0 -2px;
+		/* 26 % of the stage; --fade-tile: 1.6 × that height (the stage is 16:9 of the width, 1080:2340 on mobile) */
+		height: 26%;
+		--fade-tile: 23.4vw;
 		background: var(--ink-fade);
-		mask: var(--feather-up) center / 100% 100% no-repeat;
+		mask:
+			var(--wash-spread-up) 41% 100% / var(--fade-tile) 100% repeat-x,
+			var(--wash-spread-up) 0 100% / auto 100% repeat-x;
+		mask-composite: intersect, add;
 		pointer-events: none;
 	}
 
@@ -514,6 +532,10 @@
 
 		.stage {
 			aspect-ratio: 1080 / 2340;
+		}
+
+		.landscape-fade {
+			--fade-tile: 90vw;
 		}
 
 		.is-desktop {

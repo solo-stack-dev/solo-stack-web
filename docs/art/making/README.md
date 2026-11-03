@@ -40,3 +40,16 @@ Pixel-diff verification against the pre-edit originals found **zero changed pixe
 Keep these large masters outside the shipped bundle. Generate optimized responsive AVIF/WebP derivatives during implementation; the homepage handoff budgets are approximately 250 kB for initial hero images and 400 kB per subsequent section. No application files or optimized derivatives were changed here. All requested layers are present; the material limitation is that final target dimensions are resampled from smaller built-in generations.
 
 Exact generation prompts and ordered input references: [PROMPTS.md](PROMPTS.md).
+
+
+## Local cliff illumination repair - 2026-11-03
+
+Repaired both plate masters in place. The broad ochre surface stripe on the main laptop ledge is now dark anthracite away from a localized warm pool beneath the laptop, with sparse separated catch-lights. Detached warm background fringe on the exterior of the bezel was replaced with dark generated night pigment. The laptop body, blank screen and protected cliff silhouette retain their original RGB pixels. The mandatory two-pixel silhouette guard retains its original color, including a thin warm hairline; the lower stepped ledges and existing background washes were outside this repair.
+
+Built-in `image_gen.imagegen` was used, with highest quality requested. It exposes no model/quality selector or native mask parameter. Two generations per plate were inspected: the first pair was rejected for an overly continuous cool-grey rim and harder, more geometric pigment. The second pair was selected after mask refinement. Full plates, native-size crops and 400% bezel crops were inspected. Only masked generated pigment was composited; no whole-plate resizing, laptop regeneration or registration changes were applied to the masters.
+
+Exact grayscale masks (black = keep, white = repaint, grey = feather): [desktop](cliff-light-masks/desktop.png), [mobile](cliff-light-masks/mobile.png). Half-open support bounds: desktop **(1851, 916, 2560, 1175)**; mobile **(601, 1703, 1080, 1931)**. These bounds contain protected holes and are not rectangular replacements.
+
+Audits against pre-edit backup files: desktop **63,093** changed pixels within **67,131** mask-support pixels; mobile **46,533** changed within **49,761**. Both have **0** changed pixels outside mask support, **0** changes in protected laptop/frame/body, **0** in screen interiors, and **0** in the two-pixel silhouette guards. Untouched outside-mask RGB counts: **3,619,269** desktop and **2,477,439** mobile; before/after SHA-256 digests match. Both retain original dimensions (2560x1440 / 1080x2340), opaque 8-bit RGB, sRGB rendering intent 0, and **0** exact #000000 / #FFFFFF pixels. Saved masters were read back and their hashes verified.
+
+Original backups, before/after native-size crops, protection masks, rejected candidates and reproduction scripts remain outside the repository at `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/`. Crops are `desktop-before.png`, `desktop-after.png`, `mobile-before.png`, `mobile-after.png`. Full exact prompts, generation paths and audit hashes are appended to PROMPTS.md. No code, derivatives or other art assets were changed.
