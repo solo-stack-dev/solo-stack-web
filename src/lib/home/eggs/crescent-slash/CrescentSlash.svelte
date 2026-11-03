@@ -59,7 +59,7 @@
 		height: 100%;
 		overflow: visible;
 		/* Moonlight catching the ink edge, so the stroke reads on the dark sky. Compositor filter on its own layer. */
-		filter: drop-shadow(0 0 2px rgb(252 215 114 / 0.75)) drop-shadow(0 0 14px rgb(252 215 114 / 0.4));
+		filter: drop-shadow(0 0 2px color-mix(in oklab, var(--color-butter) 75%, transparent)) drop-shadow(0 0 14px color-mix(in oklab, var(--color-butter) 40%, transparent));
 		will-change: transform;
 	}
 

@@ -29,9 +29,10 @@
 
 <section id="game" data-night-hour="22:00" class="game-section" aria-labelledby="home-game-title">
 	<NightClock time="22:00" />
+	<h2 id="home-game-title" class="night-heading">{m.home_game_title()}</h2>
 	<div class="content">
-		<h2 id="home-game-title" class="font-display text-3xl font-black tracking-wordmark md:text-5xl">{m.home_game_title()}</h2>
-		<div class="tabs font-mono text-xs tracking-clock uppercase" role="tablist" aria-label={m.home_game_tabs_label()}>
+		<!-- Tabs in the page-wide selection idiom (label + hand-drawn underline), attached to the frame's top left -->
+		<div class="tabs label" role="tablist" aria-label={m.home_game_tabs_label()}>
 			{#each CANDIDATE_IDS as id (id)}
 				<button
 					type="button"
@@ -64,50 +65,105 @@
 </section>
 
 <style>
+	/* Heading on the shared lines (clock, gutter); the play area below it is as large as one screen allows. */
 	.game-section {
 		position: relative;
 		min-height: 100svh;
 		display: grid;
-		align-items: center;
-		padding: 9rem clamp(1.25rem, 6vw, 6rem) 6rem;
+		align-content: start;
+		gap: clamp(1.5rem, 4vh, 2.5rem);
+		padding: var(--heading-top) var(--page-gutter) calc(var(--bottom-gutter) + 2rem);
 	}
 
+	.game-section > h2 {
+		position: relative;
+		z-index: 1;
+		max-width: 60rem;
+	}
+
+	/* Tabs (2.75rem) + gap above the 16:9 stage: the whole frame fits under the heading on a laptop screen */
 	.content {
 		position: relative;
 		z-index: 1;
 		display: grid;
-		gap: 2rem;
-		width: min(100%, 72rem);
+		gap: 0.75rem;
+		width: min(100%, 72rem, calc((100svh - var(--heading-top) - 3.5rem - clamp(1.5rem, 4vh, 2.5rem) - 3.5rem - var(--bottom-gutter)) * 16 / 9));
 		margin-inline: auto;
+	}
+
+	@media (max-width: 40rem) {
+		.content {
+			width: 100%;
+		}
 	}
 
 	.tabs {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-bottom: -1rem;
+		gap: 0 0.35rem;
+		margin-left: -0.55rem;
 	}
 
 	.tabs [role='tab'] {
-		padding: 0.55rem 1rem;
-		border-radius: 999px;
-		border: 1px solid color-mix(in oklab, var(--color-cream) 28%, transparent);
+		position: relative;
+		min-height: 2.75rem;
+		padding: 0.6rem 0.55rem;
 		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+		/* preflight resets buttons to none; the label style is uppercase */
+		text-transform: inherit;
 		cursor: pointer;
-		transition:
-			background-color 0.2s,
-			border-color 0.2s,
-			color 0.2s;
+		transition: color var(--dur-hover);
 	}
 
-	.tabs [role='tab']:hover {
-		border-color: var(--color-butter);
+	.tabs [role='tab'] + [role='tab'] {
+		margin-left: 0.85rem;
 	}
 
-	.tabs [aria-selected='true'] {
+	.tabs [role='tab'] + [role='tab']::before {
+		content: '·';
+		position: absolute;
+		left: -0.75rem;
+		color: color-mix(in oklab, var(--color-cream) 55%, transparent);
+	}
+
+	.tabs [role='tab']::after {
+		content: '';
+		position: absolute;
+		left: 0.35rem;
+		right: 0.35rem;
+		bottom: 0.1rem;
+		height: 0.45rem;
 		background: var(--color-butter);
-		border-color: var(--color-butter);
-		color: var(--color-night);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
+	}
+
+	.tabs [role='tab']:hover,
+	.tabs [aria-selected='true'] {
+		color: var(--color-butter);
+	}
+
+	.tabs [aria-selected='true']::after {
+		scale: 1 1;
+	}
+
+	/* Phones: one tab per line (a wrapped row would start lines with a separator dot) */
+	@media (max-width: 40rem) {
+		.tabs {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.tabs [role='tab'] + [role='tab'] {
+			margin-left: 0;
+		}
+
+		.tabs [role='tab'] + [role='tab']::before {
+			content: none;
+		}
 	}
 
 	.poster {
@@ -116,7 +172,7 @@
 		overflow: hidden;
 		background:
 			radial-gradient(ellipse 80% 60% at 78% 22%, color-mix(in oklab, var(--color-ochre) 22%, transparent), transparent 70%),
-			linear-gradient(to bottom, #1d1c1d, var(--color-ink) 75%);
+			linear-gradient(to bottom, var(--color-night), var(--color-ink) 75%);
 	}
 
 	.poster-title {

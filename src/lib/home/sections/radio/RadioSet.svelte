@@ -237,7 +237,7 @@
 		width: 100%;
 		container: radio / inline-size;
 		/* Ink and light used on the art */
-		--ink: #1b1713;
+		--ink: var(--color-ink);
 		--glow: var(--color-butter);
 		/* Type on the glass, in radio widths (cqw): the tall radio is drawn ~2.3× smaller, so it gets larger factors */
 		--logo: 8.4cqw;
@@ -303,7 +303,7 @@
 	.mark.on {
 		opacity: 1;
 		color: var(--color-butter);
-		filter: drop-shadow(0 0 4px rgb(252 215 114 / 0.9));
+		filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-butter) 90%, transparent));
 	}
 
 	/* Needle: eased slide with a small overshoot, instant while dragging or under reduced motion */
@@ -311,7 +311,7 @@
 		position: absolute;
 		pointer-events: none;
 		transition: translate 0.75s cubic-bezier(0.34, 1.45, 0.52, 1);
-		filter: drop-shadow(0 0 4px rgb(252 215 114 / 0.55)) drop-shadow(2px 3px 2px rgb(0 0 0 / 0.5));
+		filter: drop-shadow(0 0 4px color-mix(in oklab, var(--color-butter) 55%, transparent)) drop-shadow(2px 3px 2px color-mix(in oklab, var(--color-ink) 50%, transparent));
 	}
 
 	.knob {
@@ -347,8 +347,9 @@
 		flex: none;
 		width: var(--logo);
 		height: var(--logo);
-		color: #fff7e2;
-		filter: drop-shadow(0 0 0.5cqw rgb(252 215 114 / 0.95)) drop-shadow(0 0 2cqw rgb(252 215 114 / 0.55));
+		color: var(--color-moonlight);
+		filter: drop-shadow(0 0 0.5cqw color-mix(in oklab, var(--color-butter) 95%, transparent))
+			drop-shadow(0 0 2cqw color-mix(in oklab, var(--color-butter) 55%, transparent));
 	}
 
 	.glass-text {
@@ -362,7 +363,7 @@
 		font-weight: 800;
 		font-size: var(--name);
 		line-height: 1.1;
-		text-shadow: 0 0 1.2cqw rgb(252 215 114 / 0.6);
+		text-shadow: 0 0 1.2cqw color-mix(in oklab, var(--color-butter) 60%, transparent);
 	}
 
 	.glass-handle {
@@ -407,7 +408,7 @@
 
 	.glass-song.on .glass-note {
 		opacity: 1;
-		text-shadow: 0 0 0.8cqw rgb(252 215 114 / 0.9);
+		text-shadow: 0 0 0.8cqw color-mix(in oklab, var(--color-butter) 90%, transparent);
 	}
 
 	/* Live content (StationContent: label + line). Links inside stay clickable over the dial. */

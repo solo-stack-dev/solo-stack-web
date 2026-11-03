@@ -28,6 +28,35 @@
 		U+219A-2211, U+2213-2214, U+2216-FEFE, U+FF00-FFFC, U+FFFE-10FFFF;
 }
 
+/*
+ * Geist Mono variable (official release v1.8.2 / Google Fonts, SIL OFL 1.1: static/fonts/OFL-Geist.txt), same split:
+ * - GeistMono-latin-wght.woff2 (23 kB): the Google Fonts Latin subset (its unicode-range below). Preloaded in app.html
+ *   with fetchpriority="low": the clock and the scroll cue need it above the fold, but it must not compete with the
+ *   hero moon (LCP) or the Geist text face.
+ * - GeistMono-wght.woff2 (71 kB, the release webfont): everything else (→, Latin Extended, Cyrillic…), on demand.
+ */
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('/fonts/GeistMono-latin-wght.woff2') format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
+		U+FFFD;
+}
+
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('/fonts/GeistMono-wght.woff2') format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+	unicode-range:
+		U+0100-0130, U+0132-0151, U+0154-02BA, U+02BD-02C5, U+02C7-02D9, U+02DB, U+02DD-0303, U+0305-0307, U+0309-0328, U+032A-1FFF, U+2070-20AB, U+20AD-2121, U+2123-2190,
+		U+2192, U+2194-2211, U+2213-2214, U+2216-FEFE, U+FF00-FFFC, U+FFFE-10FFFF;
+}
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -48,14 +77,24 @@
 	--color-night: #18191b;
 	--color-ink: #0e0f10;
 	--color-dusk: #2a2723;
+	/* Pale warm light: glints, steam, the beam core, dust motes, highlights on butter (never a text color) */
+	--color-moonlight: #fff4d6;
 
 	--font-display: 'Geist', ui-sans-serif, system-ui, sans-serif;
 	--font-body: 'Geist', ui-sans-serif, system-ui, sans-serif;
 	--font-sans: var(--font-body);
-	--font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+	--font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
-	/* Clock labels and other small tracked mono labels */
-	--tracking-clock: 0.32em;
+	/*
+	 * Mono label scale (homepage): `label-sm` for the clock, the rail, hints; `label` (uppercase) for controls, tabs
+	 * and short links. Wide tracking only for labels of three words or fewer.
+	 */
+	--text-label-sm: 0.6875rem;
+	--tracking-label-sm: 0.28em;
+	--text-label: 0.75rem;
+	--tracking-label: 0.2em;
+	/* Clock labels (= label-sm tracking) */
+	--tracking-clock: 0.28em;
 	/* Wordmark: Geist 900, tight */
 	--tracking-wordmark: -0.045em;
 }
@@ -194,6 +233,81 @@
 	syntax: '<number>';
 	inherits: true;
 	initial-value: 0;
+}
+
+/*
+ * Homepage system (src/lib/home, docs/HOMEPAGE-DEV.md §3b). Layout lines live on the NightPage wrapper; every section,
+ * the nav, the rail and the clock read them, so all left edges and the clock/heading lines match:
+ *   --page-gutter    left/right edge of all chrome and copy
+ *   --bottom-gutter  bottom edge of in-section controls
+ *   --clock-top      top of the hour label (NightClock)
+ *   --heading-top    top of a section heading, locked under the clock
+ */
+[data-night-page] {
+	--page-gutter: clamp(1.25rem, 4vw, 3.5rem);
+	--bottom-gutter: clamp(1.5rem, 5vh, 3.25rem);
+	--clock-top: clamp(5.5rem, 12vh, 8rem);
+	--heading-top: calc(var(--clock-top) + 1.5rem);
+	/* The nav bar's own vertical padding: its row is centered on the same top band on every page */
+	--nav-pad-y: clamp(1rem, 2.5vh, 1.75rem);
+}
+
+/*
+ * Light and ink, one of each: `--halo-ink` (text-shadow) keeps cream text readable on butter pigment; the glow scale is
+ * butter light for text-shadow or box-shadow (no spread, so both work). Motion: settle for anything that arrives or
+ * changes state, ambient for loops; durations from a hover to a section entrance.
+ */
+:root {
+	--halo-ink: 0 0 1px var(--color-ink), 0 0 2px var(--color-ink), 0 0 6px var(--color-ink), 0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
+	--halo-butter: 0 0 2px var(--color-butter), 0 0 8px color-mix(in oklab, var(--color-butter) 80%, transparent);
+	--glow-sm: 0 0 0.6rem color-mix(in oklab, var(--color-butter) 50%, transparent);
+	--glow-md: 0 0 1.75rem color-mix(in oklab, var(--color-butter) 50%, transparent);
+	--glow-lg: 0 0 4.5rem color-mix(in oklab, var(--color-butter) 35%, transparent);
+
+	/*
+	 * The one selection mark: a hand-drawn ink underline (the making pillars' stroke) as a mask. Use on an `::after`
+	 * with `background: currentColor` or butter, `mask: var(--ink-underline) center / 100% 100% no-repeat`.
+	 */
+	--ink-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.2C22 2.6 48 3.4 70 3s24 .8 28-.4' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+
+	--ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);
+	--ease-ambient: ease-in-out;
+	--dur-hover: 160ms;
+	--dur-state: 300ms;
+	--dur-reveal: 600ms;
+	--dur-entrance: 1100ms;
+}
+
+/* Mono labels (tokens in @theme): `label-sm` for the clock, rail and hints; `label` for controls, tabs, short links */
+@utility label-sm {
+	font-family: var(--font-mono);
+	font-size: var(--text-label-sm);
+	line-height: 1;
+	letter-spacing: var(--tracking-label-sm);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Section heading (homepage): one style for every visible h2, on the gutter at --heading-top, under the clock */
+@utility night-heading {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: clamp(2rem, 4vw, 3.5rem);
+	font-weight: 900;
+	line-height: 0.95;
+	letter-spacing: var(--tracking-wordmark);
+	text-transform: uppercase;
+	text-wrap: balance;
+	color: var(--color-cream);
+	text-shadow: var(--halo-ink);
+}
+
+@utility label {
+	font-family: var(--font-mono);
+	font-size: var(--text-label);
+	line-height: 1.2;
+	font-weight: 500;
+	letter-spacing: var(--tracking-label);
+	text-transform: uppercase;
 }
 
 @layer base {

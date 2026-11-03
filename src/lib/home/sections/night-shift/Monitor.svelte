@@ -58,11 +58,11 @@
 		box-sizing: border-box;
 		overflow: hidden;
 		transform-origin: 0 0;
-		color: rgb(251 243 221 / 0.92);
+		color: color-mix(in oklab, var(--color-cream) 92%, transparent);
 		line-height: 1.5;
 		letter-spacing: 0.01em;
-		text-shadow: 0 0 6px rgb(252 215 114 / 0.28);
-		background: radial-gradient(120% 90% at 30% 20%, rgb(252 215 114 / 0.06), transparent 70%);
+		text-shadow: 0 0 6px color-mix(in oklab, var(--color-butter) 28%, transparent);
+		background: radial-gradient(120% 90% at 30% 20%, color-mix(in oklab, var(--color-butter) 6%, transparent), transparent 70%);
 		pointer-events: none;
 		visibility: hidden;
 	}
@@ -83,7 +83,7 @@
 	}
 
 	.prompt {
-		color: rgb(251 243 221 / 0.6);
+		color: color-mix(in oklab, var(--color-cream) 60%, transparent);
 	}
 
 	.hash {
@@ -92,7 +92,7 @@
 
 	.note {
 		white-space: normal;
-		color: rgb(251 243 221 / 0.75);
+		color: color-mix(in oklab, var(--color-cream) 75%, transparent);
 	}
 
 	.cursor {
@@ -102,7 +102,7 @@
 		margin-left: 0.08em;
 		vertical-align: -0.15em;
 		background: var(--color-cream);
-		box-shadow: 0 0 6px rgb(252 215 114 / 0.5);
+		box-shadow: 0 0 6px color-mix(in oklab, var(--color-butter) 50%, transparent);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {

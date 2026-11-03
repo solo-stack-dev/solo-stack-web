@@ -5,9 +5,10 @@
 
 	- `variant="site"` (blog, stats, …): sticky bar on `bg-background` with a hairline border and a light blur. The
 	  (site) layout passes the theme toggle and the phone menu as `actions`; links collapse into that menu below `sm`.
-	- `variant="night"` (homepage): fixed over the painted night, wordmark in cream ink with a soft halo; the links and
-	  the actions sit in one smoked-glass "dock" capsule with the current page as a lit butter pill, so they read over
-	  the moon and the stars. NightPage passes its section menu button as `actions` and lists the site links in that
+	- `variant="night"` (homepage): fixed over the painted night, no bar and no capsule: wordmark, links and menu button
+	  are cream ink with a soft opposite-ink halo, so they read over the moon, the stars and the paper; the current page
+	  carries the page-wide selection mark (the hand-drawn butter underline, `--ink-underline`). On the page gutter and
+	  `--nav-pad-y` (layout.css). NightPage passes its section menu button as `actions` and lists the site links in that
 	  overlay on phones (the dock then holds only the button), so the homepage keeps a single header. `tone="paper"`
 	  switches to anthracite ink once the sunrise paper is under the bar; `hideWordmark` hides the small wordmark while
 	  the hero shows the giant one.
@@ -137,8 +138,27 @@
 		padding: 0 0.8rem;
 		border-radius: 999px;
 		transition:
-			color 160ms ease,
-			background-color 160ms ease;
+			color var(--dur-hover) ease,
+			background-color var(--dur-hover) ease;
+	}
+
+	/* The current page: the hand-drawn underline (layout.css --ink-underline), drawn in from the left on hover */
+	.links a::after {
+		content: '';
+		position: absolute;
+		left: 0.8rem;
+		right: 0.8rem;
+		bottom: 0.4rem;
+		height: 0.45rem;
+		background: var(--color-butter);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
+	}
+
+	.links a[aria-current]::after {
+		scale: 1 1;
 	}
 
 	/* Site look ---------------------------------------------------------------------------------------------- */
@@ -191,18 +211,6 @@
 		color: var(--foreground);
 	}
 
-	/* A short butter stroke under the current page, like a pigment underline */
-	.is-site .links a[aria-current]::after {
-		content: '';
-		position: absolute;
-		left: 0.8rem;
-		right: 0.8rem;
-		bottom: 0.45rem;
-		height: 3px;
-		border-radius: 3px;
-		background: var(--color-butter);
-	}
-
 	.is-site .actions {
 		display: flex;
 		align-items: center;
@@ -215,30 +223,30 @@
 		position: fixed;
 		color: var(--color-cream);
 		pointer-events: none;
-		/* A soft halo in the opposite ink keeps the bar readable where it crosses a ragged edge (e.g. the night edge) */
-		--nav-halo: color-mix(in oklab, var(--color-ink) 55%, transparent);
-		transition: color 300ms ease;
+		/* A soft halo in the opposite ink keeps the bar readable on any art (moon, butter clouds, the night edge) */
+		--nav-halo: color-mix(in oklab, var(--color-ink) 70%, transparent);
+		transition: color var(--dur-state) ease;
 	}
 
 	.is-night[data-tone='paper'] {
 		color: var(--color-night);
-		--nav-halo: color-mix(in oklab, var(--color-butter) 70%, transparent);
+		--nav-halo: color-mix(in oklab, var(--color-butter) 80%, transparent);
 	}
 
 	.is-night .bar {
-		padding: clamp(1rem, 2.5vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem);
+		padding: var(--nav-pad-y) var(--page-gutter);
 	}
 
 	.is-night .bar > * {
 		pointer-events: auto;
-		filter: drop-shadow(0 0 0.4rem var(--nav-halo));
+		filter: drop-shadow(0 0 0.35rem var(--nav-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
 	}
 
 	.is-night .wordmark {
 		font-size: 1.125rem;
 		transition:
-			opacity 350ms ease,
-			translate 350ms ease,
+			opacity var(--dur-state) ease,
+			translate var(--dur-state) var(--ease-settle),
 			visibility 0s;
 	}
 
@@ -259,53 +267,15 @@
 		translate: 0 -0.5rem;
 		visibility: hidden;
 		transition:
-			opacity 250ms ease,
-			translate 250ms ease,
-			visibility 0s 250ms;
-	}
-
-	/*
-	 * The dock: a smoked-glass capsule over the art, so the site links read on any background (moon, stars, paper).
-	 * The current page is a lit butter pill with the moon's glow. Its own background replaces the halo filter
-	 * (a filter would also break the backdrop blur).
-	 */
-	.is-night .bar > .dock {
-		filter: none;
+			opacity var(--dur-state) ease,
+			translate var(--dur-state) ease,
+			visibility 0s var(--dur-state);
 	}
 
 	.is-night .dock {
-		--dock-ink: var(--color-cream);
-		--dock-glass: color-mix(in oklab, var(--color-ink) 58%, transparent);
-		--dock-edge: color-mix(in oklab, var(--color-butter) 28%, transparent);
-		--dock-hover: color-mix(in oklab, var(--color-cream) 12%, transparent);
-		--dock-lit: var(--color-butter);
-		--dock-lit-ink: var(--color-night);
 		display: flex;
 		align-items: center;
-		gap: 0.25rem;
-		padding: 0.25rem;
-		border: 1px solid var(--dock-edge);
-		border-radius: 999px;
-		background: var(--dock-glass);
-		color: var(--dock-ink);
-		box-shadow:
-			0 0.5rem 1.75rem -0.5rem color-mix(in oklab, var(--color-ink) 60%, transparent),
-			inset 0 1px 0 color-mix(in oklab, var(--color-cream) 10%, transparent);
-		backdrop-filter: blur(14px) saturate(1.3);
-		-webkit-backdrop-filter: blur(14px) saturate(1.3);
-		transition:
-			background-color 300ms ease,
-			border-color 300ms ease,
-			color 300ms ease;
-	}
-
-	.is-night[data-tone='paper'] .dock {
-		--dock-ink: var(--color-night);
-		--dock-glass: color-mix(in oklab, var(--color-cream) 62%, transparent);
-		--dock-edge: color-mix(in oklab, var(--color-night) 16%, transparent);
-		--dock-hover: color-mix(in oklab, var(--color-night) 9%, transparent);
-		--dock-lit: var(--color-night);
-		--dock-lit-ink: var(--color-butter);
+		gap: 0.5rem;
 	}
 
 	/* On phones the dock holds only the menu button; the overlay lists the site links */
@@ -317,61 +287,51 @@
 		.is-night .links {
 			display: block;
 		}
-
-		/* A hairline between the pages and the section menu */
-		.is-night .links + .actions {
-			padding-left: 0.25rem;
-			border-left: 1px solid var(--dock-edge);
-		}
 	}
 
 	.is-night .links ul {
-		gap: 0.125rem;
+		gap: 0;
 	}
 
 	.is-night .links a {
-		padding: 0 1.05rem;
+		padding: 0 0.85rem;
+		border-radius: 0;
 		font-family: var(--font-display);
 		font-size: 0.875rem;
 		font-weight: 800;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		transition:
-			color 160ms ease,
-			background-color 160ms ease,
-			box-shadow 160ms ease;
+	}
+
+	.is-night .links a::after {
+		left: 0.6rem;
+		right: 0.6rem;
+		bottom: 0.3rem;
 	}
 
 	.is-night .links a:hover {
-		background: var(--dock-hover);
+		color: var(--color-butter);
 	}
 
-	.is-night .links a[aria-current] {
-		background: var(--dock-lit);
-		color: var(--dock-lit-ink);
-		box-shadow: 0 0 1.1rem -0.1rem color-mix(in oklab, var(--color-butter) 55%, transparent);
+	.is-night[data-tone='paper'] .links a:hover {
+		color: inherit;
 	}
 
-	.is-night[data-tone='paper'] .links a[aria-current] {
-		box-shadow: none;
+	.is-night[data-tone='paper'] .links a::after {
+		background: var(--color-night);
 	}
 
+	/* Hover previews the mark, faint */
+	.is-night .links a:not([aria-current]):hover::after {
+		scale: 1 1;
+		opacity: 0.45;
+	}
+
+	/* The last link's text ends on the gutter like the wordmark starts on it: the menu button keeps its 44px target
+	   but its icon is flush right */
 	.is-night .actions {
 		display: flex;
 		align-items: center;
-	}
-
-	.is-night .actions :global(button:hover) {
-		background: var(--dock-hover);
-	}
-
-	@media (prefers-reduced-transparency: reduce) {
-		.is-night .dock {
-			--dock-glass: color-mix(in oklab, var(--color-ink) 92%, transparent);
-		}
-
-		.is-night[data-tone='paper'] .dock {
-			--dock-glass: var(--color-cream);
-		}
+		margin-right: -0.65rem;
 	}
 </style>

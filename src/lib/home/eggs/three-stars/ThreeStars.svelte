@@ -85,7 +85,7 @@
 	}
 
 	.sparkle {
-		fill: #fff3cf;
+		fill: var(--color-moonlight);
 	}
 
 	.star {

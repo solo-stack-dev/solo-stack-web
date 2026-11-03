@@ -11,7 +11,7 @@
 -->
 <style>
 	:global([data-shiny] .mascot:not([data-shiny-art])) {
-		filter: sepia(0.5) saturate(1.9) hue-rotate(-10deg) brightness(1.07) drop-shadow(0 0 0.7rem rgb(252 215 114 / 0.45));
+		filter: sepia(0.5) saturate(1.9) hue-rotate(-10deg) brightness(1.07) drop-shadow(0 0 0.7rem color-mix(in oklab, var(--color-butter) 45%, transparent));
 	}
 
 	:global([data-shiny] .mascot::after) {
@@ -24,7 +24,7 @@
 		aspect-ratio: 1;
 		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-14 -14 28 28'%3E%3Cpath d='M0-14C1.4-3 3-1.4 14 0 3 1.4 1.4 3 0 14-1.4 3-3 1.4-14 0-3-1.4-1.4-3 0-14Z' fill='%23fff3cf'/%3E%3C/svg%3E")
 			center / contain no-repeat;
-		filter: drop-shadow(0 0 0.3rem rgb(252 215 114 / 0.9));
+		filter: drop-shadow(0 0 0.3rem color-mix(in oklab, var(--color-butter) 90%, transparent));
 		pointer-events: none;
 	}
 

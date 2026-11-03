@@ -170,7 +170,7 @@
 	<NightClock time="02:00" />
 
 	<div class="head">
-		<h2 id="home-radio-title" class="font-display text-3xl font-black tracking-wordmark text-cream uppercase md:text-5xl">{m.home_radio_title()}</h2>
+		<h2 id="home-radio-title" class="night-heading">{m.home_radio_title()}</h2>
 	</div>
 
 	<div class="scene">
@@ -329,7 +329,7 @@
 		container-type: inline-size;
 		overflow: clip;
 		min-height: 100svh;
-		padding: clamp(7rem, 13vh, 9rem) clamp(1.25rem, 5vw, 5rem) clamp(3rem, 8vh, 5rem);
+		padding: var(--heading-top) var(--page-gutter) clamp(3rem, 8vh, 5rem);
 		/* the clipped plate must not end in a straight line: painted soft section edges (NightPage [data-feather]) */
 		--feather-top: clamp(4rem, 9vw, 8rem);
 		--feather-bottom: clamp(4rem, 9vw, 8rem);
@@ -338,7 +338,7 @@
 	.head {
 		position: relative;
 		z-index: 1;
-		max-width: 40rem;
+		max-width: 60rem;
 	}
 
 	.scene {
@@ -476,7 +476,7 @@
 		font-size: 1.05rem;
 		font-weight: 700;
 		color: var(--color-butter);
-		text-shadow: 0 0 10px rgb(252 215 114 / 0.55);
+		text-shadow: var(--glow-sm);
 	}
 
 	.strip-freq {
@@ -509,8 +509,8 @@
 		line-height: 1;
 		text-decoration: none;
 		box-shadow:
-			0 0 0 1.5px #1b1713,
-			0 0 16px rgb(252 215 114 / 0.45);
+			0 0 0 1.5px var(--color-ink),
+			var(--glow-sm);
 		cursor: pointer;
 	}
 
@@ -536,8 +536,8 @@
 		background: var(--color-butter);
 		color: var(--color-night);
 		box-shadow:
-			0 0 0 1.5px #1b1713,
-			0 0 12px rgb(252 215 114 / 0.45);
+			0 0 0 1.5px var(--color-ink),
+			var(--glow-sm);
 		cursor: pointer;
 	}
 
@@ -595,7 +595,6 @@
 			--band: var(--band-tall);
 			--radio-w: min(calc(100cqw - 0.5rem), 25rem);
 			--stage-w: max(118cqw, calc(100svh / var(--plate-aspect)));
-			padding-inline: 1rem;
 		}
 
 		.head {

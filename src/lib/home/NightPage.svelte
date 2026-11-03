@@ -60,6 +60,8 @@
 	};
 
 	const hours: readonly NightHourDef[] = NIGHT_HOURS;
+	/** Sections with their own progress dots: the rail steps aside while they are the active hour (one indicator at a time). */
+	const OWN_PROGRESS = new Set<SectionId>(['making']);
 	// Painted transition masks as `url()` custom properties for the sections' edge CSS (shared/transitions.ts).
 	const maskVars = transitionMaskVars();
 	const last = NIGHT_HOURS.length - 1;
@@ -261,6 +263,7 @@
 	class="night-page"
 	data-night-page
 	data-hero-covers={heroCovers ? '' : undefined}
+	data-rail-away={OWN_PROGRESS.has(active) ? '' : undefined}
 	style:--dawn-from={starts[last]}
 	style:--dawn-to={stops[last]}
 	style={maskVars}
@@ -296,7 +299,7 @@
 					{#each NIGHT_HOURS as hour (hour.id)}
 						<li>
 							<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
-								<span class="font-mono text-xs tracking-clock text-cream/60 tabular-nums">{hour.time}</span>
+								<span class="label-sm text-cream/60">{hour.time}</span>
 								<span class="font-display text-2xl font-black tracking-wordmark md:text-4xl">{labels[hour.id]()}</span>
 							</a>
 						</li>
@@ -307,7 +310,7 @@
 			<nav class="menu-site" aria-label={m.site_nav_label()}>
 				<ul>
 					{#each SITE_LINKS as link (link.id)}
-						<li><a href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
+						<li><a class="label" href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
 					{/each}
 				</ul>
 			</nav>
@@ -320,7 +323,7 @@
 				{#each NIGHT_HOURS as hour (hour.id)}
 					<li>
 						<a href="#{hour.id}" aria-label={labels[hour.id]()} aria-current={active === hour.id ? 'location' : undefined}>
-							<span class="rail-time font-mono tabular-nums" aria-hidden="true">{hour.time}</span>
+							<span class="rail-time label-sm" aria-hidden="true">{hour.time}</span>
 							<span class="rail-dot" aria-hidden="true"></span>
 						</a>
 					</li>
@@ -405,6 +408,9 @@
 	.night-main {
 		position: relative;
 		z-index: 1;
+		/* The mist strips are wider than the page (they drift sideways): without this, phones zoom the page out to fit
+		   them. `clip` (not hidden) creates no scroll container, so the sticky stages keep working. */
+		overflow-x: clip;
 	}
 
 	.night-page > :global(.paper-grain) {
@@ -439,6 +445,21 @@
 		border-radius: 999px;
 		color: inherit;
 		cursor: pointer;
+	}
+
+	.menu-button,
+	.menu-close {
+		transition: color var(--dur-hover) ease;
+	}
+
+	.menu-button:hover,
+	.menu-close:hover {
+		color: var(--color-butter);
+	}
+
+	:global(.site-nav[data-tone='paper']) .menu-button:hover {
+		color: inherit;
+		opacity: 0.7;
 	}
 
 	.menu-icon,
@@ -509,13 +530,14 @@
 		display: grid;
 		align-content: center;
 		min-height: 100%;
-		padding: 5rem clamp(1.25rem, 8vw, 8rem);
+		padding: 5rem clamp(var(--page-gutter), 8vw, 8rem);
 	}
 
+	/* Exactly where the menu button sits in the nav bar */
 	.menu-close {
 		position: absolute;
-		top: clamp(1rem, 2.5vh, 1.75rem);
-		right: clamp(1.25rem, 4vw, 3.5rem);
+		top: var(--nav-pad-y);
+		right: var(--page-gutter);
 	}
 
 	.menu-list {
@@ -527,6 +549,10 @@
 		display: flex;
 		align-items: baseline;
 		gap: 1.25rem;
+	}
+
+	.menu-list a {
+		transition: color var(--dur-hover) ease;
 	}
 
 	.menu-list a:hover,
@@ -553,10 +579,6 @@
 		gap: 0.5rem;
 		min-height: 2.75rem;
 		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
-		font-family: var(--font-mono);
-		font-size: 0.8125rem;
-		letter-spacing: var(--tracking-clock);
-		text-transform: uppercase;
 	}
 
 	.menu-site a:hover,
@@ -574,7 +596,7 @@
 
 	@media (prefers-reduced-motion: no-preference) {
 		.menu[open] {
-			animation: menu-in 220ms ease-out;
+			animation: menu-in var(--dur-state) var(--ease-settle);
 		}
 	}
 
@@ -594,14 +616,15 @@
 		position: fixed;
 		z-index: 4;
 		top: 50%;
+		/* hugs the edge, outside the gutter: the gutter belongs to the copy and the controls */
 		right: clamp(0.25rem, 0.9vw, 0.9rem);
 		translate: 0 -50%;
 		display: none;
 		color: var(--color-cream);
 		pointer-events: none;
 		transition:
-			opacity 300ms ease,
-			color 300ms ease,
+			opacity var(--dur-state) ease,
+			color var(--dur-state) ease,
 			visibility 0s;
 	}
 
@@ -609,12 +632,17 @@
 		color: var(--color-night);
 	}
 
-	[data-hero-covers] .rail {
+	.rail[data-tone='paper'] .rail-time {
+		text-shadow: var(--halo-butter);
+	}
+
+	[data-hero-covers] .rail,
+	[data-rail-away] .rail {
 		opacity: 0;
 		visibility: hidden;
 		transition:
-			opacity 250ms ease,
-			visibility 0s 250ms;
+			opacity var(--dur-state) ease,
+			visibility 0s var(--dur-state);
 	}
 
 	@media (min-width: 48rem) {
@@ -646,8 +674,8 @@
 		box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 35%, transparent);
 		opacity: 0.45;
 		transition:
-			opacity 200ms,
-			scale 200ms;
+			opacity var(--dur-hover),
+			scale var(--dur-hover);
 	}
 
 	.rail-time {
@@ -655,16 +683,13 @@
 		top: 50%;
 		right: 100%;
 		translate: 0 -50%;
-		padding: 0.15rem 0.4rem;
-		border-radius: 999px;
-		background: color-mix(in oklab, var(--color-ink) 70%, transparent);
-		color: var(--color-cream);
-		font-size: 0.625rem;
-		letter-spacing: var(--tracking-clock);
+		padding-right: 0.35rem;
+		color: inherit;
+		text-shadow: var(--halo-ink);
 		white-space: nowrap;
 		pointer-events: none;
 		opacity: 0;
-		transition: opacity 200ms;
+		transition: opacity var(--dur-hover);
 	}
 
 	.rail a:hover .rail-time,
