@@ -41,8 +41,8 @@ const PATH_SURFACE: [number, number][] = [
 const COFFEE_BASE = { x: 300, y: 530 };
 const COFFEE_STEAM: Rect = { x: 222, y: -230, w: 150, h: 420 };
 /** Laptop master (docs/art/sunrise/sunrise-laptop.png): where its underside meets the ground, and the lid's sunlit edge for the glint. */
-const LAPTOP_BASE = { x: 596, y: 500 };
-const LAPTOP_GLINT: Rect = { x: 820, y: 255, w: 260, h: 110 };
+const LAPTOP_BASE = { x: 599, y: 500 };
+const LAPTOP_GLINT: Rect = { x: 820, y: 250, w: 240, h: 150 };
 /** The sun baked into each sky plate (fraction of the plate), see docs/art/sunrise/README.md. */
 const SKY_SUN: Record<Breakpoint, { x: number; y: number }> = { desktop: { x: 0.79, y: 0.68 }, mobile: { x: 0.78, y: 0.5 } };
 
