@@ -88,10 +88,14 @@ export const RADIO_LAYOUT: { wide: RadioLayout; tall: RadioLayout } = {
 	}
 };
 
-/** Landscape plates. `horizonY`: the painted mist band (waveform baseline) as a fraction of the plate height. */
+/**
+ * Landscape plates, measured on the full painted master (`w` × `h` = its aspect). `horizonY`: the painted mist band
+ * (waveform baseline) as a fraction of the master height. `cropTop`: fraction of the master cut off at the top by
+ * `assets/build-art.ts` (sky and moon); the WebP holds only the rest and is drawn at that offset inside the stage.
+ */
 export const LANDSCAPE = {
-	wide: { w: 1920, h: 1080, horizonY: 748 / 1440 },
-	tall: { w: 1080, h: 2340, horizonY: 950 / 2340 }
+	wide: { w: 2560, h: 1440, horizonY: 748 / 1440, cropTop: 480 / 1440 },
+	tall: { w: 1080, h: 2340, horizonY: 950 / 2340, cropTop: 585 / 2340 }
 } as const;
 
 /** Height of the waveform band around the horizon, as a fraction of the plate height. */

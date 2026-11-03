@@ -36,7 +36,7 @@ All rects are **(x, y, width, height)** in the final PNG's pixel coordinates, to
 
 Suggested starting placements, to be tuned with the live page copy. All screen-space coordinates refer to the matching landscape canvas. Scale the body and all controls together; never recrop the body independently from its overlays.
 
-1. **z 0:** landscape, full 2560×1440 on desktop or 1080×2340 on mobile. Moon and stars are baked into each plate.
+1. **z 0:** landscape, full 2560×1440 on desktop or 1080×2340 on mobile. Moon and stars are baked into each master; the app plates cut the sky with the moon off (`build-art.ts`, `LANDSCAPE.*.cropTop`), so the section shows only mountains, mist, sea and forest under the page's own night sky.
 2. **z 1:** code-drawn waveform behind radio. Desktop empty mist safe band **(0, 700, 2560, 95)**, baseline y=748. Mobile mist safe band **(0, 880, 1080, 140)**, baseline y=950. The mobile generation placed this band somewhat above the exact midpoint; use the measured band instead of assuming 50%.
 3. **z 2:** radio body. Desktop initial box **(480, 350, 1600, 960)**, scale 0.8. Mobile initial box **(0, 1220, 1080, 648)**, scale 0.54. Transparent lower padding means the visible feet end above the bottom of these boxes; both placements land them on the painted rock.
 4. **z 3:** live dial content, needle, keys and two knob overlays in body coordinates.

@@ -2,14 +2,17 @@
 	@component
 	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): a painted radio on the cliff, one preset key per social
 	platform (real logos), a tuning dial (slider) that snaps to stations, the display strip with the handle and a real
-	follow link, live station content (latest video, latest commit), the music station "Solo Stack FM", and the
+	follow link, live station content (latest video, latest commit), a short song per station (`track/`), and the
 	printed frequency chart with every link (the accessible, no-JS fallback).
 
 	Decisions (documented here for the lead):
-	- Audio never autoplays. The shared AudioContext (`audio.unlock()`) is created on the first key press or play
-	  click; the Web Audio code (`sound.ts`) is a lazy chunk, prefetched when the section comes near the viewport.
+	- Audio never autoplays. Tuning a station (key press, dial release, keyboard step: all user gestures) starts its
+	  song; the shared AudioContext (`audio.unlock()`) is created in that gesture. The Web Audio code (`sound.ts`) is a
+	  lazy chunk, prefetched when the section comes near the viewport. One `<audio preload="none">` element plays the
+	  tuned station's file, so a song is only downloaded when its station is tuned. A station without a song is silent.
 	- Leaving the viewport **pauses** the music (no mini player). It does not resume by itself when the visitor comes
-	  back: resuming without a click would be autoplay. Tuning away from Solo Stack FM also stops it.
+	  back: resuming without a click would be autoplay. Dragging the needle off the station or tuning another one
+	  stops the song; the strip's play button pauses and resumes it.
 	- Star pulse: the section sets `--radio-pulse` (0…1, smoothed RMS of the playing track) on its root element. The
 	  local star layer reads it for its opacity. 0 when idle, paused, or under reduced motion (never written then).
 	- Reduced motion: needle and knob jump without a sweep, no star pulse, the horizon waveform is one static frame,
@@ -27,7 +30,6 @@
 	import Waveform from './Waveform.svelte';
 	import { LANDSCAPE, RADIO_LAYOUT, WAVEFORM_BAND } from './layout.ts';
 	import { DIAL_IDLE, STATIONS, dialValue, nearestStation, stationAt, type Station } from './stations.ts';
-	import { TRACK } from './track/index.ts';
 	import type { PlayerGraph } from './sound.ts';
 
 	let section: HTMLElement;
@@ -56,9 +58,34 @@
 		});
 	}
 
-	function select(station: Station | null) {
+	/** Commit a station (inside a user gesture): its song starts, any other song stops. */
+	function select(station: Station) {
+		const changed = station.id !== selected?.id;
 		selected = station;
-		if (station?.kind !== 'music' && playing) player?.pause();
+		if (!player) return;
+		if (changed) {
+			player.pause();
+			if (station.track) player.src = station.track.src;
+			else {
+				player.removeAttribute('src');
+				player.load();
+			}
+		}
+		if (station.track && (changed || player.paused)) void start();
+	}
+
+	/** Start the loaded song. `audio.unlock()` runs synchronously in the gesture that called this. */
+	async function start() {
+		if (!player?.getAttribute('src')) return;
+		const context = audio.unlock();
+		const { connectPlayer } = await loadSound();
+		if (!audio.output) return;
+		graph = connectPlayer(player, context, audio.output, volume);
+		try {
+			await player.play();
+		} catch {
+			playing = false;
+		}
 	}
 
 	function onpreset(station: Station) {
@@ -73,6 +100,8 @@
 		dial = value;
 		const live = stationAt(value);
 		if (live && live.id !== lastLive?.id) crackle();
+		// Off the committed station: its song stops like a real radio losing the signal
+		if (live?.id !== selected?.id && playing) player?.pause();
 		lastLive = live;
 	}
 
@@ -98,21 +127,9 @@
 		onpreset(STATIONS[next]);
 	}
 
-	async function togglePlay() {
-		if (!player || !TRACK.src) return;
-		if (playing) {
-			player.pause();
-			return;
-		}
-		const context = audio.unlock();
-		const { connectPlayer } = await loadSound();
-		if (!audio.output) return;
-		graph = connectPlayer(player, context, audio.output, volume);
-		try {
-			await player.play();
-		} catch {
-			playing = false;
-		}
+	function togglePlay() {
+		if (playing) player?.pause();
+		else void start();
 	}
 
 	function setVolume(value: number) {
@@ -136,6 +153,8 @@
 	aria-labelledby="home-radio-title"
 	style:--horizon-wide={LANDSCAPE.wide.horizonY}
 	style:--horizon-tall={LANDSCAPE.tall.horizonY}
+	style:--crop-wide={LANDSCAPE.wide.cropTop}
+	style:--crop-tall={LANDSCAPE.tall.cropTop}
 	style:--horizon-at-wide={wide.horizonAt}
 	style:--horizon-at-tall={tall.horizonAt}
 	style:--aspect-wide={wide.size.h / wide.size.w}
@@ -189,11 +208,13 @@
 					{dragging}
 					{reduced}
 					{volume}
+					{playing}
 					{onpreset}
 					{ondialinput}
 					{ondialcommit}
 					{ondialkey}
 					strip={stripContent}
+					song={songControls}
 				/>
 			</div>
 			<div class="variant variant-tall">
@@ -206,11 +227,13 @@
 					{dragging}
 					{reduced}
 					{volume}
+					{playing}
 					{onpreset}
 					{ondialinput}
 					{ondialcommit}
 					{ondialkey}
 					strip={stripContent}
+					song={songControls}
 				/>
 			</div>
 		</div>
@@ -220,19 +243,16 @@
 
 	<p class="sr-only" role="status">{selected ? m.home_radio_tuned_status({ name: selected.name }) : ''}</p>
 
-	{#if TRACK.src}
-		<audio
-			bind:this={player}
-			preload="none"
-			loop={TRACK.loop}
-			crossorigin="anonymous"
-			onplay={() => (playing = true)}
-			onpause={() => (playing = false)}
-			onended={() => (playing = false)}
-		>
-			<source src={TRACK.src} type={TRACK.type} />
-		</audio>
-	{/if}
+	<!-- The tuned station's song; `select()` sets its src, so nothing downloads before a station with a song is tuned -->
+	<audio
+		bind:this={player}
+		preload="none"
+		loop
+		crossorigin="anonymous"
+		onplay={() => (playing = true)}
+		onpause={() => (playing = false)}
+		onended={() => (playing = false)}
+	></audio>
 </section>
 
 {#snippet stripContent(variant: 'wide' | 'tall')}
@@ -251,44 +271,35 @@
 		<div class="strip-row strip-sub">
 			<span class="strip-hint font-mono">{m.home_radio_strip_idle()}</span>
 		</div>
-	{:else if station.kind === 'music'}
-		<div class="strip-row">
-			<span class="strip-handle font-mono">{station.name}</span>
-			{#if TRACK.src}
-				<button type="button" class="strip-button" onclick={togglePlay} aria-label={playing ? m.home_radio_pause() : m.home_radio_play()}>
-					{#if playing}
-						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" /></svg>
-					{:else}
-						<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
-					{/if}
-				</button>
-			{/if}
-		</div>
-		<div class="strip-row strip-sub">
-			{#if TRACK.src}
-				<label class="strip-volume">
-					<span class="sr-only">{m.home_radio_volume()}</span>
-					<input type="range" min="0" max="1" step="0.05" value={volume} oninput={(event) => setVolume(event.currentTarget.valueAsNumber)} />
-				</label>
-				{#if TRACK.title}<span class="strip-line">{TRACK.title}</span>{/if}
-			{:else}
-				<span class="strip-line">{m.home_radio_fm_coming_soon()}</span>
-			{/if}
-		</div>
 	{:else}
 		<div class="strip-row">
 			<span class="strip-handle font-mono">{station.handle ?? station.name}</span>
 			<span class="strip-freq font-mono" aria-hidden="true">{station.frequency}</span>
 		</div>
 		<div class="strip-row strip-sub">
-			{#if station.url}
-				<a class="strip-button strip-follow" href={station.url} rel="me noopener" target="_blank">
-					<span class="strip-button-text">{m.home_radio_follow_label({ platform: station.name })}</span>
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
-					<span class="sr-only">{m.home_radio_opens_new_tab()}</span>
-				</a>
-			{/if}
+			<a class="strip-button strip-follow" href={station.url} rel="me noopener" target="_blank">
+				<span class="strip-button-text">{m.home_radio_follow_label({ platform: station.name })}</span>
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
+				<span class="sr-only">{m.home_radio_opens_new_tab()}</span>
+			</a>
 		</div>
+	{/if}
+{/snippet}
+
+{#snippet songControls(station: Station)}
+	<!-- Song of the tuned station on the glass: play/pause and volume once it is the committed station -->
+	{#if station.id === selected?.id}
+		<button type="button" class="song-button" onclick={togglePlay} aria-label={playing ? m.home_radio_pause() : m.home_radio_play()}>
+			{#if playing}
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor" /></svg>
+			{:else}
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+			{/if}
+		</button>
+		<label class="song-volume">
+			<span class="sr-only">{m.home_radio_volume()}</span>
+			<input type="range" min="0" max="1" step="0.05" value={volume} oninput={(event) => setVolume(event.currentTarget.valueAsNumber)} />
+		</label>
 	{/if}
 {/snippet}
 
@@ -298,12 +309,15 @@
 	 * horizon always crosses the radio at `horizonAt` (layout.ts) whatever the viewport. The section clips the overflow.
 	 *   --radio-w     rendered radio width
 	 *   --stage-w     landscape width (covers the section with slack); its height is --stage-w × plate aspect
+	 *   --crop        top fraction of the painted master cut off in the plate files (sky with the moon): the stage keeps
+	 *                 the master's box, the plate fills it from there down and fades in at its top edge
 	 *   --radio-pulse star pulse from the music (0…1), written by Waveform via setPulse
 	 */
 	.radio {
 		--radio-pulse: 0;
 		--plate-aspect: calc(1440 / 2560);
 		--horizon: var(--horizon-wide);
+		--crop: var(--crop-wide);
 		--horizon-at: var(--horizon-at-wide);
 		--radio-aspect: var(--aspect-wide);
 		--band: var(--band-wide);
@@ -351,10 +365,12 @@
 
 	.stage :global(.plate) {
 		position: absolute;
-		inset: 0;
+		top: calc(var(--crop) * 100%);
+		left: 0;
 		width: 100%;
-		height: 100%;
+		height: calc((1 - var(--crop)) * 100%);
 		object-fit: cover;
+		mask-image: linear-gradient(to bottom, transparent 0, #000 22%);
 	}
 
 	.stage :global(.plate-tall) {
@@ -434,10 +450,6 @@
 		font-size: 0.68rem;
 	}
 
-	.strip-tall button.strip-button {
-		padding: 0.25rem;
-	}
-
 	.strip-dash {
 		color: var(--color-butter);
 		opacity: 0.6;
@@ -476,14 +488,6 @@
 		text-overflow: ellipsis;
 	}
 
-	.strip-line {
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		color: inherit;
-	}
-
 	.strip-button {
 		flex: 0 1 auto;
 		min-width: 0;
@@ -515,12 +519,40 @@
 		height: 0.95rem;
 	}
 
-	button.strip-button {
-		padding: 0.45rem;
+	/* Song controls on the glass (snippet rendered by RadioSet) */
+	.song-button {
+		display: inline-grid;
+		flex: none;
+		place-items: center;
+		width: 1.7em;
+		height: 1.7em;
+		padding: 0;
+		border: 0;
+		border-radius: 999px;
+		background: var(--color-butter);
+		color: var(--color-night);
+		box-shadow:
+			0 0 0 1.5px #1b1713,
+			0 0 12px rgb(252 215 114 / 0.45);
+		cursor: pointer;
 	}
 
-	.strip-volume input {
-		width: 7rem;
+	.song-button:hover {
+		background: var(--color-cream);
+	}
+
+	.song-button svg {
+		width: 60%;
+		height: 60%;
+	}
+
+	.song-volume {
+		display: flex;
+		flex: none;
+	}
+
+	.song-volume input {
+		width: 5rem;
 		accent-color: var(--color-butter);
 	}
 
@@ -553,6 +585,7 @@
 		.radio {
 			--plate-aspect: calc(2340 / 1080);
 			--horizon: var(--horizon-tall);
+			--crop: var(--crop-tall);
 			--horizon-at: var(--horizon-at-tall);
 			--radio-aspect: var(--aspect-tall);
 			--band: var(--band-tall);

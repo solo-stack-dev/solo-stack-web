@@ -16,14 +16,12 @@
 	}
 
 	let { stations, active, class: className = '' }: Props = $props();
-
-	const links = $derived(stations.filter((station): station is Station & { url: string } => station.url !== null));
 </script>
 
 <div class={['chart', className]}>
 	<p class="chart-title font-mono" id="home-radio-chart-title">{m.home_radio_chart_title()}</p>
 	<ul aria-label={m.home_radio_socials_label()}>
-		{#each links as station (station.id)}
+		{#each stations as station (station.id)}
 			<li class:active={active === station.id}>
 				<a href={station.url} rel="me noopener" target="_blank">
 					<span class="freq font-mono" aria-hidden="true">{station.frequency}</span>

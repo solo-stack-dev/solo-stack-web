@@ -1,33 +1,49 @@
 /**
- * The Solo Stack FM track: "Bis es hell wird", generated locally with YuE2 (m-a-p/YuE2-3B, seed 7531) from lyrics and
- * title written by gpt-6.1-sol (docs/copy/radio-track-prompt.md → docs/copy/radio-track-lyrics.txt). AAC 128 kbps,
- * 2:27, about -14 LUFS, true peak -1 dBTP. The other candidates and the raw FLAC stay in the owner's YuE checkout
- * (`D:/repos/YuE/output/solo-stack/`).
+ * Station songs: every station plays its own short looping song while it is tuned. A song is a file in this folder
+ * named after the station id (`SocialId` in `socials.ts`), e.g. `youtube.m4a`. A station without a file still works,
+ * it just plays no music: to give Discord a song later, drop `discord.m4a` here (and its title into `TITLES`).
  *
- * To replace the track:
- * 1. Put the file here, e.g. `track/solo-stack-fm.m4a` (AAC) or `.opus`/`.webm` (Opus), ≤ 4 MB, loudness ~-14 LUFS.
- * 2. Import it so Vite fingerprints it: `import file from './solo-stack-fm.m4a?url';` and set `src: file`.
- * 3. Set `title` to the track title (a proper name, the owner's own data) and `type` to its MIME type.
+ * The songs were generated locally with YuE2 (m-a-p/YuE2-3B) from lyrics and titles written by gpt-6.1-sol; prompts,
+ * lyrics, styles, seeds and the chosen takes are in docs/art/radio/SONGS.md. AAC 77 to 80 kbps, 33 to 50 s, under
+ * 500 kB each, about -16 LUFS, faded at both ends so the loop restarts gently.
  *
- * While `src` is `null`, the station shows the "coming soon" placeholder and no audio element is rendered.
- * The audio is never preloaded (`preload="none"`) and only starts on a click.
+ * Only the file URLs are bundled (Vite fingerprints them); the audio itself loads when its station is tuned and the
+ * song starts (`preload="none"`).
  */
-import file from './solo-stack-fm.m4a?url';
+import type { SocialId } from '#lib/home/data/socials.ts';
 
 export interface Track {
-	/** URL of the audio file, or `null` until the owner supplies it. */
-	src: string | null;
-	/** MIME type for the `<source>`, e.g. `audio/mp4` (AAC) or `audio/ogg; codecs=opus`. */
+	/** URL of the audio file. */
+	src: string;
+	/** MIME type for the `<audio>` source. */
 	type: string;
-	/** Track title (proper name), shown on the display strip while the station is tuned. */
+	/** Song title (the owner's own data, generated with gpt-6.1-sol), shown while the station is tuned. */
 	title: string | null;
-	/** Loop the track (a radio never stops). */
-	loop: boolean;
 }
 
-export const TRACK: Track = {
-	src: file,
-	type: 'audio/mp4',
-	title: 'Bis es hell wird',
-	loop: true
+/** Song titles by station (docs/art/radio/SONGS.md). */
+const TITLES: Partial<Record<SocialId, string>> = {
+	youtube: 'Small Red Light',
+	github: 'A Little Done',
+	instagram: 'Both Can Stay',
+	tiktok: 'Hold Me Still',
+	x: 'Past the Fence',
+	bluesky: 'Open Air',
+	threads: 'Loose End',
+	twitch: 'Half a Cup',
+	facebook: 'The Fold'
 };
+
+const MIME: Record<string, string> = { m4a: 'audio/mp4', mp3: 'audio/mpeg', opus: 'audio/ogg; codecs=opus', webm: 'audio/webm' };
+
+const files = import.meta.glob<string>('./*.{m4a,mp3,opus,webm}', { query: '?url', import: 'default', eager: true });
+
+const TRACKS = new Map<string, Track>(
+	Object.entries(files).map(([path, src]) => {
+		const [, id, extension] = /^\.\/(.+)\.(\w+)$/.exec(path)!;
+		return [id, { src, type: MIME[extension], title: TITLES[id as SocialId] ?? null }];
+	})
+);
+
+/** The song of a station, or `null` if it has none (the station then plays no music). */
+export const trackFor = (id: SocialId): Track | null => TRACKS.get(id) ?? null;

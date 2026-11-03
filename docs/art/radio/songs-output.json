@@ -1,0 +1,40 @@
+{
+	"songs": {
+		"youtube": {
+			"title": "Small Red Light",
+			"lyrics": "[Verse]\nSmall red light above your eye\nI take a breath and lose my place\nThe window holds a slice of sky\nI wish the dark could show a face\n\n[Chorus]\nIs someone still awake out there\nWith tired eyes and things to say\nI leave a little empty air\nIn case your voice can find its way"
+		},
+		"github": {
+			"title": "A Little Done",
+			"lyrics": "[Verse]\nI put the last small piece away\nA patch of green beside the date\nThe branches bend, then meet again\nIt's getting late, but this can wait\n\n[Chorus]\nA little done is still enough\nI set it down and loosen up\nThere is no need to get it right\nI'll pick it up with morning light"
+		},
+		"instagram": {
+			"title": "Both Can Stay",
+			"lyrics": "[Verse]\nThe picture keeps a golden glow\nMy room is blue behind the glass\nI turn the lamp down soft and low\nAnd let the brighter colors last\n\n[Chorus]\nThe pretty part can still be true\nThe quiet part can stay here too\nI don't have to hide the night\nTo keep a little piece of light"
+		},
+		"tiktok": {
+			"title": "Hold Me Still",
+			"lyrics": "[Verse]\nMy thumb moves faster than my eyes\nThe clock says two, I blink again\nThe ceiling hears my little sighs\nI swear I'm done, but here I am\n\n[Chorus]\nCan one small moment hold me still\nAnd leave a little warmth behind\nI keep on saying that it will\nThen let it slip right through my mind"
+		},
+		"x": {
+			"title": "Past the Fence",
+			"lyrics": "[Verse]\nI throw a few words past the fence\nThey drop where I can never see\nThe dark is deep, the air is tense\nI wonder what comes back to me\n\n[Chorus]\nAn echo or a passing car\nI turn my head toward the sound\nI can't tell if you're near or far\nI keep my feet here on the ground"
+		},
+		"bluesky": {
+			"title": "Open Air",
+			"lyrics": "[Verse]\nI set my old coat by the door\nThe sky is clear enough to breathe\nA butterfly rests on the floor\nI open up and let it leave\n\n[Chorus]\nThere's room to start with something small\nThere's room to change the way I go\nI don't need answers to it all\nJust open air and room to grow"
+		},
+		"threads": {
+			"title": "Loose End",
+			"lyrics": "[Verse]\nYour sleeve has caught against the chair\nI find a loose end in my hand\nI pull, then stop and leave it there\nSome things are hard to understand\n\n[Chorus]\nYou don't have to finish that thought\nI'm here with all the words you dropped\nWe leave the little knot untied\nAnd sit a while on either side"
+		},
+		"twitch": {
+			"title": "Half a Cup",
+			"lyrics": "[Verse]\nThe cup is warm against my knee\nA little glow across the keys\nA quiet laugh comes through to me\nI let my shoulders fall with ease\n\n[Chorus]\nPull up a chair and take your time\nThere's something warm left in the pot\nYou tell me yours, I'll tell you mine\nI thought I was alone, I'm not"
+		},
+		"facebook": {
+			"title": "The Fold",
+			"lyrics": "[Verse]\nThe picture's creased along the fold\nWe're standing by your mother's gate\nYour birthday's circled on the page\nI hope my call won't come too late\n\n[Chorus]\nI still remember how you grin\nYour face all warm with candlelight\nI wonder how your days have been\nI might just call and say goodnight"
+		}
+	}
+}
