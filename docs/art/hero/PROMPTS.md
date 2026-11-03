@@ -132,7 +132,7 @@ Exact prompt:
 Use case: stylized-concept. Highest available quality. Original PRODUCTION 3D TEXTURE, PNG 4096x2048, exact 2:1 aspect. Equirectangular flat albedo of an entire watercolor moon surface, NOT a picture of a moon, NOT a sphere or disc. Full rectangular edge-to-edge butter-yellow #FCD772 painted paper field with ochre #E2A93B pigment craters, soft diffuse cream #FBF3DD patches, wet-on-wet pigment blooms, granulation and pooled irregular crater rings matching the reference moon's watercolor material. Craters different sizes, naturally distributed across ALL the field including borders. Entire rectangle stays evenly exposed, no brighter center, no dark sides. STRICT flat unlit albedo: no baked lighting, shadow, ambient occlusion, gradients, specular, glow or vignette. Seamless left-right tile: pigment crossing right edge continues exactly on left; no visible seam when wrapped horizontally. Equirectangular pole regions should use stretched horizontal low-contrast pigment to avoid polar pinching. No night sky, no border, no disc outline, no transparent background, no figures, mascot, stars, objects, letters, text, symbols, watermark. No pure black or white. Reference 1 finish style, reference 2 palette, reference 3 lunar pigment only. Texture asset only.
 ```
 
-## hero-portrait-frame.png
+## hero-portrait-frame.png (retired 2026-11-03, master removed)
 
 - Native: 1134×1387 px. Final: 900×1100 px.
 - `transparent_background`: true.

@@ -156,7 +156,7 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 **References:** `02-hero/05-painted-moon-desktop.png` (main), `02-hero/06-painted-moon-mobile.png`, `02-hero/07-painted-moon-phase-strip.png`. Ignore the mockup's mascot style (style lock §3.4).
 
-**Composition:** night sky on the left with painted clouds and stars; a huge painted moon on the right, partly off screen; the wordmark across the middle, **"SOLO" in cream over the night and "STACK" in night anthracite over the moon** (the letters change color exactly where they cross the moon's edge); the mascot sitting on the moon's upper rim with a glowing laptop; the owner's real portrait (from `profil-buttergelb.png`) in a small torn paper frame bottom left; clock `20:00` top left; a scroll cue at the bottom.
+**Composition:** night sky on the left with painted clouds and stars; a huge painted moon on the right, partly off screen; the wordmark across the middle, **"SOLO" in cream over the night and "STACK" in night anthracite over the moon** (the letters change color exactly where they cross the moon's edge); the mascot sitting on the moon's upper rim with a glowing laptop; clock `20:00` top left; a scroll cue at the bottom.
 
 **Behavior:**
 
@@ -170,7 +170,7 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 - Moon: Threlte `Canvas` with a sphere, a painted equirectangular moon texture (generated in Phase 1, watercolor craters as pigment blooms), and a custom or toon material that keeps the watercolor look. One directional light controls the phase. A soft glow sprite or post effect provides the halo. Fallback before hydration and for reduced motion or no WebGL: the painted moon image layer, which has the same position and size.
 - Wordmark color split: render the wordmark twice, cream and night, and clip the night copy to the moon's circle (`clip-path: circle(...)`) whose geometry is shared with the moon layout. Keep the moon at a fixed layout position per breakpoint so the clip always matches.
-- Layers: sky plate, cloud layers (2–3), star field (shared), painted moon fallback, moon texture for 3D, mascot on the rim (transparent), portrait frame (torn paper mask + the real photo).
+- Layers: sky plate, cloud layers (2–3), star field (shared), painted moon fallback, moon texture for 3D, mascot on the rim (transparent).
 
 **Mobile:** follow `06-painted-moon-mobile.png`: moon at the top right, wordmark stacked, mascot smaller. The 3D moon may be replaced by the painted image on low end devices (check `navigator.hardwareConcurrency` and `deviceMemory`, or simply use the image below a width threshold).
 
@@ -326,11 +326,11 @@ The game is **not decided**. A game has to be played to judge, so build **three 
 
 **References:** `06-video-sunrise/05-sunrise-footer-desktop.png`, `06-sunrise-footer-mobile.png`, `07-night-to-sunrise-mid-scroll.png`.
 
-**Composition:** the night sky retreats upward as a ragged watercolor edge with the last stars, revealing butter yellow pigment paper; a misty valley with the rising sun; the mascot walking along the cliff path carrying the laptop; a steaming coffee cup on a rock; the wordmark bottom left; footer links (Impressum, Datenschutz, Kontakt) and social icons bottom right; clock `06:00`.
+**Composition:** the night sky retreats upward as a ragged watercolor edge with the last stars, revealing butter yellow pigment paper; a misty valley with the rising sun; a steaming coffee cup on a rock with a closed laptop lying next to it (the shift is over; no mascot); the wordmark bottom left with the owner's real photo (from `profil-buttergelb.png`) next to it as an anthracite ink print on the butter paper; footer links (Impressum, Datenschutz, Kontakt) and social icons bottom right; clock `06:00`.
 
-**Behavior:** the night to day transition is scroll driven (`07-night-to-sunrise-mid-scroll.png` is the midpoint): the watercolor edge moves up, the sky color shifts via `--night`, the sun rises a little. The mascot walks a few steps as you scroll (translate plus a 2–4 frame walk cycle) or idles if at rest.
+**Behavior:** the night to day transition is scroll driven (`07-night-to-sunrise-mid-scroll.png` is the midpoint): the watercolor edge moves up, the sky color shifts via `--night`, the sun rises a little.
 
-**Build:** painted layers (night edge mask, paper sky, valley, cliff path, mascot frames, coffee), scroll driven CSS animations with JS fallback.
+**Build:** painted layers (night edge mask, paper sky, valley, cliff path, coffee, closed laptop), scroll driven CSS animations with JS fallback.
 
 **Reduced motion:** final sunrise state, static.
 
@@ -375,13 +375,13 @@ The mockups are single flat images with baked in placeholder text. Production ne
 
 ### 6.3 Layer lists per section
 
-- **Hero:** sky plate without moon and text (2560×1440 plus a mobile 1080×2340 crop); 2–3 cloud layers (transparent); painted moon disc (transparent, square, 2048 px) as the fallback; moon equirectangular texture (4096×2048, seamless horizontally) for 3D; mascot on the moon rim (transparent); torn paper frame mask for the portrait.
+- **Hero:** sky plate without moon and text (2560×1440 plus a mobile 1080×2340 crop); 2–3 cloud layers (transparent); painted moon disc (transparent, square, 2048 px) as the fallback; moon equirectangular texture (4096×2048, seamless horizontally) for 3D; mascot on the moon rim (transparent).
 - **Making:** night plate with the pigment cloud at the top left and the cliff + laptop + moon at the right edge (no line, no shape, no text); six watercolor bloom fills (transparent, roughly square), one per state.
 - **Game (after the pick only):** A moon planet: painted moon texture or sprites, bug sprites (idle, walk, squashed), boss bug, star pickup, mascot run/jump/land frames. B stack to the moon: paper block textures (blank, labels in code), sky gradient plates for the climb, moon bridge, mascot cheer frames. C constellation hunt: deep night plate, paper note card texture, zodiac wheel ornament (stars and lines are code).
 - **Night shift:** room background plate (no mascot, no screen content), window plate (sky, moon, trees) if separable, desk and props layer, mascot typing frames (transparent), bonsai normal and golden states, handheld (original design), foreground elements for parallax. Mobile crop variants.
 - **Radio:** painted radio body (transparent) with an empty dial glass, needle (transparent), preset key (one blank key style; logos are added in code), landscape plate with an empty horizon band, moon.
 - **Cinema:** night landscape plate (no frame, no beam), cliff with laptop (transparent), mascot sitting (transparent), painted screen frame border (transparent center), optional beam texture.
-- **Sunrise:** paper sunrise sky plate, retreating night edge mask (alpha), valley plate, cliff path, coffee cup (transparent), mascot walking frames.
+- **Sunrise:** paper sunrise sky plate, retreating night edge mask (alpha), valley plate, cliff path, coffee cup (transparent), closed laptop (transparent).
 - **Shared:** paper grain tile, 2–3 watercolor edge masks, a few star sprites, shooting star streak, torn paper edge.
 - **Eggs and errors:** per §5.8, with model sheet v2.
 

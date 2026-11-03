@@ -10,7 +10,7 @@
 	every size and in every phase.
 
 	Layers (bottom → top): sky plate, stars, back clouds (1, 2), moon rig, front cloud (3), cream wordmark, anthracite
-	wordmark, portrait, clock, scroll cue. The painted masters live in docs/art; tools/build-assets.mjs makes the
+	wordmark, clock, scroll cue. The painted masters live in docs/art; tools/build-assets.mjs makes the
 	optimized, cropped copies in ./assets and writes their crop rects to art.ts (README.md).
 
 	Events (window): `night:moon-phase` { phase } on every phase change, `night:moon-full-clicks` { count } for
@@ -49,8 +49,6 @@
 	import moonDisc from './assets/hero-moon-disc.webp?w=1942;1520;1200;900;640&quality=38&enhanced';
 	import mascot from './assets/mascot-hero-moonrim.webp?w=640;420;280&quality=55&enhanced';
 	import mascotGolden from './assets/mascot-golden.webp?w=640;420;280&quality=55&enhanced';
-	import portrait from './assets/hero-portrait.png?w=400;240&quality=55&enhanced';
-	import portraitFrame from './assets/hero-portrait-frame.webp?w=400;240&quality=55&enhanced';
 
 	const PHASE_NAMES: Record<MoonPhase, () => string> = {
 		full: m.home_hero_moon_phase_full,
@@ -86,22 +84,6 @@
 		sitY: ((MASCOT_SEAT.y - mascotCrop.top) / mascotCrop.height) * 100
 	};
 
-	/** Photo window of the torn frame, grown a little so the photo edge always tucks under the paper. */
-	const frame = ART_CROPS['hero-portrait-frame'];
-	const frameWindow = frame.window ?? {
-		left: frame.crop.left,
-		top: frame.crop.top,
-		right: frame.crop.left + frame.crop.width,
-		bottom: frame.crop.top + frame.crop.height
-	};
-	const TUCK = 0.02;
-	const portraitWindow = {
-		aspect: frame.crop.width / frame.crop.height,
-		left: ((frameWindow.left - frame.crop.left) / frame.crop.width - TUCK) * 100,
-		top: ((frameWindow.top - frame.crop.top) / frame.crop.height - TUCK) * 100,
-		right: ((frame.crop.left + frame.crop.width - frameWindow.right) / frame.crop.width - TUCK) * 100,
-		bottom: ((frame.crop.top + frame.crop.height - frameWindow.bottom) / frame.crop.height - TUCK) * 100
-	};
 	const pct = (value: number) => `${value.toFixed(3)}%`;
 
 	/** `sizes` per layer, mirroring the CSS below: phone/tall-portrait layout first, then desktop. */
@@ -112,9 +94,7 @@
 		cloud1: phone('150vw', '74vw'),
 		cloud2: phone('130vw', '58vw'),
 		cloud3: phone('170vw', '64vw'),
-		mascot: phone('28vw', 'clamp(7rem, 11vw, 13rem)'),
-		photo: 'clamp(4rem, 8vw, 8.5rem)',
-		frame: 'clamp(5.5rem, 10.5vw, 11rem)'
+		mascot: phone('28vw', 'clamp(7rem, 11vw, 13rem)')
 	};
 
 	// --- Moon phase ---------------------------------------------------------------------------------------------
@@ -359,18 +339,6 @@
 			<p class="wordmark is-night settle">{@render wordmarkText()}</p>
 		</div>
 	</div>
-
-	<figure
-		class="portrait"
-		style:--frame-aspect={portraitWindow.aspect.toFixed(4)}
-		style:--window-left={pct(portraitWindow.left)}
-		style:--window-top={pct(portraitWindow.top)}
-		style:--window-right={pct(portraitWindow.right)}
-		style:--window-bottom={pct(portraitWindow.bottom)}
-	>
-		<enhanced:img class="portrait-photo" src={portrait} alt={m.home_hero_portrait_alt()} sizes={SIZES.photo} />
-		<enhanced:img class="portrait-frame" src={portraitFrame} alt="" sizes={SIZES.frame} />
-	</figure>
 
 	<NightClock time="20:00" />
 
@@ -776,39 +744,7 @@
 		}
 	}
 
-	/* Portrait, clock, scroll cue ------------------------------------------------------------------------------ */
-
-	.portrait {
-		position: absolute;
-		z-index: 7;
-		left: clamp(1rem, 3cqw, 3rem);
-		bottom: clamp(1rem, 4cqh, 3rem);
-		width: clamp(5.5rem, 10.5cqw, 11rem);
-		aspect-ratio: var(--frame-aspect);
-		margin: 0;
-		rotate: -4deg;
-	}
-
-	.portrait :global(img) {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-
-	/* The photo fills the torn frame's window (art.ts) and tucks under the paper edge */
-	.portrait :global(.portrait-photo) {
-		left: var(--window-left);
-		top: var(--window-top);
-		width: calc(100% - var(--window-left) - var(--window-right));
-		height: calc(100% - var(--window-top) - var(--window-bottom));
-		object-fit: cover;
-		object-position: 50% 30%;
-	}
-
-	.portrait :global(.portrait-frame) {
-		inset: 0;
-		filter: drop-shadow(0 0.4rem 0.8rem color-mix(in oklab, var(--color-ink) 55%, transparent));
-	}
+	/* Scroll cue --------------------------------------------------------------------------------------------- */
 
 	.scroll-cue {
 		position: absolute;

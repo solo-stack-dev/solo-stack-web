@@ -3,15 +3,13 @@
 //
 // - plates (sky, sky-mobile): high quality WebP at their native generation size (1672×941, 852×1846; the 2560 and
 //   1080 masters are bilinear upscales without extra detail). enhanced-img makes the responsive AVIF/WebP.
-// - cutouts (clouds, moon disc, portrait frame, mascot + golden variant): cropped to their alpha bounding box,
+// - cutouts (clouds, moon disc, mascot + golden variant): cropped to their alpha bounding box,
 //   downscaled to what the page needs, and their crop rect is written to ../art.ts so the layout can keep using
-//   master coordinates (anchors, the moon circle, the portrait window)
+//   master coordinates (anchors, the moon circle)
 // - clouds: chroma fringe clean-up (red/yellow keying leftovers on the silhouette), see `cleanFringe`
 // - moon texture: 2048×1024 WebP for the Threlte sphere (loaded as a plain URL)
 //
-// - portrait: 640² copy of the owner photo (only when its source outside the repo exists; not part of the default run)
-//
-// Run: node src/lib/home/sections/hero/tools/build-assets.mjs [job ...]   (jobs: plates clouds moon frame mascot portrait)
+// Run: node src/lib/home/sections/hero/tools/build-assets.mjs [job ...]   (jobs: plates clouds moon mascot)
 // Preview of the cloud clean-up (before/after crops on dark and on butter): add `--preview <dir>`.
 // Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
@@ -24,8 +22,6 @@ const sharp = createRequire(`${root}node_modules/.pnpm/node_modules/`)('sharp');
 const master = (name) => `${root}docs/art/${name}`;
 const out = (name) => fileURLToPath(new URL(`../assets/${name}`, import.meta.url));
 const ART_TS = fileURLToPath(new URL('../art.ts', import.meta.url));
-/** The owner's photo (outside the repo); `portrait` job only. */
-const PORTRAIT_SOURCE = 'D:/repos/Solo Stack/branding/final-branding-assets/profil-buttergelb.png';
 
 const args = process.argv.slice(2);
 const previewIndex = args.indexOf('--preview');
@@ -229,11 +225,6 @@ async function cutout(name, file, { box, width, scale, clean, previewAt }) {
 }
 
 const jobs = {
-	async portrait() {
-		if (!existsSync(PORTRAIT_SOURCE)) return console.warn('portrait source not found, skipped:', PORTRAIT_SOURCE);
-		await sharp(PORTRAIT_SOURCE).resize(640, 640).png({ compressionLevel: 9 }).toFile(out('hero-portrait.png'));
-		console.log('hero-portrait.png');
-	},
 	async plates() {
 		await sharp(master('hero/hero-sky.png')).resize({ width: 1672, kernel: 'lanczos3' }).webp(WEBP).toFile(out('hero-sky.webp'));
 		await sharp(master('hero/hero-sky-mobile.png')).resize({ width: 852, kernel: 'lanczos3' }).webp(WEBP).toFile(out('hero-sky-mobile.webp'));
@@ -268,12 +259,6 @@ const jobs = {
 		await sharp(master('hero/hero-moon-texture.png')).resize(2048, 1024, { kernel: 'lanczos3' }).webp({ quality: 88, effort: 6 }).toFile(out('hero-moon-texture.webp'));
 		console.log('hero-moon-texture.webp: 2048×1024');
 	},
-	async frame() {
-		// Rendered ≤ 11rem wide: 400 px covers 2×.
-		const file = master('hero/hero-portrait-frame.png');
-		await cutout('hero-portrait-frame', file, { width: 400 });
-		crops['hero-portrait-frame'].window = portraitWindow(await readRaw(file));
-	},
 	async mascot() {
 		// One crop for both variants so the golden swap stays registered. Rendered ≤ ~15rem wide: 640 px covers 2×+.
 		const normal = await readRaw(master('mascot/mascot-hero-moonrim.png'));
@@ -284,28 +269,7 @@ const jobs = {
 	}
 };
 
-/** The transparent window of the torn frame: scan out from the center until the paper starts (alpha > 128). */
-function portraitWindow({ data, width, height }) {
-	const cx = Math.round(width / 2);
-	const cy = Math.round(height / 2);
-	const opaque = (x, y) => data[(y * width + x) * 4 + 3] > 128;
-	const scan = (x, y, dx, dy) => {
-		while (x > 0 && y > 0 && x < width - 1 && y < height - 1 && !opaque(x, y)) {
-			x += dx;
-			y += dy;
-		}
-		return dx ? x : y;
-	};
-	// a few scan lines per side; the innermost paper edge wins so the photo always tucks under the paper
-	const offsets = [-0.25, -0.1, 0, 0.1, 0.25];
-	const left = Math.max(...offsets.map((o) => scan(cx, Math.round(cy + o * height), -1, 0)));
-	const right = Math.min(...offsets.map((o) => scan(cx, Math.round(cy + o * height), 1, 0)));
-	const top = Math.max(...offsets.map((o) => scan(Math.round(cx + o * width), cy, 0, -1)));
-	const bottom = Math.min(...offsets.map((o) => scan(Math.round(cx + o * width), cy, 0, 1)));
-	return { left, top, right, bottom };
-}
-
-const selected = args.length ? args : Object.keys(jobs).filter((job) => job !== 'portrait');
+const selected = args.length ? args : Object.keys(jobs);
 for (const name of selected) await jobs[name]();
 
 // art.ts holds every crop, so a partial run must not drop the others: merge with the existing file (Node imports
@@ -324,7 +288,6 @@ writeFileSync(
 	crop: { left: number; top: number; width: number; height: number };
 ` +
 		`	output: { width: number; height: number };
-	window?: { left: number; top: number; right: number; bottom: number };
 }
 
 ` +

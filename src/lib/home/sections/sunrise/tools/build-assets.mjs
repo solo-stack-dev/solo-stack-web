@@ -7,15 +7,15 @@
 //   art.ts records where the crop sits on the master canvas, layout.ts places everything in master coordinates.
 // - Sources are high quality WebP (alpha kept); the lossy delivery encode happens in enhanced-img.
 //
-// - The walk: the 16-frame cycle baked by docs/art/mascot/build-walk.mjs --frames=16. Only the legs change shape
-//   between frames (the body is only translated, the near arm only rotated), so the legs ship as one atlas (row 0 the
-//   far leg, row 1 the near leg, one column per frame, every cell the union box of all leg frames) and body and arm as
-//   two static cutouts; Sunrise.svelte layers them like the bake did. A full-figure sheet costs ~2× the bytes.
+// - `portrait` job (not part of the default run; its source is the owner photo outside the repo): the footer's
+//   ink print. Crop to head and shoulders, key out the butter backdrop, turn luminance into ink density (anthracite
+//   with alpha = density), feather the shoulders and sides into the paper, and break the ink a little with the shared
+//   paper grain. Sunrise.svelte multiplies it onto the butter paper.
 //
-// Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs
+// Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs [portrait]
 // Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
-import { readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../../../../../../', import.meta.url));
@@ -29,9 +29,8 @@ const MAX_WIDTH = 1920;
 const ALPHA_THRESHOLD = 6;
 const PAD = 8;
 const WEBP = { quality: 92, alphaQuality: 100, effort: 6, smartSubsample: true };
-/** Walk sources: master px → source px. 0.5 covers the largest render (desktop 1920 px at 2×, ~0.53). */
-const WALK_SCALE = 0.5;
-const WALK_FRAMES = 16;
+/** The owner's photo (outside the repo, 1254²); `portrait` job only. */
+const PORTRAIT_SOURCE = 'D:/repos/Solo Stack/branding/final-branding-assets/profil-buttergelb.png';
 
 /**
  * Layers: `scale` shrinks the cropped content (the masters are upsampled from smaller native renders, so a smaller
@@ -44,8 +43,7 @@ const LAYERS = [
 	{ key: 'valley', src: 'sunrise/sunrise-valley.png', out: 'sunrise-valley.webp', crop: true },
 	{ key: 'cliffPath', src: 'sunrise/sunrise-cliff-path.png', out: 'sunrise-cliff-path.webp', crop: true },
 	{ key: 'coffee', src: 'sunrise/sunrise-coffee.png', out: 'sunrise-coffee.webp', crop: true },
-	{ key: 'walkBody', src: 'mascot/walk-puppet-body.png', out: 'mascot-walk-body.webp', crop: true, scale: WALK_SCALE },
-	{ key: 'walkArm', src: 'mascot/walk-puppet-arm-near.png', out: 'mascot-walk-arm.webp', crop: true, scale: WALK_SCALE }
+	{ key: 'laptop', src: 'sunrise/sunrise-laptop.png', out: 'sunrise-laptop.webp', crop: true }
 ];
 
 /** Placeholder files this script replaces. */
@@ -61,7 +59,10 @@ const STALE = [
 	'mascot-sunrise-walk@2.png',
 	'mascot-sunrise-walk@3.png',
 	'mascot-sunrise-walk@4.png',
-	'sunrise-mockup-ref.webp'
+	'sunrise-mockup-ref.webp',
+	'mascot-walk-body.webp',
+	'mascot-walk-arm.webp',
+	'mascot-walk-legs.webp'
 ];
 
 async function alphaBox(path) {
@@ -85,6 +86,65 @@ async function alphaBox(path) {
 	return { left, top, width: Math.min(info.width, x1 + 1 + PAD) - left, height: Math.min(info.height, y1 + 1 + PAD) - top };
 }
 
+const PORTRAIT = {
+	/** Head and shoulders in source px. */
+	crop: { left: 200, top: 40, width: 854, height: 1110 },
+	/** Output width: covers the largest render (~6.5rem wide) at 3×. */
+	width: 320,
+	/** Backdrop key on G − B (butter ≈ 70–110, skin ≈ −10–5, hair/shirt ≈ 0): fully paper above `to`. */
+	key: { from: 22, to: 48 },
+	/** Luminance → ink: L ≤ black is full ink, L ≥ paper is no ink; `gamma` > 1 keeps the skin tones light, like a print. */
+	tone: { black: 30, paper: 214, gamma: 1.3 },
+	/** Feather into the paper (fractions of the crop): bottom ramp, side ramps. */
+	feather: { bottom: 0.28, side: 0.14 },
+	/** How much the paper grain tile breaks up the ink (0…1). */
+	grain: 0.32,
+	ink: [24, 25, 27]
+};
+
+const smoothstep = (a, b, x) => {
+	const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+	return t * t * (3 - 2 * t);
+};
+
+async function portrait() {
+	if (!existsSync(PORTRAIT_SOURCE)) return console.warn('portrait source not found, skipped:', PORTRAIT_SOURCE);
+	const { width, height } = { width: PORTRAIT.width, height: Math.round((PORTRAIT.crop.height * PORTRAIT.width) / PORTRAIT.crop.width) };
+	const data = await sharp(PORTRAIT_SOURCE).removeAlpha().extract(PORTRAIT.crop).resize(width, height, { kernel: 'lanczos3' }).raw().toBuffer();
+	const grainFile = fileURLToPath(new URL('../../../shared/assets/paper-grain.png', import.meta.url));
+	const grainInfo = await sharp(grainFile).metadata();
+	const grain = await sharp(grainFile).ensureAlpha().extractChannel(3).raw().toBuffer();
+	const out = Buffer.alloc(width * height * 4);
+	const { key, tone, feather } = PORTRAIT;
+	for (let y = 0; y < height; y++) {
+		const fy = y / (height - 1);
+		const bottom = 1 - smoothstep(1 - feather.bottom, 1, fy);
+		for (let x = 0; x < width; x++) {
+			const fx = x / (width - 1);
+			const side = smoothstep(0, feather.side, fx) * smoothstep(0, feather.side, 1 - fx);
+			const i = (y * width + x) * 3;
+			const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+			const backdrop = smoothstep(key.from, key.to, g - b);
+			const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+			const ink = Math.pow(1 - smoothstep(tone.black, tone.paper, lum), tone.gamma);
+			const paper = grain[(y % grainInfo.height) * grainInfo.width + (x % grainInfo.width)] / 255;
+			const density = ink * (1 - backdrop) * bottom * side * (1 - PORTRAIT.grain * paper);
+			const o = (y * width + x) * 4;
+			out.set(PORTRAIT.ink, o);
+			out[o + 3] = density < 3 / 255 ? 0 : Math.round(density * 255);
+		}
+	}
+	const info = await sharp(out, { raw: { width, height, channels: 4 } })
+		.webp(WEBP)
+		.toFile(assets('sunrise-portrait.webp'));
+	console.log(`${'sunrise-portrait.webp'.padEnd(28)} ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0).padStart(5)} kB`);
+}
+
+if (process.argv.includes('portrait')) {
+	await portrait();
+	process.exit(0);
+}
+
 const art = {};
 for (const layer of LAYERS) {
 	const path = master(layer.src);
@@ -99,44 +159,6 @@ for (const layer of LAYERS) {
 		`${layer.out.padEnd(28)} ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0).padStart(5)} kB  crop ${box.left},${box.top} ${box.width}×${box.height}`
 	);
 }
-
-// Walk legs atlas: 2 rows (far, near) × WALK_FRAMES columns, every cell the same master box.
-const cycle = JSON.parse(readFileSync(master(`mascot/walk${WALK_FRAMES}-cycle.json`), 'utf8'));
-const legFrames = ['far', 'near'].flatMap((side) => Array.from({ length: WALK_FRAMES }, (_, i) => master(`mascot/walk${WALK_FRAMES}-leg-${side}@${i + 1}.png`)));
-const legBoxes = await Promise.all(legFrames.map(alphaBox));
-const cellLeft = Math.min(...legBoxes.map((b) => b.left));
-const cellTop = Math.min(...legBoxes.map((b) => b.top));
-const cell = {
-	left: cellLeft,
-	top: cellTop,
-	width: Math.max(...legBoxes.map((b) => b.left + b.width)) - cellLeft,
-	height: Math.max(...legBoxes.map((b) => b.top + b.height)) - cellTop
-};
-const cellW = Math.round(cell.width * WALK_SCALE);
-const cellH = Math.round(cell.height * WALK_SCALE);
-const atlas = Buffer.alloc(cellW * WALK_FRAMES * cellH * 2 * 4);
-for (const [index, path] of legFrames.entries()) {
-	const row = Math.floor(index / WALK_FRAMES);
-	const column = index % WALK_FRAMES;
-	const pixels = await sharp(path).extract(cell).resize(cellW, cellH, { kernel: 'lanczos3' }).raw().toBuffer();
-	for (let y = 0; y < cellH; y++) pixels.copy(atlas, ((row * cellH + y) * cellW * WALK_FRAMES + column * cellW) * 4, y * cellW * 4, (y + 1) * cellW * 4);
-}
-const atlasInfo = await sharp(atlas, { raw: { width: cellW * WALK_FRAMES, height: cellH * 2, channels: 4 } })
-	.webp(WEBP)
-	.toFile(assets('mascot-walk-legs.webp'));
-art.walkLegs = { canvas: { width: cycle.canvas[0], height: cycle.canvas[1] }, crop: { x: cell.left, y: cell.top, width: cell.width, height: cell.height } };
-console.log(
-	`${'mascot-walk-legs.webp'.padEnd(28)} ${atlasInfo.width}×${atlasInfo.height}  ${(atlasInfo.size / 1024).toFixed(0).padStart(5)} kB  cell ${cell.left},${cell.top} ${cell.width}×${cell.height}`
-);
-
-const round = (value) => Math.round(value * 100) / 100;
-const walk = {
-	frames: WALK_FRAMES,
-	stepLength: cycle.stepLength,
-	advance: cycle.advancePerFrame,
-	bob: cycle.poses.map((pose) => round(pose.translateY)),
-	arm: cycle.poses.map((pose) => round(pose.arm))
-};
 
 for (const name of STALE) rmSync(assets(name), { force: true });
 
@@ -159,20 +181,6 @@ export interface ArtBox {
 export const ART_BOXES = {
 ${body}
 } as const satisfies Record<string, ArtBox>;
-
-/**
- * The baked walk cycle (docs/art/mascot/walk${WALK_FRAMES}-cycle.json), in master px. Frame 0 and frames / 2 are the
- * contact poses (both feet down). The planted foot moves back by \`advance\` per frame, so moving the figure forward by
- * exactly that much per frame keeps it in place; \`stepLength\` = frames / 2 × advance. Per frame: \`bob\` (body and legs
- * translateY, baked into the legs atlas) and \`arm\` (near arm rotation in degrees around the shoulder).
- */
-export const WALK_CYCLE = {
-	frames: ${walk.frames},
-	stepLength: ${walk.stepLength},
-	advance: ${walk.advance},
-	bob: [${walk.bob.join(', ')}],
-	arm: [${walk.arm.join(', ')}]
-} as const;
 `
 );
 console.log('wrote art.ts');
