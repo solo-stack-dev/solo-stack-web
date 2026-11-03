@@ -96,7 +96,7 @@
 		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
 		<enhanced:img src="./assets/cinema-landscape-mobile.webp?w=1080;828;640" alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
 		<enhanced:img
-			src="./assets/cinema-cliff.webp?w=1582;1100;760"
+			src="./assets/cinema-cliff.webp?w=1582;1200;1100;960;760"
 			alt=""
 			class="placed cliff"
 			style={place.cliff}

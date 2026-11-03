@@ -134,7 +134,7 @@ interface GameProps {
 
 ### 6.2 `PaperGrain.svelte`
 
-Repeating grain tile (decoded once). Default: the painted grain from `docs/art/shared/` as a two-tone cream/ink alpha tile (`assets/paper-grain.png`, 20 kB, 256 px), so it works with `normal` blending on night and on paper. NightPage already renders one fixed grain for the whole page. Props: `opacity` (0.07), `fixed` (true; `false` = absolute in a positioned parent), `texture` (`'painted'` default, `'generated'` = the old SVG `feTurbulence` noise), `src` (any other tile URL), `size` (native tile size), `blend` (`'normal'`), `class`.
+Repeating grain tile (decoded once). Default: the painted grain from `docs/art/shared/` as a two-tone cream/ink alpha tile (`assets/paper-grain.webp`, 10 kB lossless, 256 px), so it works with `normal` blending on night and on paper. NightPage already renders one fixed grain for the whole page. Props: `opacity` (0.07), `fixed` (true; `false` = absolute in a positioned parent), `texture` (`'painted'` default, `'generated'` = the old SVG `feTurbulence` noise), `src` (any other tile URL), `size` (native tile size), `blend` (`'normal'`), `class`.
 
 ### 6.3 `StarField.svelte`
 

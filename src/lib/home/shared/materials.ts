@@ -8,7 +8,7 @@ import edge2Up from './assets/edge-2-up.webp';
 import edge2 from './assets/edge-2.webp';
 import edge3Up from './assets/edge-3-up.webp';
 import edge3 from './assets/edge-3.webp';
-import paperGrain from './assets/paper-grain.png';
+import paperGrain from './assets/paper-grain.webp';
 import shootingStar from './assets/shooting-star.webp';
 import star1 from './assets/star-1.webp';
 import star2 from './assets/star-2.webp';

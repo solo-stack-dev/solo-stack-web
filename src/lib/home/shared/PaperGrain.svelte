@@ -3,7 +3,7 @@
 	Watercolor paper grain as a repeating background tile, decoded once, so it costs nothing while scrolling.
 	`pointer-events: none`, `aria-hidden`.
 
-	Default texture: the painted grain (docs/art/shared/paper-grain.png → a two-tone cream/ink alpha tile, 20 kB), which
+	Default texture: the painted grain (docs/art/shared/paper-grain.png → a two-tone cream/ink alpha tile, 10 kB lossless WebP), which
 	reads on dark night and on butter paper with plain `normal` blending. `texture="generated"` uses the old SVG
 	`feTurbulence` noise; `src` (+ `size`) any other tile.
 
