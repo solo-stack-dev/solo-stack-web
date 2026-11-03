@@ -83,7 +83,7 @@ Um 06:00 zieht sich die Nacht zurück, mein Maskottchen geht mit dem Laptop davo
 
 ## Musik und Kino für die späten Stunden
 
-Um 02:00 steht ein gemaltes altes Radio bereit. Die sozialen Plattformen sind seine Sender, und für Solo Stack FM gibt es einen eigenen Song namens Bis es hell wird. Titel und Liedtext stammen von gpt-6.1-sol. Die Musik habe ich mit dem offenen Musikmodell YuE lokal auf meiner eigenen Grafikkarte erzeugt; sie spielt erst nach deinem Klick.
+Um 02:00 steht ein gemaltes altes Radio bereit. Die sozialen Plattformen sind seine Sender, ihre Logos sitzen auf den Sendertasten. Jeder Sender spielt seinen eigenen kurzen Song: etwa 30 bis 50 Sekunden auf Englisch, trauriger Rap oder Lo Fi, in Dauerschleife, solange du ihn eingestellt hast. Titel und Liedtexte stammen von gpt-6.1-sol. Die Musik habe ich mit dem offenen Musikmodell YuE2 lokal auf meiner eigenen Grafikkarte erzeugt; sie spielt erst, wenn du mit einem Klick einen Sender einstellst.
 
 Das Radio brachte ein sehr handfestes Problem mit: Das gemalte Gehäuse hatte sechs Plätze für Sendertasten, aber es gibt mehr soziale Plattformen. Deshalb wurde der Körper aus seinen eigenen gemalten Pixeln neu zusammengesetzt. So fanden alle Sendertasten Platz im Radio.
 
