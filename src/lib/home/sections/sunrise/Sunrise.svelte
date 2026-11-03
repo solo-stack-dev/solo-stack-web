@@ -172,8 +172,7 @@
 		overflow: clip;
 		color: var(--color-night);
 		/* the bottom of the 04:00 cinema (its --ink-fade), continued by the retreating night */
-		--ink-fade: #1c1d1d;
-		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
+		--ink-fade: var(--color-night);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -195,7 +194,7 @@
 		}
 	}
 
-	/* Butter paper behind everything: matches the bottom band of the sky plates (#fcd772) and the banner. */
+	/* Butter paper behind everything: matches the bottom band of the sky plates (butter) and the banner. */
 	.paper {
 		position: absolute;
 		inset: 0;
@@ -223,7 +222,12 @@
 
 	.sun-glow {
 		border-radius: 50%;
-		background: radial-gradient(circle, rgb(255 249 226 / 0.6) 0 18%, rgb(255 240 196 / 0.28) 38%, rgb(255 236 170 / 0) 70%);
+		background: radial-gradient(
+			circle,
+			color-mix(in oklab, var(--color-moonlight) 60%, transparent) 0 18%,
+			color-mix(in oklab, var(--color-moonlight) 28%, transparent) 38%,
+			transparent 70%
+		);
 		opacity: calc(0.2 + 0.8 * var(--sunrise));
 	}
 
@@ -266,7 +270,7 @@
 
 	.steam {
 		fill: none;
-		stroke: rgb(255 251 238 / 0.75);
+		stroke: color-mix(in oklab, var(--color-moonlight) 75%, transparent);
 		stroke-width: 2.6;
 		stroke-linecap: round;
 		filter: blur(1.4px);
@@ -315,7 +319,12 @@
 	/* A faint warm glint where the low sun catches the closed lid; it grows with the sunrise and breathes slowly. */
 	.laptop-glint {
 		border-radius: 50%;
-		background: radial-gradient(closest-side, rgb(255 244 205 / 0.55), rgb(252 215 114 / 0.18) 55%, rgb(252 215 114 / 0) 100%);
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-moonlight) 55%, transparent),
+			color-mix(in oklab, var(--color-butter) 18%, transparent) 55%,
+			transparent 100%
+		);
 		mix-blend-mode: screen;
 		opacity: calc(var(--sunrise) * 0.8);
 		pointer-events: none;
@@ -385,7 +394,7 @@
 		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: 1.5rem clamp(2rem, 5vw, 5rem);
-		padding: 2rem clamp(1.25rem, 5vw, 5rem) clamp(1.5rem, 3.5vw, 3rem);
+		padding: 2rem var(--page-gutter) var(--bottom-gutter);
 	}
 
 	/* The owner photo, ink-printed onto the paper: anthracite ink with alpha = density (tools/build-assets.mjs portrait),
@@ -428,18 +437,35 @@
 	}
 
 	.legal a {
+		position: relative;
 		display: inline-block;
 		padding-block: 0.6rem;
 	}
 
-	.legal a:hover {
-		text-decoration: underline;
-		text-underline-offset: 0.3em;
+	/* The page-wide link mark: the hand-drawn underline, in anthracite on the paper */
+	.legal a::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0.15rem;
+		height: 0.45rem;
+		background: currentColor;
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
+	.legal a:hover::after {
+		scale: 1 1;
+	}
+
+	/* 44px targets; the last icon (not its hit area) ends on the gutter */
 	.socials ul {
 		gap: 0.25rem;
 		justify-content: flex-end;
+		margin-right: -0.75rem;
 	}
 
 	.socials a {
@@ -450,8 +476,8 @@
 		border-radius: 50%;
 		color: var(--color-night);
 		transition:
-			background-color 200ms ease,
-			color 200ms ease;
+			background-color var(--dur-hover) ease,
+			color var(--dur-hover) ease;
 	}
 
 	.socials a:hover {
@@ -520,6 +546,7 @@
 
 		.socials ul {
 			justify-content: center;
+			margin-right: 0;
 		}
 	}
 </style>

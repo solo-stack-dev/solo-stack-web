@@ -255,7 +255,7 @@
 		position: absolute;
 		z-index: 5;
 		inset: 0;
-		background: #0e0f10;
+		background: var(--color-ink);
 		opacity: 0.9;
 		pointer-events: none;
 		mask:
@@ -322,7 +322,12 @@
 		aspect-ratio: 1;
 		translate: -50% -50%;
 		border-radius: 50%;
-		background: radial-gradient(closest-side, rgb(252 215 114 / 0.2), rgb(252 215 114 / 0.07) 55%, transparent);
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-butter) 20%, transparent),
+			color-mix(in oklab, var(--color-butter) 7%, transparent) 55%,
+			transparent
+		);
 		mix-blend-mode: screen;
 		pointer-events: none;
 	}
@@ -381,7 +386,12 @@
 		display: none;
 		position: absolute;
 		inset: 0;
-		background: radial-gradient(closest-side, rgb(255 196 64 / 0.85), rgb(255 196 64 / 0.45) 55%, transparent);
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ochre) 85%, transparent),
+			color-mix(in oklab, var(--color-ochre) 45%, transparent) 55%,
+			transparent
+		);
 		mix-blend-mode: soft-light;
 	}
 
@@ -395,7 +405,8 @@
 	}
 
 	.handheld.lit {
-		filter: drop-shadow(0 0 1.5px rgb(252 215 114 / 0.95)) drop-shadow(0 0 10px rgb(252 215 114 / 0.55));
+		filter: drop-shadow(0 0 1.5px color-mix(in oklab, var(--color-butter) 95%, transparent))
+			drop-shadow(0 0 10px color-mix(in oklab, var(--color-butter) 55%, transparent));
 	}
 
 	/* ── steam ── */
@@ -409,7 +420,7 @@
 
 	.wisp {
 		fill: none;
-		stroke: rgb(251 243 221 / 0.42);
+		stroke: color-mix(in oklab, var(--color-cream) 42%, transparent);
 		stroke-width: 5;
 		stroke-linecap: round;
 		stroke-dasharray: 44 70;
@@ -451,8 +462,8 @@
 		width: 3px;
 		height: 3px;
 		border-radius: 50%;
-		background: rgb(252 215 114 / 0.55);
-		box-shadow: 0 0 6px rgb(252 215 114 / 0.6);
+		background: color-mix(in oklab, var(--color-butter) 55%, transparent);
+		box-shadow: 0 0 6px color-mix(in oklab, var(--color-butter) 60%, transparent);
 		opacity: 0.4;
 	}
 

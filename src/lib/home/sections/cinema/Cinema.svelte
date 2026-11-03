@@ -140,7 +140,7 @@
 				</button>
 			{:else}
 				<div class="empty">
-					<p class="empty-line font-mono text-xs tracking-clock md:text-sm">{m.home_cinema_empty()}</p>
+					<p class="empty-line font-mono text-xs tracking-wide md:text-sm">{m.home_cinema_empty()}</p>
 				</div>
 			{/if}
 		</div>
@@ -157,12 +157,12 @@
 		<div class={['placed caption font-mono', d.caption.align === 'center' && 'd-center', mo.caption.align === 'center' && 'm-center']} style={place.caption}>
 			{#if video}
 				<p class="title text-sm tracking-wide md:text-base">{video.title}</p>
-				<a class="link text-xs tracking-clock" href={video.url} target="_blank" rel="noopener">
-					{m.home_cinema_watch_link()}<span aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+				<a class="link label" href={video.url} target="_blank" rel="noopener">
+					{m.home_cinema_watch_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
 				</a>
 			{:else}
-				<a class="link text-xs tracking-clock" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
-					{m.home_cinema_channel_link()}<span aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+				<a class="link label" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
+					{m.home_cinema_channel_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
 				</a>
 			{/if}
 		</div>
@@ -178,7 +178,7 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		overflow-x: clip;
-		--ink-fade: #1c1d1d;
+		--ink-fade: var(--color-night);
 	}
 
 	/*
@@ -281,7 +281,13 @@
 		mask-size: 100% 100%;
 		mask-repeat: no-repeat;
 		opacity: 0.55;
-		background: radial-gradient(circle at var(--d-apex), rgb(255 238 186 / 0.95) 0, rgb(252 215 114 / 0.75) 12%, rgb(226 169 59 / 0.35) 45%, rgb(226 169 59 / 0.18) 70%);
+		background: radial-gradient(
+			circle at var(--d-apex),
+			color-mix(in oklab, var(--color-moonlight) 95%, transparent) 0,
+			color-mix(in oklab, var(--color-butter) 75%, transparent) 12%,
+			color-mix(in oklab, var(--color-ochre) 35%, transparent) 45%,
+			color-mix(in oklab, var(--color-ochre) 18%, transparent) 70%
+		);
 	}
 
 	/* The painted beam (cropped canvas at the stage origin), mapped onto the cone by layout.ts's affine transform */
@@ -318,8 +324,8 @@
 		width: var(--size);
 		height: var(--size);
 		border-radius: 50%;
-		background: #fff6d8;
-		box-shadow: 0 0 6px 1px rgb(255 232 160 / 0.8);
+		background: var(--color-moonlight);
+		box-shadow: 0 0 6px 1px color-mix(in oklab, var(--color-moonlight) 80%, transparent);
 		opacity: 0;
 	}
 
@@ -410,17 +416,18 @@
 		translate: -50% -50%;
 		border-radius: 50%;
 		background:
-			radial-gradient(circle at 34% 30%, rgb(255 246 214 / 0.9) 0 12%, transparent 13%),
-			radial-gradient(circle at 64% 62%, rgb(226 169 59 / 0.45) 0 10%, transparent 11%), radial-gradient(circle at 30% 68%, rgb(226 169 59 / 0.35) 0 7%, transparent 8%),
-			radial-gradient(circle at 70% 30%, rgb(226 169 59 / 0.3) 0 6%, transparent 7%),
-			radial-gradient(circle at 40% 38%, #ffe9a6, var(--color-butter) 55%, var(--color-ochre));
+			radial-gradient(circle at 34% 30%, color-mix(in oklab, var(--color-moonlight) 90%, transparent) 0 12%, transparent 13%),
+			radial-gradient(circle at 64% 62%, color-mix(in oklab, var(--color-ochre) 45%, transparent) 0 10%, transparent 11%),
+			radial-gradient(circle at 30% 68%, color-mix(in oklab, var(--color-ochre) 35%, transparent) 0 7%, transparent 8%),
+			radial-gradient(circle at 70% 30%, color-mix(in oklab, var(--color-ochre) 30%, transparent) 0 6%, transparent 7%),
+			radial-gradient(circle at 40% 38%, var(--color-moonlight), var(--color-butter) 55%, var(--color-ochre));
 		box-shadow:
-			0 0 0 2px rgb(255 238 186 / 0.35),
-			0 0 28px 8px rgb(252 215 114 / 0.55),
-			0 0 70px 20px rgb(252 215 114 / 0.25);
+			0 0 0 2px color-mix(in oklab, var(--color-moonlight) 35%, transparent),
+			0 0 28px 8px color-mix(in oklab, var(--color-butter) 55%, transparent),
+			0 0 70px 20px color-mix(in oklab, var(--color-butter) 25%, transparent);
 		transition:
-			scale 300ms ease,
-			box-shadow 300ms ease;
+			scale var(--dur-state) var(--ease-settle),
+			box-shadow var(--dur-state) ease;
 	}
 
 	.moon-play {
@@ -435,9 +442,9 @@
 	.facade:focus-visible .moon {
 		scale: 1.08;
 		box-shadow:
-			0 0 0 2px rgb(255 238 186 / 0.5),
-			0 0 36px 12px rgb(252 215 114 / 0.7),
-			0 0 90px 30px rgb(252 215 114 / 0.35);
+			0 0 0 2px color-mix(in oklab, var(--color-moonlight) 50%, transparent),
+			0 0 36px 12px color-mix(in oklab, var(--color-butter) 70%, transparent),
+			0 0 90px 30px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
 	.empty {
@@ -449,7 +456,7 @@
 		padding: 1.5rem;
 		text-align: center;
 		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
-		background: radial-gradient(ellipse at 50% 45%, rgb(252 215 114 / 0.16), transparent 70%), var(--color-ink);
+		background: radial-gradient(ellipse at 50% 45%, color-mix(in oklab, var(--color-butter) 16%, transparent), transparent 70%), var(--color-ink);
 	}
 
 	.caption {
@@ -470,14 +477,33 @@
 		overflow-wrap: anywhere;
 	}
 
+	/* The page-wide link mark: the hand-drawn underline, always drawn on a standalone link */
 	.link {
+		position: relative;
+		padding-block: 0.35rem 0.55rem;
 		color: var(--color-butter);
-		padding-bottom: 0.3rem;
-		border-bottom: 1px solid currentColor;
+		text-shadow: var(--halo-ink);
+		transition: color var(--dur-hover) ease;
+	}
+
+	.link::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 0.45rem;
+		background: currentColor;
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
 	}
 
 	.link:hover {
 		color: var(--color-cream);
+	}
+
+	/* Geist (its Latin file has the arrows): keeps the Geist Mono Latin subset enough for this line */
+	.arrow {
+		font-family: var(--font-body);
 	}
 
 	@media (max-width: 47.99rem) {
@@ -530,10 +556,10 @@
 		.beam-light {
 			background: radial-gradient(
 				ellipse 70% 40% at var(--m-apex),
-				rgb(255 238 186 / 0.95) 0,
-				rgb(252 215 114 / 0.7) 20%,
-				rgb(226 169 59 / 0.3) 70%,
-				rgb(226 169 59 / 0.18) 100%
+				color-mix(in oklab, var(--color-moonlight) 95%, transparent) 0,
+				color-mix(in oklab, var(--color-butter) 70%, transparent) 20%,
+				color-mix(in oklab, var(--color-ochre) 30%, transparent) 70%,
+				color-mix(in oklab, var(--color-ochre) 18%, transparent) 100%
 			);
 		}
 

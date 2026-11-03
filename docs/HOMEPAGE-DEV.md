@@ -74,6 +74,24 @@ Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with 
 - Sunrise hook: `data-night-edge` marks the element whose box ends where the retreating night's ink is gone (`data-edge-clear`: the fraction of its height where that happens, default 0.72). The sunrise puts it on `.night-clear`, a box inside the translated `.night` (`data-edge-clear="1"`), so the measured line follows the wipe. Fallback without the attribute: `#sunrise .night`.
 - For progress **within** your section (morphs, pinning, sunrise), use `ScrollProgress` (§6.8), not `--night`.
 
+## 3b. System tokens (lead)
+
+Defined in `src/routes/layout.css`. Use them instead of local values so every section lines up.
+
+| Token                                                                                            | Use                                                                                                                      |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `--page-gutter`, `--bottom-gutter`                                                               | Left/right edge of all copy, chrome and controls; bottom line of in-section controls (on `[data-night-page]`)            |
+| `--clock-top`, `--heading-top`                                                                   | NightClock top; the section heading sits at `--heading-top`, under the clock                                             |
+| `--nav-pad-y`                                                                                    | Vertical padding of the nav bar (the menu close button sits on it too)                                                   |
+| `--color-butter/ochre/cream/moonlight/night/ink/dusk`                                            | The only colors. Alpha via `color-mix(in oklab, var(--color-butter) 40%, transparent)`, never raw `rgb()`                |
+| `--halo-ink`, `--halo-butter`                                                                    | Text halo for cream on pigment / anthracite on paper                                                                     |
+| `--glow-sm/md/lg`                                                                                | Butter light (works as `text-shadow` and `box-shadow`)                                                                   |
+| `--ink-underline`                                                                                | The selection/link mark: a hand-drawn stroke as a mask on an `::after` (`mask: var(--ink-underline) center / 100% 100%`) |
+| `--ease-settle`, `--ease-ambient`, `--dur-hover/state/reveal/entrance`                           | Motion (160 / 300 / 600 / 1100 ms)                                                                                       |
+| utilities `label-sm` (clock, rail, hints), `label` (controls, tabs, links), `night-heading` (h2) | Mono label scale (Geist Mono, self-hosted) and the one section heading style                                             |
+
+Interaction idioms, two only: the hand-drawn underline for every selection or navigation state (nav current page, making pillars, game tabs, links), and the solid butter disc/button for primary actions (play, follow). No pills or glass chips.
+
 ## 4. Data
 
 Remote functions, prerendered at build time (no request at runtime; results are inlined into the HTML):

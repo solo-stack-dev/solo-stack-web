@@ -180,20 +180,36 @@
 
 <style>
 	.game-frame {
+		position: relative;
 		display: grid;
 		gap: 1rem;
 		width: 100%;
+	}
+
+	/* An ink-ruled frame instead of a rounded card border: four hairlines in cream ink that run past the corners,
+	   like a frame ruled onto the paper. Outside the stage (which clips), so the game never covers it. */
+	.game-frame::before {
+		--gap: 0.45rem;
+		--overshoot: 0.7rem;
+		--rule: color-mix(in oklab, var(--color-cream) 30%, transparent);
+		content: '';
+		position: absolute;
+		inset: calc((var(--gap) + var(--overshoot)) * -1);
+		background:
+			linear-gradient(var(--rule) 0 0) 0 var(--overshoot) / 100% 1px no-repeat,
+			linear-gradient(var(--rule) 0 0) 0 calc(100% - var(--overshoot)) / 100% 1px no-repeat,
+			linear-gradient(var(--rule) 0 0) var(--overshoot) 0 / 1px 100% no-repeat,
+			linear-gradient(var(--rule) 0 0) calc(100% - var(--overshoot)) 0 / 1px 100% no-repeat;
+		pointer-events: none;
 	}
 
 	.stage {
 		position: relative;
 		overflow: hidden;
 		aspect-ratio: var(--game-aspect, 16 / 9);
-		border-radius: 1.25rem;
+		border-radius: 2px;
 		background: var(--color-ink);
-		box-shadow:
-			0 0 0 1px color-mix(in oklab, var(--color-cream) 14%, transparent),
-			0 30px 80px -30px color-mix(in oklab, var(--color-butter) 25%, transparent);
+		box-shadow: var(--glow-lg);
 	}
 
 	@media (max-width: 40rem) {
@@ -283,6 +299,6 @@
 		border-radius: 999px;
 		background: var(--color-butter);
 		color: var(--color-night);
-		box-shadow: 0 0 40px color-mix(in oklab, var(--color-butter) 55%, transparent);
+		box-shadow: var(--glow-md);
 	}
 </style>

@@ -332,7 +332,8 @@
 
 	<div class="wordmark-layer">
 		<h1 id="home-hero-title" class="wordmark is-cream settle">{@render wordmarkText()}</h1>
-		<p class="tagline settle">{m.home_hero_tagline()}</p>
+		<!-- The topics in the making pillars' style: the same row reappears as the 21:00 navigation -->
+		<p class="tagline settle label">{m.home_hero_tagline()}</p>
 	</div>
 
 	<div class="moon-box night-copy" aria-hidden="true" bind:clientWidth={nightBoxSize} style:clip-path={nightClip}>
@@ -343,7 +344,7 @@
 
 	<NightClock time="20:00" />
 
-	<a class="scroll-cue font-mono" href="#making">
+	<a class="scroll-cue label" href="#making">
 		<span class="scroll-cue-label">{m.home_hero_scroll_cue()}</span>
 		<svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true">
 			<path d="M7 1v15M1.5 10.5 7 16l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -394,7 +395,8 @@
 			--mascot-w: 28cqw;
 			--mascot-tilt: 6deg;
 			--wm-size: min(27cqw, 15cqh);
-			--wm-x: 8cqw;
+			/* the S's optical edge (and the tagline) on the page gutter, under the clock */
+			--wm-x: calc(var(--page-gutter) - 0.06 * var(--wm-size));
 			--wm-y: 19cqh;
 		}
 	}
@@ -503,7 +505,7 @@
 
 	.moon-rig {
 		z-index: 3;
-		animation: moonrise 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		animation: moonrise var(--dur-entrance) var(--ease-settle) backwards;
 	}
 
 	.moon-glow {
@@ -519,8 +521,8 @@
 		);
 		opacity: calc(0.12 + 0.88 * var(--lit, 1));
 		pointer-events: none;
-		transition: opacity 500ms ease;
-		animation: fade-in 1100ms ease-out backwards;
+		transition: opacity var(--dur-reveal) ease;
+		animation: fade-in var(--dur-entrance) ease-out backwards;
 	}
 
 	.moon {
@@ -533,7 +535,7 @@
 		background: none;
 		cursor: pointer;
 		-webkit-tap-highlight-color: transparent;
-		animation: moonlight 1100ms ease-out backwards;
+		animation: moonlight var(--dur-entrance) ease-out backwards;
 	}
 
 	.moon:focus-visible {
@@ -565,7 +567,7 @@
 		width: var(--disc-size);
 		height: var(--disc-size);
 		max-width: none;
-		transition: opacity 600ms ease;
+		transition: opacity var(--dur-reveal) ease;
 	}
 
 	/* The painted image stays in the DOM (LCP element, instant fallback); it only fades out under the 3D moon */
@@ -700,7 +702,7 @@
 		z-index: 6;
 		pointer-events: none;
 		clip-path: circle(50%);
-		animation: moonrise 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		animation: moonrise var(--dur-entrance) var(--ease-settle) backwards;
 	}
 
 	/* Back to the hero's coordinate system: undo the moon box offset, its parallax, and its moonrise. */
@@ -711,27 +713,23 @@
 		width: 100cqw;
 		height: 100cqh;
 		translate: calc(var(--wm-tx) - var(--moon-tx)) calc(var(--wm-ty) - var(--moon-ty));
-		animation: moonrise-counter 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		animation: moonrise-counter var(--dur-entrance) var(--ease-settle) backwards;
 	}
 
 	.settle {
-		animation: settle 650ms 550ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		animation: settle var(--dur-reveal) 550ms var(--ease-settle) backwards;
 	}
 
 	.tagline {
 		position: absolute;
 		left: calc(var(--wm-x) + 0.06 * var(--wm-size));
 		top: calc(var(--wm-y) + var(--wm-size) * 0.98);
-		max-width: min(26cqw, 24rem);
+		max-width: min(40cqw, 36rem);
 		margin: 0;
-		font-size: clamp(0.95rem, 1.2cqw, 1.2rem);
-		line-height: 1.45;
-		color: color-mix(in oklab, var(--color-cream) 78%, transparent);
-		/* ink halo: the line crosses the butter clouds, where cream alone has too little contrast */
-		text-shadow:
-			0 0 2px var(--color-ink),
-			0 0 6px var(--color-ink),
-			0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
+		line-height: 1.6;
+		color: var(--color-cream);
+		/* the line crosses the butter clouds, where cream alone has too little contrast */
+		text-shadow: var(--halo-ink);
 	}
 
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
@@ -739,35 +737,37 @@
 		.tagline {
 			top: auto;
 			bottom: calc(100cqh - var(--wm-y) + 0.75rem);
-			max-width: 84cqw;
-			font-size: 0.85rem;
-			line-height: 1.35;
+			max-width: calc(100cqw - 2 * var(--page-gutter));
+			/* one line on a phone: five words get the narrow tracking (wide tracking is for three words or fewer) */
+			letter-spacing: 0.1em;
 		}
 	}
 
 	/* Scroll cue --------------------------------------------------------------------------------------------- */
 
+	/* No chip: a quiet label on the bottom line with the ink halo, butter on hover (the page-wide link idiom) */
 	.scroll-cue {
 		position: absolute;
 		z-index: 7;
 		left: 50%;
-		bottom: clamp(2.5rem, 6cqh, 4rem);
+		bottom: var(--bottom-gutter);
 		translate: -50% 0;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.6rem;
-		padding: 0.5rem 0.9rem 0.5rem 1rem;
-		border-radius: 999px;
-		background: color-mix(in oklab, var(--color-cream) 90%, transparent);
-		color: var(--color-night);
-		font-size: 0.7rem;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-		box-shadow: 0 0.3rem 1rem color-mix(in oklab, var(--color-ink) 35%, transparent);
+		min-height: 2.75rem;
+		padding-inline: 0.5rem;
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+		transition: color var(--dur-hover) ease;
+	}
+
+	.scroll-cue svg {
+		filter: drop-shadow(0 0 2px var(--color-ink)) drop-shadow(0 0 5px var(--color-ink));
 	}
 
 	.scroll-cue:hover {
-		background: var(--color-butter);
+		color: var(--color-butter);
 	}
 
 	.scroll-cue-label {
@@ -780,7 +780,8 @@
 	/* Phones: only the arrow is visible, the label stays the link's accessible name */
 	@media (max-width: 47.99rem) {
 		.scroll-cue {
-			padding: 0.7rem;
+			min-width: 2.75rem;
+			justify-content: center;
 		}
 
 		.scroll-cue-label {

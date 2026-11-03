@@ -110,7 +110,7 @@
 	{@attach seen.attach}
 >
 	<NightClock time="01:00" />
-	<h2 id="home-nightshift-title" class="title font-display font-black tracking-wordmark uppercase">{m.home_nightshift_title()}</h2>
+	<h2 id="home-nightshift-title" class="title night-heading">{m.home_nightshift_title()}</h2>
 
 	<div class="sr-only" role="region" aria-label={m.home_nightshift_monitor_label()}>
 		{#if commits.length}
@@ -147,7 +147,7 @@
 		{onexplore}
 	/>
 
-	<p class={['tap-hint font-mono text-xs tracking-clock', explored && 'explored']} aria-hidden="true">{m.home_nightshift_tap_hint()}</p>
+	<p class={['tap-hint label-sm', explored && 'explored']} aria-hidden="true">{m.home_nightshift_tap_hint()}</p>
 </section>
 
 <style>
@@ -164,16 +164,9 @@
 	.title {
 		position: absolute;
 		z-index: 6;
-		top: calc(var(--night-clock-top, clamp(5rem, 9vh, 7rem)) + 1.4rem);
-		left: var(--night-clock-left, clamp(1.25rem, 4vw, 3.5rem));
+		top: var(--heading-top);
+		left: var(--page-gutter);
 		max-width: min(44rem, 70vw);
-		margin: 0;
-		font-size: clamp(2rem, 4vw, 4rem);
-		line-height: 0.95;
-		color: var(--color-cream);
-		text-shadow:
-			0 2px 18px rgb(14 15 16 / 0.65),
-			0 0 2px rgb(14 15 16 / 0.5);
 		pointer-events: none;
 	}
 
@@ -201,7 +194,6 @@
 
 		.title {
 			max-width: 70vw;
-			font-size: clamp(2.25rem, 12vw, 3.5rem);
 		}
 	}
 
@@ -210,18 +202,17 @@
 		position: absolute;
 		z-index: 6;
 		left: 50%;
-		bottom: clamp(3rem, 9svh, 5rem);
+		bottom: var(--bottom-gutter);
 		margin: 0;
-		padding: 0.4rem 0.9rem;
 		translate: -50% 0;
-		border-radius: 999px;
-		background: rgb(14 15 16 / 0.6);
-		color: rgb(251 243 221 / 0.85);
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
 		max-width: 80vw;
 		width: max-content;
+		line-height: 1.5;
 		text-align: center;
 		pointer-events: none;
-		transition: opacity 400ms ease;
+		transition: opacity var(--dur-reveal) ease;
 	}
 
 	.tap-hint.explored {

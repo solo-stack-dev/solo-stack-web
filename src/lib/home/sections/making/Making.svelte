@@ -15,6 +15,7 @@
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
+	import { NIGHT_HOURS } from '#lib/home/night.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { RafLoop, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import { BLOOM_BOX, LAYOUTS, PILLARS, STATE_IDS, bloomMask, composeLine, lineAt, progressFor, stateAt, toPathData, type MakingStateId } from './morph.ts';
@@ -53,6 +54,8 @@
 	const screenY = $derived(layout.screen.reduce((sum, p) => sum + p.y, 0) / 4);
 
 	const progress = new ScrollProgress({ mode: 'pinned' });
+	/** The 21:00 sky color backs the plate in the wipe overlap (night.ts). */
+	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'making')!.sky;
 
 	/** Index of the state the line currently rests at or is closest to (drives title, pillars, dots). */
 	let active = $state(0);
@@ -146,7 +149,7 @@
 </script>
 
 <!-- Transition from the hero: an ink-wash wipe on .track (CSS below, docs/HOMEPAGE-DEV.md §6.5). -->
-<section id="making" data-night-hour="21:00" class="making" style={MASK_VARS} aria-labelledby="home-making-title">
+<section id="making" data-night-hour="21:00" class="making" style={MASK_VARS} style:--making-sky={SKY} aria-labelledby="home-making-title">
 	<div class="track" bind:this={track} {@attach progress.attach}>
 		<div
 			class="stage"
@@ -191,7 +194,8 @@
 			</div>
 
 			<NightClock time="21:00" />
-			<h2 id="home-making-title" class="heading font-mono text-xs">{m.home_making_title()}</h2>
+			<!-- The pillar row below names the topics on screen (the hero tagline in the same style leads into it) -->
+			<h2 id="home-making-title" class="sr-only">{m.home_making_title()}</h2>
 
 			<ol class="titles" aria-label={m.home_making_states_label()} style:--title-y={layout.titleY}>
 				{#each STATE_IDS as id, i (id)}
@@ -199,7 +203,7 @@
 				{/each}
 			</ol>
 
-			<nav class="pillars font-mono" aria-label={m.home_making_pillars_label()}>
+			<nav class="pillars label" aria-label={m.home_making_pillars_label()}>
 				<ul>
 					{#each PILLARS as pillar (pillar.label)}
 						{@const current = (pillar.states as readonly number[]).includes(active)}
@@ -247,7 +251,7 @@
 <style>
 	.making {
 		position: relative;
-		--ink-cream: #f8e8bd;
+		--ink-cream: var(--color-cream);
 		/* Ink-wash wipe from the hero: the section overlaps the hero's bottom by --wipe-overlap (it paints above it) and
 		   its plate floods up over the moon as a wet wash front (.track mask). The overlap must not swallow the hero's
 		   controls underneath, so only this section's own controls take pointer events. */
@@ -282,8 +286,8 @@
 		/* Backing in the overlap (the 21:00 sky color, fading out below it): the plate's soft top edge must show sky,
 		   not the hero underneath; only the wipe mask reveals the hero. */
 		background:
-			linear-gradient(#221f1d 0 0) top / 100% var(--wipe-overlap) no-repeat,
-			linear-gradient(#221f1d, transparent) left 0 top var(--wipe-overlap) / 100% 30svh no-repeat;
+			linear-gradient(var(--making-sky) 0 0) top / 100% var(--wipe-overlap) no-repeat,
+			linear-gradient(var(--making-sky), transparent) left 0 top var(--wipe-overlap) / 100% 30svh no-repeat;
 		mask-image: var(--wash-spread-up), var(--wash-spread-up), linear-gradient(#000 0 0);
 		mask-repeat: repeat-x, repeat-x, no-repeat;
 		/* the ramps tile sideways near their painted aspect instead of being squashed to the full width */
@@ -330,6 +334,12 @@
 		/* Plate px → CSS px: cover the stage, but on narrow landscape windows shrink so the laptop stays in view
 		   (the plate then letterboxes into the sky through its faded edges). Resolved in descendants (cq units). */
 		--s: max(100cqw / 2560, min(100cqh / 1440, 100cqw / 2400));
+	}
+
+	/* The 21:00 clock rides up with the plate during the wipe, over the washed-out hero tagline: it only fades in as
+	   the wipe completes (--wipe is 1 without scroll-driven animations, so the static fallback shows it). */
+	.stage :global(.night-clock) {
+		opacity: clamp(0, (var(--wipe) - 0.75) * 4, 1);
 	}
 
 	/* ── scene ───────────────────────────────────────────────────────────── */
@@ -441,22 +451,6 @@
 
 	/* ── text and controls (stage coordinates) ──────────────────────────── */
 
-	.heading {
-		position: absolute;
-		z-index: 2;
-		top: calc(var(--night-clock-top, clamp(5rem, 9vh, 7rem)) + 1.6rem);
-		left: var(--night-clock-left, clamp(1.25rem, 4vw, 3.5rem));
-		max-width: min(22rem, 40vw);
-		letter-spacing: 0.12em;
-		line-height: 1.6;
-		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
-		/* ink halo: on portrait layouts the heading sits on the butter pigment cloud */
-		text-shadow:
-			0 0 2px var(--color-ink),
-			0 0 6px var(--color-ink),
-			0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
-	}
-
 	.titles {
 		position: absolute;
 		left: 50%;
@@ -480,14 +474,14 @@
 		line-clamp: 2;
 		overflow: hidden;
 		color: var(--color-cream);
-		text-shadow: 0 0 1.5rem color-mix(in oklab, var(--color-butter) 25%, transparent);
+		text-shadow: var(--glow-md);
 		opacity: 0;
 		translate: 0 0.4em;
 		filter: blur(6px);
 		transition:
-			opacity 380ms ease,
-			translate 480ms cubic-bezier(0.2, 0.7, 0.2, 1),
-			filter 380ms ease;
+			opacity var(--dur-state) ease,
+			translate var(--dur-reveal) var(--ease-settle),
+			filter var(--dur-state) ease;
 	}
 
 	.title.is-active {
@@ -496,17 +490,19 @@
 		filter: none;
 	}
 
+	/* Bottom line of the stage; the first label's text (not its hit area) starts on the gutter */
 	.pillars {
 		position: absolute;
 		z-index: 2;
-		left: clamp(1.25rem, 4vw, 3.5rem);
-		bottom: clamp(1.5rem, 5vh, 3.25rem);
+		left: var(--page-gutter);
+		bottom: var(--bottom-gutter);
 	}
 
 	.pillars ul {
 		display: flex;
 		align-items: center;
 		gap: 0.35rem;
+		margin-left: -0.55rem;
 	}
 
 	.pillars li + li::before {
@@ -519,11 +515,10 @@
 		position: relative;
 		white-space: nowrap;
 		padding: 0.6rem 0.55rem;
-		font-size: 0.75rem;
-		letter-spacing: 0.22em;
-		color: color-mix(in oklab, var(--color-cream) 78%, transparent);
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
 		cursor: pointer;
-		transition: color 200ms;
+		transition: color var(--dur-hover);
 	}
 
 	.pillar:hover,
@@ -546,18 +541,19 @@
 		vector-effect: non-scaling-stroke;
 		scale: 0 1;
 		transform-origin: left;
-		transition: scale 360ms cubic-bezier(0.3, 0.8, 0.2, 1);
+		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
 	.pillar[aria-current] .underline {
 		scale: 1 1;
 	}
 
+	/* The dots sit on the pillars' text line, left of the skip arrow */
 	.progress {
 		position: absolute;
 		z-index: 2;
-		right: calc(clamp(1.25rem, 4vw, 3.5rem) + 3rem);
-		bottom: calc(clamp(1.5rem, 5vh, 3.25rem) + 1rem);
+		right: calc(var(--page-gutter) + 2.25rem);
+		bottom: calc(var(--bottom-gutter) + 1.125rem);
 		display: flex;
 		gap: 0.7rem;
 	}
@@ -568,8 +564,8 @@
 		border-radius: 50%;
 		border: 1px solid color-mix(in oklab, var(--color-cream) 80%, transparent);
 		transition:
-			background-color 250ms,
-			scale 250ms;
+			background-color var(--dur-state),
+			scale var(--dur-state);
 	}
 
 	.dot.is-active {
@@ -578,16 +574,18 @@
 		scale: 1.25;
 	}
 
+	/* 44px target, the arrow itself on the right gutter */
 	.cue {
 		position: absolute;
 		z-index: 2;
-		right: clamp(1.25rem, 4vw, 3.5rem);
-		bottom: clamp(1.5rem, 5vh, 3.25rem);
+		right: calc(var(--page-gutter) - 0.925rem);
+		bottom: var(--bottom-gutter);
 		display: grid;
 		place-items: center;
 		width: 2.75rem;
 		height: 2.75rem;
 		color: var(--color-cream);
+		transition: color var(--dur-hover);
 	}
 
 	.cue svg {
@@ -633,18 +631,9 @@
 			padding-inline: 12vw;
 		}
 
-		.heading {
-			max-width: min(16rem, 48vw);
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 3;
-			line-clamp: 3;
-			overflow: hidden;
-		}
-
 		.pillars {
 			left: 50%;
-			bottom: calc(clamp(1.25rem, 4vh, 2.5rem) + 4.75rem);
+			bottom: calc(var(--bottom-gutter) + 4.75rem);
 			translate: -50% 0;
 		}
 
@@ -654,6 +643,7 @@
 			justify-content: center;
 			column-gap: 1.75rem;
 			row-gap: 0;
+			margin-left: 0;
 		}
 
 		.pillars li + li::before {
@@ -670,7 +660,7 @@
 			right: auto;
 			left: 50%;
 			translate: -50% 0;
-			bottom: calc(clamp(1.25rem, 4vh, 2.5rem) + 3.25rem);
+			bottom: calc(var(--bottom-gutter) + 3.25rem);
 		}
 
 		.cue {
@@ -684,8 +674,11 @@
 	/* ── reduced motion: no pinning, static sequence ─────────────────────── */
 
 	@media (prefers-reduced-motion: reduce) {
+		/* the static stage starts below the overlap: the top --wipe-overlap of the track is the hero → plate wash
+		   (mostly transparent), where the clock and the pillars would be unreadable */
 		.track {
 			height: auto;
+			padding-top: var(--wipe-overlap);
 		}
 
 		.stage {
@@ -693,7 +686,7 @@
 			height: auto;
 			overflow: visible;
 			container-type: normal;
-			padding: calc(clamp(5rem, 9vh, 7rem) + 1.6rem) clamp(1.25rem, 4vw, 3.5rem) 6rem;
+			padding: var(--heading-top) var(--page-gutter) 6rem;
 			/* no stage container here: cq units fall back to the viewport, so the backdrop plate covers one screen */
 		}
 
@@ -713,19 +706,12 @@
 			display: none;
 		}
 
-		.heading {
-			position: relative;
-			top: auto;
-			left: auto;
-			max-width: 36rem;
-		}
-
 		.pillars {
 			position: relative;
 			left: auto;
 			bottom: auto;
 			translate: none;
-			margin: 1.25rem 0 0 -0.55rem;
+			margin: 0;
 		}
 
 		.pillars ul {

@@ -79,7 +79,12 @@
 		border-radius: 50%;
 		pointer-events: none;
 		opacity: 0;
-		background: radial-gradient(closest-side, rgb(252 215 114 / 0.34), rgb(252 215 114 / 0.12) 55%, transparent);
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-butter) 34%, transparent),
+			color-mix(in oklab, var(--color-butter) 12%, transparent) 55%,
+			transparent
+		);
 		mix-blend-mode: screen;
 		transition: opacity 260ms ease;
 	}
@@ -92,14 +97,14 @@
 	.spot:focus-visible .glow {
 		opacity: 1;
 		box-shadow:
-			0 0 0 2px rgb(252 215 114 / 0.85),
-			0 0 18px 4px rgb(252 215 114 / 0.35);
+			0 0 0 2px color-mix(in oklab, var(--color-butter) 85%, transparent),
+			0 0 18px 4px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
 	/* Bonsai and handheld light up through their own layers (golden tree, contour); keep only a faint glow. */
 	.spot[data-spot='bonsai'] .glow,
 	.spot[data-spot='handheld'] .glow {
-		background: radial-gradient(closest-side, rgb(252 215 114 / 0.12), transparent);
+		background: radial-gradient(closest-side, color-mix(in oklab, var(--color-butter) 12%, transparent), transparent);
 	}
 
 	.tip {
@@ -114,7 +119,7 @@
 		font-size: 0.75rem;
 		line-height: 1.35;
 		text-align: center;
-		box-shadow: 0 6px 18px rgb(14 15 16 / 0.45);
+		box-shadow: 0 6px 18px color-mix(in oklab, var(--color-ink) 45%, transparent);
 		pointer-events: none;
 		opacity: 0;
 		translate: -50% calc(-100% - 0.6rem);
@@ -165,10 +170,10 @@
 		position: absolute;
 		width: 1.6rem;
 		height: 1.6rem;
-		border: 2px solid rgb(251 243 221 / 0.85);
+		border: 2px solid color-mix(in oklab, var(--color-cream) 85%, transparent);
 		border-radius: 50%;
 		translate: -50% -50%;
-		box-shadow: 0 0 10px rgb(252 215 114 / 0.5);
+		box-shadow: 0 0 10px color-mix(in oklab, var(--color-butter) 50%, transparent);
 		pointer-events: none;
 		transition: opacity 200ms ease;
 	}

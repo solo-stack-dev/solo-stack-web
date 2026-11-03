@@ -37,19 +37,19 @@
 
 <style>
 	.chart {
-		--paper: #f3e6c1;
-		--ink: #1b1713;
+		--paper: var(--color-cream);
+		--ink: var(--color-ink);
 		position: relative;
 		color: var(--ink);
 		background:
-			radial-gradient(120% 80% at 20% 0%, rgb(255 250 232 / 0.7), transparent 60%), radial-gradient(90% 70% at 100% 100%, rgb(214 168 82 / 0.35), transparent 70%),
-			var(--paper);
+			radial-gradient(120% 80% at 20% 0%, color-mix(in oklab, var(--color-moonlight) 70%, transparent), transparent 60%),
+			radial-gradient(90% 70% at 100% 100%, color-mix(in oklab, var(--color-ochre) 35%, transparent), transparent 70%), var(--paper);
 		border-radius: 0.35rem 0.6rem 0.45rem 0.3rem;
 		padding: 1.1rem 1.1rem 0.9rem;
 		box-shadow:
-			0 1px 0 rgb(255 255 255 / 0.4) inset,
-			0 18px 40px -12px rgb(0 0 0 / 0.7),
-			0 3px 8px rgb(0 0 0 / 0.35);
+			0 1px 0 color-mix(in oklab, var(--color-moonlight) 40%, transparent) inset,
+			0 18px 40px -12px color-mix(in oklab, var(--color-ink) 70%, transparent),
+			0 3px 8px color-mix(in oklab, var(--color-ink) 35%, transparent);
 		rotate: -1.2deg;
 	}
 
@@ -113,7 +113,7 @@
 		font-size: 0.72rem;
 		font-variant-numeric: tabular-nums;
 		opacity: 0.7;
-		border-right: 1px dotted rgb(27 23 19 / 0.5);
+		border-right: 1px dotted color-mix(in oklab, var(--color-ink) 50%, transparent);
 		padding-right: 0.4rem;
 	}
 
@@ -145,6 +145,12 @@
 
 	/* Pencil highlight on the tuned station */
 	li.active a {
-		background: linear-gradient(100deg, transparent 2%, rgb(241 196 82 / 0.75) 6%, rgb(241 196 82 / 0.55) 92%, transparent 98%);
+		background: linear-gradient(
+			100deg,
+			transparent 2%,
+			color-mix(in oklab, var(--color-butter) 75%, transparent) 6%,
+			color-mix(in oklab, var(--color-butter) 55%, transparent) 92%,
+			transparent 98%
+		);
 	}
 </style>
