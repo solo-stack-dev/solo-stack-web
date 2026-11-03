@@ -40,9 +40,11 @@ const PATH_SURFACE: [number, number][] = [
 /** Coffee master (600×600): where the rock meets the ground, and the box above the cup mouth for the steam. */
 const COFFEE_BASE = { x: 300, y: 530 };
 const COFFEE_STEAM: Rect = { x: 222, y: -230, w: 150, h: 420 };
-/** Laptop master (docs/art/sunrise/sunrise-laptop.png): where its underside meets the ground, and the lid's sunlit edge for the glint. */
-const LAPTOP_BASE = { x: 599, y: 500 };
-const LAPTOP_GLINT: Rect = { x: 820, y: 250, w: 240, h: 150 };
+/** Laptop master (docs/art/sunrise/sunrise-laptop.png, 1400×700, the closed laptop on its own flat rock): where the rock's
+ *  broad base meets the ground (a little above its rounded lowest point, so it sits in the path), and the lid's sunlit
+ *  right edge for the glint. */
+const LAPTOP_BASE = { x: 670, y: 588 };
+const LAPTOP_GLINT: Rect = { x: 1000, y: 150, w: 240, h: 220 };
 /** The sun baked into each sky plate (fraction of the plate), see docs/art/sunrise/README.md. */
 const SKY_SUN: Record<Breakpoint, { x: number; y: number }> = { desktop: { x: 0.79, y: 0.68 }, mobile: { x: 0.78, y: 0.5 } };
 
@@ -74,7 +76,8 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		valley: { x: 0, y: 29.2, w: 100 },
 		cliffPath: { x: -2, y: 46.5, w: 104 },
 		coffee: { x: 9.5, w: 8.6, sink: 0.6 },
-		laptop: { x: 21, w: 17.2, sink: 0.6 },
+		// body ≈ 2.2 × the mug's width (the masters' px scale: coffee ÷ 1.286, docs/art/sunrise/README.md)
+		laptop: { x: 22, w: 15.6, sink: 0.6 },
 		nightEdge: { x: 0, w: 100, from: 30, to: -52 },
 		sunGlow: 22
 	},
@@ -83,7 +86,8 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		valley: { x: -82, y: 26, w: 205 },
 		cliffPath: { x: -14, y: 52, w: 150 },
 		coffee: { x: 12, w: 22, sink: 1 },
-		laptop: { x: 42, w: 44, sink: 1 },
+		// smaller than the desktop ratio, so it doesn't dominate the narrow scene
+		laptop: { x: 37, w: 33, sink: 1 },
 		nightEdge: { x: -80, w: 260, from: 55, to: -50 },
 		sunGlow: 46
 	}

@@ -116,7 +116,7 @@
 			alt=""
 			class="placed art"
 			style={place.laptop}
-			sizes="(min-width: 48rem) 14vw, 36vw"
+			sizes="(min-width: 48rem) 15vw, 32vw"
 			loading="lazy"
 			decoding="async"
 		/>

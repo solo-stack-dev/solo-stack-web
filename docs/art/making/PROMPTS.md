@@ -241,3 +241,147 @@ The following records compare decoded RGB pixels against the pre-edit files. SHA
 ```
 
 Blank screen interior was additionally checked independently: zero changed pixels in both plates. Saved final PNGs were read back and matched the recorded final SHA-256 values.
+
+
+## Registered local cliff-light repair - 2026-11-03
+
+Tool: built-in `image_gen.imagegen`, underlying model not exposed; highest quality requested, no selectable model/quality/native-mask option. `transparent_background: false`. Four generation calls: two per plate. Grayscale mask supplied as image 2 is a visual guide; exact pixel confinement comes from final compositing.
+
+### Input crops and attempts
+
+Originals were copied before edits to `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-original.png` and `mobile-original.png`.
+
+- Desktop target: original crop (1560, 800, 2560, 1440), 1000x640. Both generated outputs: 1568x1003.
+- Mobile target: original crop (280, 1600, 1080, 2240), 800x640. Both generated outputs: 1402x1122.
+- Each call received `{desktop,mobile}-before.png` first and `{desktop,mobile}-mask-crop.png` second, in that order, from the temp directory above.
+- First pair rejected: too strong a continuous cool-grey rim and hard geometric pigment. The first composites also retained excess gold just inside the protected silhouette because the initial inner feather was too broad.
+- Second pair selected: softer irregular pigment and a localized laptop light pool. Subsequent deterministic mask corrections narrowed the inner feather, protected the vertical left cliff edge, and prevented the old bezel fringe being misidentified as a cliff silhouette. No additional generations were needed.
+
+### Rejected first pair outputs
+
+- desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-becffc26-c799-4870-aa13-6bfeb4649189.png`.
+- mobile: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-03a762ce-4a3c-45f8-b279-94fc25ac4430.png`.
+### Selected second pair outputs
+
+- desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-e96f9cb7-4c8c-426c-8a98-285e5fcbf5f1.png`.
+- mobile: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-32d785c5-a89c-487a-a672-adac1b8af43b.png`.
+
+### First-generation exact desktop prompt
+
+```text
+Use case: lighting-weather. Highest available quality, precise registered watercolor-ink image repair. Image 1 is the edit target crop, image 2 is its grayscale edit guide: white=repaint, black=preserve, grey=feather. Repaint only the lit top edge of this dark rock cliff in the same watercolor-ink style: light comes from the small laptop screen only, a warm pool around the laptop fading out within ~1.5 laptop widths, with a few sparse ochre catch-lights on ledges further away; the rest of the cliff top stays dark anthracite with subtle cool-grey rim. Keep the laptop, the screen and the cliff silhouette pixel-identical. Remove the faint warm exterior fringe around the laptop bezel: background immediately beside it must match surrounding dark night. Preserve all actual laptop frame and body pixels, blank screen, and silhouette. Match the original coarse irregular watercolor pigment granulation and angular stone texture, no fine sand or smear. The current continuous full-width gold stripe must disappear except for the small localized pool of screen light. No bright outline across the whole cliff, no new sky glow. Maintain original framing and every rock feature. Output image 1 only, opaque RGB, no text or comparison. Target desktop.
+```
+
+The mobile call replaced only `Target desktop.` with `Target mobile crop.`.
+
+### Second-generation exact desktop prompt
+
+```text
+Use case: lighting-weather. Highest available image quality. Image 1 is original edit target, image 2 white=repaint black=protect mask. Repaint only the lit top edge of this dark rock cliff in the same watercolor-ink style: light comes from the small laptop screen only, a warm pool around the laptop fading out within ~1.5 laptop widths, with a few sparse ochre catch-lights on ledges further away; the rest of the cliff top stays dark anthracite with subtle cool-grey rim. Keep the laptop, the screen and the cliff silhouette pixel-identical. VERY IMPORTANT: preserve irregular original large coarse watercolor granules and rock features. Do not sharpen into little geometric tiles. No continuous grey/blue border or thick dark band; cool rim must be very subtle, intermittent and dark, almost invisible. Maintain natural irregular transitions in the rock. Outside the small laptop light pool the gold stripe becomes very dark charcoal pigment, with only a few isolated tiny warm flecks. Do not relocate or recreate rock formations. The exterior bezel fringe is removed to dark night, but actual laptop body and blank cream screen are unchanged. Keep exact image framing. No new light, new objects, moon, typography, collage. Output only repaired image 1, opaque RGB. Target desktop.
+```
+
+The mobile call replaced only `Target desktop.` with `Target mobile crop.`.
+
+### Masking, compositing and limits
+
+Final masks are `cliff-light-masks/desktop.png` and `cliff-light-masks/mobile.png`, full-size 8-bit grayscale. Black copies original RGB bytes verbatim, white replaces with generated pixels, intermediate grey feathers. Support includes only the main top ledge, a small amount of its rock face, and thin exterior bezel background. Lower stepped ledges and broad existing golden washes were excluded. Mask bounds and counts below are authoritative.
+
+The cliff skyline was traced near its visible warm transition, with the laptop and its surrounding 15-pixel neighborhood excluded from edge detection. A 5x5 dilation of the one-pixel trace protects two pixels on either side. The actual cliff remains unchanged above that trace as well; the left vertical silhouette is excluded by inward support clipping. The inner top feather reaches full weight over 1.5 pixels beyond the guard; bottom feather is 28 pixels; left feather is 14 pixels. The body/screen protection polygon includes its antialias boundary. On the bezel's right, detached warm background peaks were separated from the actual dark frame by the intervening dark trough; the trough and inner frame remain protected. Guard masks and fringe traces are saved in the temp directory for inspection. These detached background pixels are not part of the laptop frame.
+
+Generated output was bilinearly mapped only to its input crop dimensions. For the exterior sky ring, generated dark sky sampled 120 crop pixels above was used to prevent a regenerated screen or frame from leaking into the repair. Compositing is `round(original * (1 - mask/255) + generated * mask/255)`. Exact black/white pixels introduced inside support were remapped to #0E0F10 / #FBF3DD; all pixels where mask=0 were then copied directly from the original. No original whole-plate resampling or color conversion was performed. Export is opaque 8-bit RGB, sRGB intent 0.
+
+A thin warm hairline remains exactly where the requested two-pixel silhouette guard protects original pigment. It is not an unremoved broad surface stripe. Original warmth intrinsic to the preserved laptop frame also remains. Recoloring either protected feature would violate the pixel-identity requirement.
+
+### Final verification
+
+Audits compare decoded RGB against the pre-edit copies. Outside-mask SHA-256 values concatenate RGB triples in raster order. The silhouette count covers the traced main ledge and its guard; all remaining skyline lies entirely outside repair support and is therefore also byte-identical. Screen is checked independently of the larger laptop polygon. Both masters were inspected at full-plate scale, repair crops at native 100%, and bezel crops at 400%.
+
+```json
+{
+  "desktop": {
+    "file": "making-plate.png",
+    "dimensions": [
+      2560,
+      1440
+    ],
+    "mode": "RGB",
+    "opaque": true,
+    "chunks": [
+      "IHDR",
+      "sRGB",
+      "IDAT",
+      "IEND"
+    ],
+    "maskBBoxXYXYExclusive": [
+      1851,
+      916,
+      2560,
+      1175
+    ],
+    "maskPixels": 67131,
+    "changedPixels": 63093,
+    "unchangedOutsideMask": 3619269,
+    "changedOutsideMask": 0,
+    "laptopProtectedPixels": 13254,
+    "changedLaptop": 0,
+    "screenProtectedPixels": 4989,
+    "changedScreen": 0,
+    "silhouetteProtectedPixels": 4982,
+    "changedSilhouette": 0,
+    "pureBlack": 0,
+    "pureWhite": 0,
+    "originalSHA256": "c950d5f9040e2d2eb2ded4bcf7698f8451a7a51ca866a3de439757fa85418b07",
+    "finalSHA256": "1d54c5239c5d08de783f3ec474688ca300584c6ec7a7b11a7e36f6e51a03586b",
+    "outsideOriginalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
+    "outsideFinalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
+    "bytes": 4115376
+  },
+  "mobile": {
+    "file": "making-plate-mobile.png",
+    "dimensions": [
+      1080,
+      2340
+    ],
+    "mode": "RGB",
+    "opaque": true,
+    "chunks": [
+      "IHDR",
+      "sRGB",
+      "IDAT",
+      "IEND"
+    ],
+    "maskBBoxXYXYExclusive": [
+      601,
+      1703,
+      1080,
+      1931
+    ],
+    "maskPixels": 49761,
+    "changedPixels": 46533,
+    "unchangedOutsideMask": 2477439,
+    "changedOutsideMask": 0,
+    "laptopProtectedPixels": 11690,
+    "changedLaptop": 0,
+    "screenProtectedPixels": 4062,
+    "changedScreen": 0,
+    "silhouetteProtectedPixels": 3005,
+    "changedSilhouette": 0,
+    "pureBlack": 0,
+    "pureWhite": 0,
+    "originalSHA256": "92ddf1145d5f01f072367f8be7b20d6ec342b324c62c6fd21811b873280510cb",
+    "finalSHA256": "d6809d47c674415d2766033acbc2393435359c3adf3feb4c4e41bf042a90e788",
+    "outsideOriginalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
+    "outsideFinalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
+    "bytes": 3076536
+  }
+}
+```
+
+Before/after inspection crops (outside repo):
+
+- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-before.png`
+- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-after.png`
+- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/mobile-before.png`
+- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/mobile-after.png`
+
+The same directory contains `audit.json`, `spec.json`, `masks.py`, `refine.py`, `tighten.py`, `composite2.py`, and independent `{desktop,mobile}-{laptop,screen,silhouette}-protect.png` diagnostic masks (white marks protected pixels in these temporary diagnostics, unlike the production edit masks). PNG master hashes were checked again after saving. This appendix supersedes the earlier statement that original warm cliff-top paint was wholly retained; it was retained during moon removal, then selectively repaired here.
