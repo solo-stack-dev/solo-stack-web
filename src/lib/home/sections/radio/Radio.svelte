@@ -25,6 +25,7 @@
 	import { inView, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
+	import BrandIconSprite from './BrandIconSprite.svelte';
 	import FrequencyChart from './FrequencyChart.svelte';
 	import RadioSet from './RadioSet.svelte';
 	import Waveform from './Waveform.svelte';
@@ -167,6 +168,7 @@
 	})}
 	{@attach inView((near) => near && void loadSound(), { rootMargin: '50% 0px', once: true })}
 >
+	<BrandIconSprite stations={STATIONS} />
 	<NightClock time="02:00" />
 
 	<div class="head">

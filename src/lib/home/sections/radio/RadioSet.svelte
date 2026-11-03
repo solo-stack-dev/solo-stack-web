@@ -16,6 +16,7 @@
 	import knobImage from './assets/radio-knob.webp?enhanced';
 	import needleImage from './assets/radio-needle.webp?enhanced';
 	import BrandIcon from './BrandIcon.svelte';
+	import { iconHref } from './icons.ts';
 	import StationContent from './StationContent.svelte';
 	import { RADIO_LAYOUT, keySlots, toPercent, type Knob, type RadioLayout, type Rect } from './layout.ts';
 	import { DIAL_MAX, type Station } from './stations.ts';
@@ -98,7 +99,7 @@
 		{#each stationMarks as mark (mark.station.id)}
 			<g class={['mark', tuned?.id === mark.station.id && 'on']}>
 				<path d={mark.tick} class="mark-tick" />
-				<svg x={mark.logo.x} y={mark.logo.y} width={mark.logo.size} height={mark.logo.size} viewBox="0 0 24 24"><path d={mark.station.icon} fill="currentColor" /></svg>
+				<use href={iconHref(mark.station.id)} x={mark.logo.x} y={mark.logo.y} width={mark.logo.size} height={mark.logo.size} />
 			</g>
 		{/each}
 	</svg>
@@ -126,7 +127,7 @@
 		{#if tuned}
 			{#key tuned.id}
 				<div class="glass-station">
-					<BrandIcon path={tuned.icon} class="glass-logo" />
+					<BrandIcon id={tuned.id} class="glass-logo" />
 					<div class="glass-text">
 						<p class="glass-name">{tuned.name}</p>
 						{#if tuned.handle}<p class="glass-handle font-mono">{tuned.handle}</p>{/if}
@@ -208,7 +209,7 @@
 			>
 				<enhanced:img src={down ? keyPressed : keyUp} alt="" class="fill" sizes="8rem" loading="lazy" />
 				<span class="key-face">
-					<BrandIcon path={station.icon} class="key-logo" />
+					<BrandIcon id={station.id} class="key-logo" />
 					<span class="key-name" aria-hidden="true">{station.name}</span>
 				</span>
 			</button>

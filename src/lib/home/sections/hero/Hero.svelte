@@ -41,11 +41,12 @@
 	import { ART_CROPS } from './art.ts';
 	// Explicit width ladders (`…&enhanced`, see imagetools.d.ts): the masters are upscales of smaller generations, so
 	// widths stop at the native detail, and AVIF quality is tuned for the above-the-fold budget (handoff §6.4).
+	// The soft cloud layers are capped at 1280 px (quality 50 keeps their grain): ~55 kB less above the fold at 1440@2x.
 	import sky from './assets/hero-sky.webp?w=1672;1280;960&quality=40&enhanced';
 	import skyMobile from './assets/hero-sky-mobile.webp?w=852;640&quality=45&enhanced';
-	import clouds1 from './assets/hero-clouds-1.webp?w=1894;1280;800&quality=45&enhanced';
-	import clouds2 from './assets/hero-clouds-2.webp?w=1915;1280;800&quality=45&enhanced';
-	import clouds3 from './assets/hero-clouds-3.webp?w=1858;1280;800&quality=45&enhanced';
+	import clouds1 from './assets/hero-clouds-1.webp?w=1280;960;640&quality=50&enhanced';
+	import clouds2 from './assets/hero-clouds-2.webp?w=1280;960;640&quality=50&enhanced';
+	import clouds3 from './assets/hero-clouds-3.webp?w=1280;960;640&quality=50&enhanced';
 	import moonDisc from './assets/hero-moon-disc.webp?w=1942;1520;1200;900;640&quality=38&enhanced';
 	import mascot from './assets/mascot-hero-moonrim.webp?w=640;420;280&quality=55&enhanced';
 	import mascotGolden from './assets/mascot-golden.webp?w=640;420;280&quality=55&enhanced';

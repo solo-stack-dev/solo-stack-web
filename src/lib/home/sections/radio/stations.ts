@@ -4,7 +4,6 @@
  * over the dial (0…1) and get an FM-style frequency label (88.0–108.0), which is decoration, not copy.
  */
 import { linkedSocials, type SocialId } from '#lib/home/data/socials.ts';
-import { SOCIAL_ICONS } from './icons.ts';
 import { trackFor, type Track } from './track/index.ts';
 
 export type StationId = SocialId;
@@ -16,8 +15,6 @@ export interface Station {
 	handle: string | null;
 	/** Profile URL. */
 	url: string;
-	/** 24×24 path data. */
-	icon: string;
 	/** The station's song, `null` if it has none. */
 	track: Track | null;
 	/** Position on the dial, 0…1. */
@@ -37,7 +34,6 @@ function build(): Station[] {
 		name: social.name,
 		handle: social.handle,
 		url: social.url,
-		icon: SOCIAL_ICONS[social.id],
 		track: trackFor(social.id)
 	}));
 	const span = 1 - 2 * DIAL_MARGIN;
