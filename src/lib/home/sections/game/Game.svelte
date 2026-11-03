@@ -2,7 +2,7 @@
 	@component
 	22:00 Game. All three games as tabs; each shows a painted poster + play button and its code loads only on click
 	(GameFrame). Only the selected tab's frame is mounted, so switching tabs stops the previous game. The poster is built
-	from the shared materials (sky, painted stars, moon glow, paper grain).
+	from the shared materials (sky, painted stars, paper grain).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -53,7 +53,6 @@
 					{#snippet poster()}
 						<div class="poster" aria-hidden="true">
 							<StarField density={1.6} brightness={0.95} seed={2200} />
-							<div class="poster-moon"></div>
 							<p class="poster-title font-display font-black tracking-wordmark uppercase">{candidate.title()}</p>
 							<PaperGrain fixed={false} opacity={0.12} />
 						</div>
@@ -118,17 +117,6 @@
 		background:
 			radial-gradient(ellipse 80% 60% at 78% 22%, color-mix(in oklab, var(--color-ochre) 22%, transparent), transparent 70%),
 			linear-gradient(to bottom, #1d1c1d, var(--color-ink) 75%);
-	}
-
-	.poster-moon {
-		position: absolute;
-		top: 12%;
-		right: 10%;
-		width: clamp(4.5rem, 16%, 10rem);
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: radial-gradient(circle at 38% 36%, #fff1c4, var(--color-butter) 45%, var(--color-ochre));
-		box-shadow: 0 0 80px 10px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
 	.poster-title {

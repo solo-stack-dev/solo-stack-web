@@ -4,7 +4,7 @@
 // can place every cropped layer on its scene canvas.
 //
 // - Scene plates (room with the mascot painted in): desktop downscaled to 1920 wide (the painting's native raster is
-//   1672×941, more pixels add nothing), mobile 1080×2340, sky 1100×1100. High quality WebP sources (the build
+//   1672×941, more pixels add nothing), mobile 1080×2340. High quality WebP sources (the build
 //   re-encodes them).
 // - Typing hands live IN the plate file: a band below the scene holds the three hand frames side by side. Each frame
 //   is composited onto the full master scene, put through the same resize as the plate, and cut out around the pixels
@@ -141,7 +141,6 @@ const scenes = {
 		'nightshift-scene-mobile.webp'
 	)
 };
-await webp(sharp(art('nightshift-window-sky.png')).resize({ width: 1100 })).toFile(out('nightshift-window-sky.webp'));
 const props = {
 	bonsai: await prop('nightshift-bonsai.png', 'nightshift-bonsai.webp'),
 	golden: await prop('nightshift-bonsai-golden.png', 'nightshift-bonsai-golden.webp'),

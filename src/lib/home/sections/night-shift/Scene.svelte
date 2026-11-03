@@ -10,7 +10,7 @@
 	import LazyMount from '#lib/home/shared/LazyMount.svelte';
 	import Hotspot from './Hotspot.svelte';
 	import Monitor from './Monitor.svelte';
-	import { polygonMask, type Rect, type SceneLayout, type SpotId } from './layout.ts';
+	import { type Rect, type SceneLayout, type SpotId } from './layout.ts';
 	import type { Terminal } from './terminal.svelte.ts';
 
 	interface Props {
@@ -112,7 +112,6 @@
 	let goldenReady = $state(false);
 	const art = $derived(layout.props);
 	const goldenOrigin = $derived(`${((layout.bonsai.x - art.golden.x) / art.golden.w) * 100}% ${((layout.bonsai.y - art.golden.y) / art.golden.h) * 100}%`);
-	const skyMask = $derived(polygonMask(layout.sky.panes));
 	// Particle box around the bonsai, in canvas percentages
 	const motesBox = $derived({ x: layout.bonsai.x - 14, y: layout.bonsai.y - 36, w: 24, h: 40 });
 	const stageVars = $derived(`--cw: ${layout.canvas.width}; --ch: ${layout.canvas.height}; --fx: ${layout.focal.x}; --fy: ${layout.focal.y}`);
@@ -132,13 +131,6 @@
 				{:else}
 					<enhanced:img src="./assets/nightshift-scene-mobile.webp?w=1080;828;640" alt={sceneAlt} loading="lazy" sizes="103vw" class="sheet" />
 				{/if}
-			</div>
-
-			<!-- 2 · the moon (from the sky plate), shown only through the glass panes, drifting with the scroll -->
-			<div class="panes" aria-hidden="true" style:mask-image={skyMask}>
-				<div class="sky" style={box(layout.sky.rect)}>
-					<enhanced:img src="./assets/nightshift-window-sky.webp?w=1100;800;550" alt="" loading="lazy" sizes={vw(layout.sky.rect.w)} class="fill" />
-				</div>
 			</div>
 
 			<span class="lamp" aria-hidden="true" style:left={pct(layout.lamp.x)} style:top={pct(layout.lamp.y)} style:width={pct(layout.lamp.radius * 2)}></span>
@@ -297,31 +289,6 @@
 	.mascot {
 		position: absolute;
 		pointer-events: none;
-	}
-
-	/* ── 2 · sky in the glass panes: pointer parallax plus a slow drift with the scroll (the moon sinks as the night goes on) ── */
-	/* the mask isolates .panes, so the blend has to sit here to reach the plate below */
-	.panes {
-		position: absolute;
-		inset: 0;
-		mix-blend-mode: lighten;
-		mask-size: 100% 100%;
-		mask-repeat: no-repeat;
-		pointer-events: none;
-	}
-
-	/* The plate paints its own sky, stars and treetops: only the moon and its glow (a soft circle around it at 33.2 %, 40.7 %
-	   of the sky image) lighten the glass, so the painted trees stay in front where they are brighter. */
-	.sky {
-		position: absolute;
-		mask-image: radial-gradient(ellipse 16.5% 16.5% at 33.2% 40.7%, #000 80%, transparent);
-		translate: calc(var(--px, 0) * 9px) calc(var(--py, 0) * 6px);
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		.sky {
-			translate: calc(var(--px, 0) * 9px + (var(--scroll, 0.5) - 0.5) * -2.5%) calc(var(--py, 0) * 6px + (0.5 - var(--scroll, 0.5)) * -7%);
-		}
 	}
 
 	/* ── lamp light: very subtle flicker ── */

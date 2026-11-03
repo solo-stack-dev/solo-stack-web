@@ -155,3 +155,89 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 No artwork was painted procedurally. Generated raster pigment was exported to requested dimensions with alpha-aware bilinear resampling. Cloud masters use 2560×1024, preserving source aspect within a 40 px inset; bloom masters use 1400×1400 with a 40 px inset; the paper frame uses 900×1100 with a 20 px inset. Opaque plates and albedo fill their target dimensions. Invisible RGB is zeroed and visible exact black/white pixels are remapped to the specified ink/cream palette.
 
 The six organic blooms remain independent fills for SVG masks. The final export was checked for pixel dimensions, transparent borders, fractional alpha, and visible palette extrema.
+
+## Registered moon removal — 2026-11-03
+
+Tool/model: built-in `image_gen.imagegen`; underlying model identifier is not exposed. This was the available built-in image editor; highest quality was requested in the prompts. No model or quality selector and no native mask argument are exposed. Image 2 supplied the grayscale mask as an edit guide; exact confinement was enforced afterward by deterministic pixel compositing, not entrusted to model registration. `transparent_background: false`.
+
+### Inputs and selection
+
+- Desktop measured lunar disc: center approximately (2255, 855), radius 158 px. Input 1: original desktop crop (1536, 416), size 1024×1024. Input 2: corresponding crop of the initial sky mask. Two 1254×1254 edits were generated; the first had finer grain and was rejected. Selected second output: `C:/Users/peter/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8225a66a-4499-47bd-b659-455d4fcce704.png`.
+- Mobile measured lunar disc: center approximately (919, 1661), radius 125 px. Input 1: original mobile crop (0, 1260), size 1080×1080. Input 2: corresponding crop of the initial sky mask. Selected 1254×1254 output: `C:/Users/peter/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8437b4c9-e1d2-41d4-abdd-3590af457d30.png`.
+
+### Initial prompt (selected mobile generation; rejected first desktop generation)
+
+```text
+Use case: precise-object-edit. Highest available image quality. Image 1 is the EXACT EDIT TARGET, a registered square crop from a watercolor night production plate. Image 2 is its edit-mask guide: white = repaint; black = strictly preserve; gray = feathered transition. Remove the entire large yellow moon disc AND ALL its surrounding yellow atmospheric halo in the white region, filling it with the same dark mottled anthracite night sky found above and to the left. Continue the existing organic ink/pigment variation, coarse paper grain, granulation scale and contrast exactly. This is seamless restoration, no redesign. No residual round shape, no dark circular silhouette, no halo ring, no smudge, no smooth flat fill, no new clouds. At most one tiny faint star in repaired sky, preferably none. Keep EVERY other object and its registration unchanged, especially the original laptop body, keyboard, dark screen outline, blank warm cream lit screen, cliff silhouette and cliff-top rim. The laptop screen is the sole small local light source at this spot; eliminate moon backlight from sky but keep the warm cliff-top rim itself as painted. Do not move, scale, sharpen, restyle or redraw the laptop or cliff. Preserve dark ink outline cleanly against the restored dark sky. No objects, moons, letters, UI, symbols, logos, watermark or text. Output only repaired image 1 in the same square framing; do not output the mask, a comparison or a collage. Opaque RGB, sRGB, no exact black or white.
+```
+
+The respective call appended exactly ` Target: mobile plate crop. Retain its individual paper texture.` or ` Target: desktop plate crop. Retain its individual paper texture.`
+
+### Second desktop prompt (selected)
+
+```text
+Use case: precise-object-edit. Highest quality restoration. Image 1 is an exact original square watercolor night crop to edit; image 2 is white repaint/black protect mask. Remove the big yellow moon and its whole halo from white region; restore dark night behind it. CRITICAL MATERIAL MATCH: retain the original LARGE coarse interlocking irregular polygon/cellular watercolor paper granules, about 8 to 14 pixels across in the 1024px input, visibly angular curled pigment ridges. The repaired sky must have EXACTLY SAME coarse granulation size and contrast as original sky to the immediate LEFT of moon and directly ABOVE moon, not fine sand, not smooth noise, not fabric weave, not soft airbrush. Dark anthracite #18191b with natural uneven dark ink mottling and tonal grain. No circular shape or ring remains. Do not introduce bright clouds or glow. No new stars. Preserve all original laptop and cliff geometry exactly, keep screen warm cream blank and its original dark frame. Preserve cliff-top warm rim, all original stars and all sky outside mask. This is a registered repair, no repaint elsewhere. Output the repaired square composition only, not mask. No text, UI, logos, watermark, second moon, new objects. Opaque sRGB.
+```
+
+### Final masks and compositing
+
+Exact masks: [desktop](moon-removal-masks/desktop.png), [mobile](moon-removal-masks/mobile.png). Each is full-size 8-bit grayscale, black = unchanged, white = replacement, gray = feather. Final support bounds use half-open (x0, y0, x1, y1): desktop **(1878, 573, 2560, 1048)**; mobile **(578, 1403, 1080, 1830)**.
+
+Starting ellipses (cx, cy, rx, ry): desktop (2265, 870, 390, 300), mobile (935, 1690, 360, 290). Outer 27% uses smoothstep feathering. The masks are clipped above the traced cliff skyline, with protected laptop silhouettes. Final masks refine the original guides around the screen edges: exclude original foreground, remove bright lunar background beside the frame, and restore the narrow dark foreground antialias fringe. The stored masks are authoritative.
+
+Generated crops were bilinearly mapped to their original crop dimensions. In a narrow band next to the foreground, replacement sky was blended with generated sky sampled 180 crop pixels above (smoothstep over 25 px, full at distance ≤5 px, zero at ≥30 px) to prevent any regenerated laptop/cliff pixels from entering the repair. RGB compositing was `round(original * (1 - mask/255) + generatedSky * mask/255)`. Original RGB bytes were copied directly wherever mask = 0; no whole-image resampling or color conversion was performed. No procedural texture was painted. Final output PNGs use RGB color type 2, 8 bits/channel and sRGB rendering intent 0.
+
+### Verification
+
+Full-size and magnified views were inspected after iterative mask corrections. No visible lunar disc, circular halo or hard patch boundary remains. Original warm cliff-top paint and the lower-left pigment wash were deliberately retained; they are not newly painted screen illumination. Original masters already contain resampled rather than native-resolution generation detail.
+
+The following records compare decoded RGB pixels against the pre-edit files. SHA-256 outside-mask digests concatenate untouched RGB triplets in raster order. Zero changes outside the mask also proves zero changes outside its bounding box.
+
+```json
+{
+	"desktop": {
+		"file": "making-plate.png",
+		"dimensions": [2560, 1440],
+		"channels": 3,
+		"chunks": ["IHDR", "sRGB", "IDAT", "IEND"],
+		"maskBBoxXYXYExclusive": [1878, 573, 2560, 1048],
+		"changedBBoxXYXYExclusive": [1888, 585, 2560, 1047],
+		"maskPixels": 255126,
+		"changedPixels": 238277,
+		"unchangedOutsideMask": 3431274,
+		"changedOutsideMask": 0,
+		"changedCliff": 0,
+		"changedProtectedLaptop": 0,
+		"pureBlack": 0,
+		"pureWhite": 0,
+		"originalSHA256": "45b85cb1573b45b258b1590005a88ce5622580d9b06f4877e834da69ed9c930d",
+		"finalSHA256": "c950d5f9040e2d2eb2ded4bcf7698f8451a7a51ca866a3de439757fa85418b07",
+		"outsideOriginalSHA256": "d511fa1f0d86d9178db56d219ff995138604191e9731ab7dc58ceb49bfca5df1",
+		"outsideFinalSHA256": "d511fa1f0d86d9178db56d219ff995138604191e9731ab7dc58ceb49bfca5df1",
+		"bytes": 4172851
+	},
+	"mobile": {
+		"file": "making-plate-mobile.png",
+		"dimensions": [1080, 2340],
+		"channels": 3,
+		"chunks": ["IHDR", "sRGB", "IDAT", "IEND"],
+		"maskBBoxXYXYExclusive": [578, 1403, 1080, 1830],
+		"changedBBoxXYXYExclusive": [588, 1411, 1080, 1829],
+		"maskPixels": 170357,
+		"changedPixels": 156306,
+		"unchangedOutsideMask": 2356843,
+		"changedOutsideMask": 0,
+		"changedCliff": 0,
+		"changedProtectedLaptop": 0,
+		"pureBlack": 0,
+		"pureWhite": 0,
+		"originalSHA256": "f3c805b4e025cf44d11a760c633066a929d23f2ea44cd80b00c7734187f484cc",
+		"finalSHA256": "92ddf1145d5f01f072367f8be7b20d6ec342b324c62c6fd21811b873280510cb",
+		"outsideOriginalSHA256": "a513e815a55265ad192cfe7ba1b3e0f9172c537218d1d98aad70783a47ff259e",
+		"outsideFinalSHA256": "a513e815a55265ad192cfe7ba1b3e0f9172c537218d1d98aad70783a47ff259e",
+		"bytes": 3127246
+	}
+}
+```
+
+Blank screen interior was additionally checked independently: zero changed pixels in both plates. Saved final PNGs were read back and matched the recorded final SHA-256 values.
