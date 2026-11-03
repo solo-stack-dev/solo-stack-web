@@ -289,12 +289,10 @@ The game is **not decided**. A game has to be played to judge, so build **three 
 
 **Music:**
 
-- One station (e.g. "Solo Stack FM") plays the owner's own track (lo fi / sad rap, the owner generates it with their AI music tool and supplies the file). Placeholder until then: no audio, the station shows "coming soon" style placeholder copy.
-- Audio never autoplays; it starts only on a click, with a clear pause control and volume. Load the audio file only after the first interaction (`preload="none"`, AAC/Opus, ≤ 4 MB).
+- Every station plays its own short song (30 to 45 s, looping; English sad rap or lo fi, generated with YuE2 from gpt-6.1-sol lyrics, see `docs/art/radio/SONGS.md`) while it is tuned. A station without a song file in `radio/track/` simply plays no music (e.g. Discord until it gets one). The former single music station "Solo Stack FM" was dropped (owner decision, 2026-11-03).
+- Audio never autoplays; a song starts only when the visitor tunes its station (a gesture), with a clear pause control and volume. Each file loads only when its station is tuned (`preload="none"`, AAC, < 500 kB).
 - **Waveform horizon:** while playing, a Web Audio `AnalyserNode` drives a glowing waveform along the horizon (Canvas 2D or SVG path), and the stars pulse slightly with the beat (CSS variable from RMS). When idle, the horizon shows a slow, quiet wave.
 - Tuning between stations plays a short burst of static generated with Web Audio (noise buffer), no extra file.
-
-**Later (not now):** a hidden station between two presets (e.g. tuning the dial to a special frequency) as an Easter egg. Leave a `TODO(egg)` hook.
 
 **Build:** radio as layered art (body, dial glass, needle, keys separately so they can move); needle and keys animated with CSS transforms; dial is a real slider (`input type=range` styled, or a custom ARIA slider) plus the preset buttons.
 

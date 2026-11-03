@@ -34,14 +34,18 @@
 		reduced: boolean;
 		/** Music volume 0…1 (turns the left knob). */
 		volume: number;
+		/** The selected station's song is playing. */
+		playing: boolean;
 		onpreset: (station: Station) => void;
 		ondialinput: (value: number) => void;
 		ondialcommit: () => void;
 		ondialkey: (event: KeyboardEvent) => void;
 		strip: Snippet<['wide' | 'tall']>;
+		/** Song controls for a station with a song, shown next to its title on the glass. */
+		song: Snippet<[Station]>;
 	}
 
-	let { variant, stations, dial, tuned, selected, dragging, reduced, volume, onpreset, ondialinput, ondialcommit, ondialkey, strip }: Props = $props();
+	let { variant, stations, dial, tuned, selected, dragging, reduced, volume, playing, onpreset, ondialinput, ondialcommit, ondialkey, strip, song }: Props = $props();
 
 	const layout: RadioLayout = $derived(RADIO_LAYOUT[variant]);
 	const slots = $derived(keySlots(layout, stations.length));
@@ -92,7 +96,7 @@
 		<path d={scale.rule} class="scale-rule" />
 		<path d={scale.ticks} class="scale-ticks" />
 		{#each stationMarks as mark (mark.station.id)}
-			<g class={['mark', tuned?.id === mark.station.id && 'on', mark.station.kind === 'music' && 'music']}>
+			<g class={['mark', tuned?.id === mark.station.id && 'on']}>
 				<path d={mark.tick} class="mark-tick" />
 				<svg x={mark.logo.x} y={mark.logo.y} width={mark.logo.size} height={mark.logo.size} viewBox="0 0 24 24"><path d={mark.station.icon} fill="currentColor" /></svg>
 			</g>
@@ -126,6 +130,12 @@
 					<div class="glass-text">
 						<p class="glass-name">{tuned.name}</p>
 						{#if tuned.handle}<p class="glass-handle font-mono">{tuned.handle}</p>{/if}
+						{#if tuned.track}
+							<div class={['glass-song', playing && tuned.id === selected?.id && 'on']}>
+								{@render song(tuned)}
+								<span class="glass-song-title"><span class="glass-note" aria-hidden="true">♪</span> {tuned.track.title}</span>
+							</div>
+						{/if}
 						{#if tuned.id === 'youtube' || tuned.id === 'github'}
 							<p class="glass-content">
 								<svelte:boundary>
@@ -187,7 +197,7 @@
 			{@const down = selected?.id === station.id}
 			<button
 				type="button"
-				class={['key', down && 'down', station.kind === 'music' && 'music']}
+				class={['key', down && 'down']}
 				style:left={slot.left}
 				style:top={slot.top}
 				style:width={slot.width}
@@ -315,8 +325,10 @@
 	}
 
 	/* Station on the glass: logo left, name / handle / live content right */
+	/* Above the dial slider, but transparent to the pointer except for its links and controls */
 	.glass {
 		position: absolute;
+		z-index: 1;
 		display: grid;
 		place-items: center;
 		pointer-events: none;
@@ -358,6 +370,44 @@
 		font-size: var(--small);
 		color: color-mix(in oklab, var(--color-butter) 85%, white);
 		opacity: 0.9;
+	}
+
+	/* Song of the tuned station: controls (snippet) and title; the note glows while it plays. Clickable over the dial. */
+	.glass-song {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+		margin: 0.15em 0 0;
+		font-size: var(--small);
+		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+		pointer-events: auto;
+	}
+
+	/* Tall radio: the strip right below already shows the handle; drop it here so name, song and live content fit */
+	.set-tall .glass-text:has(.glass-song) .glass-handle {
+		display: none;
+	}
+
+	.glass-song-title {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-style: italic;
+	}
+
+	.glass-note {
+		display: inline-block;
+		font-style: normal;
+		color: var(--color-butter);
+		opacity: 0.6;
+		transition: opacity 0.3s;
+	}
+
+	.glass-song.on .glass-note {
+		opacity: 1;
+		text-shadow: 0 0 0.8cqw rgb(252 215 114 / 0.9);
 	}
 
 	/* Live content (StationContent: label + line). Links inside stay clickable over the dial. */

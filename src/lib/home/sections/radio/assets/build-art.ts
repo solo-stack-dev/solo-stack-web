@@ -5,7 +5,7 @@
  *
  *     node src/lib/home/sections/radio/assets/build-art.ts
  *
- * The painted body has six preset slots, the section has one key per station (10 now, 11 with Discord). The script
+ * The painted body has six preset slots, the section has one key per station (9 now, 10 with Discord). The script
  * re-assembles the body from its own painted pixels (no new paint):
  *
  * - The six-slot plate between the knobs becomes one long dark window: the display strip (9-slice of the slot rims).
@@ -248,6 +248,9 @@ function drawWall(dst: Img, master: Img, side: 'left' | 'right', from: number, t
 	}
 }
 
+/** Master rows cut off the top of the landscape plates (sky and moon). Keep in sync with LANDSCAPE.*.cropTop. */
+const PLATE_CROP_TOP = { wide: 480, tall: 585 } as const;
+
 /** Speaker grille columns removed for the phone radio, and the cut used above/below the grille rows. */
 const GRILLE_CUT = { inner: 152, outer: 700, width: 446, top: 280, bottom: 948 };
 
@@ -413,12 +416,17 @@ async function main() {
 	report('wide', wideSave, 0, PLATE, wideRecess);
 	report('tall', tallSave, GRILLE_CUT.width, tallPlate, tallRecess);
 
-	// Plates (masters are upscaled from ~1670 / ~850 px paintings; 1920 / 1080 keep all painted detail)
-	for (const [name, width] of [
-		['radio-landscape', 1920],
-		['radio-landscape-mobile', 1080]
+	// Plates (masters are upscaled from ~1670 / ~850 px paintings; 1920 / 1080 keep all painted detail). The sky with
+	// the moon is cut off at `cropTop` master rows: the section shows only mountains, mist, sea and forest, the page's
+	// own night sky shows above (LANDSCAPE.*.cropTop in layout.ts places the cut plate at its original offset).
+	for (const [name, width, cropTop] of [
+		['radio-landscape', 1920, PLATE_CROP_TOP.wide],
+		['radio-landscape-mobile', 1080, PLATE_CROP_TOP.tall]
 	] as const) {
-		const info = await sharp(join(masters, `${name}.png`))
+		const file = join(masters, `${name}.png`);
+		const { width: w, height: h } = await sharp(file).metadata();
+		const info = await sharp(file)
+			.extract({ left: 0, top: cropTop, width: w, height: h - cropTop })
 			.resize(width)
 			.webp({ quality: 84, effort: 6 })
 			.toFile(join(out, `${name}.webp`));
