@@ -5,7 +5,7 @@
 //
 //   node src/lib/home/shared/tools/optimize-materials.mjs
 //
-// - paper-grain.png: the neutral grayscale tile turned into a two-tone alpha tile (cream where the paper is lighter
+// - paper-grain.webp: the neutral grayscale tile turned into a two-tone alpha tile (cream where the paper is lighter
 //   than its mean, ink where it is darker), so it reads as grain with plain `normal` blending (no blend-mode cost).
 // - edge-{1,2,3}.webp / edge-{1,2,3}-up.webp: alpha masks (opaque above / transparent below) and their vertical flips
 //   (transparent above / opaque below), downscaled to 1280×200 (they are stretched to the strip width anyway).
@@ -44,11 +44,13 @@ const report = (name) => console.log(`${name.padEnd(22)} ${(statSync(target(name
 		// ±2.5σ → full alpha; the component's `opacity` scales it down
 		out[index * 4 + 3] = Math.round(Math.min(1, Math.abs(z) / 2.5) * 255);
 	}
-	await sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } })
-		// Two colors × alpha levels: a 32-entry palette PNG is ~20 kB, lossy WebP of noise is > 45 kB.
+	// Two colors × alpha levels: quantized to a 32-entry palette (as a PNG, ~20 kB), then stored as lossless WebP
+	// (same pixels, ~10 kB). Lossy WebP of noise is > 45 kB.
+	const palette = await sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } })
 		.png({ palette: true, colors: 32, effort: 10, compressionLevel: 9 })
-		.toFile(target('paper-grain.png'));
-	report('paper-grain.png');
+		.toBuffer();
+	await sharp(palette).webp({ lossless: true }).toFile(target('paper-grain.webp'));
+	report('paper-grain.webp');
 }
 
 for (const edge of [1, 2, 3]) {

@@ -14,13 +14,14 @@
 
 	Chrome that follows the art underneath:
 	- The nav wordmark and the rail hide while the hero (with its giant wordmark and moon) covers the top of the viewport.
-	- Global shooting stars pause while the opaque hero covers the sky (the hero has its own).
+	- Global shooting stars pause while the opaque hero covers the sky (the hero has its own); the global star field stops
+	  twinkling while the hero fills the whole viewport (its 20 fps full-screen canvas would redraw unseen).
 	- Nav and rail switch to dark ink only once the sunrise paper is really under them: the sunrise night edge
 	  (`#sunrise [data-night-edge]`, falling back to `#sunrise .night`) is tracked while the sunrise is on screen.
 	- `html[data-night-end]` while the sunrise is on screen: bottom overscroll shows butter paper, top overscroll night.
 -->
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import { on } from 'svelte/events';
 	import { page } from '$app/state';
 	import SiteNav from '#lib/components/site/SiteNav.svelte';
@@ -64,6 +65,8 @@
 	let active = $state<SectionId>('hero');
 	// The page loads at the top: the hero covers the sky until the observer says otherwise.
 	let heroCovers = $state(true);
+	// …and fills the whole viewport (reaches its bottom edge), so the global sky is completely hidden.
+	let heroFills = $state(true);
 	let navOnPaper = $state(false);
 	let railOnPaper = $state(false);
 	// Evenly spaced until measured on the client. stops[k]: hour k fully reached; starts[k]: its blend begins.
@@ -92,7 +95,7 @@
 		if (elements.length !== NIGHT_HOURS.length) return;
 		let previous = 0;
 		const nextStarts = [0];
-		stops = elements.map((element, index) => {
+		const nextStops = elements.map((element, index) => {
 			if (index === 0) return 0;
 			const top = element.getBoundingClientRect().top + window.scrollY;
 			const center = top + element.offsetHeight / 2 - window.innerHeight / 2;
@@ -102,17 +105,32 @@
 			nextStarts.push(Math.min(start, previous));
 			return previous;
 		});
-		starts = nextStarts;
+		// New arrays re-render the sky layers and --sky-now, which every element inherits: only write real changes.
+		if (!sameValues(stops, nextStops)) stops = nextStops;
+		if (!sameValues(starts, nextStarts)) starts = nextStarts;
 	}
 
+	const sameValues = (a: number[], b: number[]) => a.length === b.length && a.every((value, index) => value === b[index]);
+
 	$effect(() => {
-		const observer = new ResizeObserver(measureStops);
+		// One measurement per frame: a window resize also resizes the wrapper, so both sources fire together.
+		let frame = 0;
+		const schedule = () => {
+			if (!frame)
+				frame = requestAnimationFrame(() => {
+					frame = 0;
+					measureStops();
+				});
+		};
+		const observer = new ResizeObserver(schedule);
 		observer.observe(wrapper);
-		const offResize = on(window, 'resize', measureStops, { passive: true });
-		measureStops();
+		const offResize = on(window, 'resize', schedule, { passive: true });
+		// untracked: measureStops reads `stops`/`starts`, which must not become dependencies of this effect
+		untrack(measureStops);
 		return () => {
 			observer.disconnect();
 			offResize();
+			cancelAnimationFrame(frame);
 		};
 	});
 
@@ -149,11 +167,18 @@
 		const hero = byId('hero');
 		if (!hero) {
 			heroCovers = false;
+			heroFills = false;
 			return;
 		}
 		const observer = new IntersectionObserver(([entry]) => (heroCovers = entry.isIntersecting), { rootMargin: '0px 0px -60% 0px' });
+		// The hero starts at the page top, so reaching the bottom 1 % of the viewport means it covers all of it.
+		const fills = new IntersectionObserver(([entry]) => (heroFills = entry.isIntersecting), { rootMargin: '-99% 0px 0px 0px' });
 		observer.observe(hero);
-		return () => observer.disconnect();
+		fills.observe(hero);
+		return () => {
+			observer.disconnect();
+			fills.disconnect();
+		};
 	});
 
 	// Sunrise: overscroll color, and nav/rail ink that follows the paper under them (not the page progress).
@@ -252,7 +277,7 @@
 			<div class="sky-layer is-blend" style:background={skyBackground(hour)} style:--from={starts[index + 1]} style:--to={stops[index + 1]}></div>
 		{/each}
 		<div class="sky-stars">
-			<StarField />
+			<StarField twinkle={!heroFills} />
 			<ShootingStars enabled={!heroCovers} />
 		</div>
 	</div>
