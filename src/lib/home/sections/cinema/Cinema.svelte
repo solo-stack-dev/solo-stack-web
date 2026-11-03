@@ -192,7 +192,10 @@
 		position: absolute;
 		inset: 0;
 		background: var(--cinema-sky);
-		mask-image: linear-gradient(to bottom, transparent, black 18%);
+		/* painted soft edge (shared/transitions.ts): the top ~20 % feathers into the 02:00 sky under the mist bank */
+		mask:
+			var(--feather-up) top / 100% 20% no-repeat,
+			linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat;
 		pointer-events: none;
 	}
 
@@ -226,15 +229,19 @@
 
 	/* The landscape plate is opaque: its top melts into the section's own night backdrop above the stage. */
 	.landscape {
-		mask-image: linear-gradient(to bottom, transparent, black 9%);
+		mask:
+			var(--feather-up) top / 100% 12% no-repeat,
+			linear-gradient(#000 0 0) bottom / 100% 88.5% no-repeat;
 	}
 
-	/* The bottom melts into the night edge that opens the sunrise section. */
+	/* The bottom melts into the solid night that opens the sunrise section (its ink-wash wipe), with the painted soft
+	   edge instead of a straight gradient. */
 	.landscape-fade {
 		position: absolute;
 		inset: auto 0 0;
-		height: 14%;
-		background: linear-gradient(to bottom, transparent, var(--ink-fade));
+		height: 18%;
+		background: var(--ink-fade);
+		mask: var(--feather-up) center / 100% 100% no-repeat;
 		pointer-events: none;
 	}
 

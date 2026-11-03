@@ -138,6 +138,7 @@
 	}
 </script>
 
+<!-- Transition from the hero: an ink-wash wipe on .track (CSS below, docs/HOMEPAGE-DEV.md §6.5). -->
 <section id="making" data-night-hour="21:00" class="making" aria-labelledby="home-making-title">
 	<div class="track" bind:this={track} {@attach progress.attach}>
 		<div
@@ -154,7 +155,7 @@
 		>
 			<!-- Painted scene in plate coordinates: decorative only, the meaning lives in the titles and the pillar row. -->
 			<div class="scene" aria-hidden="true">
-				<div class="frame" {@attach loop.attach}>
+				<div class="frame" data-feather {@attach loop.attach}>
 					<!-- string src: enhanced-img derives a full width ladder from `sizes` (the plate covers the stage) -->
 					<enhanced:img class="plate plate-desktop" src="./assets/making-plate.webp" alt="" sizes="max(100vw, min(178vh, 107vw))" loading="lazy" />
 					<enhanced:img class="plate plate-mobile" src="./assets/making-plate-mobile.webp" alt="" sizes="100vw" loading="lazy" />
@@ -240,11 +241,77 @@
 	.making {
 		position: relative;
 		--ink-cream: #f8e8bd;
+		/* Ink-wash wipe from the hero: the section overlaps the hero's bottom by --wipe-overlap (it paints above it) and
+		   its plate floods up over the moon as a wet wash front (.track mask). The overlap must not swallow the hero's
+		   controls underneath, so only this section's own controls take pointer events. */
+		--wipe-overlap: 45svh;
+		margin-top: calc(-1 * var(--wipe-overlap));
+		view-timeline: --making-wipe block;
+		pointer-events: none;
+	}
+
+	.making :is(a, button) {
+		pointer-events: auto;
+	}
+
+	/* Wipe progress 0…1. Initial value 1 is unused: without animation the static fallback below applies. */
+	@property --wipe {
+		syntax: '<number>';
+		inherits: true;
+		initial-value: 1;
 	}
 
 	.track {
 		position: relative;
 		height: 560svh;
+		/* Static fallback (reduced motion, no scroll-driven animations): the overlap is one soft wash from hero to
+		   plate. The mask lives on the track, not the pinned stage, so it scrolls away before the stage pins.
+		   --wipe-b: where the plate turns solid; --wipe-w: height of the wash ramp above it (≤ --wipe-b, so the
+		   plate's straight top edge is always transparent while the hero is on screen). Two layers of the same
+		   painted ramp at different sizes and offsets (added) make the front change shape as it moves. */
+		--wipe-b: var(--wipe-overlap);
+		--wipe-w: var(--wipe-overlap);
+		--wipe-x: 30%;
+		/* Backing in the overlap (the 21:00 sky color, fading out below it): the plate's soft top edge must show sky,
+		   not the hero underneath; only the wipe mask reveals the hero. */
+		background:
+			linear-gradient(#221f1d 0 0) top / 100% var(--wipe-overlap) no-repeat,
+			linear-gradient(#221f1d, transparent) left 0 top var(--wipe-overlap) / 100% 30svh no-repeat;
+		mask-image: var(--wash-spread-up), var(--wash-spread-up), linear-gradient(#000 0 0);
+		mask-repeat: repeat-x, repeat-x, no-repeat;
+		/* the ramps tile sideways near their painted aspect instead of being squashed to the full width */
+		mask-size:
+			max(60%, var(--wipe-w) * 1.6) var(--wipe-w),
+			max(90%, var(--wipe-w) * 2.4) calc(var(--wipe-w) * 0.75),
+			100% 100%;
+		mask-position:
+			0 calc(var(--wipe-b) - var(--wipe-w)),
+			var(--wipe-x) calc(var(--wipe-b) - var(--wipe-w) * 0.75),
+			0 calc(var(--wipe-b) - 1px);
+	}
+
+	/* The wipe: from the page top (the overlap's share of the entry range) until the section top reaches the
+	   viewport top, the front runs up from the viewport bottom ~1.4× faster than the page and widens as it spreads. */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: view()) {
+			.track {
+				--wipe-b: calc(var(--wipe-overlap) * (1 - var(--wipe)));
+				--wipe-w: min(calc(var(--wipe-overlap) * 0.15 + var(--wipe) * 45svh), var(--wipe-b));
+				--wipe-x: calc(10% + var(--wipe) * 45%);
+				animation: making-wipe linear both;
+				animation-timeline: --making-wipe;
+				animation-range: entry 45% entry 100%;
+			}
+		}
+	}
+
+	@keyframes making-wipe {
+		from {
+			--wipe: 0;
+		}
+		to {
+			--wipe: 1;
+		}
 	}
 
 	.stage {
@@ -273,6 +340,9 @@
 		width: calc(var(--pw) * var(--s));
 		height: calc(var(--ph) * var(--s));
 		translate: -50% -50%;
+		/* painted soft edges (NightPage [data-feather]): the top meets the wipe, the bottom the 22:00 mist */
+		--feather-top: calc(var(--ph) * var(--s) * 0.08);
+		--feather-bottom: calc(var(--ph) * var(--s) * 0.18);
 	}
 
 	.plate {
@@ -280,7 +350,6 @@
 		inset: 0;
 		width: 100%;
 		height: 100%;
-		mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 88%, transparent);
 	}
 
 	.plate-mobile {

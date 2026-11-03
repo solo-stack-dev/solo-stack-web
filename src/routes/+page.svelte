@@ -8,7 +8,7 @@
 	import NightShift from '#lib/home/sections/night-shift/NightShift.svelte';
 	import Radio from '#lib/home/sections/radio/Radio.svelte';
 	import Sunrise from '#lib/home/sections/sunrise/Sunrise.svelte';
-	import Seam from '#lib/home/shared/Seam.svelte';
+	import Mist from '#lib/home/shared/Mist.svelte';
 </script>
 
 <svelte:head>
@@ -18,20 +18,21 @@
 
 <!--
 	One night, 20:00 → 06:00. Order must match NIGHT_HOURS in src/lib/home/night.ts.
-	Seams: ragged sky-colored watercolor bands over the section boundaries (shared/Seam.svelte), tuned per boundary at
-	1440 and 390 (docs/screens/integration/). 04→06 needs none: the sunrise brings its own painted night edge.
+	Transitions (docs/HOMEPAGE-DEV.md §6.5): every plate feathers its own edges with the painted soft edge, and a
+	partly transparent painted mist bank (shared/Mist.svelte) drifts across the boundary. Two boundaries are
+	scroll-driven ink-wash wipes owned by the sections themselves: 20→21 (the making plate floods up over the hero)
+	and 04→06 (the sunrise night dries and pulls back), so they get no mist.
 -->
 <NightPage>
 	<Hero />
-	<Seam height="clamp(7rem, 12vw, 12rem)" above={0.3} top={3} bottom={1} fill="color-mix(in srgb, var(--sky-now) 40%, #171615)" />
 	<Making />
-	<Seam height="clamp(7rem, 12vw, 12rem)" top={3} bottom={1} />
+	<Mist variant="dusk" height="clamp(7rem, 15vw, 14rem)" above={0.3} opacity={0.6} gaps={[18, 64]} />
 	<Game />
-	<Seam height="clamp(7rem, 13vw, 13rem)" top={1} bottom={3} mirror />
+	<Mist variant="night" height="clamp(8rem, 18vw, 16rem)" above={0.55} opacity={0.6} gaps={[40, 86]} mirror />
 	<NightShift />
-	<Seam height="clamp(7rem, 12vw, 12rem)" top={3} bottom={1} mirror />
+	<Mist variant="night" height="clamp(8rem, 17vw, 15rem)" above={0.5} opacity={0.55} gaps={[30, 72]} />
 	<Radio />
-	<Seam height="clamp(7rem, 12vw, 12rem)" top={1} bottom={3} />
+	<Mist variant="predawn" height="clamp(8rem, 18vw, 16rem)" above={0.45} opacity={0.65} gaps={[24, 58]} mirror />
 	<Cinema />
 	<Sunrise />
 </NightPage>

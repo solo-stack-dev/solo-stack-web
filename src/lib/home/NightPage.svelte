@@ -9,8 +9,11 @@
 	The sky is a stack of full-viewport color layers; layer k fades in between its measured start and stop, so the
 	visible color is an exact linear blend of neighboring hours. Stops are anchored to the real section positions
 	(section center at viewport center; hours with `from: 'enter'` start blending when their section enters the
-	viewport), re-measured on resize. `--dawn` (0…1) is the progress of the last blend (butter paper); `--sky-now` is the
-	current flat sky color (used by the Seam bands between sections).
+	viewport), re-measured on resize. `--dawn` (0…1) is the progress of the last blend (butter paper).
+
+	Section transitions: the painted masks of shared/transitions.ts as `url()` custom properties (`--feather-up`,
+	`--feather-down`, `--wash-spread-up`, `--wash-dry`), and the `[data-feather]` helper that feathers a plate's top
+	and/or bottom with the painted soft edge (`--feather-top` / `--feather-bottom`: edge heights as lengths).
 
 	Chrome that follows the art underneath:
 	- The nav wordmark and the rail hide while the hero (with its giant wordmark and moon) covers the top of the viewport.
@@ -32,6 +35,7 @@
 	import ShootingStars from './shared/ShootingStars.svelte';
 	import StarField from './shared/StarField.svelte';
 	import { reducedMotion } from './shared/motion.svelte.ts';
+	import { transitionMaskVars } from './shared/transitions.ts';
 
 	interface Props {
 		children: Snippet;
@@ -41,7 +45,7 @@
 
 	let { children, rail = true }: Props = $props();
 
-	/** Fraction of the sunrise night edge's height below which its ink is gone (alpha profile of sunrise-night-edge.png). */
+	/** Fallback when the sunrise night edge has no `data-edge-clear`: fraction of its height below which its ink is gone. */
 	const SUNRISE_EDGE_CLEAR = 0.72;
 
 	const labels: Record<SectionId, () => string> = {
@@ -55,6 +59,8 @@
 	};
 
 	const hours: readonly NightHourDef[] = NIGHT_HOURS;
+	// Painted transition masks as `url()` custom properties for the sections' edge CSS (shared/transitions.ts).
+	const maskVars = transitionMaskVars();
 	const last = NIGHT_HOURS.length - 1;
 
 	let wrapper: HTMLDivElement;
@@ -69,18 +75,6 @@
 	// Evenly spaced until measured on the client. stops[k]: hour k fully reached; starts[k]: its blend begins.
 	let stops = $state<number[]>(NIGHT_HOURS.map((_, index) => index / last));
 	let starts = $state<number[]>(NIGHT_HOURS.map((_, index) => Math.max(0, index - 1) / last));
-
-	// The live flat sky color as one CSS value (same blend as the layer stack, without the horizon gradients), for
-	// anything that has to match the sky exactly, e.g. the Seam bands between sections.
-	const skyNow = $derived(
-		hours
-			.slice(1)
-			.reduce(
-				(color, hour, index) =>
-					`color-mix(in srgb, ${color}, ${hour.sky} calc(clamp(0, (var(--night) - ${starts[index + 1]}) / ${Math.max(0.0001, stops[index + 1] - starts[index + 1])}, 1) * 100%))`,
-				hours[0].sky as string
-			)
-	);
 
 	const sections = () => Array.from(wrapper.querySelectorAll<HTMLElement>(`[${NIGHT_HOUR_ATTR}]`));
 	const byId = (id: SectionId) => wrapper.querySelector<HTMLElement>(`#${id}[${NIGHT_HOUR_ATTR}]`);
@@ -244,7 +238,7 @@
 	data-hero-covers={heroCovers ? '' : undefined}
 	style:--dawn-from={starts[last]}
 	style:--dawn-to={stops[last]}
-	style:--sky-now={skyNow}
+	style={maskVars}
 >
 	<div class="sky" aria-hidden="true">
 		<div class="sky-layer" style:background={skyBackground(hours[0])}></div>
@@ -328,6 +322,16 @@
 		/* Ink color that stays readable on the sky: cream at night, anthracite once the paper is bright (06:00) */
 		--night-ink: color-mix(in oklab, var(--color-cream), var(--color-night) calc(clamp(0, (var(--dawn) - 0.6) * 2.5, 1) * 100%));
 		color: var(--color-cream);
+	}
+
+	/* Feathered plate edges (docs/HOMEPAGE-DEV.md §6.5): the painted soft edge over the top `--feather-top` and/or the
+	   bottom `--feather-bottom` (lengths, default 0) of the element, solid in between (overlapping the edges by 1px,
+	   so no hairline shows). Opt in with the `data-feather` attribute; it owns the element's `mask`. */
+	.night-page :global([data-feather]) {
+		mask:
+			var(--feather-up) top / 100% var(--feather-top, 0px) no-repeat,
+			linear-gradient(#000 0 0) left 0 top calc(var(--feather-top, 0px) - 1px) / 100% calc(100% - var(--feather-top, 0px) - var(--feather-bottom, 0px) + 2px) no-repeat,
+			var(--feather-down) bottom / 100% var(--feather-bottom, 0px) no-repeat;
 	}
 
 	@supports (animation-timeline: scroll()) {

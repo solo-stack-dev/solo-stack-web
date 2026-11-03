@@ -132,6 +132,7 @@
 	bind:this={section}
 	id="radio"
 	data-night-hour="02:00"
+	data-feather
 	class="radio"
 	aria-labelledby="home-radio-title"
 	style:--horizon-wide={LANDSCAPE.wide.horizonY}
@@ -315,6 +316,9 @@
 		overflow: clip;
 		min-height: 100svh;
 		padding: clamp(7rem, 13vh, 9rem) clamp(1.25rem, 5vw, 5rem) clamp(3rem, 8vh, 5rem);
+		/* the clipped plate must not end in a straight line: painted soft section edges (NightPage [data-feather]) */
+		--feather-top: clamp(4rem, 9vw, 8rem);
+		--feather-bottom: clamp(4rem, 9vw, 8rem);
 	}
 
 	.head {

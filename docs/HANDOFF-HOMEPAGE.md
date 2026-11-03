@@ -96,7 +96,7 @@ src/lib/home/
     PaperGrain.svelte
     StarField.svelte
     ShootingStars.svelte
-    SectionEdge.svelte                   watercolor mask transitions
+    Mist.svelte, transitions.ts          painted section transitions (HOMEPAGE-DEV.md §6.5)
     LazyMount.svelte                     mounts children (dynamic import) when near the viewport
     motion.svelte.ts                     reducedMotion state, inView action/attachment, scroll progress helpers, rAF loop that pauses off screen
     audio.svelte.ts                      shared AudioContext, created only on user gesture
