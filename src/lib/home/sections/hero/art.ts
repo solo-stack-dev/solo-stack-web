@@ -5,7 +5,6 @@ export interface ArtCrop {
 	master: { width: number; height: number };
 	crop: { left: number; top: number; width: number; height: number };
 	output: { width: number; height: number };
-	window?: { left: number; top: number; right: number; bottom: number };
 }
 
 export const ART_CROPS: Record<string, ArtCrop> = {
@@ -71,28 +70,6 @@ export const ART_CROPS: Record<string, ArtCrop> = {
 		output: {
 			width: 1942,
 			height: 1942
-		}
-	},
-	'hero-portrait-frame': {
-		master: {
-			width: 900,
-			height: 1100
-		},
-		crop: {
-			left: 42,
-			top: 55,
-			width: 818,
-			height: 994
-		},
-		output: {
-			width: 400,
-			height: 486
-		},
-		window: {
-			left: 173,
-			top: 169,
-			right: 753,
-			bottom: 853
 		}
 	},
 	'mascot-hero-moonrim': {

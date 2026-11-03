@@ -17,7 +17,6 @@ Technical export only: preserve generated pigment, add transparent breathing roo
 - **[hero-clouds-3.png](hero-clouds-3.png)** — 2560×1024 px; 1,690,257 bytes; z=4. RGBA: transparent exterior and fractional-alpha edges. Native generation 1983×793 px. Dark foreground bank, heavier on the right; overlap the lower moon rim. Suggested width 80–110%; it may be cropped by the section, not by the PNG.
 - **[hero-moon-disc.png](hero-moon-disc.png)** — 2048×2048 px; 4,842,903 bytes; z=3. RGBA: transparent exterior and fractional-alpha edges. Native generation 1254×1254 px. Static/reduced-motion moon, on the right and partly outside the desktop viewport; top right on mobile. Use the exact disc geometry below for the live wordmark clip.
 - **[hero-moon-texture.png](hero-moon-texture.png)** — 4096×2048 px; 9,200,506 bytes; z=3, replacement for disc. RGB: fully opaque. Native generation 1774×887 px. Unlit color/albedo map for the lazy 3D sphere at the same position and diameter as the fallback disc. Repeat U; clamp V. Separate scene lighting controls phases.
-- **[hero-portrait-frame.png](hero-portrait-frame.png)** — 900×1100 px; 825,019 bytes; z=6, real photo at z=5. RGBA: transparent exterior and fractional-alpha edges; transparent central window. Native generation 1134×1387 px. Bottom-left portrait frame, approximately 150×183 CSS px as a starting point. Crop a real photograph beneath the torn opening; keep the photo rectangle under the paper border, not under the transparent outer margin.
 
 ## Moon geometry and texture
 
@@ -29,12 +28,14 @@ The texture is a **4096×2048 equirectangular flat color/albedo map**. It has pi
 
 ## Compositing and verification
 
-Layer order is sky → distant clouds → wisps → moon → foreground clouds → photograph → paper frame. Live wordmark and navigation sit above the art; the wordmark uses the moon circle for its color split. A separate mascot asset belongs to another production task.
+Layer order is sky → distant clouds → wisps → moon → foreground clouds. Live wordmark and navigation sit above the art; the wordmark uses the moon circle for its color split. A separate mascot asset belongs to another production task.
 
-All eight images were visually inspected; the second cloud was regenerated because its initial silhouette was too similar to the first. The final cloud silhouettes are a low warm bank, thin rising wisps, and a darker right-heavy bank. The cutouts were inspected together on #18191B. Dimension checks passed; RGBA outer-border alpha is zero; the portrait-window center alpha is zero; visible pure-black/pure-white pixel counts are zero; the texture horizontal seam has maximum RGB difference zero.
+All eight images were visually inspected; the second cloud was regenerated because its initial silhouette was too similar to the first. The final cloud silhouettes are a low warm bank, thin rising wisps, and a darker right-heavy bank. The cutouts were inspected together on #18191B. Dimension checks passed; RGBA outer-border alpha is zero; visible pure-black/pure-white pixel counts are zero; the texture horizontal seam has maximum RGB difference zero.
 
 ## Integration limits
 
 Keep these large masters outside the shipped bundle. Generate optimized responsive AVIF/WebP derivatives during implementation; the homepage handoff budgets are approximately 250 kB for initial hero images and 400 kB per subsequent section. No application files or optimized derivatives were changed here. All requested layers are present; the material limitation is that final target dimensions are resampled from smaller built-in generations.
 
 Exact generation prompts and ordered input references: [PROMPTS.md](PROMPTS.md).
+
+**2026-11-03:** `hero-portrait-frame.png` was retired (owner decision: no torn-paper polaroid in the hero; the photo moved to the 06:00 footer as an ink print, see `src/lib/home/sections/sunrise/tools/build-assets.mjs`). Its prompt stays in PROMPTS.md for the record.

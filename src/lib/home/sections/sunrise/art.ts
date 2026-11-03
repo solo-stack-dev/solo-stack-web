@@ -13,21 +13,5 @@ export const ART_BOXES = {
 	valley: { canvas: { width: 2560, height: 900 }, crop: { x: 0, y: 256, width: 2560, height: 641 } },
 	cliffPath: { canvas: { width: 2560, height: 600 }, crop: { x: 0, y: 38, width: 2560, height: 534 } },
 	coffee: { canvas: { width: 600, height: 600 }, crop: { x: 5, y: 141, width: 592, height: 424 } },
-	walkBody: { canvas: { width: 1152, height: 1600 }, crop: { x: 292, y: 92, width: 496, height: 900 } },
-	walkArm: { canvas: { width: 1152, height: 1600 }, crop: { x: 400, y: 572, width: 196, height: 496 } },
-	walkLegs: { canvas: { width: 1152, height: 1600 }, crop: { x: 240, y: 892, width: 695, height: 618 } }
+	laptop: { canvas: { width: 1200, height: 600 }, crop: { x: 101, y: 223, width: 979, height: 297 } }
 } as const satisfies Record<string, ArtBox>;
-
-/**
- * The baked walk cycle (docs/art/mascot/walk16-cycle.json), in master px. Frame 0 and frames / 2 are the
- * contact poses (both feet down). The planted foot moves back by `advance` per frame, so moving the figure forward by
- * exactly that much per frame keeps it in place; `stepLength` = frames / 2 × advance. Per frame: `bob` (body and legs
- * translateY, baked into the legs atlas) and `arm` (near arm rotation in degrees around the shoulder).
- */
-export const WALK_CYCLE = {
-	frames: 16,
-	stepLength: 340,
-	advance: 42.5,
-	bob: [35, 43.1, 45, 33.8, 20, 11.9, 10, 21.3, 35, 43.1, 45, 33.8, 20, 11.9, 10, 21.3],
-	arm: [13, 11.31, 8, 4.19, 0, -4.19, -8, -11.31, -13, -11.31, -8, -4.19, 0, 4.19, 8, 11.31]
-} as const;
