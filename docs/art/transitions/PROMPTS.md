@@ -1,6 +1,6 @@
 # transitions generation prompts
 
-Note: the `_source-*`, `_check-*` and `_rejected-*` images and `_wash-report.html` referenced below are not committed (about 90 MB); they are archived outside the repo in `C:/Users/peter/solo-stack-redesign/art-scratch/transitions/`. The processing scripts expect them next to this file.
+Note: everything prefixed `_` referenced below (the `_source-*`, `_check-*` and `_rejected-*` images, `_wash-report.html`, the master finishing scripts `_process-mist.mjs` / `_process-washes.mjs` / `_check-washes.mjs` / `_validate-wash-spread.mjs`, the retired Python finishers and the `_*-validation.json` measurements) is not committed; it is archived outside the repo in `C:/Users/peter/solo-stack-redesign/art-scratch/transitions/` (the scripts are also in git history before this note). The finishing scripts resolve the repo relative to their own folder, so copy them back next to this file together with their `_source-*` inputs to re-finish a master. Shipped runtime assets are rebuilt from the committed masters only, see [README.md](README.md).
 
 ## mist strips
 
@@ -191,7 +191,7 @@ Opened and inspected before generation:
 
 1. `docs/art/shared/edge-1.png`, `edge-2.png`, `edge-3.png` (also composited on anthracite to inspect their alpha).
 2. `docs/art/shared/PROMPTS.md` and `README.md`.
-3. `docs/art/sunrise/sunrise-night-edge.png` (negative example: dense hanging stain boundary).
+3. `docs/art/sunrise/sunrise-night-edge.png` (negative example: dense hanging stain boundary; since removed, see git history).
 4. `docs/art/hero/hero-sky.png`.
 5. `docs/art/making/making-plate.png`.
 6. `docs/art/sunrise/sunrise-sky.png`.

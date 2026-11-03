@@ -1,6 +1,14 @@
 # Section transition materials
 
-Painted masters for the section transitions (docs/HOMEPAGE-DEV.md §6.5). Prompts, rejected attempts and processing: [PROMPTS.md](PROMPTS.md). Optimized runtime files: `node src/lib/home/shared/tools/optimize-transitions.mjs` → `src/lib/home/shared/assets/transitions/`.
+Painted masters for the section transitions (docs/HOMEPAGE-DEV.md §6.5). Prompts, rejected attempts and processing: [PROMPTS.md](PROMPTS.md).
+
+**Rebuild the shipped assets** from the masters in this folder (the only build step needed):
+
+```sh
+node src/lib/home/shared/tools/optimize-transitions.mjs   # → src/lib/home/shared/assets/transitions/
+```
+
+The masters themselves are finished from raw generations; those sources, the finishing scripts and their validation output are archived outside the repo (see the note at the top of PROMPTS.md).
 
 | Master             | Size      | Kind                                  | Runtime                                             | Used by                                                           |
 | ------------------ | --------- | ------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------- |

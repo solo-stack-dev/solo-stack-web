@@ -62,8 +62,6 @@ interface Placement {
 	coffee: { x: number; w: number; sink: number };
 	/** Closed laptop next to the cup: like the coffee. */
 	laptop: { x: number; w: number; sink: number };
-	/** Night edge: width/left in % of the section; vertical travel in % of its own height (from → to). */
-	nightEdge: { x: number; w: number; from: number; to: number };
 	/** Diameter of the warm glow over the baked sun (stage % of width). */
 	sunGlow: number;
 }
@@ -75,7 +73,6 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		cliffPath: { x: -2, y: 46.5, w: 104 },
 		coffee: { x: 9.5, w: 8.6, sink: 0.6 },
 		laptop: { x: 21, w: 17.2, sink: 0.6 },
-		nightEdge: { x: 0, w: 100, from: 30, to: -52 },
 		sunGlow: 22
 	},
 	mobile: {
@@ -84,7 +81,6 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		cliffPath: { x: -14, y: 52, w: 150 },
 		coffee: { x: 12, w: 22, sink: 1 },
 		laptop: { x: 42, w: 44, sink: 1 },
-		nightEdge: { x: -80, w: 260, from: 55, to: -50 },
 		sunGlow: 46
 	}
 };
@@ -142,7 +138,6 @@ export interface SunriseLayout {
 	laptop: Rect;
 	/** Warm glint on the lid edge (stage %). */
 	laptopGlint: Rect;
-	nightEdge: Placement['nightEdge'];
 }
 
 function build(bp: Breakpoint): SunriseLayout {
@@ -163,8 +158,7 @@ function build(bp: Breakpoint): SunriseLayout {
 		coffee: cropRect(coffeeCanvas, ART_BOXES.coffee),
 		steam: subRect(coffeeCanvas, ART_BOXES.coffee, COFFEE_STEAM),
 		laptop: cropRect(laptopCanvas, ART_BOXES.laptop),
-		laptopGlint: subRect(laptopCanvas, ART_BOXES.laptop, LAPTOP_GLINT),
-		nightEdge: place.nightEdge
+		laptopGlint: subRect(laptopCanvas, ART_BOXES.laptop, LAPTOP_GLINT)
 	};
 }
 
@@ -177,15 +171,6 @@ export function placeVars(desktop: Rect, mobile: Rect): string {
 	return [
 		`--dx: ${pct(desktop.x)}; --dy: ${pct(desktop.y)}; --dw: ${pct(desktop.w)}; --dh: ${pct(desktop.h)}`,
 		`--mx: ${pct(mobile.x)}; --my: ${pct(mobile.y)}; --mw: ${pct(mobile.w)}; --mh: ${pct(mobile.h)}`
-	].join('; ');
-}
-
-/** Root CSS vars: the night edge (section-relative left/width, travel in % of its own height). */
-export function rootVars(): string {
-	const { desktop: d, mobile: m } = SUNRISE_LAYOUT;
-	return [
-		`--d-night-x: ${pct(d.nightEdge.x)}; --d-night-w: ${pct(d.nightEdge.w)}; --d-from: ${pct(d.nightEdge.from)}; --d-to: ${pct(d.nightEdge.to)}`,
-		`--m-night-x: ${pct(m.nightEdge.x)}; --m-night-w: ${pct(m.nightEdge.w)}; --m-from: ${pct(m.nightEdge.from)}; --m-to: ${pct(m.nightEdge.to)}`
 	].join('; ');
 }
 

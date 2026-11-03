@@ -16,7 +16,8 @@
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-const SHAPE_POINTS = 360;
+/** 180 is visually identical to the former 360 at every layout scale (140 starts rounding the tight `</>` tips). */
+const SHAPE_POINTS = 180;
 const OUT = fileURLToPath(new URL('../src/lib/home/sections/making/paths.ts', import.meta.url));
 
 /** Points along a circular arc from angle `from` to `to` (radians, screen coordinates). */

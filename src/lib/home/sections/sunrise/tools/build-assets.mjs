@@ -39,7 +39,6 @@ const PORTRAIT_SOURCE = 'D:/repos/Solo Stack/branding/final-branding-assets/prof
 const LAYERS = [
 	{ key: 'sky', src: 'sunrise/sunrise-sky.png', out: 'sunrise-sky.webp', crop: false },
 	{ key: 'skyMobile', src: 'sunrise/sunrise-sky-mobile.png', out: 'sunrise-sky-mobile.webp', crop: false },
-	{ key: 'nightEdge', src: 'sunrise/sunrise-night-edge.png', out: 'sunrise-night-edge.webp', crop: true },
 	{ key: 'valley', src: 'sunrise/sunrise-valley.png', out: 'sunrise-valley.webp', crop: true },
 	{ key: 'cliffPath', src: 'sunrise/sunrise-cliff-path.png', out: 'sunrise-cliff-path.webp', crop: true },
 	{ key: 'coffee', src: 'sunrise/sunrise-coffee.png', out: 'sunrise-coffee.webp', crop: true },
@@ -51,6 +50,7 @@ const STALE = [
 	'sunrise-sky.png',
 	'sunrise-sky-mobile.png',
 	'sunrise-night-edge.png',
+	'sunrise-night-edge.webp',
 	'sunrise-valley.png',
 	'sunrise-cliff-path.png',
 	'sunrise-coffee.png',

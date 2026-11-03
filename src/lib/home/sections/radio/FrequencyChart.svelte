@@ -25,7 +25,7 @@
 			<li class:active={active === station.id}>
 				<a href={station.url} rel="me noopener" target="_blank">
 					<span class="freq font-mono" aria-hidden="true">{station.frequency}</span>
-					<BrandIcon path={station.icon} class="logo" />
+					<BrandIcon id={station.id} class="logo" />
 					<span class="name">{station.name}</span>
 					{#if station.handle}<span class="handle font-mono">{station.handle}</span>{/if}
 					<span class="sr-only">{m.home_radio_opens_new_tab()}</span>

@@ -17,7 +17,7 @@
 	import { InView, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { SOCIAL_ICON_PATHS } from './icons.ts';
-	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars, rootVars } from './layout.ts';
+	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars } from './layout.ts';
 	import portrait from './assets/sunrise-portrait.webp?w=320;240;160&enhanced';
 
 	const socials = linkedSocials();
@@ -38,7 +38,6 @@
 		laptop: placeVars(d.laptop, mo.laptop),
 		laptopGlint: placeVars(d.laptopGlint, mo.laptopGlint)
 	};
-	const rootStyle = rootVars();
 
 	let root: HTMLElement;
 	const near = new InView();
@@ -64,7 +63,6 @@
 	id="sunrise"
 	data-night-hour="06:00"
 	class={['sunrise', near.current && 'is-near']}
-	style={rootStyle}
 	aria-labelledby="home-sunrise-title"
 	{@attach through.attach}
 	{@attach near.attach}

@@ -139,8 +139,8 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 };
 
 /** Points of the entry curve (before the shape) and exit curve (after it). */
-const ENTRY_POINTS = 64;
-const EXIT_POINTS = 80;
+const ENTRY_POINTS = 32;
+const EXIT_POINTS = 40;
 export const LINE_POINTS = ENTRY_POINTS + SHAPE_POINTS + EXIT_POINTS;
 
 /** Cubic Bézier from p0 to p3, resampled to `count` points evenly spaced by arc length (t ∈ [from, to]). */
@@ -200,7 +200,8 @@ export function composeLine(layoutId: LayoutId, state: MakingStateId): Float32Ar
 	const outLength = Math.hypot(layout.anchor.x - end.x, layout.anchor.y - end.y);
 	// leave along the shape's own end tangent so the line runs on without a kink
 	const n = shape.length;
-	const leave = norm(shape[n - 2] - shape[n - 6] + layout.leaveDir.x, shape[n - 1] - shape[n - 5] + layout.leaveDir.y);
+	// (over the last sample step: ~13 local units, the same distance as two steps at the former 360 points)
+	const leave = norm(shape[n - 2] - shape[n - 4] + layout.leaveDir.x, shape[n - 1] - shape[n - 3] + layout.leaveDir.y);
 	const exit = cubicPoints(
 		end,
 		{ x: end.x + leave.x * outLength * layout.exitHandles[0], y: end.y + leave.y * outLength * layout.exitHandles[0] },

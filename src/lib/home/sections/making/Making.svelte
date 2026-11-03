@@ -36,7 +36,10 @@
 		chart: m.home_making_state_chart_title,
 		moon: m.home_making_state_moon_title
 	};
-	const MASKS = Object.fromEntries(STATE_IDS.map((id) => [id, bloomMask(id)])) as Record<MakingStateId, string>;
+	// Each bloom mask (an SVG data URL) is defined once as `--mask-<id>` on the section; the stage bloom and the
+	// reduced-motion figure only reference it, so the HTML carries every URL once instead of four times.
+	const MASK_VARS = STATE_IDS.map((id) => `--mask-${id}: ${bloomMask(id)}`).join('; ');
+	const MASKS = Object.fromEntries(STATE_IDS.map((id) => [id, `var(--mask-${id})`])) as Record<MakingStateId, string>;
 	const FIGURE_LINES = Object.fromEntries(STATE_IDS.map((id) => [id, toPathData(composeLine('figure', id))])) as Record<MakingStateId, string>;
 
 	// Same breakpoint as the CSS below: portrait-ish viewports use the tall plate and the vertical line.
@@ -143,7 +146,7 @@
 </script>
 
 <!-- Transition from the hero: an ink-wash wipe on .track (CSS below, docs/HOMEPAGE-DEV.md §6.5). -->
-<section id="making" data-night-hour="21:00" class="making" aria-labelledby="home-making-title">
+<section id="making" data-night-hour="21:00" class="making" style={MASK_VARS} aria-labelledby="home-making-title">
 	<div class="track" bind:this={track} {@attach progress.attach}>
 		<div
 			class="stage"
