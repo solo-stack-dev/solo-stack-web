@@ -50,8 +50,6 @@ export interface SceneLayout {
 	mascot: Rect;
 	/** Upper window glass (both panes). */
 	window: Rect;
-	/** Sky plate (drifts with the scroll) and the two glass panes it shows through, as polygons in canvas percent. */
-	sky: { rect: Rect; panes: Point[][] };
 	/** Desk lamp bulb (flicker glow) and its light radius in percent of the canvas width. */
 	lamp: Point & { radius: number };
 	/** Steam over the mug: box the wisps rise in (they start at the bottom center). */
@@ -158,30 +156,6 @@ export const desktop: SceneLayout = {
 	// head, headphones, back and both arms down to the hands on the keys (the chair excluded)
 	mascot: rectPct(D, 1018, 230, 1160, 1082),
 	window: rectPct(D, 420, 0, 1080, 480),
-	sky: {
-		// moon (at 33.2 %, 40.7 % of the sky plate) in the upper left pane, right of the heading and above the treetops
-		rect: rectPct(D, 523, -211, 985, 985),
-		panes: [
-			[
-				[72, 0],
-				[1058, 0],
-				[1058, 498],
-				[769, 506],
-				[768, 758],
-				[91, 811],
-				[72, 758]
-			],
-			[
-				[1147, 0],
-				[1664, 0],
-				[1664, 231],
-				[1550, 330],
-				[1520, 500],
-				[1419, 496],
-				[1147, 501]
-			]
-		].map((pane) => pane.map((point) => pointPct(D, point as [number, number])))
-	},
 	// center of the shade's lit opening
 	lamp: { ...pointPct(D, [358, 622]), radius: 14 },
 	// mug rim [501, 860, 134, 30], steam origin (568, 873): the wisps rise from the bottom center of this box
@@ -232,27 +206,6 @@ export const mobile: SceneLayout = {
 	},
 	mascot: rectPct(M, 388, 895, 614, 572),
 	window: rectPct(M, 60, 20, 662, 700),
-	sky: {
-		// moon in the upper right pane, above the treetops
-		rect: rectPct(M, 289, -89, 833, 833),
-		panes: [
-			[
-				[60, 15],
-				[357, 61],
-				[357, 931],
-				[150, 940],
-				[150, 1047],
-				[60, 1060]
-			],
-			[
-				[411, 66],
-				[722, 119],
-				[722, 897],
-				[612, 923],
-				[411, 932]
-			]
-		].map((pane) => pane.map((point) => pointPct(M, point as [number, number])))
-	},
 	lamp: { ...pointPct(M, [172, 882]), radius: 26 },
 	// mug rim [79, 1212, 68, 22], steam origin (112, 1223)
 	steam: rectPct(M, 80, 1103, 66, 120),
@@ -272,10 +225,3 @@ export const mobile: SceneLayout = {
 
 /** How many commits one terminal "page" types before it clears and continues with the next ones. */
 export const COMMITS_PER_PAGE = 6;
-
-/** SVG mask (data URL) that shows only the given polygons (canvas percent): the sky inside the glass panes. */
-export function polygonMask(polygons: Point[][]): string {
-	const shapes = polygons.map((polygon) => `<polygon points='${polygon.map((p) => `${p.x},${p.y}`).join(' ')}' fill='white'/>`).join('');
-	const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'>${shapes}</svg>`;
-	return `url("data:image/svg+xml,${svg.replaceAll('<', '%3C').replaceAll('>', '%3E')}")`;
-}

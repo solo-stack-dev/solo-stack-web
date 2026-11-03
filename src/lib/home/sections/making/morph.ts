@@ -1,6 +1,6 @@
 /**
  * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates), the scroll timeline, and the one continuous
- * line (entry → current shape → exit to the moon) interpolated between the six precomputed shapes from paths.ts.
+ * line (entry → current shape → exit to the laptop screen) interpolated between the six precomputed shapes from paths.ts.
  * Pure functions plus small caches; no DOM. See docs/HANDOFF-HOMEPAGE.md §5.2.
  */
 import { SHAPES, SHAPE_MASKS, SHAPE_POINTS, STATE_IDS, type MakingStateId } from './paths.ts';
@@ -39,33 +39,37 @@ export interface MakingLayout {
 	stroke: number;
 	/** Vertical position of the state title's top edge, plate px. */
 	titleY: number;
-	/** Painted moon on the plate (center and radius, plate px): a halo wakes it at the last state. */
-	moon: Point & { r: number };
+	/** Screen of the painted laptop on the cliff (clockwise TL, TR, BR, BL, plate px): it lights up at the last state. */
+	screen: readonly [Point, Point, Point, Point];
 }
 
 /**
- * The painted moon above the cliff on the final plates (docs/art/making, 2560×1440 and 1080×2340), in plate pixels.
- * Measured with `node src/lib/home/sections/making/tools/build-assets.mjs --measure` and checked by overlay.
+ * The blank laptop screen on the cliff of the final plates (docs/art/making, 2560×1440 and 1080×2340), inner edge
+ * of the bezel in plate pixels, clockwise from the top left. Measured on zoomed crops of the masters.
  */
-export const PAINTED_MOON = {
-	desktop: { x: 2256, y: 861, r: 157 },
-	mobile: { x: 918, y: 1665, r: 124 }
-} as const satisfies Record<'desktop' | 'mobile', Point & { r: number }>;
-
-/** Point on a painted moon's rim at `degrees` (0 = right, clockwise in screen space). */
-const rim = ({ x, y, r }: Point & { r: number }, degrees: number): Point => ({
-	x: Math.round(x + r * Math.cos((degrees * Math.PI) / 180)),
-	y: Math.round(y + r * Math.sin((degrees * Math.PI) / 180))
-});
+export const LAPTOP_SCREEN = {
+	desktop: [
+		{ x: 2260, y: 938 },
+		{ x: 2338, y: 939 },
+		{ x: 2317, y: 1020 },
+		{ x: 2238, y: 1017 }
+	],
+	mobile: [
+		{ x: 898, y: 1728 },
+		{ x: 972, y: 1730 },
+		{ x: 952, y: 1800 },
+		{ x: 875, y: 1792 }
+	]
+} as const satisfies Record<'desktop' | 'mobile', readonly [Point, Point, Point, Point]>;
 
 /**
- * Where the line ends: exactly on the rim of the painted moon. Desktop: the left limb a little above the middle
- * (the line arrives from the shape on the left, clear of the laptop); portrait: the upper left limb (the line
- * comes down from the shape above).
+ * Where the line ends: on the left edge of the laptop screen, a little above its middle, so the line plugs into the
+ * screen (which then lights up) instead of crossing it. Desktop arrives from the shape on the left, portrait comes
+ * down from the shape above.
  */
-export const MOON_ANCHOR = {
-	desktop: rim(PAINTED_MOON.desktop, 195),
-	mobile: rim(PAINTED_MOON.mobile, 235)
+export const SCREEN_ANCHOR = {
+	desktop: { x: 2247, y: 972 },
+	mobile: { x: 885, y: 1758 }
 } as const satisfies Record<'desktop' | 'mobile', Point>;
 
 const norm = (x: number, y: number): Point => {
@@ -85,12 +89,12 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		entryHandles: [0.5, 0.45],
 		leaveDir: { x: 0, y: 0.08 },
 		exitHandles: [0.45, 0.4],
-		anchor: MOON_ANCHOR.desktop,
-		// arrive pointing at the moon's center, so the line meets the limb head on
-		anchorDir: norm(1, 0.27),
+		anchor: SCREEN_ANCHOR.desktop,
+		// arrive pointing into the screen, so the line meets its edge head on
+		anchorDir: norm(1, 0.12),
 		stroke: 6.5,
 		titleY: 975,
-		moon: PAINTED_MOON.desktop
+		screen: LAPTOP_SCREEN.desktop
 	},
 	mobile: {
 		width: 1080,
@@ -103,11 +107,11 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		entryHandles: [0.42, 0.22],
 		leaveDir: { x: 0, y: 0.25 },
 		exitHandles: [0.62, 0.38],
-		anchor: MOON_ANCHOR.mobile,
-		anchorDir: norm(0.7, 1),
+		anchor: SCREEN_ANCHOR.mobile,
+		anchorDir: norm(0.8, 1),
 		stroke: 8.5,
 		titleY: 1240,
-		moon: PAINTED_MOON.mobile
+		screen: LAPTOP_SCREEN.mobile
 	},
 	// reduced motion: one static figure per state, short line in from the left and out to the right
 	figure: {
@@ -125,7 +129,12 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		anchorDir: norm(1, 0),
 		stroke: 6,
 		titleY: 0,
-		moon: { x: 0, y: 0, r: 0 }
+		screen: [
+			{ x: 0, y: 0 },
+			{ x: 0, y: 0 },
+			{ x: 0, y: 0 },
+			{ x: 0, y: 0 }
+		]
 	}
 };
 

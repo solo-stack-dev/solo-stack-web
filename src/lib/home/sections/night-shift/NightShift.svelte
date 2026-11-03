@@ -5,7 +5,7 @@
 	objects are explorable hotspots (the bonsai is the golden tree egg). Geometry lives in `layout.ts`.
 
 	Motion: typing loop, hand frame swap on the painted mascot, steam, lamp flicker, dust, pointer parallax (the scene
-	plate with everything on it, the sky, the foreground leaf and dust) and a scroll drift of the moon. Everything pauses
+	plate with everything on it, the foreground leaf and dust). Everything pauses
 	off screen and in hidden tabs; under reduced motion the scene is static with the first page of commits fully typed,
 	and the hotspots still work.
 -->
@@ -14,7 +14,7 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { getRecentCommits } from '#lib/home/data/github.remote.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
-	import { InView, RafLoop, ScrollProgress, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
+	import { InView, RafLoop, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import Scene from './Scene.svelte';
 	import { COMMITS_PER_PAGE, desktop, mobile, type SpotId } from './layout.ts';
 	import { Terminal } from './terminal.svelte.ts';
@@ -87,8 +87,7 @@
 		root.style.removeProperty('--py');
 	});
 
-	// ── Moon drift with the scroll, and the "live" flag that pauses CSS loops off screen ──────────────────
-	const scroll = new ScrollProgress({ cssVar: '--scroll' });
+	// ── The "live" flag that pauses CSS loops off screen ──────────────────
 	const seen = new InView({ rootMargin: '10% 0px' });
 	const live = $derived(seen.current && pageVisibility.current);
 
@@ -108,7 +107,6 @@
 	{onpointerleave}
 	{@attach typing.attach}
 	{@attach parallax.attach}
-	{@attach scroll.attach}
 	{@attach seen.attach}
 >
 	<NightClock time="01:00" />

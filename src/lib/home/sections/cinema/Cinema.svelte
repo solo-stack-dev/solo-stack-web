@@ -140,7 +140,6 @@
 				</button>
 			{:else}
 				<div class="empty">
-					<span class="moon is-small" aria-hidden="true"></span>
 					<p class="empty-line font-mono text-xs tracking-clock md:text-sm">{m.home_cinema_empty()}</p>
 				</div>
 			{/if}
@@ -446,15 +445,6 @@
 		background: radial-gradient(ellipse at 50% 45%, rgb(252 215 114 / 0.16), transparent 70%), var(--color-ink);
 	}
 
-	.moon.is-small {
-		position: relative;
-		left: auto;
-		top: auto;
-		translate: none;
-		width: clamp(2.5rem, 9%, 4.5rem);
-		opacity: 0.85;
-	}
-
 	.caption {
 		height: auto;
 		display: grid;
@@ -485,7 +475,7 @@
 
 	@media (max-width: 47.99rem) {
 		.cinema {
-			/* a little sky above the portrait stage keeps the moon clear of the clock */
+			/* a little sky above the portrait stage keeps the painted sky clear of the clock */
 			min-height: max(100svh, calc(216.67vw + 3rem));
 		}
 
