@@ -43,7 +43,7 @@ Every section component renders one root element with:
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `id="<section id>"` from `NIGHT_HOURS`       | Menu and rail anchors (`#hero`, `#making`, `#game`, `#night-shift`, `#radio`, `#cinema`, `#sunrise`) |
 | `data-night-hour="<time>"`                   | NightPage anchors the sky color stops to the section's real position                                 |
-| `position: relative`                         | NightClock, SectionEdge, MockupRef are absolutely positioned inside it                               |
+| `position: relative`                         | NightClock, MockupRef are absolutely positioned inside it                                            |
 | `<NightClock time="…" />`                    | Same clock position in every section                                                                 |
 | a heading with `aria-labelledby` on the root | Landmark and outline. Hero owns the only `<h1>` (the wordmark); others use `<h2>`                    |
 | transparent background                       | The global sky shows through; paint your art on top of it                                            |
@@ -57,7 +57,7 @@ Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with 
 - `--night` is a registered `<number>` custom property (`@property` in `src/routes/layout.css`), set on NightPage's wrapper `[data-night-page]` and inherited by every section: **0 at the top of the hero (20:00), 1 at the bottom of the page (06:00)**. It is linear in page scroll position.
 - Driver: a CSS scroll-driven animation (`animation-timeline: scroll(root block)`) where supported and motion is allowed; otherwise (no support, or `prefers-reduced-motion: reduce`) a passive, rAF-throttled scroll listener writes it inline. Both produce the same value; you never write `--night` yourself.
 - The base sky is a fixed stack of color layers built from `NIGHT_HOURS[].sky`. Each hour's color is reached when that section's center meets the viewport center (stops re-measured on resize). Colors: `20:00 #2d2620` dusky warm → `21:00 #221f1d` → `22:00 #1a1a1b` → `01:00 #111213` → `02:00 #0e0f10` deepest → `04:00 #2a2723` still night, with a warming horizon (`horizon: #4a3826`, a bottom gradient) → `06:00 #fcd772` butter paper. The sunrise has `from: 'enter'`: its blend only starts when the sunrise section's top enters the viewport, so 04:00 stays night and butter arrives with the sunrise. Only the lead changes the curve (`night.ts`).
-- `--dawn` (0…1): progress of that last blend (0 through the whole night, 1 at the page end). `--sky-now`: the current flat sky color as one CSS value (a nested `color-mix` of the hours driven by `--night`), for anything that must match the sky exactly (the seam bands).
+- `--dawn` (0…1): progress of that last blend (0 through the whole night, 1 at the page end).
 - Global stars fade in after the hero and retreat with `--dawn`. Global shooting stars pause while the hero covers the top of the viewport (the hero has its own).
 - Use it in CSS, never by polling it in JS:
 
@@ -71,7 +71,7 @@ Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with 
 - Readable ink on the sky: `var(--night-ink)` is cream at night and turns anthracite as `--dawn` completes. The nav and the rail do not use it: they track the real background under them (cream until the sunrise night edge has cleared them, then anthracite) and carry a soft opposite-ink halo for ragged edges.
 - Page chrome: the nav wordmark and the hour rail are hidden while the hero covers the top 40 % of the viewport. The rail shows its clock labels only on hover/focus, and only its dots take pointer events (24 px each, right edge), so art underneath stays clickable.
 - Overscroll: `html` is night; NightPage sets `html[data-night-end]` (butter) while the sunrise is on screen, so bottom overscroll shows paper.
-- Sunrise hook (sunrise agent, optional): put `data-night-edge` on the retreating night edge element (and `data-edge-clear="0.72"`, the fraction of its height below which the ink is gone, if the art changes). Until then NightPage falls back to `#sunrise .night`.
+- Sunrise hook: `data-night-edge` marks the element whose box ends where the retreating night's ink is gone (`data-edge-clear`: the fraction of its height where that happens, default 0.72). The sunrise puts it on `.night-clear`, a box inside the translated `.night` (`data-edge-clear="1"`), so the measured line follows the wipe. Fallback without the attribute: `#sunrise .night`.
 - For progress **within** your section (morphs, pinning, sunrise), use `ScrollProgress` (§6.8), not `--night`.
 
 ## 4. Data
@@ -149,24 +149,38 @@ import { SHOOTING_STAR_EVENT, type ShootingStarDetail } from '#lib/home/shared/S
 $effect(() => on(window, SHOOTING_STAR_EVENT, (event) => lookAt((event as CustomEvent<ShootingStarDetail>).detail)));
 ```
 
-### 6.5 `SectionEdge.svelte`
+### 6.5 Section transitions (lead)
 
-Ragged watercolor edge so sections bleed into each other. Place it inside your `position: relative` root.
+No opaque bands between sections. Every boundary is air: each plate feathers its own edges with a painted soft edge, a partly transparent painted mist bank drifts across the boundary, and two boundaries are scroll-driven ink-wash wipes. Masters and prompts: `docs/art/transitions/`; optimized files: `shared/assets/transitions/` (`node src/lib/home/shared/tools/optimize-transitions.mjs`); URLs: `shared/transitions.ts`.
 
-```svelte
-<SectionEdge position="top" fill="var(--color-ink)" height="7rem" seed={4} />
-<SectionEdge position="bottom" mask={paintedEdge} height="10rem">{@render paintedTexture()}</SectionEdge>
-```
+**Masks as CSS variables.** NightPage puts the painted masks on `[data-night-page]` as `url()` custom properties, so section CSS uses them directly:
 
-Props: `position` (`'top'` sits above your top edge, `'bottom'` below your bottom edge), `fill` (CSS background, default `currentColor`), `height` (`6rem`), `overlap` (how far it reaches into your own section, `1px`), `seed` (1; use a unique one per edge), `roughness` (1), `edge` (1 wet blooms, 2 dry brush, 3 diagonal bleed: the shared painted masks, oriented for `position` automatically), `mask` (URL of any other painted alpha mask, used as is), `mirror` (flip horizontally), `children` (content inside the masked strip instead of `fill`), `class`. Without `edge`/`mask` the generated SVG edge is used. Sections that come later in the DOM paint above earlier ones, so a top edge overlaps the previous section.
+| Variable             | Alpha                                      | Use                                                          |
+| -------------------- | ------------------------------------------ | ------------------------------------------------------------ |
+| `--feather-up`       | transparent above → opaque below           | soft top edge of a plate (`mask: var(--feather-up) top / …`) |
+| `--feather-down`     | opaque above → transparent below           | soft bottom edge                                             |
+| `--wash-spread-up`   | transparent above → opaque below, wet      | the 20→21 wipe front                                         |
+| `--wash-spread-down` | the same, opaque above → transparent below | lobes in the 04→06 retreating night                          |
+| `--wash-dry`         | opaque above → transparent below, drying   | the 04→06 retreating night                                   |
 
-### 6.5b `Seam.svelte` and `materials.ts` (lead)
+All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use them instead of `linear-gradient` masks: a linear fade reads as a digital edge on painted art.
 
-`Seam` is a zero-height band over the boundary between two sections, placed in `src/routes/+page.svelte` (never inside a section). It is filled with `var(--sky-now)` (invisible over open sky, it only hides straight edges of art) and bordered by the painted edge masks: `<Seam height="clamp(7rem, 12vw, 12rem)" above={0.5} top={3} bottom={1} mirror fill="…" />`. It paints above both neighbors and takes no pointer events. 04→06 has none: the sunrise brings its own night edge.
+**`[data-feather]` helper.** Put `data-feather` on a plate (or its wrapper) and set `--feather-top` / `--feather-bottom` (lengths, not percentages; default 0) in your CSS. NightPage's rule owns the element's `mask`: painted soft edge over those heights, solid in between. Without the attribute, write the mask yourself (the cinema backdrop uses `var(--feather-up) top / 100% 20% no-repeat, linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat`).
 
-`materials.ts` exports the optimized shared materials: `PAPER_GRAIN`, `EDGE_MASKS[1|2|3].down|up`, `STAR_SPRITES`, `SHOOTING_STAR_SPRITE`. Regenerate the files after the masters change: `node src/lib/home/shared/tools/optimize-materials.mjs` (uses `sharp` from pnpm's store, no new dependency).
+**`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one): a zero-height boundary with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads lazily (enhanced-img), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion).
 
-QA screenshots: `node src/lib/home/shared/tools/scroll-screens.mjs <dev url> docs/screens/integration --prefix desktop-1440 [--width 390 --height 844] [--reduced] [--sheet] [--seams]` (headless Chrome on a random free port, one WebP per half viewport, reports console errors).
+**Wipes.**
+
+- 20→21, making: `#making` overlaps the hero by `--wipe-overlap` (45svh, negative margin; only its own `a`/`button` take pointer events there) and its `.track` is masked by two layers of `--wash-spread-up` plus a solid layer. A registered `--wipe` (0…1) runs on the named view timeline `--making-wipe` (`animation-range: entry 45% entry 100%`: from the page top until the section top reaches the viewport top). The front starts at the viewport bottom and floods up over the moon ~1.4× faster than the page; the plate's straight top is always transparent while the hero is on screen. Static fallback (no support, reduced motion): the overlap is one soft wash from hero to plate. If you change the overlap, change the `entry 45%` start with it.
+- 04→06, sunrise: `.night` is solid ink (`--ink-fade`, the cinema's bottom color) ending in `--wash-dry` plus a layer of `--wash-spread-down`; with `--sunrise` it translates up (`--night-travel`) and its ramp tightens from 42svh to 20svh (the wash dries). It always covers the section's top line. Reduced motion / no JS: the final state.
+
+The night shift frames its room with a night-ink vignette inside the feathered art (`Scene.svelte` `.art::after`), so the interior sinks into the dark before it meets the sky.
+
+### 6.5b `materials.ts` (lead)
+
+`materials.ts` exports the optimized shared materials: `PAPER_GRAIN`, `EDGE_MASKS[1|2|3].down|up` (ragged painted edges, currently unused by the page), `STAR_SPRITES`, `SHOOTING_STAR_SPRITE`. Regenerate the files after the masters change: `node src/lib/home/shared/tools/optimize-materials.mjs` (uses `sharp` from pnpm's store, no new dependency).
+
+QA screenshots: `node src/lib/home/shared/tools/scroll-screens.mjs <dev url> docs/screens/integration --prefix desktop-1440 [--width 390 --height 844] [--reduced] [--sheet] [--seams]` (headless Chrome on a random free port, one WebP per half viewport, reports console errors; `--seams` centers every section boundary).
 
 ### 6.6 `LazyMount.svelte`
 

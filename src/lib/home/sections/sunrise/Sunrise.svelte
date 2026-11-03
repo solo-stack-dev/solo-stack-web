@@ -123,11 +123,10 @@
 		<div class="placed laptop-glint" style={place.laptopGlint}></div>
 	</div>
 
-	<div class="night" data-night-edge aria-hidden="true">
-		<enhanced:img src="./assets/sunrise-night-edge.webp?w=1920;1440;1080;720" alt="" sizes="(min-width: 48rem) 100vw, 260vw" loading="lazy" decoding="async" />
+	<!-- The night dries and pulls back (ink-wash wipe, CSS below). NightPage tracks the cleared line for the nav ink. -->
+	<div class="night" aria-hidden="true">
+		<span class="night-clear" data-night-edge data-edge-clear="1"></span>
 	</div>
-
-	<div class="seam" aria-hidden="true"></div>
 
 	<NightClock time="06:00" />
 
@@ -174,7 +173,7 @@
 		justify-content: flex-end;
 		overflow: clip;
 		color: var(--color-night);
-		/* the bottom of the 04:00 cinema (its --ink-fade), continued above the painted night edge */
+		/* the bottom of the 04:00 cinema (its --ink-fade), continued by the retreating night */
 		--ink-fade: #1c1d1d;
 		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
 	}
@@ -341,47 +340,44 @@
 		}
 	}
 
-	/* The night retreats upward: a ragged watercolor wash, solid ink above it. */
+	/*
+	 * The night retreats upward (the 04:00 → 06:00 ink-wash wipe): solid ink in the color of the cinema's bottom, ending
+	 * in the painted drying wash with tide lines, plus a layer of the wet bloom wash at another size and offset (added;
+	 * shared/transitions.ts), so the front has lobes and changes shape as it moves. As --sunrise runs 0 → 1 it pulls
+	 * back by --night-travel (a translate, no layout) and dries: the wet ramp tightens from 42svh to 20svh. It always
+	 * covers the section's top line, so the cinema's bottom never meets the paper at a straight edge. Reduced motion /
+	 * no JS: the final state, static.
+	 */
 	.night {
+		--night-ramp: calc(42svh - 22svh * var(--sunrise));
+		--night-travel: -41svh;
 		position: absolute;
 		top: 0;
-		left: var(--d-night-x);
-		width: var(--d-night-w);
-		translate: 0 calc(var(--d-from) + (var(--d-to) - var(--d-from)) * var(--sunrise));
-		pointer-events: none;
-	}
-
-	.night :global(img) {
-		display: block;
+		left: 0;
 		width: 100%;
-		height: auto;
-	}
-
-	.night::before {
-		content: '';
-		position: absolute;
-		inset: auto 0 calc(100% - 2px);
-		height: 100svh;
+		height: 65svh;
+		translate: 0 calc(var(--night-travel) * var(--sunrise));
 		background: var(--ink-fade);
-	}
-
-	/* blends the painted wash (#151719 at its top) into the fill above, so no line shows at the section top */
-	.night::after {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		height: 14%;
-		background: linear-gradient(to bottom, var(--ink-fade), transparent);
-	}
-
-	/* Softens the section's top edge into the flat bottom of the 04:00 section, so the painted night is never cut by a
-	   straight line while it scrolls past. */
-	.seam {
-		position: absolute;
-		inset: 0 0 auto;
-		height: 10svh;
-		background: linear-gradient(to bottom, var(--ink-fade), transparent);
 		pointer-events: none;
+		mask-image: linear-gradient(#000 0 0), var(--wash-dry), var(--wash-spread-down);
+		/* the ramps tile sideways near their painted aspect instead of being squashed to the full width */
+		mask-repeat: no-repeat, repeat-x, repeat-x;
+		mask-size:
+			100% calc(100% - var(--night-ramp) * 0.9),
+			max(55%, var(--night-ramp) * 1.9) var(--night-ramp),
+			max(70%, var(--night-ramp) * 2.4) calc(var(--night-ramp) * 1.1);
+		mask-position:
+			0 0,
+			0 100%,
+			calc(20% + var(--sunrise) * 40%) calc(100% + var(--night-ramp) * 0.1);
+	}
+
+	/* The part of .night that still carries ink (above the transparent tail of the ramp): NightPage's nav/rail ink
+	   switch reads this box (data-night-edge, data-edge-clear="1"). */
+	.night-clear {
+		position: absolute;
+		inset: 0 0 auto;
+		height: calc(100% - 6svh);
 	}
 
 	.bar {
@@ -503,12 +499,6 @@
 
 		.art {
 			height: auto;
-		}
-
-		.night {
-			left: var(--m-night-x);
-			width: var(--m-night-w);
-			translate: 0 calc(var(--m-from) + (var(--m-to) - var(--m-from)) * var(--sunrise));
 		}
 
 		.bar {

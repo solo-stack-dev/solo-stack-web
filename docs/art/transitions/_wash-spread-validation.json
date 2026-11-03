@@ -1,0 +1,38 @@
+{
+	"width": 2048,
+	"height": 2048,
+	"source": {
+		"width": 1254,
+		"height": 1254,
+		"hasAlpha": false
+	},
+	"rgbErrors": 0,
+	"topErrors": 0,
+	"bottomErrors": 0,
+	"opaqueRows": 287,
+	"transparentRows": 287,
+	"seamMax": 0,
+	"metricDefinition": "Mean alpha in rows [409, 1638); centered 101-column box moving average, periodic horizontal boundaries; max minus min residual in 0-255 alpha levels.",
+	"before": {
+		"adjacentMeanMax": 1.691619202603448,
+		"range": 20.174826188883813,
+		"min": -8.535676594510491,
+		"max": 11.639149594373322,
+		"minX": 1870,
+		"maxX": 1822
+	},
+	"after": {
+		"adjacentMeanMax": 1.5077298616761254,
+		"range": 4.638738731480771,
+		"min": -2.2391463719193325,
+		"max": 2.3995923595614386,
+		"minX": 1407,
+		"maxX": 1041
+	},
+	"reductionPercent": 77.0072927119606,
+	"frontRange": [0.296875, 0.69287109375],
+	"bands": [
+		255, 255, 255, 254.4444460401348, 248.4095731568568, 234.49188591452207, 215.63813572303923, 197.83815135770632, 179.65346392463235, 167.80299984830097,
+		159.63091681985293, 143.91121419270834, 120.38201608009709, 95.76332241881127, 65.15889051122574, 24.667619293811274, 3.359006395526961, 0, 0, 0
+	]
+}

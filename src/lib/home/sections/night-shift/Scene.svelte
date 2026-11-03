@@ -121,7 +121,7 @@
 
 <!-- Two stacks with identical stage geometry: the masked art below the section heading, the hotspots above it. -->
 <div class="scene" data-variant={variant} {onpointerdown} onpointerenter={want} role="presentation" style={stageVars}>
-	<div class="frame art">
+	<div class="frame art" data-feather>
 		<div class="stage" {@attach measure}>
 			<!-- 1 · opaque scene plate with the mascot painted in (complete static fallback: moonless window, hands at rest). The
 			     file also carries the typing hands band below the scene, clipped off here. -->
@@ -235,8 +235,33 @@
 
 	.art {
 		z-index: 1;
-		/* bleed into the global sky above and below instead of a hard edge */
-		mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 92%, transparent);
+		/* painted soft edges into the night above and below (NightPage [data-feather]); ~14 % of the section height */
+		--feather-top: min(14svh, 7.9vw);
+		--feather-bottom: min(16svh, 9vw);
+	}
+
+	@media (max-aspect-ratio: 4/5) {
+		.art {
+			--feather-top: min(9svh, 19.5vw);
+			--feather-bottom: min(10svh, 21.7vw);
+		}
+	}
+
+	/* Framing: the lit room is seen out of the dark instead of floating in the open sky. A night-ink vignette (painted
+	   soft edges top and bottom, a wide soft falloff at the sides) over the whole art, inside its feathered mask, so
+	   the room sinks into darkness before it dissolves into the sky; the page's mist banks drift over the edges. */
+	.art::after {
+		content: '';
+		position: absolute;
+		z-index: 5;
+		inset: 0;
+		background: #0e0f10;
+		opacity: 0.9;
+		pointer-events: none;
+		mask:
+			var(--feather-down) top / 100% 34% no-repeat,
+			var(--feather-up) bottom / 100% 30% no-repeat,
+			radial-gradient(ellipse 70% 90% at 50% 50%, transparent 55%, #000 100%);
 	}
 
 	.ui {
