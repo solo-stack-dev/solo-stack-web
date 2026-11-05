@@ -1,0 +1,223 @@
+[
+  {
+    "file": "blog/blog-reading-hill.png",
+    "pixels": [
+      1672,
+      941
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 1237368,
+    "partial_pixels": 42310,
+    "opaque_pixels": 293674,
+    "alpha_bbox": [
+      759,
+      132,
+      1672,
+      941
+    ]
+  },
+  {
+    "file": "blog/video-ai-news.png",
+    "pixels": [
+      1672,
+      941
+    ],
+    "mode": "RGB"
+  },
+  {
+    "file": "blog/video-ai-test.png",
+    "pixels": [
+      1672,
+      941
+    ],
+    "mode": "RGB"
+  },
+  {
+    "file": "blog/video-business.png",
+    "pixels": [
+      1672,
+      941
+    ],
+    "mode": "RGB"
+  },
+  {
+    "file": "blog/video-project.png",
+    "pixels": [
+      1672,
+      941
+    ],
+    "mode": "RGB"
+  },
+  {
+    "file": "contact/owl-closed.png",
+    "pixels": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 1181881,
+    "partial_pixels": 26918,
+    "opaque_pixels": 363717,
+    "alpha_bbox": [
+      62,
+      183,
+      1254,
+      1199
+    ]
+  },
+  {
+    "file": "contact/owl-flying.png",
+    "pixels": [
+      1513,
+      1039
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 1114553,
+    "partial_pixels": 41453,
+    "opaque_pixels": 416001,
+    "alpha_bbox": [
+      122,
+      38,
+      1434,
+      975
+    ]
+  },
+  {
+    "file": "contact/owl-open.png",
+    "pixels": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 1181881,
+    "partial_pixels": 26918,
+    "opaque_pixels": 363717,
+    "alpha_bbox": [
+      62,
+      183,
+      1254,
+      1199
+    ]
+  },
+  {
+    "file": "shared/backlight-wash.png",
+    "pixels": [
+      1604,
+      980
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      204
+    ],
+    "transparent_pixels": 709133,
+    "partial_pixels": 862787,
+    "opaque_pixels": 0,
+    "alpha_bbox": [
+      67,
+      85,
+      1539,
+      879
+    ]
+  },
+  {
+    "file": "shared/footer-horizon.png",
+    "pixels": [
+      2172,
+      299
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 526527,
+    "partial_pixels": 20032,
+    "opaque_pixels": 102869,
+    "alpha_bbox": [
+      0,
+      166,
+      2172,
+      299
+    ]
+  },
+  {
+    "file": "stats/stats-growth-tree.png",
+    "pixels": [
+      1190,
+      1322
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 844940,
+    "partial_pixels": 534873,
+    "opaque_pixels": 193367,
+    "alpha_bbox": [
+      47,
+      108,
+      1133,
+      1322
+    ]
+  },
+  {
+    "file": "stats/stats-mascot-sitting.png",
+    "pixels": [
+      700,
+      700
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      255
+    ],
+    "transparent_pixels": 320737,
+    "partial_pixels": 10746,
+    "opaque_pixels": 158517,
+    "alpha_bbox": [
+      50,
+      41,
+      650,
+      663
+    ]
+  },
+  {
+    "file": "stats/stats-tree-rays.png",
+    "pixels": [
+      1586,
+      992
+    ],
+    "mode": "RGBA",
+    "alpha_range": [
+      0,
+      132
+    ],
+    "transparent_pixels": 710460,
+    "partial_pixels": 862852,
+    "opaque_pixels": 0,
+    "alpha_bbox": [
+      61,
+      29,
+      1480,
+      946
+    ]
+  }
+]
