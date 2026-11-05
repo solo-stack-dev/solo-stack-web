@@ -2,7 +2,7 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
 // Full-page scroll sequence of the homepage in headless Chrome (integration QA, docs/HOMEPAGE-DEV.md §9).
 //
-//   node src/lib/home/shared/tools/scroll-screens.mjs <url> <outDir> [--width 1440 --height 900] [--reduced] [--step 0.5] [--prefix name] [--sheet] [--seams] [--only-seams]
+//   node src/lib/home/shared/tools/scroll-screens.mjs <url> <outDir> [--width 1440 --height 900] [--reduced] [--theme light|dark] [--step 0.5] [--prefix name] [--sheet] [--seams] [--only-seams]
 //
 // One WebP per `step` viewports; exit code 1 on console errors/warnings or uncaught exceptions. `--sheet`: contact sheet
 // (`<prefix>-sheet.webp`). `--seams`: every section boundary centered (`<prefix>-seam-<id>.webp`, id = section below);
@@ -123,6 +123,8 @@ try {
 	await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
 	if (mobile) await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 	await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: reduced ? 'reduce' : 'no-preference' }] });
+	// --theme light|dark: mode-watcher's stored choice on the subpages (the homepage ignores it)
+	if (flag('theme')) await send('Page.addScriptToEvaluateOnNewDocument', { source: `localStorage.setItem('mode-watcher-mode', ${JSON.stringify(flag('theme'))})` });
 	await send('Page.navigate', { url });
 	await evaluate(`new Promise((done) => document.readyState === 'complete' ? done() : addEventListener('load', done, { once: true }))`);
 	await sleep(2500);
