@@ -4,12 +4,12 @@
 	mottling); its foot is a painted feather (stats-hill-feather.webp, docs/art/site/round-3/ink-feather.png) whose brush runs
 	out into the page unevenly, so in the light theme the hill dissolves into the paper instead of ending in a band. The curve is the glowing path along its crest, and it climbs to the tree of light, whose
 	trunk stands exactly on today's value. God rays fan out behind the canopy, a few golden motes drift down, the mascot sits
-	small at the tree's foot looking up. Light theme: ink wash on warm paper (~86 % at the crest, thinning toward the foot) with a butter wash behind the tree;
+	small at the tree's foot looking up. Light theme: a granulating warm sumi wash on paper (~85 % at the crest, thinning toward the foot) with a butter wash behind the tree;
 	dark: solid ink, backlit night.
 
 	Geometry (hill.ts) lives in fixed virtual canvases (one per layout, switched at 640 px) and the art is placed in percent, so
 	the prerendered page is exact at every width. Hover or drag to read a day. The first and last date sit in the ink under the
-	path, turned with it: the first after the first point, the last ending under today's light (only from 640 px). Screen readers get the table in Horizon.
+	path, turned with it: the first after the first point, the last ending under today's light. Screen readers get the table in Horizon.
 -->
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
@@ -141,14 +141,34 @@
 					<stop offset="0" stop-color="var(--color-butter)" stop-opacity="var(--halo-alpha)" />
 					<stop offset="1" stop-color="var(--color-butter)" stop-opacity="0" />
 				</radialGradient>
-				<!-- Paper: the ink is ~86 % along the land's top edge and thins with depth to ~58 % toward the foot (a soft band
-					 along the surface over a base wash). Night: no wash, solid ink (see .washed). -->
+				<!-- Paper: the ink is ~85 % along the land's top edge and thins with depth to ~60 % toward the foot (a soft band
+					 along the surface over a base wash), then granulates: the paper's tooth lifts fine specks of pigment and the
+					 heavier particles settle into clumps, both gathered in slow clouds (flocculation). Night: solid ink (see .washed). -->
 				<filter id="soften-{name}" filterUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
 					<feGaussianBlur stdDeviation={g.spec.h * 0.05} />
 				</filter>
+				<!-- Granulation as mask layers: the tooth (black, fine) lifts pigment, the clumps (white, a little coarser) add it,
+					 the clumps gathered by slow flocculation clouds -->
+				<filter id="tooth-{name}" filterUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} color-interpolation-filters="sRGB">
+					<feTurbulence type="fractalNoise" baseFrequency="0.38" numOctaves="2" seed="31" />
+					<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1.1 0 0 0 -0.46" result="grain" />
+					<feTurbulence type="fractalNoise" baseFrequency="0.009 0.018" numOctaves="2" seed="5" />
+					<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  2.2 0 0 0 -0.85" result="floc" />
+					<feComposite in="grain" in2="floc" operator="arithmetic" k1="1" result="lifted" />
+					<feGaussianBlur in="lifted" stdDeviation="0.35" />
+				</filter>
+				<filter id="clump-{name}" filterUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} color-interpolation-filters="sRGB">
+					<feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="2" seed="47" />
+					<feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  1.6 0 0 0 -0.78" result="grain" />
+					<feTurbulence type="fractalNoise" baseFrequency="0.012 0.022" numOctaves="2" seed="17" />
+					<feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -0.75" result="floc" />
+					<feComposite in="grain" in2="floc" operator="arithmetic" k1="1" />
+				</filter>
 				<mask id="wash-{name}" maskUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
-					<rect x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} fill="#fff" fill-opacity="0.58" />
-					<path d={g.surface} fill="none" stroke="#fff" stroke-opacity="0.72" stroke-width={g.spec.h * 0.2} stroke-linejoin="round" filter="url(#soften-{name})" />
+					<rect x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} fill="#fff" fill-opacity="0.72" />
+					<path d={g.surface} fill="none" stroke="#fff" stroke-width={g.spec.h * 0.26} stroke-linejoin="round" filter="url(#soften-{name})" />
+					<rect x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} filter="url(#tooth-{name})" />
+					<rect x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} filter="url(#clump-{name})" />
 				</mask>
 				<!-- Solid above the attach line, the painted feather (white pigment, its own alpha) below it -->
 				<mask id="dissolve-{name}" maskUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
@@ -256,7 +276,8 @@
 	.hill {
 		touch-action: pan-y;
 		aspect-ratio: var(--narrow-aspect);
-		--ink: var(--color-ink);
+		/* Paper: a warm sumi (umber in the black), so the thinned wash reads as ink on paper, not grey */
+		--ink: #2a2418;
 		--far: var(--color-ochre);
 		--far-alpha: 0.2;
 		--path: var(--color-butter);
@@ -268,6 +289,7 @@
 	}
 
 	:global(.dark) .hill {
+		--ink: var(--color-ink);
 		--far: #f6e7b8;
 		--far-alpha: 0.055;
 		--path-halo: var(--color-butter);
@@ -296,6 +318,7 @@
 		--end-x: var(--narrow-end-x);
 		--end-y: var(--narrow-end-y);
 		--end-a: var(--narrow-end-a);
+		--strip: 27% 7%;
 	}
 
 	.land-wide {
@@ -322,14 +345,11 @@
 			--end-x: var(--wide-end-x);
 			--end-y: var(--wide-end-y);
 			--end-a: var(--wide-end-a);
+			--strip: 40% 8%;
 		}
 
 		.land-narrow {
 			display: none;
-		}
-
-		.hill .end {
-			display: block;
 		}
 
 		.land-wide {
@@ -355,9 +375,9 @@
 		--y: var(--tree-y);
 		--w: var(--tree-w);
 		container-type: inline-size;
-		/* The painted mound strip dissolves into the knoll's ink */
-		/* The painted mound strip dissolves into the knoll's ink; its flat outer ends fade first */
-		mask-image: linear-gradient(180deg, #000 91%, transparent 97.5%), radial-gradient(40% 8% at 48.2% 97.6%, #000 50%, transparent 100%);
+		/* The painted mound strip dissolves into the knoll's ink; its flat outer ends fade first (sooner on the phone dome,
+		   which falls away on both sides of the trunk) */
+		mask-image: linear-gradient(180deg, #000 91%, transparent 97.5%), radial-gradient(var(--strip) at 48.2% 97.6%, #000 50%, transparent 100%);
 	}
 
 	.rays {
@@ -495,7 +515,6 @@
 	}
 
 	.end {
-		display: none;
 		left: var(--end-x);
 		top: var(--end-y);
 		transform-origin: 100% 0;

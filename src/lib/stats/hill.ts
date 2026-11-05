@@ -39,6 +39,13 @@ export interface LayoutSpec {
 	 */
 	foot: readonly [left: number, right: number];
 	footDepth: number;
+	/**
+	 * The knoll under the roots. `shelf`: a low, broad mound level with the trunk base (wide canvas, where the crest climbs
+	 * gently). `dome`: on a steep, cropped canvas a shelf would read as a box, so the land leaves the crest along its own slope
+	 * and swells into one rounded crown on the trunk, falling away on both sides (`flank` in tree widths, `crown` in art px
+	 * above the trunk base).
+	 */
+	knoll: { kind: 'shelf' | 'dome'; flank: number; crown: number };
 }
 
 export const LAYOUTS = {
@@ -55,7 +62,8 @@ export const LAYOUTS = {
 		mascotGap: 0.02,
 		rightEdge: 0.66,
 		foot: [0.8, 0.72],
-		footDepth: 0.19
+		footDepth: 0.19,
+		knoll: { kind: 'dome', flank: 0.62, crown: 30 }
 	},
 	/** From 640 px: the canvas tucks under the big number, the tree rises beside it. */
 	wide: {
@@ -70,7 +78,8 @@ export const LAYOUTS = {
 		mascotGap: 0.08,
 		rightEdge: 0.5,
 		foot: [0.76, 0.66],
-		footDepth: 0.21
+		footDepth: 0.21,
+		knoll: { kind: 'shelf', flank: 0.24, crown: 16 }
 	}
 } as const satisfies Record<string, LayoutSpec>;
 
@@ -220,24 +229,40 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 	// The knoll is a low dome under the painted root strip: shoulders slightly below the trunk base, crown just above it, so
 	// the strip's faded edge always melts into ink and no straight line shows.
 	const mound = ey + 8 * scale;
-	const crown = ey - 16 * scale;
+	const crown = ey - spec.knoll.crown * scale;
 	const rootLeft = ex - (ART.tree.trunkX - ART.tree.rootLeft) * scale;
 	const rootRight = ex + (ART.tree.rootRight - ART.tree.trunkX) * scale;
-	const flank = treeW * 0.24;
+	const right = h * spec.rightEdge;
+	const dome = spec.knoll.kind === 'dome';
+	const flank = treeW * spec.knoll.flank;
 	const footX = Math.max(startX, rootLeft - flank);
 	const footY = crestAt(points, slopes, footX);
-	const flankCurve: Cubic = [
-		[footX, footY + 2],
-		[footX + flank * 0.55, footY],
-		[rootLeft - flank * 0.25, mound],
-		[rootLeft + treeW * 0.06, mound]
-	];
-	const right = h * spec.rightEdge;
-	const knollTop =
-		`M${pt(flankCurve[0])}C${flankCurve.slice(1).map(pt).join(' ')}` +
-		`C${pt([ex - treeW * 0.22, crown])} ${pt([ex + treeW * 0.22, crown])} ${pt([rootRight - treeW * 0.06, mound])}` +
-		`C${pt([rootRight + treeW * 0.08, mound + 3 * scale])} ${pt([w - treeW * 0.02, right - h * 0.03])} ${pt([w + 12, right])}` +
-		`L${pt([w + 400, right + h * 0.04])}`;
+	let flankCurve: Cubic;
+	let knollTop: string;
+	if (dome) {
+		// Leave the crest along its own slope, then roll over into the crown just left of the trunk (horizontal there): concave
+		// at the foot, convex at the top, no shelf. The crown runs over the trunk and falls in one long convex curve past the edge.
+		const summit: Point = [ex - treeW * 0.08, crown];
+		const run = summit[0] - footX;
+		const slope = (crestAt(points, slopes, footX + 2) - crestAt(points, slopes, footX - 2)) / 4;
+		flankCurve = [[footX, footY - lift], [footX + run * 0.4, footY - lift + run * 0.4 * slope * 1.25], [summit[0] - run * 0.42, crown], summit];
+		knollTop =
+			`M${pt(flankCurve[0])}C${flankCurve.slice(1).map(pt).join(' ')}` +
+			`C${pt([ex + treeW * 0.2, crown])} ${pt([w - treeW * 0.04, right - h * 0.07])} ${pt([w + 12, right])}` +
+			`L${pt([w + 400, right + h * 0.06])}`;
+	} else {
+		flankCurve = [
+			[footX, footY + 2],
+			[footX + flank * 0.55, footY],
+			[rootLeft - flank * 0.25, mound],
+			[rootLeft + treeW * 0.06, mound]
+		];
+		knollTop =
+			`M${pt(flankCurve[0])}C${flankCurve.slice(1).map(pt).join(' ')}` +
+			`C${pt([ex - treeW * 0.22, crown])} ${pt([ex + treeW * 0.22, crown])} ${pt([rootRight - treeW * 0.06, mound])}` +
+			`C${pt([rootRight + treeW * 0.08, mound + 3 * scale])} ${pt([w - treeW * 0.02, right - h * 0.03])} ${pt([w + 12, right])}` +
+			`L${pt([w + 400, right + h * 0.04])}`;
+	}
 	const knoll = `${knollTop}L${pt([w + 400, h * 1.4])}L${pt([footX, h * 1.4])}Z`;
 
 	// Left of the data the land runs on gently past the canvas edge (the canvas is capped on very wide screens).
@@ -257,9 +282,10 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 
 	// Highest ink at x (crest or knoll flank): where the mascot sits.
 	const flankPoints = Array.from({ length: 33 }, (_, step) => bezier(flankCurve, step / 32));
+	const flankEnd = flankPoints[flankPoints.length - 1][0];
 	const surfaceAt = (x: number) => {
 		let y = crestAt(points, slopes, x) - lift;
-		if (x >= rootLeft) return Math.min(y, mound);
+		if (x >= flankEnd) return Math.min(y, dome ? crown : mound);
 		for (let index = 1; index < flankPoints.length; index++) {
 			const [x0, y0] = flankPoints[index - 1];
 			const [x1, y1] = flankPoints[index];
