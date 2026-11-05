@@ -10,6 +10,7 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
 	import { getRecentCommits } from '#lib/home/data/github.remote.ts';
+	import { GITHUB_COMMIT_LIMIT } from '#lib/home/data/github.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { InView, RafLoop, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import Scene from './Scene.svelte';
@@ -19,9 +20,16 @@
 	import { isPublicSubject } from './log-filter.ts';
 
 	// Live feed at build time; if it comes back empty, the baked log of this site's own recent commits (never an error in the painting).
-	// Both pass the same subject filter: no merges, critique scores or screenshot housekeeping on the monitor.
+	// Both pass the same subject filter (log-filter.ts): only real development activity, no review rounds or agent-lane housekeeping.
+	// A live feed the filter leaves thinner than one monitor page is topped up from the baked log (newest first, no duplicates).
 	const fetched = $derived((await getRecentCommits()).filter((commit) => isPublicSubject(commit.message)));
-	const commits = $derived(fetched.length ? fetched : FALLBACK_LOG);
+	const commits = $derived(
+		fetched.length >= COMMITS_PER_PAGE
+			? fetched
+			: [...fetched, ...FALLBACK_LOG.filter((entry) => !fetched.some((commit) => commit.hash === entry.hash))]
+					.toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date))
+					.slice(0, GITHUB_COMMIT_LIMIT)
+	);
 	const terminal = $derived(new Terminal(commits, m.home_nightshift_monitor_empty(), COMMITS_PER_PAGE));
 	const reduced = $derived(reducedMotion.current);
 

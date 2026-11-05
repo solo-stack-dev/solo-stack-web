@@ -2,7 +2,7 @@
 // Bakes the monitor's fallback log: the latest real commit subjects of this repository (`git log`, merges skipped) into
 // ../fallback-log.ts. NightShift shows them when the build's GitHub fetch comes back empty (rate limit, network), so the painted
 // monitor never shows an error. Live data only: subjects are copied verbatim, nothing is written by hand. Housekeeping subjects
-// (merges, critiques, screenshots, scores, parentheses) are skipped by `isPublicSubject` (../log-filter.ts), the same rule the page applies.
+// (merges, review rounds, agent lanes, housekeeping batches, scores, parentheses) are skipped by `isPublicSubject` (../log-filter.ts), the same rule the page applies.
 //
 // Run before a release build (or whenever the log should move on):
 //   node src/lib/home/sections/night-shift/tools/commit-log.mjs && pnpm exec oxfmt src/lib/home/sections/night-shift/fallback-log.ts

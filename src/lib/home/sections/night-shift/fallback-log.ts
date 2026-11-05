@@ -4,62 +4,6 @@ import type { Commit } from '#lib/home/data/github.ts';
 /** Real recent commits of this site's repository, newest first: the monitor's log when the live GitHub feed is empty. */
 export const FALLBACK_LOG: Commit[] = [
 	{
-		hash: '23b6ad8',
-		message: 'Home B round 3: dawn cloud bank seam, finished 04:00 cinema, 02:00 pulled up',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:22:37+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/23b6ad87fcca2f0099c42369943f5a60d8bb7d18'
-	},
-	{
-		hash: '224fefd',
-		message: 'Stats round 3: painted hill foot and KPI ground, no root, chart details',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:10:51+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/224fefd8fd0788b48dba94ddf7bd95443d33448c'
-	},
-	{
-		hash: 'f4cd368',
-		message: 'Contact round 3: wax-seal send, sentence-case captions, live error clearing, tighter mobile opening',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:09:54+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/f4cd36877a92f0d3531e5b513f822d7ef45b4a92'
-	},
-	{
-		hash: '596fefe',
-		message: 'Round 3 shell: painted footer wordmark on one ink ground, swash focus, opaque home menu, paper theme chooser',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:05:44+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/596fefe6dc92db655b33fa1258374fd012796451'
-	},
-	{
-		hash: '2a314d2',
-		message: 'Blog round 3: meta-line video status, mobile masthead, lit hill, section-tied breaks, reliable TOC',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:02:15+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/2a314d29c629f0d044c727e1612d9040481489c6'
-	},
-	{
-		hash: '94ca627',
-		message: 'Home A round 3: 21→22 overlap, title crossfade, 22:00 on the grid, desk edge, mobile 21:00 group',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T06:01:09+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/94ca627b5d5fb8bdd614839ef27bce0d105fea8f'
-	},
-	{
-		hash: 'b685133',
-		message: 'Add round 3 dawn, ink ground and crescent seal artwork',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T05:54:09+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/b6851333bf62f8796e21008701c16056ef502789'
-	},
-	{
-		hash: '2cfb3b2',
-		message: 'Home art round 2: painted game posters, cinema projection, varied seam clouds, dawn tint',
-		repo: 'solo-stack-web',
-		date: '2026-11-05T05:15:22+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/2cfb3b227a8a1f7e41e99eb07a14da0772a824db'
-	},
-	{
 		hash: 'b48e7bc',
 		message: 'Stats: painted long root from the tree into the footer horizon',
 		repo: 'solo-stack-web',
@@ -74,17 +18,73 @@ export const FALLBACK_LOG: Commit[] = [
 		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/dc95227765aa0425d1e4c166f494799676839c76'
 	},
 	{
-		hash: 'c581a0e',
-		message: 'Home round 2: 21:00 composition and ink, hero cue, 01:00 fallback log, radio glass and ground, sunrise print',
+		hash: '19e8839',
+		message: 'Contact night owl messenger and silhouette horizon footer',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T05:01:34+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/c581a0eb2fb5d66dfc78eed32c8631073ccb58fc'
+		date: '2026-11-05T03:56:11+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/19e88398b9d128c60d7c61552974c5ff3c727537'
 	},
 	{
-		hash: '21ab600',
-		message: 'Round 2 shell: one nav language, painted scrim, horizon footer, 404 seal',
+		hash: 'd127249',
+		message: 'Stats: the growth tree hero and a root that runs down the page',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T04:58:07+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/21ab600b871c3ac07693796abf64535363c5e580'
+		date: '2026-11-05T03:48:24+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/d12724956a6d70dab52334456d1e6340091f3497'
+	},
+	{
+		hash: 'cc4a394',
+		message: 'Blog: the reading hill, silhouette vignettes, moon-free index and post pages',
+		repo: 'solo-stack-web',
+		date: '2026-11-05T03:37:31+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/cc4a39488a54d0629aa50f4845670d54818bed5b'
+	},
+	{
+		hash: '5c4f3a0',
+		message: 'Making: autoplay rotation instead of pinned scroll scrub',
+		repo: 'solo-stack-web',
+		date: '2026-11-05T03:16:40+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/5c4f3a08f3a57c5f0ff8632fb40d3fd47fbadcd1'
+	},
+	{
+		hash: '1d04c3e',
+		message: 'Site shell: painted night paper, on-brand focus ring, contact letter field states',
+		repo: 'solo-stack-web',
+		date: '2026-11-05T03:03:44+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/1d04c3e2dd789bc789e8885d688d2ba116a693e1'
+	},
+	{
+		hash: '3628df0',
+		message: 'Delete retired sunrise walk masters, puppet parts and build script',
+		repo: 'solo-stack-web',
+		date: '2026-11-05T02:30:29+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/3628df0024db9376be07b4674e1ae549140e7ff4'
+	},
+	{
+		hash: 'b05a282',
+		message: 'Repainted sunrise laptop and making cliff light, rebuilt assets',
+		repo: 'solo-stack-web',
+		date: '2026-11-03T23:49:27+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/b05a2829c4514c6514798af9d739925bed28925f'
+	},
+	{
+		hash: '5ea1eb4',
+		message: 'Painted wipes and edges: square-aspect wash fronts, sunrise night clears the 06:00 clock, ink-print portrait',
+		repo: 'solo-stack-web',
+		date: '2026-11-03T23:42:54+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/5ea1eb4158f2e574b43020afedaacf44d1f0422c'
+	},
+	{
+		hash: 'c0166c6',
+		message: 'Homepage layout system: shared tokens, aligned chrome, ink-native nav, tabs and game frame',
+		repo: 'solo-stack-web',
+		date: '2026-11-03T23:19:23+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/c0166c6fd85919b7af5a794a122afa80f7eba347'
+	},
+	{
+		hash: '70424be',
+		message: 'Homepage perf: cap hero clouds, halve making paths, radio icon sprite',
+		repo: 'solo-stack-web',
+		date: '2026-11-03T23:14:59+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/70424bedff89c4becf9bbf2ca16d836ee80cc518'
 	}
 ];

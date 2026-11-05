@@ -114,7 +114,8 @@
 		<enhanced:img src={needleImage} alt="" class="fill" sizes="1rem" loading="lazy" />
 	</div>
 
-	<!-- Big station logo, name, song, live content on the glass (the handle is on the display strip below) -->
+	<!-- Big station glyph, song, live content on the glass. The name is said once, by the glyph (sr-only text here); the handle
+	     is on the display strip below. -->
 	<div
 		class="glass"
 		style:left={pct(layout.glassContent).left}
@@ -127,7 +128,7 @@
 				<div class="glass-station">
 					<BrandIcon id={tuned.id} class="glass-logo" />
 					<div class="glass-text">
-						<p class="glass-name">{tuned.name}</p>
+						<p class="sr-only">{tuned.name}</p>
 						{#if tuned.track}
 							<div class={['glass-song', playing && tuned.id === selected?.id && 'on']}>
 								{@render song(tuned)}
@@ -239,14 +240,12 @@
 		--glow: var(--color-butter);
 		/* Glass type in cqw; the tall radio is drawn ~2.3× smaller, hence larger factors */
 		--logo: 8.4cqw;
-		--name: max(0.85rem, 2.3cqw);
 		/* supporting glass labels never below 12px */
 		--small: max(0.75rem, 1.35cqw);
 	}
 
 	.set-tall {
 		--logo: 13cqw;
-		--name: max(0.85rem, 4.4cqw);
 		--small: max(0.75rem, 2.9cqw);
 	}
 
@@ -330,6 +329,8 @@
 		position: absolute;
 		z-index: 1;
 		display: grid;
+		/* one column the size of the glass, so a long song title ellipsizes inside it instead of growing the track */
+		grid-template-columns: minmax(0, 1fr);
 		place-items: center;
 		pointer-events: none;
 		color: var(--color-cream);
@@ -370,14 +371,6 @@
 		display: grid;
 		gap: 0.15em;
 		min-width: 0;
-	}
-
-	.glass-name {
-		margin: 0;
-		font-weight: 800;
-		font-size: var(--name);
-		line-height: 1.1;
-		text-shadow: 0 0 1.2cqw color-mix(in oklab, var(--color-butter) 60%, transparent);
 	}
 
 	/* Clickable over the dial */
@@ -485,12 +478,12 @@
 		outline-offset: 3px;
 	}
 
-	/* Display strip */
+	/* Display strip: the handle ellipsizes ~12px inside the painted window */
 	.strip {
 		position: absolute;
 		display: grid;
 		align-content: center;
-		padding: 0 2.2cqw;
+		padding: 0 0.75rem;
 		color: var(--color-cream);
 	}
 
