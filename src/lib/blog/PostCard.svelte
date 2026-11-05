@@ -153,11 +153,21 @@
 		animation: blink 3.6s ease-in-out infinite;
 	}
 
+	/* On paper: a deep ochre core (3.9:1 on the page) that stays solid; only its warm halo breathes */
 	:global(html:not(.dark)) .spark {
-		background: #f1b73e;
+		background: #a87318;
 		box-shadow:
-			0 0 2px 1px rgb(226 169 59 / 0.9),
-			0 0 8px 2px rgb(252 215 114 / 0.75);
+			0 0 0 1px rgb(226 169 59 / 0.55),
+			0 0 7px 2px rgb(252 215 114 / 0.7);
+		animation-name: breathe;
+	}
+
+	@keyframes breathe {
+		50% {
+			box-shadow:
+				0 0 0 1px rgb(226 169 59 / 0.25),
+				0 0 5px 1px rgb(252 215 114 / 0.3);
+		}
 	}
 
 	@keyframes blink {
@@ -341,7 +351,8 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.spark {
+		.spark,
+		:global(html:not(.dark)) .spark {
 			animation: none;
 		}
 

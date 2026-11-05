@@ -43,8 +43,10 @@ type BreakArt =
 			image: Enhanced;
 			/** Rendered height of the painting from 40rem (phones: 85 %). */
 			height: string;
-			/** Horizontal placement of the painting's center in the column, 50% = centered; `right`: flush with its right edge. */
+			/** Horizontal placement of the painting's center in the column, 50% = centered; `left` / `right`: flush with that edge. */
 			x: string;
+			/** Placement from 64rem (desktop, beside the contents), same values as `x`; default: `x`. */
+			xLg?: string;
 			/** Center of the night light on the painting (its own light source), in % of the painting box. */
 			glow: string;
 			/** An ink silhouette: at night it gets a thin moonlit rim, so the black reads on the dark page. */
@@ -54,8 +56,11 @@ type BreakArt =
 export const BREAK_ART = {
 	/** The night journey (20:00 to 06:00): the valley under the glowing horizon, a wide and shallow plate. */
 	horizon: { kind: 'scene', image: horizon, glow: '62% 46%' },
-	/** The night radio at 02:00, set small and to the right, as if it stood at the edge of the desk. */
-	radio: { kind: 'object', image: radio, height: '6.75rem', x: 'right', glow: '64% 38%' },
+	/**
+	 * The night radio at 02:00, set small. Phones: to the right, as if it stood at the edge of the desk; desktop: flush left
+	 * on the heading's edge, so after the full-measure panorama it reads as the section's own object, not a stray one.
+	 */
+	radio: { kind: 'object', image: radio, height: '6.75rem', x: 'right', xLg: 'left', glow: '64% 38%' },
 	laptop: { kind: 'object', image: laptop, height: '7rem', x: '50%', glow: '28% 40%', ink: true },
 	owl: { kind: 'object', image: owl, height: '8rem', x: '54%', glow: '45% 34%', ink: true },
 	fireflies: { kind: 'object', image: fireflies, height: '8.5rem', x: '46%', glow: '66% 30%', ink: true }
@@ -100,20 +105,33 @@ function properties(art: BreakArt) {
 					'--h': art.height,
 					'--h-sm': `calc(${art.height} * 0.85)`,
 					'--box-ratio': 'auto',
-					...(art.x === 'right' ? { '--x': 'auto', '--right': '0', '--shift': '0' } : { '--x': art.x }),
+					...placement(art.x),
 					'--edge': OPAQUE,
 					'--night-fade': OPAQUE,
 					'--night-feather': OPAQUE,
 					'--rim': art.ink ? 'drop-shadow(0 0 1px rgb(251 243 221 / 0.3)) drop-shadow(0 0 9px rgb(252 215 114 / 0.2))' : 'none'
 				};
-	return Object.entries({ ...shared, ...placed })
+	return css({ ...shared, ...placed });
+}
+
+/** `--x` / `--right` / `--shift` of an object's horizontal placement (all three, so a desktop placement can override). */
+function placement(x: string) {
+	if (x === 'left') return { '--x': '0', '--right': 'auto', '--shift': '0' };
+	if (x === 'right') return { '--x': 'auto', '--right': '0', '--shift': '0' };
+	return { '--x': x, '--right': 'auto', '--shift': '-50%' };
+}
+
+const css = (entries: Record<string, string>) =>
+	Object.entries(entries)
 		.map(([name, value]) => `${name}:${value}`)
 		.join(';');
-}
 
 /** One style sheet with the art of every break name and of the plain-break order (prerendered into the post's head). */
 export function breakStyles() {
-	const named = Object.entries(BREAK_ART).map(([name, art]) => `.prose-post>hr[data-art="${name}"]{${properties(art)}}`);
+	const named = Object.entries(BREAK_ART).map(([name, art]) => {
+		const rule = `.prose-post>hr[data-art="${name}"]{${properties(art)}}`;
+		return 'xLg' in art && art.xLg ? `${rule} @media (min-width:64rem){.prose-post>hr[data-art="${name}"]{${css(placement(art.xLg))}}}` : rule;
+	});
 	const plain = DEFAULT_ORDER.map((name, index) => `.prose-post>hr:not([data-art]):nth-of-type(3n+${(index + 1) % 3}){${properties(BREAK_ART[name])}}`);
 	return [...named, ...plain].join('\n');
 }
