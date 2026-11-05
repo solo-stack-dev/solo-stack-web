@@ -3,9 +3,8 @@ import { m } from '#lib/paraglide/messages.js';
 /**
  * The tech zodiac: hand-authored constellations for the owner's tools and interests.
  *
- * Coordinates are in a local 0…100 box (y down). Each sign lists its stars and the edges (index pairs) the player has
- * to trace; edges are order-agnostic. Shapes are original stylizations: Svelte follows the outline of its logo
- * (fan use), every other brand is an allusion (cloud, droplet, elephant, letters), not a logo.
+ * Local 0…100 box, y down. Edges are star index pairs to trace, order-agnostic. Shapes are original: Svelte follows its
+ * logo outline (fan use); every other brand is an allusion (cloud, droplet, elephant, letters), not a logo.
  *
  * Names: proper names are literal, everything else is a Paraglide message (`TODO(copy)`).
  */
@@ -43,7 +42,7 @@ export const SIGNS: readonly SignDef[] = [
 		name: () => 'Svelte',
 		note: m.home_game_stars_note_svelte,
 		href: 'https://svelte.dev',
-		// Tilted double-band "S" of the Svelte mark: upper band curls left and down, a diagonal crosses, lower band curls back.
+		// Tilted double-band "S" of the Svelte mark: upper band curls left/down, a diagonal crosses, lower band curls back.
 		points: [
 			[76, 10],
 			[52, 2],

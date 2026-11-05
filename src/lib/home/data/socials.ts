@@ -1,9 +1,9 @@
 /**
- * Social platforms of Solo Stack. Source: docs/PROJECT.md#links (verified by the owner on 2026-10-31 in the channel
- * workspace). Names are proper names; handles and URLs are the owner's own data, so neither is "copy".
+ * Social platforms. Source: docs/PROJECT.md#links (verified by the owner 2026-10-31). Names are proper names, handles
+ * and URLs the owner's data: neither is "copy".
  *
- * `icon` is the Simple Icons slug (https://simpleicons.org, CC0). Render the real logo and follow each platform's
- * brand guidelines. `url: null` means "not linkable yet": filter it out before rendering links (`linkedSocials`).
+ * `icon`: Simple Icons slug (https://simpleicons.org, CC0); render the real logo per each platform's brand guidelines.
+ * `url: null` = not linkable yet; render links from `linkedSocials`.
  */
 export type SocialId = 'youtube' | 'github' | 'instagram' | 'tiktok' | 'x' | 'bluesky' | 'threads' | 'twitch' | 'facebook' | 'discord';
 
@@ -24,12 +24,12 @@ export const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@solostack_dev';
 export const GITHUB_OWNER = 'solo-stack-dev';
 
 /**
- * TODO(owner): permanent Discord invite. The invite currently linked on YouTube (discord.gg/y7MPvkm8R) has an
- * unknown expiry, so it is not published here until the owner confirms a non-expiring invite.
+ * TODO(owner): permanent Discord invite. The one linked on YouTube (discord.gg/y7MPvkm8R) has unknown expiry, so it
+ * stays unpublished until the owner confirms a non-expiring invite.
  */
 export const DISCORD_INVITE_URL: string | null = null;
 
-/** Order: the main platforms first (YouTube, GitHub), then the rest roughly by reach. */
+/** Order: YouTube, GitHub, then roughly by reach. */
 export const SOCIALS: readonly Social[] = [
 	{ id: 'youtube', name: 'YouTube', url: YOUTUBE_CHANNEL_URL, handle: '@solostack_dev', icon: 'youtube' },
 	{ id: 'github', name: 'GitHub', url: `https://github.com/${GITHUB_OWNER}`, handle: GITHUB_OWNER, icon: 'github' },

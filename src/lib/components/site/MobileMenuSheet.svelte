@@ -1,9 +1,7 @@
 <!--
 	@component
-	Phone menu of the site navbar (below `sm`): a sheet from the right with the site links in large type.
-	Closes on navigation. The vendored close button carries an English literal, so this renders its own.
-
-	Heavy (bits-ui dialog): never import statically. MobileMenu loads it on the first tap and mounts it open.
+	Phone menu sheet (below `sm`); closes on navigation. Own close button: the vendored one has an English literal.
+	Heavy (bits-ui dialog): never import statically; MobileMenu loads it on first tap.
 -->
 <script lang="ts">
 	import MenuIcon from '@lucide/svelte/icons/menu';
@@ -18,8 +16,7 @@
 
 	let trigger = $state<HTMLButtonElement | null>(null);
 
-	// When LazyMenu mounts this already open, the focused element (its placeholder button) is gone, so bits-ui would
-	// return focus to <body> on close. Always hand it back to the real trigger instead.
+	// Mounted open by LazyMenu, the previously focused placeholder is gone and bits-ui would focus <body> on close; hand it to the trigger.
 	function returnFocus(event: Event) {
 		event.preventDefault();
 		trigger?.focus();

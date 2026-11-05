@@ -1,10 +1,8 @@
 <!--
 	@component
-	The total follower curve of the period, painted as a landscape: the line is a hill ridge (ink on paper, moonlit rim
-	at night) that ends on a cliff, like the laptop cliff of the Nachtstudio banner, and runs into the painted moon
-	beyond it at the moon's middle. The whole picture spans the page's content column, the moon closes it on the right.
-	A faint second ridge behind adds depth. Hover or drag to read a day. Plain SVG, no chart library; the edges
-	bleed through one cheap turbulence filter. Screen readers get the numbers from the table in Horizon.
+	Period follower total as a landscape: a hill ridge (ink on paper, moonlit rim at night) ending on a cliff (echoing the Nachtstudio
+	banner's laptop cliff), with a faint far ridge for depth. Spans the content column; the moon closes it on the right. Hover or
+	drag to read a day. Plain SVG; edges bleed through one cheap turbulence filter. Screen readers get the table in Horizon.
 -->
 <script lang="ts">
 	import { curveMonotoneX, line as d3line } from 'd3-shape';
@@ -28,8 +26,7 @@
 		const w = Math.max(280, width);
 		const h = Math.max(160, height);
 		const narrow = w < 640;
-		// The moon closes the content column on the right, so the chart spans exactly the text column: the curve starts at
-		// its left edge and runs into the moon's left limb at the moon's vertical middle.
+		// Curve runs from the column's left edge into the moon's left limb at its vertical middle.
 		const moonSize = Math.round(Math.min(narrow ? 112 : 220, h * 0.62, w * 0.3));
 		const endX = w - moonSize - 2;
 		const min = Math.min(...values);
@@ -42,11 +39,11 @@
 		const points = values.map((value, index) => [(index / last) * endX, bottom - ((value - min) / span) * (bottom - top)] as [number, number]);
 		const ridge = d3line().curve(curveMonotoneX)(points) ?? '';
 		const [ex, ey] = points[points.length - 1];
-		// The cliff below today: a steep, slightly undercut drop that stays left of the moon.
+		// Cliff below today: steep, slightly undercut, left of the moon.
 		const cliff = `C${ex + 3} ${ey + h * 0.12} ${ex - 8} ${ey + h * 0.22} ${ex - 4} ${ey + h * 0.36}S${ex - 2} ${h * 0.9} ${ex + 2} ${h + 2}`;
 		const body = `${ridge}${cliff}L0 ${h + 2}Z`;
 
-		// A distant ridge behind: the same curve, flattened and lifted, running on below the moon to the right edge.
+		// Far ridge: same curve flattened and lifted, continuing below the moon to the right edge.
 		const far = points.map(([x, y]) => [x * 1.06, top * 0.5 + (y - top) * 0.55] as [number, number]);
 		far.push([w, far[far.length - 1][1] + h * 0.22]);
 		const farRidge = d3line().curve(curveMonotoneX)(far) ?? '';

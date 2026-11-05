@@ -3,9 +3,8 @@ import { on } from 'svelte/events';
 import { MediaQuery, createSubscriber } from 'svelte/reactivity';
 
 /**
- * Reactive `prefers-reduced-motion: reduce`. Read `reducedMotion.current` in markup, `$derived`, or `$effect`.
- * SSR renders as `false` (motion allowed); clients that prefer reduced motion switch on hydration, so every
- * section's static state must also be correct when rendered without JS.
+ * Reactive `prefers-reduced-motion: reduce`. SSR value is `false` (motion allowed); reduced-motion clients switch on
+ * hydration, so every section's static state must also be correct without JS.
  */
 export const reducedMotion = new MediaQuery('(prefers-reduced-motion: reduce)', false);
 
@@ -27,7 +26,6 @@ export interface InViewOptions extends IntersectionObserverInit {
 
 /**
  * Attachment that reports viewport visibility.
- *
  * ```svelte
  * <div {@attach inView((visible) => (near = visible), { rootMargin: '100% 0px' })}></div>
  * ```
@@ -48,7 +46,6 @@ export function inView(callback: (visible: boolean, entry: IntersectionObserverE
 
 /**
  * Reactive visibility of one element.
- *
  * ```svelte
  * <script>const seen = new InView({ rootMargin: '50% 0px' });</script>
  * <div {@attach seen.attach}>{seen.current}</div>
@@ -78,16 +75,14 @@ export interface ScrollProgressOptions {
 	 * - `enter`: 0 when the top reaches the viewport bottom, 1 when the top reaches the viewport top.
 	 */
 	mode?: ScrollProgressMode;
-	/** Also write the progress to this CSS custom property on the element (e.g. `--progress`). Cheaper than markup. */
+	/** Also write the progress to this custom property on the element (e.g. `--progress`); cheaper than markup. */
 	cssVar?: `--${string}`;
 }
 
 const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
 
 /**
- * Scroll progress of an element through the viewport, 0…1, measured in a passive, rAF-throttled scroll listener
- * that only runs while the element is near the viewport.
- *
+ * Scroll progress of an element through the viewport, 0…1. rAF-throttled; listens only while the element is near the viewport.
  * ```svelte
  * <script>const progress = new ScrollProgress({ mode: 'pinned', cssVar: '--progress' });</script>
  * <div class="h-[600svh]" {@attach progress.attach}><div class="sticky top-0 h-svh">{progress.current}</div></div>
@@ -124,7 +119,7 @@ export class ScrollProgress {
 			if (!frame) frame = requestAnimationFrame(measure);
 		};
 
-		// Measure on every visibility change too, so the value settles at exactly 0 or 1 when the element leaves.
+		// Also measure on visibility changes, so the value settles at exactly 0 or 1 when the element leaves.
 		const observer = new IntersectionObserver(
 			(entries) => {
 				near = entries.at(-1)?.isIntersecting ?? false;
@@ -154,10 +149,8 @@ export interface RafLoopOptions {
 }
 
 /**
- * A requestAnimationFrame loop that only runs while its element is in the viewport, the tab is visible, and it is
- * not paused. `tick(dt, time)` gets the delta in seconds (clamped to 0.1 s so a resumed loop never jumps).
- * Under reduced motion, set `paused = true` and draw one static frame yourself.
- *
+ * rAF loop that runs only while its element is in view, the tab is visible, and it is not paused. `tick(dt, time)`: dt in
+ * seconds, clamped to 0.1 s so a resumed loop never jumps. Under reduced motion, pause it and draw one static frame yourself.
  * ```svelte
  * <script>
  *   const loop = new RafLoop((dt) => draw(dt), { fps: 30 });

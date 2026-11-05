@@ -1,11 +1,9 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Turns the painted cinema masters (docs/art/cinema/, docs/art/mascot/mascot-cinema-sitting.png) into the optimized
-// sources in ../assets/ that `@sveltejs/enhanced-img` encodes to AVIF/WebP at build time, and writes ../art.ts with
-// each layer's crop and anchors (in the cropped image's px), which layout.ts places on the stage.
+// Builds the cinema sources in ../assets/ (encoded to AVIF/WebP by enhanced-img) from docs/art/cinema/ and
+// docs/art/mascot/mascot-cinema-sitting.png, and writes ../art.ts: each layer's crop and anchors (cropped px) for layout.ts.
 //
-// - Landscapes: desktop downscaled to 1920 wide (native raster 1672×941), mobile 1080×2340. High quality WebP.
-// - Cliff, frame, beam, mascot: cropped to their visible alpha bounding box; anchors from docs/art/*/README.md are
-//   shifted by the crop offset.
+// - Landscapes: desktop 1920 wide (native raster 1672×941), mobile 1080×2340. High quality WebP.
+// - Cliff, frame, beam, mascot: cropped to their alpha box; README anchors shifted by the crop offset.
 //
 // Run: node src/lib/home/sections/cinema/tools/optimize-art.mjs && pnpm exec oxfmt src/lib/home/sections/cinema/art.ts
 // Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).

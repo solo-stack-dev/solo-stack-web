@@ -1,9 +1,8 @@
 <!--
 	@component
-	Egg: presence on the moon (mockup 01-mascot-easter-eggs/05). A faint, featureless giant leans over the visible part
-	of the hero moon for ~2.2 s. Anchored to the moon element (`[data-egg-moon]`) in page coordinates so it stays on
-	the moon while scrolling, clipped to the moon's circle, multiplied into the pigment. Only opacity (and a tiny
-	drift with motion) animates; the watery edge filter is rasterized once.
+	Egg: presence on the moon (mockup 01-mascot-easter-eggs/05). A faint featureless giant leans over the visible part of
+	the hero moon. Positioned in page coordinates over `[data-egg-moon]` (stays put while scrolling), clipped to the
+	disc, multiplied into the pigment. Only opacity and a tiny drift animate; the wash filter rasterizes once.
 -->
 <script lang="ts">
 	import type { EggProps } from '../events.ts';
@@ -17,7 +16,7 @@
 	let root: HTMLDivElement;
 	let box = $state<{ left: number; top: number; size: number; x: number; y: number; figure: number } | null>(null);
 
-	/** Moon rect in the coordinates of our offset parent, plus the centroid and size of the moon's on-screen part. */
+	/** Moon rect relative to our offset parent, plus centroid and size of its on-screen part. */
 	function measure(moon: Element) {
 		const rect = moon.getBoundingClientRect();
 		const parent = (root.offsetParent ?? document.documentElement).getBoundingClientRect();
@@ -123,7 +122,7 @@
 		height: 100%;
 	}
 
-	/* Reduced motion: no drift, an opacity-only fade of the root (calmFade) */
+	/* Reduced motion: no drift (calmFade on the root) */
 	.still .figure {
 		animation: none;
 		opacity: 1;

@@ -1,8 +1,6 @@
 /**
- * Egg: DevTools console, on every page (root layout, lazily on idle, in production too). Once per browser session it
- * prints the SOLO STACK wordmark as block letters in a butter to ochre gradient, followed by a Solo Leveling style
- * System window with a parody daily quest. Defines `window.arise()`: on the homepage it dispatches ARISE_EVENT (same
- * effect as the Konami code), elsewhere the System answers that shadows only rise in the night studio.
+ * Console egg, every page (root layout, on idle, also in production). Once per session: a gradient block-letter wordmark and
+ * a Solo Leveling style System window. `window.arise()` dispatches ARISE_EVENT on the homepage (= Konami code), else declines.
  */
 /* oxlint-disable no-console -- printing to the console is this egg */
 import { ARISE_EVENT } from '#lib/home/eggs/events.ts';
@@ -28,7 +26,7 @@ const GLYPHS: Record<string, string[]> = {
 	' ': ['   ', '   ', '   ', '   ', '   ', '   ']
 };
 
-/** Top to bottom: cream highlight, butter, ochre, like the painted 404 digits. */
+/** Top to bottom, like the painted 404 digits. */
 const ROW_COLORS = ['#fbf3dd', '#fde49a', '#fcd772', '#f2c057', '#e2a93b', '#b9862a'];
 
 const MONO = 'font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
@@ -38,7 +36,7 @@ function wordmark(text: string) {
 	return ROW_COLORS.map((_, row) => [...text].map((letter) => GLYPHS[letter]?.[row] ?? '').join(' '));
 }
 
-/** Pads every line to the same width so the System window's background reads as one box. */
+/** Equal widths so the background reads as one box. */
 function box(lines: string[]) {
 	const width = Math.max(...lines.map((line) => line.length));
 	return lines.map((line) => ` ${line.padEnd(width)} `).join('\n');
@@ -62,15 +60,14 @@ export function install() {
 		// Storage blocked: print anyway, once per page load.
 	}
 
-	// Wordmark: one %c segment per row, each row its own color
+	// One %c segment per row, each its own color
 	const rows = wordmark('SOLO STACK');
 	console.log(
 		rows.map((row) => `%c${row}`).join('\n'),
 		...ROW_COLORS.map((color) => `color:${color};${MONO};font-weight:700;line-height:1.05;text-shadow:0 0 6px rgb(252 215 114 / 0.35)`)
 	);
 
-	// System window
-	// "Defeat a bug 0/1" → goal and progress, the progress in a right-aligned column
+	// System window. "Defeat a bug 0/1" → goal, progress (right-aligned column)
 	const items = m
 		.egg_system_quest_items()
 		.split(' | ')

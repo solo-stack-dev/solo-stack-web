@@ -1,11 +1,8 @@
 <!--
 	@component
-	Glowing waveform along the landscape horizon (Canvas 2D). Fills its positioned parent (the horizon band).
-	- Playing: an AnalyserNode drives it. The spectrum sets the envelope (log scale, low frequencies at the center
-	  spreading outward, smoothed RMS as a floor), the time-domain signal sets the jagged line. `onlevel` gets the smoothed RMS 0…1.
-	- Idle: a slow, quiet wave.
-	- Reduced motion: one static frame, no loop, level 0.
-	The loop (RafLoop, 30 fps) only runs while the canvas is on screen and the tab is visible.
+	Glowing horizon waveform (Canvas 2D), fills its positioned parent. Playing: AnalyserNode spectrum sets the envelope,
+	time-domain signal the jag; `onlevel` gets smoothed RMS 0…1. Idle: slow quiet wave. Reduced motion: one static frame,
+	level 0. RafLoop at 30 fps, only on screen with the tab visible.
 -->
 <script lang="ts">
 	import { RafLoop } from '#lib/home/shared/motion.svelte.ts';
@@ -90,7 +87,7 @@
 
 		const center = height / 2;
 		const half = width / 2;
-		// Log frequency scale from the center outward, so bass is not hidden behind the radio; RMS as a floor.
+		// Log frequency scale from the center outward (bass not hidden behind the radio); RMS as a floor.
 		const minBin = 2;
 		const maxBin = Math.floor(frequency.length * 0.6);
 		const samples = wave!.length;

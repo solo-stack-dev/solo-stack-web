@@ -1,7 +1,6 @@
 <!--
 	@component
-	A station logo, single color via `currentColor`, decorative. Draws the `<symbol>` from BrandIconSprite (rendered once
-	by Radio.svelte), so each path ships once in the HTML however often the logo appears.
+	Decorative station logo in `currentColor`. Uses the BrandIconSprite `<symbol>`, so each path ships once in the HTML.
 -->
 <script lang="ts">
 	import { ICON_VIEWBOX, iconHref } from './icons.ts';

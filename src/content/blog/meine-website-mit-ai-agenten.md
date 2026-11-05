@@ -77,9 +77,9 @@ Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und
 
 Die tippenden Hände waren zunächst ein separates Bildstück. Auf dem Telefon verschoben sie sich um ungefähr einen halben Pixel gegenüber der Szene. Das klingt klein, fällt an einer solchen Naht aber auf. Inzwischen stecken Hände und Szene in derselben Bilddatei.
 
-Auch der Spaziergang zum Sonnenaufgang brauchte einen neuen Aufbau. Der gemalte Ablauf mit vier Bildern stockte, weil zwei Bilder dasselbe Bein nach vorne führten. Ich habe die Figur deshalb aus einzelnen Körperteilen als Puppe neu aufbauen lassen. Daraus wurde ein gleichmäßiger Gang mit 16 Bildern, der deinem Scrollen folgt.
+Die deckend gemalten Bänder zwischen den Abschnitten zerschnitten die Seite in einzelne Stücke. Ich habe sie durch gemalten Nebel ersetzt, der über die Seite zieht und die Abschnitte ineinander übergehen lässt. Dazu kommen zwei Übergänge mit verwaschener Tinte. Von 20:00 bis 21:00 flutet nasse Tinte von unten über den Mond im Hero, während du scrollst. Von 04:00 bis 06:00 zieht sich die Nachttinte zurück und trocknet mit dem Sonnenaufgang.
 
-Um 06:00 zieht sich die Nacht zurück, mein Maskottchen geht mit dem Laptop davon, und auf dem buttergelben Papier dampft der Kaffee neben den Footer Links. Gerade hier sollte die Bewegung ruhig wirken. Ein kleiner Fehler im Gang hätte die ganze Szene immer wieder unterbrochen.
+Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem buttergelben Papier dampft der Kaffee neben einem geschlossenen Laptop. Neben dem SOLO STACK Schriftzug siehst du ein Foto von mir, als wäre es mit anthrazitfarbener Tinte auf das Papier gedruckt. Danach kommen die Footer Links.
 
 ## Musik und Kino für die späten Stunden
 

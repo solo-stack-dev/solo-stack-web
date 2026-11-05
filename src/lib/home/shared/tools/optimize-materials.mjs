@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Optimizes the shared painted materials (docs/art/shared/, masters) into runtime assets under
-// src/lib/home/shared/assets/. Re-run after the masters change:
+// Masters in docs/art/shared/ → src/lib/home/shared/assets/. Re-run after the masters change:
 //
 //   node src/lib/home/shared/tools/optimize-materials.mjs
 //
-// - paper-grain.webp: the neutral grayscale tile turned into a two-tone alpha tile (cream where the paper is lighter
-//   than its mean, ink where it is darker), so it reads as grain with plain `normal` blending (no blend-mode cost).
-// - edge-{1,2,3}.webp / edge-{1,2,3}-up.webp: alpha masks (opaque above / transparent below) and their vertical flips
-//   (transparent above / opaque below), downscaled to 1280×200 (they are stretched to the strip width anyway).
-// - star-{1..4}.webp: 48 px sprites for the bright stars of StarField.
-// - shooting-star.webp: 480×48 streak sprite for ShootingStars (head on the right).
+// - paper-grain.webp: grayscale tile → two-tone alpha (cream above the mean, ink below), so `normal` blending suffices.
+// - edge-{1,2,3}.webp (opaque above) and -up (flipped), 1280×200 (CSS stretches them anyway).
+// - star-{1..4}.webp: 48 px StarField sprites. shooting-star.webp: 480×48, head on the right.
 //
-// Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
+// Uses `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { mkdirSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -44,8 +40,7 @@ const report = (name) => console.log(`${name.padEnd(22)} ${(statSync(target(name
 		// ±2.5σ → full alpha; the component's `opacity` scales it down
 		out[index * 4 + 3] = Math.round(Math.min(1, Math.abs(z) / 2.5) * 255);
 	}
-	// Two colors × alpha levels: quantized to a 32-entry palette (as a PNG, ~20 kB), then stored as lossless WebP
-	// (same pixels, ~10 kB). Lossy WebP of noise is > 45 kB.
+	// 32-color palette PNG (~20 kB) → lossless WebP (same pixels, ~10 kB). Lossy WebP of noise is > 45 kB.
 	const palette = await sharp(out, { raw: { width: info.width, height: info.height, channels: 4 } })
 		.png({ palette: true, colors: 32, effort: 10, compressionLevel: 9 })
 		.toBuffer();

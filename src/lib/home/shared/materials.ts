@@ -20,8 +20,7 @@ export const PAPER_GRAIN = { src: paperGrain, size: 256 } as const;
 
 /**
  * Painted watercolor edge masks (alpha, 1280×200, stretch to the strip): 1 broad wet blooms, 2 restrained dry brush,
- * 3 deep diagonal bleed. `down`: opaque above, transparent below (a surface ending downwards, e.g. a section bottom).
- * `up`: the vertical flip (a surface starting upwards, e.g. a section top).
+ * 3 deep diagonal bleed. `down`: opaque above, transparent below (e.g. a section bottom); `up`: the flip (a section top).
  */
 export const EDGE_MASKS = {
 	1: { down: edge1, up: edge1Up },

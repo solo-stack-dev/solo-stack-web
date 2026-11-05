@@ -1,9 +1,8 @@
 <!--
 	@component
-	One art-directed variant of the night shift room (desktop 16:9 or mobile portrait). A stage with the art's exact
-	aspect ratio is cover-cropped into the section around `layout.focal`; every layer, the live monitor and the
-	hotspots are positioned in canvas percentages inside it, so they stay registered at every size.
-	NightShift renders both variants; CSS shows one, and lazy images inside the hidden one are never fetched.
+	One variant of the night shift room (desktop 16:9 or mobile portrait). A stage with the art's aspect ratio is
+	cover-cropped around `layout.focal`; layers, monitor and hotspots sit in canvas percentages inside it, so they stay
+	registered at every size. NightShift renders both variants; CSS shows one, the hidden one's lazy images never load.
 -->
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
@@ -31,7 +30,7 @@
 
 	const pct = (value: number) => `${value}%`;
 	const box = (rect: Rect) => `left: ${rect.x}%; top: ${rect.y}%; width: ${rect.w}%; height: ${rect.h}%`;
-	/** `sizes` for a layer `w` percent of the stage wide (the stage is ~103vw: cover crop plus parallax overscan). */
+	/** `sizes` for a layer `w`% of the stage wide (stage ≈ 103vw: cover crop + parallax overscan). */
 	const vw = (w: number) => `${Math.ceil(w * 1.03)}vw`;
 
 	// ── Stage size for the monitor's matrix3d ───────────────────────────────────────────────────────────────
@@ -46,7 +45,7 @@
 		return () => observer.disconnect();
 	};
 
-	// ── Hotspot state: hover, focus and touch pin, dismissable with Escape ─────────────────────────────────
+	// ── Hotspot state: hover, focus, touch pin; Escape dismisses ───────────────────────────────────────────
 	let hovered = $state<SpotId | null>(null);
 	let focused = $state<SpotId | null>(null);
 	let pinned = $state<SpotId | null>(null);
@@ -56,7 +55,7 @@
 	const golden = $derived(shown === 'bonsai');
 	const handheldLit = $derived(shown === 'handheld');
 
-	// The golden layer and particle chunk load on the first sign of interest, not with the scene.
+	// Golden layer and particle chunk load on first interest, not with the scene.
 	let goldenWanted = $state(false);
 	let goldenEver = $state(false);
 
@@ -108,7 +107,7 @@
 		};
 	}
 
-	// The golden tree crossfades with the green one once its image has loaded (the pots are pixel-identical).
+	// Golden tree crossfades with the green one once loaded (pots are pixel-identical).
 	let goldenReady = $state(false);
 	const art = $derived(layout.props);
 	const goldenOrigin = $derived(`${((layout.bonsai.x - art.golden.x) / art.golden.w) * 100}% ${((layout.bonsai.y - art.golden.y) / art.golden.h) * 100}%`);
@@ -123,8 +122,8 @@
 <div class="scene" data-variant={variant} {onpointerdown} onpointerenter={want} role="presentation" style={stageVars}>
 	<div class="frame art" data-feather>
 		<div class="stage" {@attach measure}>
-			<!-- 1 · opaque scene plate with the mascot painted in (complete static fallback: moonless window, hands at rest). The
-			     file also carries the typing hands band below the scene, clipped off here. -->
+			<!-- 1 · opaque plate with the mascot painted in (complete static fallback: moonless window, hands at rest). The file
+			     also carries the typing-hands band below the scene, clipped here. -->
 			<div class="plate" style:--sheet={pct(layout.sheet)}>
 				{#if variant === 'desktop'}
 					<enhanced:img src="./assets/nightshift-scene.webp?w=1920;1536;1080" alt={sceneAlt} loading="lazy" sizes="103vw" class="sheet" />
@@ -135,8 +134,8 @@
 
 			<span class="lamp" aria-hidden="true" style:left={pct(layout.lamp.x)} style:top={pct(layout.lamp.y)} style:width={pct(layout.lamp.radius * 2)}></span>
 
-			<!-- 3 · typing hands: a window onto the hands band of the SAME plate image (same srcset and sizes, so the same file
-			     and decode), showing cell 1…3. Under reduced motion the plate's own hands at rest are frame 1. -->
+			<!-- 3 · typing hands: a window onto the hands band of the SAME plate image (same srcset/sizes, so one file and
+			     decode), showing cell 1…3. Reduced motion: the plate's resting hands are frame 1. -->
 			{#if !reduced}
 				{@const cell = layout.hands.cells[terminal.frame - 1] ?? layout.hands.cells[0]}
 				<div class="hands" data-frame={terminal.frame} aria-hidden="true" style={box(layout.hands.rect)}>
@@ -150,7 +149,7 @@
 				</div>
 			{/if}
 
-			<!-- shiny egg: a soft golden wash over the painted mascot; the egg's sparkle is this element's ::after -->
+			<!-- shiny egg target (see .mascot::before) -->
 			<div class="mascot" data-shiny-art aria-hidden="true" style={box(layout.mascot)}></div>
 
 			<Monitor monitor={layout.monitor} {terminal} {stage} blink={!reduced} />
@@ -220,7 +219,7 @@
 </div>
 
 <style>
-	/* No stacking context here, so the art (z 1) sits below and the hotspots (z 7) above the section heading (z 6). */
+	/* No stacking context, so the art (z 1) sits below and the hotspots (z 7) above the heading (z 6). */
 	.scene {
 		position: absolute;
 		inset: 0;
@@ -235,7 +234,7 @@
 
 	.art {
 		z-index: 1;
-		/* painted soft edges into the night above and below (NightPage [data-feather]); ~14 % of the section height */
+		/* soft edges into the night (NightPage [data-feather]); ~14 % of the section height */
 		--feather-top: min(14svh, 7.9vw);
 		--feather-bottom: min(16svh, 9vw);
 	}
@@ -247,9 +246,8 @@
 		}
 	}
 
-	/* Framing: the lit room is seen out of the dark instead of floating in the open sky. A night-ink vignette (painted
-	   soft edges top and bottom, a wide soft falloff at the sides) over the whole art, inside its feathered mask, so
-	   the room sinks into darkness before it dissolves into the sky; the page's mist banks drift over the edges. */
+	/* Night-ink vignette inside the feathered mask, so the lit room sinks into darkness before dissolving into the sky
+	   instead of floating in it; the page's mist banks drift over the edges. */
 	.art::after {
 		content: '';
 		position: absolute;
@@ -332,7 +330,7 @@
 		pointer-events: none;
 	}
 
-	/* ── golden tree egg: crossfade to the grown golden canopy, which grows out of the (identical) pot ── */
+	/* ── golden tree egg: golden canopy grows out of the identical pot ── */
 	.bonsai {
 		transition: opacity 600ms ease;
 	}
@@ -365,7 +363,7 @@
 		height: 100%;
 	}
 
-	/* ── typing hands: the window steps between the cells per frame (no transition) ── */
+	/* ── typing hands: steps between cells, no transition ── */
 	.hands {
 		position: absolute;
 		overflow: hidden;
@@ -378,9 +376,8 @@
 		top: 0;
 	}
 
-	/* ── shiny egg (docs/HOMEPAGE-DEV.md §11): the mascot is part of the plate, so instead of the egg's filter fallback a
-	   radial gold wash warms just the area around the mascot. Soft light keeps the painting's values (a color blend
-	   muddied the skin, screen looked hazy); the egg's sparkle is this element's ::after. ── */
+	/* ── shiny egg (docs/HOMEPAGE-DEV.md §11): the mascot is part of the plate, so a radial gold wash replaces the egg's
+	   filter fallback. Soft light keeps the painting's values (color muddies skin, screen looks hazy). Sparkle: ::after. ── */
 	.mascot::before {
 		content: '';
 		display: none;
@@ -440,7 +437,7 @@
 		opacity: 0.35;
 	}
 
-	/* ── 5 · foreground leaf and dust in the lamp light: strongest parallax (the art contract allows ±6 px for the leaf) ── */
+	/* ── 5 · foreground leaf and lamp dust: strongest parallax (art contract allows ±6 px for the leaf) ── */
 	.foreground {
 		z-index: 3;
 		translate: calc(var(--px, 0) * -6px) calc(var(--py, 0) * -4px);
@@ -477,7 +474,7 @@
 		pointer-events: auto;
 	}
 
-	/* ── autonomous motion: only with motion allowed; NightShift pauses it off screen ([data-live]) ── */
+	/* ── autonomous motion; NightShift pauses it off screen ([data-live]) ── */
 	@media (prefers-reduced-motion: no-preference) {
 		.lamp {
 			animation: flicker 7.3s linear infinite;

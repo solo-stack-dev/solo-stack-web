@@ -1,7 +1,6 @@
 /**
- * Procedural ink crescent: one brush stroke along a quadratic arc, thick in the belly and tapering to hairlines,
- * with ragged edges, dry-brush strands, a butter rim, and flicked droplets. Geometry only (SVG path strings in a
- * 1600×900 viewBox), so nothing is filtered or rasterized per frame.
+ * Procedural ink crescent: one tapering brush stroke along a quadratic arc with ragged edges, dry-brush strands, butter
+ * rim, and droplets. Geometry only (SVG paths, 1600×900 viewBox): nothing is filtered or rasterized per frame.
  */
 
 export const VIEW_W = 1600;
@@ -13,7 +12,7 @@ export interface Droplet {
 	x: number;
 	y: number;
 	r: number;
-	/** 0…1 position along the stroke, used to time the droplet with the sweep. */
+	/** 0…1 along the stroke; times the droplet with the sweep. */
 	t: number;
 }
 

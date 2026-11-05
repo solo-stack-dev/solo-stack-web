@@ -1,22 +1,18 @@
 #!/usr/bin/env node
 /**
- * 21:00 "What I make": build time resampler for the ink morph (docs/HANDOFF-HOMEPAGE.md §5.2).
+ * 21:00 "What I make": build-time resampler for the ink morph (docs/HANDOFF-HOMEPAGE.md §5.2).
  *
- * Every state is authored below as ONE continuous SVG path (absolute M/L/C/Q only) in a local box centered on (0, 0),
- * roughly ±300 units. Each path starts on the shape's left side (where the line comes in) and ends on its right side
- * (where it leaves). Interior details are reached by retracing: a segment drawn twice reads as one stroke, so the
- * whole drawing stays one line. The script flattens each path and resamples it to SHAPE_POINTS points evenly spaced
- * by arc length, so all six states have the identical point structure and can be interpolated point by point.
+ * Each state is ONE continuous SVG path (absolute M/L/C/Q only) in a local box centered on (0, 0), roughly ±300 units, from the shape's
+ * left (line enters) to its right (line leaves). Interior details are reached by retracing: a segment drawn twice reads as one stroke.
+ * Paths are flattened and resampled to SHAPE_POINTS points evenly spaced by arc length, so all states interpolate point by point.
+ * Also emits the bloom masks (closed regions or thick strokes, same box) that clip the watercolor.
  *
- * It also emits the bloom masks (closed regions or thick strokes in the same local box) that clip the watercolor.
- *
- * Usage: `node scripts/making-paths.mjs && pnpm exec oxfmt src/lib/home/sections/making/paths.ts` → regenerates
- * src/lib/home/sections/making/paths.ts. No dependencies.
+ * Usage (regenerates paths.ts): `node scripts/making-paths.mjs && pnpm exec oxfmt src/lib/home/sections/making/paths.ts`. No dependencies.
  */
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-/** 180 is visually identical to the former 360 at every layout scale (140 starts rounding the tight `</>` tips). */
+/** Visually lossless at every layout scale; 140 starts rounding the tight `</>` tips. */
 const SHAPE_POINTS = 180;
 const OUT = fileURLToPath(new URL('../src/lib/home/sections/making/paths.ts', import.meta.url));
 

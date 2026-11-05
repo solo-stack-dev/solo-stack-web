@@ -1,11 +1,9 @@
 /**
- * Moon phases and the lit-region geometry shared by the 3D moon (light direction), the 2D fallback (shadow
- * overlay), and the wordmark split (clip of the anthracite copy). One source, so all three always agree.
+ * Moon phases and lit-region geometry: the single source for the 3D moon (light direction), the 2D shade overlay, and the wordmark clip.
  *
- * Model: a unit sphere seen orthographically, light direction in view space `L = (-sin φ, 0, cos φ)`.
- * φ = 0 full (light from the viewer), 90° half lit from the left (waning, as in the mockup), 180° new.
- * 180° → 360° sweeps through the waxing side (lit from the right) back to full.
- * The terminator projects to the half ellipse `x = cos φ · √(1 − y²)`, so the lit region is exact in 2D.
+ * Model: orthographic unit sphere, view-space light `L = (-sin φ, 0, cos φ)`. φ = 0 full (light from the viewer), 90° half lit from the
+ * left (waning, as in the mockup), 180° new; 180° → 360° is the waxing side (lit from the right) back to full.
+ * The terminator projects to the half ellipse `x = cos φ · √(1 − y²)`, so the 2D lit region is exact.
  */
 
 export const MOON_PHASES = ['full', 'waning-gibbous', 'half', 'crescent', 'new'] as const;
@@ -46,8 +44,8 @@ export function lightDirection(angle: number): [number, number, number] {
 const round = (value: number) => Math.round(value * 100) / 100;
 
 /**
- * SVG path of the lit region for a circle of radius `r` centred at (`cx`, `cy`), or `null` when nothing is lit.
- * Fully lit returns a full circle. Coordinates in the caller's units (px for `clip-path: path()`, units for SVG).
+ * SVG path of the lit region of circle (`cx`, `cy`, `r`) in the caller's units (px for `clip-path: path()`); full circle when fully lit,
+ * `null` when nothing is lit.
  */
 export function litPath(angle: number, r: number, cx = r, cy = r): string | null {
 	const a = ((angle % 360) + 360) % 360;

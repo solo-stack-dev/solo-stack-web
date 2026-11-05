@@ -1,6 +1,6 @@
 /**
- * Procedural watercolor paper for the canvas: block textures (torn edges, blooms, granulation, creases, ink outline,
- * label), the moon, cloud banks. Everything is rendered once into offscreen canvases and reused by the renderer.
+ * Procedural watercolor paper: block textures (torn edges, blooms, granulation, creases, ink outline, label), moon,
+ * clouds. All rendered once into offscreen canvases and reused.
  */
 import type { Paper, Tone } from './engine.ts';
 import { rng } from './rng.ts';
@@ -46,10 +46,7 @@ function grainTile(): HTMLCanvasElement {
 
 export const PAD = 8;
 
-/**
- * Paper block texture in CSS pixels × dpr. The block occupies `[PAD, PAD + w·scale]` × `[PAD, PAD + h·scale]`,
- * the padding holds torn fibers and the outline.
- */
+/** Block texture in CSS px × dpr. The block fills `[PAD, PAD + w·scale]` × `[PAD, PAD + h·scale]`; the padding holds torn fibers and the outline. */
 export function paperTexture(paper: Paper, blockH: number, scale: number, dpr: number): HTMLCanvasElement {
 	const w = Math.max(4, paper.w * scale);
 	const h = blockH * scale;
@@ -282,10 +279,7 @@ export function moonTexture(R = 300): { canvas: HTMLCanvasElement; radius: numbe
 	return { canvas, radius: R };
 }
 
-/**
- * A horizontally tileable bank of watercolor clouds lit from above (butter tops, dusky bottoms).
- * Width × height in device pixels; the renderer scales it to world units.
- */
+/** Horizontally tileable watercolor cloud bank lit from above (butter tops, dusky bottoms). Size in device px; the renderer scales it to world units. */
 export function cloudBank(seed: number, width = 1600, height = 420): HTMLCanvasElement {
 	const canvas = document.createElement('canvas');
 	canvas.width = width;

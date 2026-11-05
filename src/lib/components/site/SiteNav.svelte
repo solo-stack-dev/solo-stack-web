@@ -1,21 +1,11 @@
 <!--
 	@component
-	The one slim site navbar: SOLO STACK wordmark (home), the top level links (Start, Blog, Stats), and an `actions`
-	snippet on the right. Two looks:
-
-	- `variant="site"` (blog, stats, …): sticky bar on `bg-background` with a hairline border and a light blur. The
-	  (site) layout passes the theme toggle and the phone menu as `actions`; links collapse into that menu below `sm`.
-	- `variant="night"` (homepage): fixed over the painted night, no bar and no capsule: wordmark, links and menu button
-	  are cream ink with a soft opposite-ink halo, so they read over the moon, the stars and the paper; the current page
-	  carries the page-wide selection mark (the hand-drawn butter underline, `--ink-underline`). On the page gutter and
-	  `--nav-pad-y` (layout.css). NightPage passes its section menu button as `actions` and lists the site links in that
-	  overlay on phones (the dock then holds only the button), so the homepage keeps a single header. `tone="paper"`
-	  switches to anthracite ink once the sunrise paper is under the bar; `hideWordmark` hides the small wordmark while
-	  the hero shows the giant one.
-
-	Easter egg: `eclipse-moon.ts` swaps the crescent (and the favicon) for the eclipse moon; restored here on mount.
-
-	The heavy pieces (dropdown, sheet) are never imported here, so the homepage does not ship them.
+	The site navbar: wordmark (home), top level links, `actions` snippet on the right.
+	- `variant="site"`: sticky blurred bar. The (site) layout passes theme toggle and phone menu as `actions`; links move into it below `sm`.
+	- `variant="night"` (homepage): fixed, no bar; cream ink with an opposite-ink halo to read over any art; current page gets
+	  `--ink-underline`. Sits on `--page-gutter` / `--nav-pad-y`. NightPage passes its menu button as `actions` and lists the site
+	  links in that overlay on phones, so the homepage has one header. `tone="paper"` = anthracite ink over the sunrise.
+	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown/sheet here: the homepage must not ship them.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -53,7 +43,7 @@
 			<span class="font-display font-black tracking-wordmark uppercase">SOLO STACK</span>
 		</a>
 
-		<!-- Site look: `display: contents`. Night look: one floating capsule holding the links and the menu button. -->
+		<!-- Site look: `display: contents`. Night look: a row of the links and the menu button. -->
 		<div class="dock">
 			<nav class="links" aria-label={m.site_nav_label()}>
 				<ul>
@@ -92,7 +82,7 @@
 		line-height: 1;
 	}
 
-	/* A tiny butter crescent: the moon of the banner, drawn with two gradients (no image) */
+	/* The banner's butter crescent, CSS only */
 	.moon {
 		width: 0.85em;
 		height: 0.85em;
@@ -103,10 +93,7 @@
 		rotate: -20deg;
 	}
 
-	/*
-	 * Easter egg (eclipse-moon.ts): the eclipse moon. Its halo already fills the box, so it is drawn larger with a
-	 * negative margin (the wordmark does not shift). On light paper it sits on a small night disc to stay visible.
-	 */
+	/* Eclipse egg: its halo fills the box, so it is larger with a negative margin (no shift). On light paper it gets a night disc. */
 	:global(html[data-eclipse-moon]) .site-nav .moon {
 		width: 1.3em;
 		height: 1.3em;
@@ -142,7 +129,7 @@
 			background-color var(--dur-hover) ease;
 	}
 
-	/* The current page: the hand-drawn underline (layout.css --ink-underline), drawn in from the left on hover */
+	/* Current page underline (--ink-underline), drawn in from the left on hover */
 	.links a::after {
 		content: '';
 		position: absolute;
@@ -175,7 +162,7 @@
 		color: var(--foreground);
 		backdrop-filter: blur(12px) saturate(1.2);
 		-webkit-backdrop-filter: blur(12px) saturate(1.2);
-		/* Holds still during page view transitions (view-transition.ts) */
+		/* Holds still during view transitions */
 		view-transition-name: site-nav;
 	}
 
@@ -223,7 +210,7 @@
 		position: fixed;
 		color: var(--color-cream);
 		pointer-events: none;
-		/* A soft halo in the opposite ink keeps the bar readable on any art (moon, butter clouds, the night edge) */
+		/* Opposite-ink halo keeps it readable on any art */
 		--nav-halo: color-mix(in oklab, var(--color-ink) 70%, transparent);
 		transition: color var(--dur-state) ease;
 	}
@@ -261,7 +248,7 @@
 		box-shadow: none;
 	}
 
-	/* The hero shows the giant wordmark: the small one fades in once the hero has scrolled up */
+	/* Hidden while the hero shows the giant wordmark */
 	.is-night .wordmark.is-hidden {
 		opacity: 0;
 		translate: 0 -0.5rem;
@@ -327,8 +314,7 @@
 		opacity: 0.45;
 	}
 
-	/* The last link's text ends on the gutter like the wordmark starts on it: the menu button keeps its 44px target
-	   but its icon is flush right */
+	/* Icon flush with the gutter (mirroring the wordmark) while the button keeps its 44px target */
 	.is-night .actions {
 		display: flex;
 		align-items: center;

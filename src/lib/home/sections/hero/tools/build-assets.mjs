@@ -1,17 +1,14 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Builds the hero's optimized layers from the painted masters in docs/art (see ../README.md):
-//
-// - plates (sky, sky-mobile): high quality WebP at their native generation size (1672×941, 852×1846; the 2560 and
-//   1080 masters are bilinear upscales without extra detail). enhanced-img makes the responsive AVIF/WebP.
-// - cutouts (clouds, moon disc, mascot + golden variant): cropped to their alpha bounding box,
-//   downscaled to what the page needs, and their crop rect is written to ../art.ts so the layout can keep using
-//   master coordinates (anchors, the moon circle)
-// - clouds: chroma fringe clean-up (red/yellow keying leftovers on the silhouette), see `cleanFringe`
-// - moon texture: 2048×1024 WebP for the Threlte sphere (loaded as a plain URL)
+// Builds the hero layers from the masters in docs/art (../README.md):
+// - plates (sky, sky-mobile): WebP at native generation size (1672×941, 852×1846; the 2560/1080 masters are bilinear upscales).
+//   enhanced-img makes the responsive AVIF/WebP.
+// - cutouts (clouds, moon disc, mascot + golden): cropped to the alpha box, downscaled; crop rects go to ../art.ts so the layout keeps
+//   master coordinates (anchors, moon circle). Clouds also get `cleanFringe`.
+// - moon texture: 2048×1024 WebP for the Threlte sphere (plain URL).
 //
 // Run: node src/lib/home/sections/hero/tools/build-assets.mjs [job ...]   (jobs: plates clouds moon mascot)
-// Preview of the cloud clean-up (before/after crops on dark and on butter): add `--preview <dir>`.
-// Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
+// `--preview <dir>` writes before/after crops of the cloud clean-up on dark and butter.
+// `sharp` comes from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
 import { existsSync, writeFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -27,7 +24,7 @@ const args = process.argv.slice(2);
 const previewIndex = args.indexOf('--preview');
 const previewDir = previewIndex >= 0 ? args.splice(previewIndex, 2)[1] : null;
 
-/** Lossy WebP intermediates: high enough that the second encode by enhanced-img adds no visible loss. */
+/** Lossy WebP intermediates, high enough that enhanced-img's second encode adds no visible loss. */
 const WEBP = { quality: 92, alphaQuality: 100, effort: 6, smartSubsample: true };
 
 async function readRaw(file) {
@@ -68,12 +65,11 @@ const smoothstep = (a, b, v) => {
 };
 
 /**
- * Removes the red/yellow chroma fringe the keying left on the cloud silhouettes:
- * 1. erode alpha by 1 px (3×3 minimum), which drops the outermost, most contaminated ring;
- * 2. saturated warm pixels on the soft edge take the color of the opaque cloud right behind them (alpha weighted
- *    7×7 neighbourhood), or turn into a darker grey if there is no opaque neighbour;
- * 3. pure red specks in the faint halo (alpha < 40) are removed;
- * 4. a gentle desaturate + darken of the faintest edge, so nothing glows brighter than the cloud body.
+ * Removes the red/yellow keying fringe on cloud silhouettes:
+ * 1. erode alpha 1 px (3×3 min), dropping the most contaminated ring;
+ * 2. saturated warm soft-edge pixels take the alpha-weighted 7×7 color of the opaque cloud behind them, else a darker grey;
+ * 3. red specks in the faint halo (alpha < 40) are removed;
+ * 4. the faintest edge is desaturated and darkened so nothing glows brighter than the cloud body.
  */
 function cleanFringe({ data, width, height }) {
 	const alpha = new Uint8Array(width * height);
@@ -231,7 +227,7 @@ const jobs = {
 		console.log('hero-sky.webp, hero-sky-mobile.webp');
 	},
 	async clouds() {
-		// Masters are 2560 wide, upscaled from 2048 native generations: back to 0.8 × (native detail, a third fewer pixels)
+		// 2560 masters are upscales of 2048 generations: scale back to native detail (a third fewer pixels)
 		const previews = {
 			'hero-clouds-1': [
 				[600, 250, 500, 300],
@@ -253,8 +249,7 @@ const jobs = {
 		}
 	},
 	async moon() {
-		// Disc: crop to the glow, keep master resolution (the native generation was 1254 px; the LCP image is
-		// rendered up to ~1450 CSS px wide, so the 2× candidates need every pixel there is).
+		// Disc: crop to the glow, keep master resolution (native was 1254 px, but the LCP image renders up to ~1450 CSS px; 2× needs it all).
 		await cutout('hero-moon-disc', master('hero/hero-moon-disc.png'), { width: 2048 });
 		await sharp(master('hero/hero-moon-texture.png')).resize(2048, 1024, { kernel: 'lanczos3' }).webp({ quality: 88, effort: 6 }).toFile(out('hero-moon-texture.webp'));
 		console.log('hero-moon-texture.webp: 2048×1024');
@@ -272,8 +267,7 @@ const jobs = {
 const selected = args.length ? args : Object.keys(jobs);
 for (const name of selected) await jobs[name]();
 
-// art.ts holds every crop, so a partial run must not drop the others: merge with the existing file (Node imports
-// .ts directly by stripping the types), then write it and format it like the rest of the repo.
+// Merge with the existing art.ts so a partial run keeps the other crops (Node imports .ts by stripping types), then format it.
 let previous = {};
 if (existsSync(ART_TS)) previous = (await import(`${pathToFileURL(ART_TS).href}?t=${Date.now()}`)).ART_CROPS;
 writeFileSync(

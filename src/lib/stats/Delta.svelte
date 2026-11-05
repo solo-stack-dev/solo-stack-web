@@ -1,7 +1,7 @@
 <!--
 	@component
-	Signed change of a period: an arrow (direction is never color alone), the optional absolute change and the
-	percentage, set in mono like a margin note. Optional muted comparison text. Up is good for every number here.
+	Signed period change in mono, like a margin note: arrow (direction is never color alone), optional absolute change, percentage,
+	optional muted comparison. Up is good for every number here.
 -->
 <script lang="ts">
 	import { cn } from '#lib/utils.js';

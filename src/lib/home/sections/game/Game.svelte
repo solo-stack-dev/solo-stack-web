@@ -1,8 +1,7 @@
 <!--
 	@component
-	22:00 Game. All three games as tabs; each shows a painted poster + play button and its code loads only on click
-	(GameFrame). Only the selected tab's frame is mounted, so switching tabs stops the previous game. The poster is built
-	from the shared materials (sky, painted stars, paper grain).
+	22:00 Game: the three games as tabs. Each shows a poster (shared sky, painted stars, paper grain) + play button; code
+	loads on click (GameFrame). Only the selected tab's frame is mounted, so switching tabs stops the previous game.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

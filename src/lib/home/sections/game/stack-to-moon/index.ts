@@ -3,9 +3,8 @@ import type { TuningDef } from '../shared/types.ts';
 import { DEFAULT_TUNING } from './engine.ts';
 
 /**
- * Candidate B: Stack to the moon (contract: GameModule in ../shared/types.ts). Loaded lazily by GameFrame.
- * Keys match `Tuning` in engine.ts. `swingMode`: 0 = slide, 1 = pendulum. `collapse` is the lean angle in radians
- * that topples the tower, `moonHeight` is in blocks, `perfect` in world units (a block is 3.2 wide, 0.7 high).
+ * Candidate B: Stack to the moon (contract: GameModule in ../shared/types.ts). Keys match `Tuning` in engine.ts.
+ * `collapse`: toppling lean (radians). `moonHeight`: blocks. `perfect`: world units (a block is 3.2 × 0.7).
  */
 export { default } from './StackToMoon.svelte';
 

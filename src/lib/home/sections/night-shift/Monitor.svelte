@@ -1,7 +1,7 @@
 <!--
 	@component
-	Live terminal on the painted monitor: a fixed-size HTML box mapped onto the screen quad with a matrix3d, so the text
-	sits in the painting's perspective. Decorative mirror of the accessible commit list in NightShift (aria-hidden).
+	Live terminal: a fixed-size HTML box mapped onto the painted screen quad via matrix3d (perspective). Decorative
+	(aria-hidden) mirror of NightShift's accessible commit list.
 -->
 <script lang="ts">
 	import { quadToMatrix3d, scaleQuad } from './homography.ts';

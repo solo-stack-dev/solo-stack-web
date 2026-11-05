@@ -1,11 +1,9 @@
 <!--
 	@component
-	Occasional shooting stars: one CSS-animated streak every `minDelay`…`maxDelay` ms (default 8–20 s), drawn with the
-	painted streak sprite (materials.ts; `sprite={false}` = the generated SVG streak). Fills its positioned parent.
-	Off under reduced motion; no new streaks (and no events) while the tab is hidden or `enabled` is false.
+	One CSS-animated streak every `minDelay`…`maxDelay` ms, painted sprite from materials.ts. Fills its positioned parent.
+	Off under reduced motion; no streaks or events while the tab is hidden or `enabled` is false.
 
-	Every streak dispatches `window` event `night:shooting-star` (detail: `ShootingStarDetail`), so other parts of
-	the page can react (e.g. the hero mascot turns its head):
+	Each streak dispatches `SHOOTING_STAR_EVENT` on `window` (e.g. the hero mascot turns its head):
 
 	```ts
 	import { SHOOTING_STAR_EVENT } from '#lib/home/shared/ShootingStars.svelte';
@@ -37,7 +35,7 @@
 		maxDelay?: number;
 		/** Limit spawn positions to the top part of the container (0…1). Default 0.6. */
 		maxY?: number;
-		/** Spawn streaks (and dispatch their events). False e.g. while the layer is covered. Default true. */
+		/** Spawn streaks and events; false e.g. while the layer is covered. Default true. */
 		enabled?: boolean;
 		/** Painted streak sprite (default) or the generated SVG streak. */
 		sprite?: boolean;

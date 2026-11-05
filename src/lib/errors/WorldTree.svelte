@@ -1,14 +1,11 @@
 <!--
 	@component
-	404 scene, a Hunter x Hunter homage: the World Tree above a sea of clouds just before sunrise. A wanderer waits on the
-	top platform with his back turned; the mascot (yellow backpack) clings to the trunk further down. The page is missing,
-	like Ging.
+	404 scene (Hunter x Hunter homage): the World Tree above a cloud sea before sunrise. A wanderer waits on the top platform, back
+	turned; the mascot (yellow backpack) clings to the trunk below.
 
-	Painted layers (assets/error-tree-*.webp, docs/art/errors-404/) composited with CSS: the sky plate, the tree cutout,
-	and the figures, which are positioned in the tree's own box (`tree.ts`) so they stay on the painting at every size.
-	On load the camera pans up the trunk. The tree is a button: each click makes the mascot climb a stop, the last one
-	takes him onto the platform, the wanderer says his line and the sun comes up. Reduced motion: no pan, no drift, the
-	steps still happen.
+	Painted layers (assets/error-tree-*.webp, docs/art/errors-404/) composited with CSS. Figures are placed in the tree's own box
+	(`tree.ts`) so they stay on the painting at every size. On load the camera pans up the trunk. The tree is a button: each click
+	climbs one stop; the last reaches the platform, the wanderer speaks and the sun rises. Reduced motion: no pan or drift, steps kept.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

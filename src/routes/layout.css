@@ -1,10 +1,8 @@
 /*
- * Geist variable, split by unicode-range (same family, so text never mixes fonts visibly):
- * - Geist-latin-wght.woff2 (34 kB, preloaded in app.html): Basic Latin, Latin-1, general punctuation, € ™ and the
- *   arrows. Covers every German and English page. Made with fontTools from the full file:
+ * Geist variable, split by unicode-range (one family, so no visible font mixing):
+ * - Geist-latin-wght.woff2 (34 kB, preloaded in app.html): Latin-1, punctuation, € ™, arrows; covers all DE/EN pages.
  *   `pyftsubset Geist-wght.woff2 --unicodes="<the range below>" --layout-features='*' --flavor=woff2`
- * - Geist-wght.woff2 (70 kB, the original): only for the characters outside that range (Latin Extended, Cyrillic,
- *   Greek…, e.g. in a commit message or video title). Browsers fetch it only when such a character is on the page.
+ * - Geist-wght.woff2 (70 kB, original): the rest (Latin Extended, Cyrillic, Greek…), fetched only when such a character appears.
  */
 @font-face {
 	font-family: 'Geist';
@@ -29,11 +27,10 @@
 }
 
 /*
- * Geist Mono variable (official release v1.8.2 / Google Fonts, SIL OFL 1.1: static/fonts/OFL-Geist.txt), same split:
- * - GeistMono-latin-wght.woff2 (23 kB): the Google Fonts Latin subset (its unicode-range below). Preloaded in app.html
- *   with fetchpriority="low": the clock and the scroll cue need it above the fold, but it must not compete with the
- *   hero moon (LCP) or the Geist text face.
- * - GeistMono-wght.woff2 (71 kB, the release webfont): everything else (→, Latin Extended, Cyrillic…), on demand.
+ * Geist Mono variable (release v1.8.2 / Google Fonts, SIL OFL 1.1: static/fonts/OFL-Geist.txt), same split:
+ * - GeistMono-latin-wght.woff2 (23 kB): Google Fonts Latin subset. Preloaded in app.html with fetchpriority="low": the clock
+ *   and scroll cue need it above the fold, but it must not compete with the hero moon (LCP) or the Geist text face.
+ * - GeistMono-wght.woff2 (71 kB, release webfont): the rest (→, Latin Extended, Cyrillic…), on demand.
  */
 @font-face {
 	font-family: 'Geist Mono';
@@ -60,16 +57,10 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/*
- * shadcn-svelte (components.json, style "nova"). Class based dark mode driven by mode-watcher on the non-home pages
- * (blog, stats). The homepage ignores these tokens and stays in its fixed night.
- */
+/* shadcn-svelte (style "nova"): class dark mode via mode-watcher on non-home pages. The homepage ignores it (fixed night). */
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design tokens (docs/HANDOFF-HOMEPAGE.md §3). Starting values sampled from the banner; refine against the final art.
- * Every token becomes a utility: `bg-night`, `text-cream`, `font-display`, `tracking-clock`, …
- */
+/* Design tokens (docs/HANDOFF-HOMEPAGE.md §3), sampled from the banner; refine against the final art. Each becomes a utility (`bg-night`, …). */
 @theme {
 	--color-butter: #fcd772;
 	--color-ochre: #e2a93b;
@@ -85,10 +76,7 @@
 	--font-sans: var(--font-body);
 	--font-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 
-	/*
-	 * Mono label scale (homepage): `label-sm` for the clock, the rail, hints; `label` (uppercase) for controls, tabs
-	 * and short links. Wide tracking only for labels of three words or fewer.
-	 */
+	/* Mono labels: `label-sm` for clock, rail, hints; `label` (uppercase) for controls, tabs, short links. Wide tracking only for ≤ 3 words. */
 	--text-label-sm: 0.6875rem;
 	--tracking-label-sm: 0.28em;
 	--text-label: 0.75rem;
@@ -99,10 +87,7 @@
 	--tracking-wordmark: -0.045em;
 }
 
-/*
- * shadcn-svelte semantic tokens, mapped onto the brand: light = warm paper with anthracite ink and butter accents,
- * dark = the night with cream text and butter as the primary. Charts use the butter/ochre family plus calm contrasts.
- */
+/* shadcn-svelte tokens on the brand: light = warm paper, anthracite ink, butter accents; dark = night, cream text, butter primary. */
 :root {
 	--radius: 0.75rem;
 	--background: #fdf9ee;
@@ -124,9 +109,8 @@
 	--input: #e6dcc3;
 	--ring: #e2a93b;
 	/*
-	 * Charts: watercolor pigments (yellow ochre, prussian blue, burnt sienna, violet, sap green). Categorical order is
-	 * fixed and validated per surface (lightness band, chroma, CVD and contrast): keep the order when editing.
-	 * `--chart-accent` is the single series line (ochre on paper, butter at night), `--chart-wash` its area fill.
+	 * Charts: watercolor pigments (ochre, prussian blue, burnt sienna, violet, sap green). The order is validated per surface
+	 * (lightness, chroma, CVD, contrast): keep it. `--chart-accent` = single-series line, `--chart-wash` = its area fill.
 	 */
 	--chart-1: #b97d10;
 	--chart-2: #2468a0;
@@ -225,9 +209,8 @@
 }
 
 /*
- * The night contract (docs/HOMEPAGE-DEV.md): `--night` is page scroll progress, 0 at the hero (20:00) and 1 at the
- * sunrise footer (06:00). Registered so it can be animated by a scroll-driven animation and used in calc().
- * NightPage sets it on its wrapper; everything inside inherits it.
+ * Night contract (docs/HOMEPAGE-DEV.md): `--night` = scroll progress, 0 at the hero (20:00), 1 at the sunrise (06:00).
+ * Registered so a scroll-driven animation can animate it and calc() can use it. Set on the NightPage wrapper.
  */
 @property --night {
 	syntax: '<number>';
@@ -236,8 +219,7 @@
 }
 
 /*
- * Homepage system (src/lib/home, docs/HOMEPAGE-DEV.md §3b). Layout lines live on the NightPage wrapper; every section,
- * the nav, the rail and the clock read them, so all left edges and the clock/heading lines match:
+ * Homepage layout lines (docs/HOMEPAGE-DEV.md §3b), read by every section, the nav, rail and clock so all edges align:
  *   --page-gutter    left/right edge of all chrome and copy
  *   --bottom-gutter  bottom edge of in-section controls
  *   --clock-top      top of the hour label (NightClock)
@@ -248,14 +230,13 @@
 	--bottom-gutter: clamp(1.5rem, 5vh, 3.25rem);
 	--clock-top: clamp(5.5rem, 12vh, 8rem);
 	--heading-top: calc(var(--clock-top) + 1.5rem);
-	/* The nav bar's own vertical padding: its row is centered on the same top band on every page */
+	/* Nav bar vertical padding: centers its row on the same top band on every page */
 	--nav-pad-y: clamp(1rem, 2.5vh, 1.75rem);
 }
 
 /*
- * Light and ink, one of each: `--halo-ink` (text-shadow) keeps cream text readable on butter pigment; the glow scale is
- * butter light for text-shadow or box-shadow (no spread, so both work). Motion: settle for anything that arrives or
- * changes state, ambient for loops; durations from a hover to a section entrance.
+ * `--halo-ink` (text-shadow) keeps cream text readable on butter. Glows have no spread, so they work as text- or box-shadow.
+ * Ease: settle for arrivals and state changes, ambient for loops.
  */
 :root {
 	--halo-ink: 0 0 1px var(--color-ink), 0 0 2px var(--color-ink), 0 0 6px var(--color-ink), 0 0 14px color-mix(in oklab, var(--color-ink) 70%, transparent);
@@ -264,10 +245,7 @@
 	--glow-md: 0 0 1.75rem color-mix(in oklab, var(--color-butter) 50%, transparent);
 	--glow-lg: 0 0 4.5rem color-mix(in oklab, var(--color-butter) 35%, transparent);
 
-	/*
-	 * The one selection mark: a hand-drawn ink underline (the making pillars' stroke) as a mask. Use on an `::after`
-	 * with `background: currentColor` or butter, `mask: var(--ink-underline) center / 100% 100% no-repeat`.
-	 */
+	/* The one selection mark (hand-drawn underline as a mask). On `::after`: `background: currentColor`, `mask: var(--ink-underline) center / 100% 100% no-repeat`. */
 	--ink-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.2C22 2.6 48 3.4 70 3s24 .8 28-.4' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
 
 	--ease-settle: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -278,7 +256,7 @@
 	--dur-entrance: 1100ms;
 }
 
-/* Mono labels (tokens in @theme): `label-sm` for the clock, rail and hints; `label` for controls, tabs, short links */
+/* Mono labels: usage at the tokens in @theme */
 @utility label-sm {
 	font-family: var(--font-mono);
 	font-size: var(--text-label-sm);
@@ -287,7 +265,7 @@
 	font-variant-numeric: tabular-nums;
 }
 
-/* Section heading (homepage): one style for every visible h2, on the gutter at --heading-top, under the clock */
+/* Homepage section heading: every visible h2, placed at --heading-top */
 @utility night-heading {
 	margin: 0;
 	font-family: var(--font-display);
@@ -321,18 +299,14 @@
 		text-rendering: optimizeLegibility;
 	}
 
-	/*
-	 * Overscroll: the canvas shows the html background. Night above the page; butter paper below the sunrise footer
-	 * (NightPage sets `data-night-end` while the sunrise is on screen, when only bottom overscroll is possible).
-	 */
+	/* Overscroll shows the html background: butter below the sunrise (NightPage sets `data-night-end` while it is on screen). */
 	html[data-night-end] {
 		background-color: var(--color-butter);
 	}
 
 	/*
-	 * Non-home pages (src/routes/(site)/, marked with `data-site-surface`): the canvas follows the light/dark theme, so
-	 * overscroll and the first paint match the page. mode-watcher writes an inline `color-scheme` on <html>; outside the
-	 * site surface (homepage, error pages) the night always wins, also after a client side navigation from a light page.
+	 * Site pages (`data-site-surface`): the canvas follows the theme so overscroll and first paint match. mode-watcher writes an
+	 * inline `color-scheme` on <html>, so elsewhere (homepage, errors) `!important` keeps the night, also after navigating from a light page.
 	 */
 	html:has([data-site-surface]) {
 		background-color: var(--background);
@@ -348,7 +322,7 @@
 		color-scheme: dark !important;
 	}
 
-	/* Butter is too pale for a focus ring on the light paper: `--focus-ring` is a deep ochre there, butter in dark mode */
+	/* Butter is too pale on light paper, so `--focus-ring` is deep ochre there */
 	[data-site-surface] :focus-visible,
 	[data-slot='sheet-content'] :focus-visible {
 		outline-color: var(--focus-ring);
@@ -373,18 +347,17 @@
 }
 
 /*
- * Page view transitions between the site pages (src/lib/components/site/view-transition.ts). The navbar is named, so
- * it leaves the root snapshot and holds still; only the content underneath changes. Entry-weighted: the old page
- * leaves at once and the new one arrives on a short rise, so a navigation reads as arrival rather than as a wash.
+ * Site page view transitions (src/lib/components/site/view-transition.ts). The named navbar leaves the root snapshot and holds
+ * still. Entry-weighted: the old page leaves at once, the new one rises in, so it reads as arrival, not a wash.
  */
 :root {
 	--vt-out: 90ms;
 	--vt-in: 170ms;
-	/* Overlaps the tail of the exit, so the content never blinks to bare background. */
+	/* Overlaps the exit's tail so content never blinks to bare background */
 	--vt-in-delay: 60ms;
 }
 
-/* Same geometry on every page, only the current link's underline moves: keep its cross-fade quick. */
+/* Only the current link's underline moves: keep the cross-fade quick */
 ::view-transition-group(site-nav),
 ::view-transition-old(site-nav),
 ::view-transition-new(site-nav) {
@@ -424,9 +397,8 @@ html[data-vt-dir='back']::view-transition-new(root) {
 }
 
 /*
- * Global reduced motion guard. Components still ship a designed static state (§1.3); this only catches leftovers.
- * The `--night` sky is not affected: under reduced motion NightPage drives it from a scroll listener instead of a
- * scroll-driven animation, so the sky still follows the scroll without any autonomous motion.
+ * Global reduced-motion guard for leftovers; components ship their own static state (§1.3). `--night` is unaffected:
+ * under reduced motion NightPage drives it from a scroll listener instead of a scroll-driven animation.
  */
 @media (prefers-reduced-motion: reduce) {
 	*,
@@ -439,7 +411,7 @@ html[data-vt-dir='back']::view-transition-new(root) {
 	}
 }
 
-/* Sections receive programmatic focus from the menu; the focus ring would outline the whole painted scene. */
+/* Menu focuses sections programmatically; a ring would outline the whole scene */
 [data-night-page] section[tabindex='-1']:focus-visible {
 	outline: none;
 }

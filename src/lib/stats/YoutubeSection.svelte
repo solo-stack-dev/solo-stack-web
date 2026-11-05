@@ -1,7 +1,6 @@
 <!--
 	@component
-	YouTube in detail without boxes: four channel numbers set like a scoreboard between ink rules, then the daily
-	views as columns of light next to the most watched videos.
+	YouTube detail: four channel numbers as a scoreboard between ink rules, then daily views (columns of light) beside top videos.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

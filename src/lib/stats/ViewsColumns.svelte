@@ -1,7 +1,7 @@
 <!--
 	@component
-	YouTube views per day as columns of light: rounded pigment strokes that fade toward the ground, the best day
-	marked, a few dotted guides. Hover or drag to read a day. Plain SVG (measured width), no chart library.
+	Daily YouTube views as columns of light: rounded pigment strokes fading toward the ground, best day marked, dotted guides.
+	Hover or drag to read a day. Plain SVG (measured width).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

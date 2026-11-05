@@ -1,11 +1,7 @@
 <!--
-	/kontakt: business requests, collaborations, feedback. A letter written at night: giant title over a butter
-	pigment wash with the painted moon, the form as ruled lines on the paper (the message field is lined like a
-	letter pad), the topic as a pill track like the blog filter.
-
-	Data: `sendContact` remote form (`#lib/contact/contact.remote.ts`) with valibot preflight in the browser, the same
-	schema on the server, and Cloudflare Turnstile against spam. The page is prerendered; only the submission runs in
-	the Worker. Validation issues carry codes, the localized text comes from `contact_error_*`.
+	/kontakt: a letter written at night (giant title, butter wash, painted moon, ruled-line form, topic pill track).
+	Prerendered; only the submission runs in the Worker: `sendContact` (`#lib/contact/contact.remote.ts`), valibot preflight
+	plus the same schema on the server, Turnstile against spam. Issue codes map to `contact_error_*` messages.
 -->
 <script lang="ts">
 	import { page } from '$app/state';
@@ -35,11 +31,11 @@
 	let turnstile = $state<ReturnType<typeof TurnstileWidget>>();
 	let successHeading = $state<HTMLElement>();
 
-	// Preflight already passed when this runs, so every call reaches the server and spends the Turnstile token.
+	// Runs after preflight passed, so every call reaches the server and spends the Turnstile token.
 	const enhanced = contact.enhance(async (instance) => {
 		failed = false;
 		try {
-			// `.updates()` without arguments: nothing on this page needs a refresh afterwards
+			// No arguments: nothing on this page needs a refresh
 			if (await instance.submit().updates()) {
 				instance.element.reset();
 				sent = true;
@@ -86,7 +82,7 @@
 {/snippet}
 
 <div class="relative isolate overflow-x-clip">
-	<!-- Night sky over the header, only in the dark theme (like /blog and /stats) -->
+	<!-- Night sky over the header, dark theme only -->
 	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[34rem] mask-b-from-30% dark:block" aria-hidden="true">
 		<StarField density={0.5} brightness={0.7} seed={71} />
 	</div>
@@ -184,7 +180,7 @@
 						{@render fieldError('contact-message-error', invalid.message(), m.contact_error_message())}
 					</div>
 
-					<!-- Honeypot: off screen and out of the tab order, only bots fill it in -->
+					<!-- Honeypot: off screen, out of the tab order -->
 					<div class="pointer-events-none absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
 						<label for="contact-website">{m.contact_honeypot_label()}</label>
 						<input id="contact-website" tabindex="-1" autocomplete="off" {...fields.website.as('text')} />
@@ -223,7 +219,7 @@
 <style>
 	.giant {
 		font-size: clamp(4.5rem, 14vw, 10rem);
-		/* Ink on paper; at night the title catches the moonlight (same as /blog) */
+		/* Ink on paper; moonlit at night (as /blog) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
 		background-clip: text;
 		color: transparent;
@@ -243,7 +239,7 @@
 		transform: rotate(-2deg);
 	}
 
-	/* The painted moon hangs over the right edge of the header, slowly breathing its glow */
+	/* Painted moon over the header's right edge, breathing its glow */
 	.moon {
 		position: absolute;
 		top: -1.5rem;
@@ -274,7 +270,7 @@
 		align-content: start;
 	}
 
-	/* Inputs are ruled lines on the paper, the line warms to ochre while you write */
+	/* Inputs are ruled lines that warm to ochre while you write */
 	.line {
 		width: 100%;
 		min-height: 3rem;
@@ -285,7 +281,7 @@
 		transition: border-color 200ms ease;
 	}
 
-	/* The message field is a lined letter pad; the lines scroll with the text */
+	/* Lined letter pad; the lines scroll with the text */
 	.pad {
 		--rule: 2.25rem;
 		width: 100%;
@@ -337,7 +333,7 @@
 		display: none;
 	}
 
-	/* Topic pills: the chosen one is a butter disc, like the blog filter */
+	/* Topic pills: the chosen one is a butter disc (as the blog filter) */
 	.topic {
 		display: inline-flex;
 		align-items: center;
@@ -370,7 +366,7 @@
 		outline-offset: 2px;
 	}
 
-	/* Send: a butter pill with a small moon that rises a little on hover */
+	/* Butter pill; its moon rises on hover */
 	.send {
 		display: inline-flex;
 		align-items: center;

@@ -2,11 +2,11 @@ import { COLORS, dustTile, glowSprite, paintBackdrop, pigmentSprite } from './pa
 import { EXPLORE_WORLD, SIGNS, type SignDef } from './signs.ts';
 
 /**
- * Constellation hunt engine: world state, rules, input, and Canvas 2D rendering. Framework free; the Svelte component
- * owns the DOM (HUD, note card, wheel) and talks to the engine through `EngineHooks`.
+ * Constellation hunt engine: state, rules, input, Canvas 2D rendering. Framework free; the Svelte component owns the DOM
+ * (HUD, note card, wheel) and talks to it via `EngineHooks`.
  *
- * World units: trace mode uses a fixed view box (160×90 landscape, 100×125 portrait) fitted into the stage; explore mode
- * uses `EXPLORE_WORLD` with a panning camera (110 units across the stage's short side).
+ * World units: trace = fixed view box (160×90 landscape, 100×125 portrait) fitted to the stage; explore = `EXPLORE_WORLD`
+ * with a panning camera (110 units across the stage's short side).
  */
 
 export type Mode = 'trace' | 'explore';
@@ -1003,12 +1003,12 @@ export class ConstellationEngine {
 		}
 		context.globalAlpha = 1;
 
-		// Note card: let the component place it, then hang it from the sign with two threads.
+		// Note card: the component places it; hang it from the sign with two threads.
 		if (this.#card >= 0) {
 			const sign = this.#signs[this.#card]!;
 			const box = this.#signBox(sign, drift);
 			const rect = this.#hooks.placeCard(box);
-			// Threads from the sign's nearest side to the card's facing edge; none when the card has to overlap the sign.
+			// From the sign's nearest side to the card's facing edge; none if the card overlaps the sign.
 			if (rect) {
 				const cx = (box.minX + box.maxX) / 2;
 				const cy = (box.minY + box.maxY) / 2;

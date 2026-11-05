@@ -1,12 +1,10 @@
 <!--
 	@component
-	One cheap canvas star field with twinkle. Fills its positioned parent (`position: absolute; inset: 0`).
-	The loop is capped at 20 fps, pauses off screen and in hidden tabs, and draws one static frame under reduced motion.
-	Stars are deterministic per `seed`, so resizing does not reshuffle them. The few bright stars (~3 %) are drawn with
-	the painted star sprites (materials.ts, < 4 kB together) once they have decoded; until then (or with
-	`sprites={false}`) they are plain dots.
+	Cheap canvas star field with twinkle; fills its positioned parent. 20 fps cap, pauses off screen and in hidden tabs,
+	one static frame under reduced motion. Deterministic per `seed`, so resizing does not reshuffle. Bright stars (~3 %)
+	use the painted sprites (materials.ts, < 4 kB total) once decoded; until then, or with `sprites={false}`, dots.
 
-	NightPage renders the global sky stars. Sections may add their own, e.g. denser stars behind the radio:
+	NightPage renders the global sky stars; sections may add their own:
 
 	```svelte
 	<div class="relative h-svh">
@@ -24,7 +22,7 @@
 		density?: number;
 		/** Multiplier on star alpha, 0…1+. Default 1. */
 		brightness?: number;
-		/** PRNG seed. Different seeds give different skies. Default 7. */
+		/** PRNG seed. Default 7. */
 		seed?: number;
 		/** Animate twinkle (ignored under reduced motion). Default true. */
 		twinkle?: boolean;
@@ -48,7 +46,7 @@
 		sprite: number;
 	}
 
-	/** Sprite box per star radius: the painted sprites have transparent margins, the glint is ~half the box. */
+	/** Sprite box per star radius (sprites have transparent margins; the glint is ~half the box). */
 	const SPRITE_SCALE = 6.5;
 
 	const MAX_STARS = 700;
@@ -80,7 +78,7 @@
 				speed: 0.6 + random() * 1.8,
 				phase: random() * Math.PI * 2,
 				twinkles: random() > 0.55,
-				// derived from `size` (no extra random draw), so every star keeps its position for a given seed
+				// from `size`, no extra random draw: keeps every star's position for a given seed
 				sprite: bright ? Math.floor((size - 0.97) / 0.0075) % STAR_SPRITES.length : -1
 			};
 		});
@@ -94,7 +92,7 @@
 	let devicePixelRatioCapped = 1;
 	let spriteImages: HTMLImageElement[] = [];
 
-	// Decode the sprites off the main thread, then redraw once (a static frame needs it under reduced motion).
+	// Decode off the main thread, then redraw once (needed for the static reduced-motion frame).
 	$effect(() => {
 		if (!sprites) {
 			spriteImages = [];
@@ -121,8 +119,7 @@
 		const context = canvas?.getContext('2d');
 		if (!context) return;
 		context.clearRect(0, 0, canvas.width, canvas.height);
-		// Untracked: draw() is called from effects, which must not re-run (and reallocate the canvas) whenever the loop
-		// starts or stops on scroll.
+		// Untracked: calling effects must not re-run (and reallocate the canvas) when the loop starts/stops on scroll.
 		const animate = untrack(() => loop.running);
 		for (const star of visible) {
 			const flicker = animate && star.twinkles ? 0.6 + 0.4 * Math.sin(time * star.speed + star.phase) : 1;

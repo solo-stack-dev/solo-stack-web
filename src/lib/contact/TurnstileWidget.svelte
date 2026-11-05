@@ -1,12 +1,9 @@
 <!--
 	@component
-	Cloudflare Turnstile inside a form: loads the script on mount (contact page only) and renders the widget
-	explicitly. The widget does not add its own token input (`response-field: false`): remote form fields are
-	namespaced per form, so the page puts the token into its bound `turnstile` field via `ontoken`. Appearance
-	`interaction-only`: most visitors never see it, only a suspected bot gets the checkbox. Theme follows the site
-	theme (the widget re-renders on a switch) and the language follows the page.
-
-	Call `reset()` after every submission that reached the server: tokens are single use.
+	Turnstile in a form, script loaded on mount. `response-field: false`: remote form fields are namespaced per form, so the
+	page writes the token into its `turnstile` field via `ontoken`. `interaction-only`: only suspected bots see a checkbox.
+	Follows site theme (re-renders on switch) and page language. Call `reset()` after every submission that reached the
+	server: tokens are single use.
 -->
 <script lang="ts">
 	import { mode } from 'mode-watcher';
@@ -16,7 +13,7 @@
 	interface Props {
 		/** The current token, `''` while there is none (not solved yet, expired, reset). */
 		ontoken: (token: string) => void;
-		/** `true` when the widget cannot load or the challenge fails, `false` once a token arrives. */
+		/** `true` when the widget fails to load or the challenge fails, `false` once a token arrives. */
 		onerror?: (failed: boolean) => void;
 	}
 
@@ -30,7 +27,7 @@
 	}
 
 	function widget(node: HTMLElement) {
-		// Read synchronously, so a theme switch re-runs the attachment
+		// Read synchronously so a theme switch re-runs the attachment
 		const theme = mode.current === 'dark' ? 'dark' : 'light';
 		let removed = false;
 
@@ -58,7 +55,7 @@
 					'error-callback': () => {
 						ontoken('');
 						onerror?.(true);
-						// Handled: Turnstile retries on its own, no console noise from the default handler
+						// Handled: Turnstile retries itself; suppresses the default handler's console noise
 						return true;
 					},
 					'expired-callback': () => reset()

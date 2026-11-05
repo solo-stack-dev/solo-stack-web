@@ -3,8 +3,8 @@ import * as v from 'valibot';
 import { FALLBACK_VIDEO, LatestVideoSchema, YOUTUBE_FEED_URL, parseLatestVideo, type LatestVideo } from './youtube.ts';
 
 /**
- * Latest video of the channel, from the public channel RSS (no API key). Prerendered: refreshed on every build
- * (e.g. a scheduled rebuild). Any error or an empty feed returns `FALLBACK_VIDEO` (`null`), the build never fails.
+ * Latest video from the public channel RSS (no API key). Prerendered, so refreshed per build (e.g. scheduled rebuild).
+ * Errors or an empty feed return `FALLBACK_VIDEO` (`null`); the build never fails.
  *
  * ```svelte
  * {#if await getLatestVideo()}…{/if}

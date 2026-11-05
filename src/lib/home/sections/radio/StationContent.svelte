@@ -1,8 +1,7 @@
 <!--
 	@component
-	Live content of a station on the display strip: YouTube → latest video title, GitHub → latest commit (repo ·
-	message). Both are prerendered remote functions; this component only mounts when such a station is tuned, so the
-	data loads then (a small prerendered JSON on the client). Wrap it in a `<svelte:boundary>` with a pending snippet.
+	Live station content: YouTube → latest video, GitHub → latest commit. Prerendered remote functions; mounted only when
+	tuned, so the small JSON loads then. Wrap in a `<svelte:boundary>` with a pending snippet.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

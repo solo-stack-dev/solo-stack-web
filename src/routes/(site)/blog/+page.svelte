@@ -12,7 +12,7 @@
 
 	const posts = $derived(await getPosts());
 
-	// Format filter: client side (the page is prerendered once), mirrored to `?format=` so a filtered view can be shared.
+	// Client side filter (the page is prerendered once), mirrored to `?format=` so a filtered view can be shared.
 	let format = $state<PostFormat | null>(null);
 	const visible = $derived(format ? posts.filter((post) => post.format === format) : posts);
 	const otherLanguage = $derived(posts.some((post) => post.lang !== getLocale()));
@@ -30,8 +30,7 @@
 		replaceState(url, page.state);
 	}
 
-	// The butter disc of the filter track: measured from the chosen button, re-measured when the track resizes (web font
-	// swap, viewport). Before that the chosen button paints its own disc (CSS fallback).
+	// Filter disc, measured from the chosen button and on track resize (font swap, viewport). Until then: CSS fallback.
 	let track = $state<HTMLElement>();
 	let indicator = $state<{ x: number; w: number } | null>(null);
 
@@ -66,7 +65,7 @@
 </svelte:head>
 
 <div class="relative isolate overflow-x-clip">
-	<!-- Night sky over the header, only in the dark theme (like /stats) -->
+	<!-- Night sky over the header, dark theme only -->
 	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[34rem] mask-b-from-30% dark:block" aria-hidden="true">
 		<StarField density={0.5} brightness={0.7} seed={53} />
 	</div>
@@ -118,11 +117,11 @@
 <style>
 	.giant {
 		font-size: clamp(5.5rem, 16vw, 11rem);
-		/* Ink on paper; at night the title catches the moonlight, like the big number on /stats */
+		/* Ink on paper; moonlit at night (as the big number on /stats) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
 		background-clip: text;
 		color: transparent;
-		/* room for the descender of the g inside the clipped background */
+		/* room for the g's descender inside the clipped background */
 		padding-bottom: 0.16em;
 		margin-bottom: -0.16em;
 	}
@@ -133,7 +132,7 @@
 		text-shadow: 0 0 60px rgb(252 215 114 / 0.15);
 	}
 
-	/* Format filter: a pill track like the period switch on /stats, the butter disc slides to the chosen format */
+	/* Pill track (as the /stats period switch); the disc slides to the chosen format */
 	.filter {
 		position: relative;
 		z-index: 1;
@@ -157,7 +156,7 @@
 		color: var(--color-night);
 	}
 
-	/* Until the track is measured (SSR, no JS) the chosen pill paints its own disc */
+	/* Unmeasured (SSR, no JS): the chosen pill paints its own disc */
 	.track:not(.is-measured) .filter[aria-pressed='true'] {
 		background: var(--color-butter);
 	}

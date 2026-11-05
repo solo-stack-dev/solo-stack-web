@@ -1,10 +1,8 @@
 <!--
 	@component
-	Self-hosted, 16:9 video thumbnail (see ./thumbnail.ts) as a responsive `<picture>`: AVIF and WebP in every prerendered
-	width, the 1280 px JPEG as `<img>` fallback. Decorative (`alt=""`): the facades label their play button instead.
-	`sizes` is required: it is the rendered width of the image. Every other attribute (class, loading, fetchpriority,
-	onerror, …) goes to the `<img>`; style it from the parent with `:global(…)`. The `<picture>` is `display: contents`,
-	so the `<img>` sizes and positions as if it were the parent's direct child.
+	Self-hosted 16:9 video thumbnail (./thumbnail.ts) as a `<picture>`: AVIF/WebP in every prerendered width, 1280 px JPEG
+	fallback. Decorative (`alt=""`): facades label their play button. Other attributes go to the `<img>`; style it via
+	`:global(…)`. The `<picture>` is `display: contents`, so the `<img>` lays out as the parent's direct child.
 -->
 <script lang="ts">
 	import type { HTMLImgAttributes } from 'svelte/elements';

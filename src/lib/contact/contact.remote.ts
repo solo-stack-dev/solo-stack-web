@@ -6,11 +6,8 @@ import { ContactSchema } from './schema.ts';
 import { TurnstileNotConfiguredError, verifyTurnstile } from './turnstile.server.ts';
 
 /**
- * The /kontakt form. The page itself is prerendered; this runs in the Worker (`/_app/remote/…`), so it needs
- * JavaScript in the browser, which the Turnstile widget needs anyway.
- *
- * Validation issues use the codes from `ContactSchema` (`turnstile` for a rejected token); the page maps them to
- * localized messages. A bot that fills the honeypot gets the normal success answer and its message is dropped.
+ * /kontakt form, runs in the Worker (`/_app/remote/…`); needs JS, as Turnstile does anyway. Issue codes as in `ContactSchema`
+ * (`turnstile` = rejected token). A filled honeypot gets the normal success answer and the message is dropped.
  */
 export const sendContact = form(ContactSchema, async ({ website, turnstile, ...message }, issue) => {
 	if (website) return { sent: true } as const;
@@ -28,7 +25,7 @@ export const sendContact = form(ContactSchema, async ({ website, turnstile, ...m
 	try {
 		await deliverContactMessage(message);
 	} catch (cause) {
-		// Keep the message in the logs so a failed mail does not lose it.
+		// Logged in full so a failed mail does not lose the message.
 		console.error('Contact mail failed', { cause, topic: message.topic, name: message.name, email: message.email, message: message.message });
 		error(503, 'Contact form unavailable');
 	}

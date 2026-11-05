@@ -1,11 +1,10 @@
 /**
- * Stack to the moon: pure simulation (no DOM). World units, y up, origin at the bottom center of the base block.
- * Advanced in fixed steps (`STEP`) by the component; the renderer only reads the state.
+ * Stack to the moon: pure simulation (no DOM). World units, y up, origin at the base block's bottom center. The component
+ * advances it in fixed `STEP`s; the renderer only reads state.
  *
- * Sway model (fake physics): the tower has one lean angle `theta` driven by a damped spring toward an equilibrium
- * lean from the worst center-of-mass offset in the stack (`imbalance`). Off-center drops kick it. The spring gets
- * softer as the tower grows, so tall towers wobble slower and wider. `|theta| > collapse` topples the tower.
- * Visually the lean bends the top `SWAY_SPAN` blocks (more lean toward the top).
+ * Sway (fake physics): one lean angle `theta`, a damped spring toward the equilibrium lean set by the worst center-of-mass
+ * offset (`imbalance`). Off-center drops kick it; the spring softens as the tower grows (taller = slower, wider wobble).
+ * `|theta| > collapse` topples. Visually the lean bends the top `SWAY_SPAN` blocks, increasing toward the top.
  */
 import { clamp, lerp, rng, smoothstep } from './rng.ts';
 

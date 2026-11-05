@@ -1,8 +1,7 @@
 <!--
 	@component
-	The blog header art, painted straight onto the page instead of framed in a card: the big painted moon of the
-	homepage hero (the same disc as on /stats) and the sitting mascot looking up at it. Two images, no canvas; the
-	moon breathes a little glow (off under reduced motion). Decorative.
+	Blog header art, unframed: the hero moon (as on /stats) and the mascot. Two images, no canvas; the glow breathes
+	(off under reduced motion). Decorative.
 -->
 <script lang="ts">
 	import moon from '#lib/home/sections/hero/assets/hero-moon-disc.webp?w=480;300&quality=42&enhanced';

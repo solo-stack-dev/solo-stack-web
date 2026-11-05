@@ -1,9 +1,7 @@
 <!--
 	@component
-	STUB. Programmer-art placeholder that satisfies the game contract so the frame, lab, and section work before the
-	real prototypes exist. Draws the palette, a player block that moves (left/right), jumps (action) with
-	`tuning.gravity` / `tuning.speed`, and counts jumps as score. Each candidate agent replaces its own folder and
-	stops importing this; delete it once no candidate uses it.
+	STUB. Programmer-art game that satisfies the game contract: a block that moves (left/right) and jumps (action) with
+	`tuning.gravity` / `tuning.speed`; jumps count as score. No candidate imports it any more; safe to delete.
 -->
 <script lang="ts">
 	import { RafLoop } from '#lib/home/shared/motion.svelte.ts';

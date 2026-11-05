@@ -1,7 +1,7 @@
 import { m } from '#lib/paraglide/messages.js';
 import { deLocalizeHref, localizeHref } from '#lib/paraglide/runtime.js';
 
-/** Top level pages in the site navigation. `path` is unlocalized; `/stats` is the public social media dashboard, `/kontakt` the contact form. */
+/** Site nav pages; `path` is unlocalized. `/stats` = public social media dashboard. */
 export const SITE_LINKS = [
 	{ id: 'home', path: '/', label: m.site_nav_home },
 	{ id: 'blog', path: '/blog', label: m.site_nav_blog },
@@ -11,13 +11,10 @@ export const SITE_LINKS = [
 
 export type SiteLink = (typeof SITE_LINKS)[number];
 
-/** Localized href of a site link, in the current locale. */
+/** In the current locale. */
 export const siteHref = (link: SiteLink) => localizeHref(link.path);
 
-/**
- * `aria-current` for a site link on the current page: `page` on the exact page, `true` inside its section
- * (e.g. a blog post under Blog), otherwise undefined. `pathname` is the current (localized) URL path.
- */
+/** `aria-current`: `page` on the exact page, `true` inside its section (a post under Blog). `pathname` is localized. */
 export function siteCurrent(link: SiteLink, pathname: string): 'page' | 'true' | undefined {
 	const path = deLocalizeHref(pathname).replace(/\/$/, '') || '/';
 	if (path === link.path) return 'page';

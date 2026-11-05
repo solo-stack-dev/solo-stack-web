@@ -1,8 +1,7 @@
 <!--
 	@component
-	Frame shared by every error page: wordmark (home), the 03:00 clock (the one hour the night on the homepage
-	skips), the status in mono, heading, body, the way home, optional retry, and the homepage sections as plain
-	links. The scene (`WorldTree`, `GiantWall`) renders behind via the `scene` snippet.
+	Frame for every error page: wordmark, 03:00 clock (the hour the homepage night skips), mono status, copy, home link, optional
+	retry, homepage sections as plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -130,8 +129,7 @@
 
 	/* Panel ---------------------------------------------------------------------------------------------------- */
 
-	/* The panel box overlaps the scene (phones: its top half is transparent), so only its children take clicks and the
-	   interactive parts of the scene stay reachable. */
+	/* The panel overlaps the scene (phones: top half transparent); only its children take clicks so the scene stays reachable. */
 	.panel {
 		pointer-events: none;
 		position: relative;

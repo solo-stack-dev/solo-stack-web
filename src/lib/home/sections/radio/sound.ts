@@ -1,6 +1,6 @@
 /**
- * Web Audio for the radio. Loaded lazily (dynamic import on the first interaction with the radio), so none of this is
- * in the initial bundle. The AudioContext is the shared one from `audio.svelte.ts`, unlocked in the gesture handler.
+ * Radio Web Audio, a lazy chunk (not in the initial bundle). Uses the shared AudioContext from `audio.svelte.ts`,
+ * unlocked in the gesture handler.
  */
 
 let noise: AudioBuffer | null = null;
@@ -15,10 +15,7 @@ function noiseBuffer(context: AudioContext): AudioBuffer {
 	return buffer;
 }
 
-/**
- * Short burst of tuning static: band-passed noise with a crackle envelope and a falling filter sweep.
- * Quiet on purpose (it plays on every preset press).
- */
+/** Tuning static: band-passed noise, crackle envelope, falling sweep. Quiet on purpose (plays on every preset press). */
 export function playStatic(context: AudioContext, output: AudioNode, { duration = 0.32, level = 0.16 } = {}): void {
 	const now = context.currentTime;
 	const source = context.createBufferSource();
@@ -56,10 +53,7 @@ export interface PlayerGraph {
 
 const graphs = new WeakMap<HTMLMediaElement, PlayerGraph>();
 
-/**
- * Route an `<audio>` element through the shared context: element → radio gain → analyser → master output.
- * `createMediaElementSource` may only be called once per element, so the graph is cached.
- */
+/** element → gain → analyser → output. Cached: `createMediaElementSource` works only once per element. */
 export function connectPlayer(element: HTMLMediaElement, context: AudioContext, output: AudioNode, volume: number): PlayerGraph {
 	const existing = graphs.get(element);
 	if (existing) return existing;

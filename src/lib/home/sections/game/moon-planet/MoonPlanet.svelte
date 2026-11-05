@@ -99,7 +99,7 @@
 		context = canvas.getContext('2d');
 		view.best = loadHighScore(GAME_ID);
 		view.coarse = window.matchMedia('(pointer: coarse)').matches;
-		// Dev only: expose live state for playtest scripts (headless checks, balancing). Stripped from production builds.
+		// Dev only (stripped from production): live state for headless playtest/balancing scripts.
 		if (import.meta.env.DEV) Object.assign(canvas, { moonPlanet: { game: () => game, restart } });
 		const resize = () => {
 			const rect = canvas.getBoundingClientRect();

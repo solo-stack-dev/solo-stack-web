@@ -1,7 +1,6 @@
 /**
- * Shadow soldiers for ARISE: painted ink cutouts (assets/arise-*.webp, masters in docs/art/arise/). Every image is the
- * same 2:3 canvas with the smoke fading out at the bottom edge, so they share one baseline and scale. `eyes` is the
- * point between the glowing eyes (0 … 1 of the canvas), where the ignition flare sits.
+ * ARISE soldiers: ink cutouts (masters in docs/art/arise/), all on the same 2:3 canvas with smoke fading out at the
+ * bottom, so they share one baseline and scale. `eyes`: point between the eyes (0…1 of the canvas) for the flare.
  */
 import assassin from './assets/arise-assassin.webp';
 import brute from './assets/arise-brute.webp';
@@ -31,13 +30,13 @@ export interface Soldier {
 	mirror: boolean;
 	/** Rise delay in ms. */
 	delay: number;
-	/** Smoke puffs curling off the base: offset in % of the figure width, size in % of it, timing in ms. */
+	/** Smoke puffs at the base: x and size in % of figure width, timing in ms. */
 	puffs: { x: number; size: number; delay: number; duration: number; drift: number }[];
 }
 
 type Slot = { id: SoldierId; x: number; height: number; depth: 0 | 1 | 2; mirror: boolean };
 
-/** Wide screens: the army fills the right, where the hero has open sky. Narrow: across the bottom. */
+/** Wide: right side, where the hero has open sky. Narrow: across the bottom. */
 const WIDE: Slot[] = [
 	{ id: 'brute', x: 64, height: 0.8, depth: 1, mirror: false },
 	{ id: 'knight', x: 78, height: 0.92, depth: 2, mirror: false },
@@ -52,7 +51,7 @@ const NARROW: Slot[] = [
 	{ id: 'mascot', x: 36, height: 0.58, depth: 0, mirror: false }
 ];
 
-/** Rise order: the knight first, then the flanks, the little one last (the punchline). */
+/** Rise order; the mascot last (punchline). */
 const ORDER: SoldierId[] = ['knight', 'brute', 'assassin', 'mascot'];
 
 export function createSoldiers(narrow: boolean): Soldier[] {
@@ -71,7 +70,7 @@ export function createSoldiers(narrow: boolean): Soldier[] {
 	}));
 }
 
-/** Preloads and decodes the cutouts, so nothing pops in mid-rise. Resolves after `timeout` ms at the latest. */
+/** Decodes the cutouts (no pop-in mid-rise). Resolves after `timeout` ms at the latest. */
 export function preloadSoldiers(timeout = 1500) {
 	const decodes = Object.values(SOLDIERS).map(({ src }) => {
 		const image = new Image();

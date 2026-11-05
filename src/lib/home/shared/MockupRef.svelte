@@ -1,10 +1,9 @@
 <!--
 	@component
-	TEMPORARY. Shows a section's round-2 mockup as a low-opacity background so section agents build against the
-	target in place. Delete the component usage and the `assets/*-mockup-ref.webp` file once the real art lands
-	(Phase 3 removes this component entirely). Decorative: empty alt, `aria-hidden`.
+	TEMPORARY. A section's mockup as a low-opacity background to build against in place. Delete the usage and its
+	`assets/*-mockup-ref.webp` once the real art lands (Phase 3 removes this component). Decorative.
 
-	Toggle all references while comparing: add `?ref=0` (hide) or `?ref=1` (opacity 0.9) to the URL in dev.
+	In dev, `?ref=0` hides all references, `?ref=1` shows them at 0.9.
 -->
 <script lang="ts">
 	interface Props {
@@ -18,7 +17,7 @@
 
 	let { src, opacity = 0.3, fit = 'cover', class: className = '' }: Props = $props();
 
-	// Prerendered pages have no query string at build time, so only read it in the browser after hydration.
+	// Prerendered: no query string at build time, so read it after hydration.
 	let override = $state<string | null>(null);
 	$effect(() => {
 		override = new URLSearchParams(window.location.search).get('ref');

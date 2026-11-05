@@ -26,10 +26,9 @@ async function getJson(url: string): Promise<unknown> {
 }
 
 /**
- * Recent public commits of github.com/solo-stack-dev for the night shift monitor: the commits of the most recently
- * pushed public repos (the Events API no longer carries commit messages), merged and sorted newest first.
- * Prerendered (unauthenticated, 1 + GITHUB_REPO_LIMIT requests per build, well within the 60/h limit).
- * Any error returns `FALLBACK_COMMITS` (empty): commit messages are never invented.
+ * Recent public commits for the night shift monitor, read from the most recently pushed repos (the Events API no longer
+ * carries commit messages). Prerendered, unauthenticated: 1 + GITHUB_REPO_LIMIT requests per build (limit 60/h).
+ * Any error returns `FALLBACK_COMMITS` (empty); messages are never invented.
  *
  * TODO(owner): if builds hit the rate limit (shared CI IPs), add a read-only GITHUB_TOKEN via src/env.ts.
  */

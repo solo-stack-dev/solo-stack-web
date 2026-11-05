@@ -1,13 +1,12 @@
 /**
- * Geometry for the 404 scene (`WorldTree.svelte`), normalized to the tree cutout `assets/error-tree.webp`
- * (0 … 1 of its width and height). The figures and the climb stops are positioned in that box, so they stay glued to
- * the painted tree at every viewport size.
+ * Geometry for the 404 scene (`WorldTree.svelte`), normalized to the cutout `assets/error-tree.webp` (0 … 1 of its width and
+ * height) so figures and climb stops stay on the painted tree at every viewport size.
  */
 
 /** Width / height of error-tree.webp. */
 export const TREE_ASPECT = 701 / 1700;
 
-/** Standing surface of the top platform: where the wanderer and (at the end) the mascot stand. */
+/** Top platform surface: where the wanderer and (at the end) the mascot stand. */
 export const TOP = { y: 0.014, wanderer: 0.6, mascot: 0.41 } as const;
 
 /** Trunk center at a few heights, top to bottom; `trunkX` interpolates between them. */
@@ -28,8 +27,8 @@ export function trunkX(y: number) {
 }
 
 /**
- * Where the mascot clings while climbing (his center), on bare trunk between the canopy tiers, lowest first. The last
- * click takes him onto the top platform. Phones (`sm`) show less of the tree above the text, so the stops sit higher.
+ * Mascot centers while climbing, on bare trunk between canopy tiers, lowest first; the last click goes onto the platform.
+ * Phones (`sm`) show less tree above the text, so their stops sit higher.
  */
 export const CLIMB_STOPS = (
 	[

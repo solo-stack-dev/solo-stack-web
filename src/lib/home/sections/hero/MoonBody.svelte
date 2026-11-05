@@ -1,9 +1,7 @@
 <!--
 	@component
-	Scene content of MoonScene: an orthographic camera that maps the unit sphere exactly onto the canvas (so the
-	moon's edge matches the wordmark clip circle), the painted texture, and a watercolor toon material whose single
-	light direction is the moon phase. Threlte's own animation loop is replaced by a RafLoop (30 fps, paused off
-	screen and in hidden tabs).
+	MoonScene content: orthographic camera mapping the unit sphere exactly onto the canvas (edge = wordmark clip circle), painted texture,
+	watercolor toon material lit from the phase direction. A 30 fps RafLoop (paused off screen / hidden tab) replaces Threlte's loop.
 -->
 <script lang="ts">
 	import { on } from 'svelte/events';
@@ -24,7 +22,7 @@
 	const { renderer, scheduler, invalidate, canvas } = useThrelte();
 	const { frameInvalidated } = useScheduler();
 
-	/** Radians per second around the moon's axis. Slow enough to feel like drift, not spin. */
+	/** Rad/s around the moon's axis: drift, not spin. */
 	const ROTATION_SPEED = 0.03;
 
 	const camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
@@ -48,8 +46,7 @@
 				gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 			}
 		`,
-		// Colors stay in sRGB on purpose (texture without color space, no output conversion), so the first frame
-		// matches the painted disc image pixel for pixel in tone.
+		// Deliberately sRGB throughout (no texture color space, no output conversion) so the first frame matches the painted disc's tones.
 		fragmentShader: /* glsl */ `
 			uniform sampler2D map;
 			uniform vec3 lightDir;
@@ -104,7 +101,7 @@
 		invalidate();
 	});
 
-	// Threlte's built-in animation loop runs every display frame; the RafLoop below replaces it.
+	// Threlte's loop renders every display frame; the RafLoop below replaces it.
 	renderer.setAnimationLoop(null);
 
 	const loop = new RafLoop(

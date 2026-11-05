@@ -1,10 +1,10 @@
 <!--
 	@component
-	Candidate C: constellation hunt (tech zodiac). Two modes:
-	- trace (timed): one named sign per round, connect its stars among decoys before the timer runs out.
-	- explore (free): roam a larger sky, connecting signs fills the zodiac wheel.
-	The engine (engine.ts) owns rules and Canvas 2D rendering; this component owns the DOM: HUD, mode switch, note card,
-	zodiac wheel, end panels, and the screen reader announcements.
+	Candidate C: constellation hunt (tech zodiac).
+	- trace (timed): one named sign per round; connect its stars among decoys before time runs out.
+	- explore (free): roam a larger sky; completed signs fill the zodiac wheel.
+	engine.ts owns rules and Canvas 2D rendering; this component owns the DOM: HUD, mode switch, note card, wheel, end
+	panels, screen reader announcements.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';
@@ -186,7 +186,7 @@
 		const margin = 12;
 		let x: number;
 		let y: number;
-		// Narrow stages center the card; it hangs below or above the sign when there is room, else sits at the bottom.
+		// Narrow stages center the card horizontally.
 		if (stage.w < 560) x = (stage.w - w) / 2;
 		else x = Math.min(Math.max((box.minX + box.maxX) / 2 - w / 2, margin), stage.w - w - margin);
 		const below = box.maxY + 26;

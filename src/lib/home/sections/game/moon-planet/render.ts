@@ -56,7 +56,7 @@ export class Renderer {
 	#sky: HTMLCanvasElement | null = null;
 	#glowSprite: HTMLCanvasElement | null = null;
 
-	/** Soft butter glow, rendered once and stamped with drawImage (cheaper and softer than gradients per frame). */
+	/** Soft butter glow, rendered once and stamped (cheaper and softer than per-frame gradients). */
 	#glow(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, strength: number) {
 		if (!this.#glowSprite) {
 			const sprite = document.createElement('canvas');
@@ -100,7 +100,7 @@ export class Renderer {
 		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 		this.#background(ctx, view, L, camA * (1 - fixed));
 
-		// Screen shake (trauma², off in calm mode since trauma never rises there).
+		// Screen shake = trauma² (calm mode never raises trauma).
 		const shake = game.trauma * game.trauma;
 		const sx = shake * 12 * Math.sin(time * 71.3);
 		const sy = shake * 12 * Math.sin(time * 53.7 + 1.3);
@@ -663,9 +663,8 @@ function keycap(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, 
 const SPRITE_H = 34;
 
 /**
- * Painted mascot (one pose) with a procedural run/jump/fall pose on top of the caller's squash & stretch: a footfall
- * bob and forward lean while running, a lean back on the way up and forward on the way down. Feet at the origin, facing
- * +x. Returns false until the sprite sheet is decoded (the caller then draws the vector placeholder).
+ * Painted mascot (one pose) plus procedural posing on top of the caller's squash & stretch: running = footfall bob and
+ * forward lean; airborne = lean back rising, forward falling. Feet at origin, facing +x. False until the sheet is decoded.
  */
 function drawSpriteMascot(ctx: CanvasRenderingContext2D, p: Player): boolean {
 	ctx.save();

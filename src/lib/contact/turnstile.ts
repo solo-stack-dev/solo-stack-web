@@ -1,25 +1,22 @@
 /**
- * Cloudflare Turnstile, browser side: the public site key and a lazy loader for the widget script.
- *
- * Outside the `staging` and `production` builds (`pnpm dev`, `pnpm preview`) the official test key is used, which
- * always passes and shows a "testing only" widget. The matching test secret is the server default in those modes
- * (`turnstile.server.ts`), so the whole form works locally without any setup.
+ * Cloudflare Turnstile, browser side: site key and lazy script loader.
+ * Outside `staging`/`production` builds the official test key is used (always passes, "testing only" widget); the matching
+ * test secret is the server default there (`turnstile.server.ts`), so the form works locally without setup.
  */
 
-// Site key of the Turnstile widget (hostnames solo-stack.dev and staging.solo-stack.dev, mode Managed). Site keys are
-// public, committing it is fine. The secret goes into `.env.staging` / `.env.production` as TURNSTILE_SECRET_KEY.
+// Widget for solo-stack.dev + staging.solo-stack.dev, mode Managed. Site keys are public. Secret: TURNSTILE_SECRET_KEY in `.env.<mode>`.
 const SITE_KEY = '0x4AAAAAAFxPRdhFUZe1Puyr';
 
-/** Official Turnstile test site key: always passes, visible widget. */
+/** Official test site key: always passes, visible widget. */
 const TEST_SITE_KEY = '1x00000000000000000000AA';
 
 /** `vite build --mode <mode>`: only the deploy builds need the real key. */
 export const TURNSTILE_TESTING = import.meta.env.MODE !== 'staging' && import.meta.env.MODE !== 'production';
 
-/** Site key for the current build, empty when a deploy build has no key yet (the widget then stays empty). */
+/** Empty when a deploy build has no key yet (the widget then stays empty). */
 export const TURNSTILE_SITE_KEY = SITE_KEY || (TURNSTILE_TESTING ? TEST_SITE_KEY : '');
 
-/** `action` of the widget, checked by the server so a token from another form on another site is rejected. */
+/** Checked by the server, so a token from another site's form is rejected. */
 export const TURNSTILE_ACTION = 'contact';
 
 export interface TurnstileRenderOptions {
@@ -54,8 +51,8 @@ const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render
 let loading: Promise<TurnstileApi> | undefined;
 
 /**
- * Loads the Turnstile script once (only on the contact page, so no other page pays for it). Must be fetched from
- * Cloudflare directly: a proxied or cached copy breaks with their updates. A failed load can be retried.
+ * Loads the script once, on the contact page only. Must come from Cloudflare directly: a proxied or cached copy breaks
+ * with their updates. A failed load can be retried.
  */
 export function loadTurnstile(): Promise<TurnstileApi> {
 	if (window.turnstile) return Promise.resolve(window.turnstile);

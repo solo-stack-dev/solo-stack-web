@@ -2,20 +2,15 @@
 	@component
 	20:00 Hero: moonrise (docs/HANDOFF-HOMEPAGE.md §5.1).
 
-	Geometry: the moon circle is defined once by CSS custom properties on `.hero` (`--moon-r`, `--moon-cx`,
-	`--moon-cy`, in container units of the hero) per breakpoint. Everything that has to line up with the moon uses
-	them: the moon rig (glow, painted moon / 3D canvas, mascot) and the anthracite copy of the wordmark, which lives
-	in a box of exactly the moon's size and is clipped to the moon's lit region (moon.ts). Its text is
-	counter-positioned so it sits exactly on top of the cream wordmark, which makes the color split pixel exact at
-	every size and in every phase.
+	Geometry: `--moon-r`, `--moon-cx`, `--moon-cy` on `.hero` (hero container units, per breakpoint) define the moon circle once. The moon
+	rig (glow, painted/3D moon, mascot) and the anthracite wordmark copy use them. That copy sits in a moon-sized box clipped to the lit region
+	(moon.ts), counter-positioned onto the cream wordmark, so the color split is pixel exact at every size and phase.
 
-	Layers (bottom → top): sky plate, stars, back clouds (1, 2), moon rig, front cloud (3), cream wordmark, anthracite
-	wordmark, clock, scroll cue. The painted masters live in docs/art; tools/build-assets.mjs makes the
-	optimized, cropped copies in ./assets and writes their crop rects to art.ts (README.md).
+	Layers (bottom → top): sky, stars, back clouds (1, 2), moon rig, front cloud (3), cream wordmark, anthracite wordmark, clock, scroll cue.
+	Masters live in docs/art; tools/build-assets.mjs writes cropped copies to ./assets and their crop rects to art.ts (README.md).
 
-	Events (window): `night:moon-phase` { phase } on every phase change, `night:moon-full-clicks` { count } for
-	every click on the full moon; every 10th one keeps the moon full (the moon presence egg needs a full moon).
-	Listens to `night:shooting-star` (mascot leans back and looks up).
+	Events (window): emits `night:moon-phase` { phase } per phase change and `night:moon-full-clicks` { count } per full-moon click (every
+	10th keeps the moon full for the presence egg). Listens to `night:shooting-star` (mascot leans back, looks up).
 -->
 <script lang="ts">
 	import { on } from 'svelte/events';
@@ -39,9 +34,8 @@
 		type MoonPhaseDetail
 	} from './moon.ts';
 	import { ART_CROPS } from './art.ts';
-	// Explicit width ladders (`…&enhanced`, see imagetools.d.ts): the masters are upscales of smaller generations, so
-	// widths stop at the native detail, and AVIF quality is tuned for the above-the-fold budget (handoff §6.4).
-	// The soft cloud layers are capped at 1280 px (quality 50 keeps their grain): ~55 kB less above the fold at 1440@2x.
+	// Width ladders (`…&enhanced`, imagetools.d.ts) stop at the native detail of the masters (they are upscales); AVIF quality fits the
+	// above-the-fold budget (handoff §6.4). Clouds capped at 1280 px, quality 50 keeps their grain: ~55 kB less at 1440@2x.
 	import sky from './assets/hero-sky.webp?w=1672;1280;960&quality=40&enhanced';
 	import skyMobile from './assets/hero-sky-mobile.webp?w=852;640&quality=45&enhanced';
 	import clouds1 from './assets/hero-clouds-1.webp?w=1280;960;640&quality=50&enhanced';
@@ -76,7 +70,7 @@
 		size: (discCrop.width / DISC.r / 2) * 100
 	};
 
-	/** Seat contact of the mascot master (docs/art/mascot/README.md), as fractions of the cropped image. */
+	/** Seat contact in mascot master px (docs/art/mascot/README.md); mascotRig turns it into % of the cropped image. */
 	const MASCOT_SEAT = { x: 740, y: 980 };
 	const mascotCrop = ART_CROPS['mascot-hero-moonrim'].crop;
 	const mascotRig = {
@@ -459,8 +453,7 @@
 		pointer-events: none;
 	}
 
-	/* Cloud images are cropped to their content (art.ts); widths match SIZES in the script. Order from the art notes:
-	   1 warm low bank and 2 thin wisps behind the moon, 3 dark right-heavy bank in front of the lower moon rim. */
+	/* Cropped to content (art.ts); widths must match SIZES. 1 warm low bank, 2 thin wisps (behind the moon); 3 dark bank over the lower rim. */
 	.layer :global(.cloud-1) {
 		left: -12cqw;
 		bottom: 9cqh;
@@ -585,8 +578,7 @@
 		pointer-events: none;
 	}
 
-	/* Mascot (painted, docs/art/mascot): seat point (--sit-x/y, from art.ts) on the rim; the whole figure leans back
-	   around it when a shooting star passes; a soft screen glow from the laptop flickers on the face and hands. ----- */
+	/* Mascot (docs/art/mascot): seat point (--sit-x/y) on the rim, the pivot for the shooting-star lean; laptop glow flickers on face/hands. */
 
 	.mascot {
 		/* laptop light, fractions of the cropped image (between the lid, the hands and the face) */
@@ -743,9 +735,8 @@
 		}
 	}
 
-	/* The tagline leaves over the first 40 % of the making wipe (Making.svelte: the wipe runs over the first
-	   100svh − 45svh of page scroll), so it never meets the 21:00 clock and heading that follow the wash up.
-	   Listed before `settle`, which wins while it runs. */
+	/* Fades out over the first 40 % of the making wipe (Making.svelte: wipe = first 55svh of scroll), clear of the 21:00 clock and heading
+	   riding up with the wash. Listed before `settle`, which wins while it runs. */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: scroll()) {
 			.tagline {
@@ -768,7 +759,7 @@
 
 	/* Scroll cue --------------------------------------------------------------------------------------------- */
 
-	/* No chip: a quiet label on the bottom line with the ink halo, butter on hover (the page-wide link idiom) */
+	/* No chip: quiet label with ink halo, butter on hover (page-wide link idiom) */
 	.scroll-cue {
 		position: absolute;
 		z-index: 7;

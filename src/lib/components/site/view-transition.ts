@@ -1,20 +1,16 @@
 import { onNavigate } from '$app/navigation';
 
 /**
- * Subtle view transitions between the calm site pages (blog, posts, stats). Call once from the (site) layout.
- *
- * The site navbar carries `view-transition-name: site-nav`, so it leaves the root snapshot and holds still while
- * only the content underneath fades and rises (styles in src/routes/layout.css). The homepage is left out: its
- * night scene swaps the whole surface, a cross-fade to the paper would only smear.
+ * View transitions between the site pages (blog, posts, stats); call once from the (site) layout. Styles and the named
+ * navbar: src/routes/layout.css. The homepage is excluded: its night scene swaps the whole surface, a cross-fade would smear.
  */
 
 /** Only navigations that start and end inside this route group transition. */
 const GROUP = '/(site)';
 
 /**
- * Rendering is frozen until the update callback settles, and async pages also block their DOM commit on data. A
- * ceiling, not a cost: a page that commits sooner never waits. Past it the transition is skipped rather than
- * capturing a stale DOM.
+ * Rendering is frozen until the update callback settles, and async pages block their commit on data. A ceiling, not a
+ * cost: past it the transition is skipped rather than capturing a stale DOM.
  */
 const DEADLINE_MS = 250;
 
@@ -44,8 +40,7 @@ export function useViewTransitions() {
 					committed = true;
 				});
 				await Promise.race([navigation.complete, new Promise((done) => setTimeout(done, DEADLINE_MS))]).catch(() => {});
-				// An async page past its deadline has not committed yet: capturing now would snapshot the old DOM as
-				// the new state and the real page would pop in afterwards. An instant swap degrades more cleanly.
+				// Not committed yet: capturing now would snapshot the old DOM and the real page would pop in later.
 				if (!committed) transition.skipTransition();
 			});
 

@@ -1,14 +1,14 @@
 /**
- * The night as one scroll: the single source of truth for section order, clock times, anchor ids, and the base sky
- * color per hour. NightPage builds the sky, the menu, and the progress rail from this list.
+ * Single source of truth for section order, clock times, anchor ids, and sky color per hour. NightPage builds the sky,
+ * menu, and rail from it.
  *
- * Sky curve: each hour's `sky` is reached when that section's center meets the viewport center, blended linearly from
- * the previous hour. Optional per hour:
- * - `horizon`: the sky becomes a vertical gradient `sky` → `horizon` (bottom of the viewport), e.g. a warming dawn line.
- * - `from: 'enter'`: the blend into this hour only starts when the section's top enters the viewport (instead of at
- *   the previous hour's stop). The sunrise uses it so butter paper arrives with the sunrise section, not during 04:00.
+ * Sky curve: each hour's `sky` is reached when its section's center meets the viewport center, blended linearly from
+ * the previous hour. Optional:
+ * - `horizon`: vertical gradient `sky` → `horizon` (viewport bottom), e.g. a warming dawn line.
+ * - `from: 'enter'`: blend starts when the section's top enters the viewport, not at the previous stop. Sunrise uses it
+ *   so butter paper arrives with the sunrise section, not during 04:00.
  *
- * Changing the sky curve: edit it here (integration, lead only). Section agents never edit this file.
+ * Integration lead only; section agents never edit this file.
  */
 export interface NightHourDef {
 	id: string;
@@ -28,7 +28,7 @@ export const NIGHT_HOURS = [
 	{ id: 'radio', time: '02:00', sky: '#0e0f10' },
 	// still night, the horizon starts to warm before dawn
 	{ id: 'cinema', time: '04:00', sky: '#2a2723', horizon: '#4a3826' },
-	// butter paper, where the banner begins; only once the sunrise section scrolls in
+	// butter paper, where the banner begins
 	{ id: 'sunrise', time: '06:00', sky: '#fcd772', from: 'enter' }
 ] as const satisfies readonly NightHourDef[];
 
@@ -36,7 +36,7 @@ export type NightHour = (typeof NIGHT_HOURS)[number];
 export type SectionId = NightHour['id'];
 export type ClockTime = NightHour['time'];
 
-/** Attribute every section root carries so NightPage can anchor the sky stops to real section positions. */
+/** On every section root; NightPage anchors the sky stops to these elements. */
 export const NIGHT_HOUR_ATTR = 'data-night-hour';
 
 /** CSS background of one hour's sky layer. */

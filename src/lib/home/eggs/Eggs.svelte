@@ -2,9 +2,8 @@
 	@component
 	Easter egg triggers (docs/HANDOFF-HOMEPAGE.md §5.8, docs/HOMEPAGE-DEV.md §11). Mounted once inside NightPage.
 
-	This file is the only egg code in the initial bundle: a few window listeners and dice rolls. Every effect is a
-	dynamic import that loads on its trigger, renders a `pointer-events: none` overlay, and unmounts itself.
-	Escape removes every running egg at once.
+	The only egg code in the initial bundle. Each egg is a dynamic import loaded on its trigger: a `pointer-events: none`
+	overlay that unmounts itself. Escape removes all running eggs.
 
 	| Egg            | Trigger                                                                  |
 	| -------------- | ------------------------------------------------------------------------ |
@@ -157,7 +156,7 @@
 		};
 	});
 
-	// Three stars at random: 1 in 6 page views, after 30–90 s without input while a dark section is on screen.
+	// Three stars at random (trigger in the table above).
 	$effect(() => {
 		if (Math.random() >= STARS_CHANCE) return;
 		const idleFor = 30_000 + Math.random() * 60_000;
@@ -178,7 +177,7 @@
 		return stop;
 	});
 
-	// Shiny mascot: one 12-bit draw per session (never rerolled on remounts), `?shiny=1|0` forces it for QA.
+	// Shiny mascot: one 12-bit draw per session, cached so remounts never reroll.
 	$effect(() => {
 		const forced = new URLSearchParams(location.search).get('shiny');
 		let shiny = forced === '1';

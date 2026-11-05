@@ -1,7 +1,6 @@
 import { defineEnvVars } from '@sveltejs/kit/env';
 
-// Type-safe env vars, exposed via `$app/env/public` and `$app/env/private`.
-// Add entries here (validated with valibot or a function) when needed.
+// Type-safe env vars for `$app/env/public` / `$app/env/private`, validated with valibot or a function.
 export const variables = defineEnvVars({
 	TURNSTILE_SECRET_KEY: {
 		description:

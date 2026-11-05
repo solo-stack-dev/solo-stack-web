@@ -1,7 +1,4 @@
-/**
- * Cheap painted textures for the constellation game, generated once on small offscreen canvases: star glow, watercolor
- * pigment wash, background dust tile, and the static night backdrop (sky wash, milky band, horizon ridge, vignette).
- */
+/** Cheap painted textures, generated once on small offscreen canvases: star glow, pigment wash, dust tile, static night backdrop. */
 
 export const COLORS = {
 	butter: '#fcd772',

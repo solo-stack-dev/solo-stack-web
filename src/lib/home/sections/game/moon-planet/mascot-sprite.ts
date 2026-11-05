@@ -1,9 +1,9 @@
 /**
- * The painted mascot for Canvas 2D games (docs/art/mascot/mascot-game-sprite-master.png, built by tools/build-sprite.mjs).
- * Shared by the candidates: stack-to-moon imports it from here, so keep it free of moon-planet specifics.
+ * Painted mascot for Canvas 2D games (docs/art/mascot/mascot-game-sprite-master.png, built by tools/build-sprite.mjs).
+ * Shared: stack-to-moon imports it from here, so keep it free of moon-planet specifics.
  *
- * The sheet starts loading when this module is first imported (the game chunk loads on the play click) and is drawn
- * only once decoded: until then `drawMascotSprite` returns false and the caller draws its vector placeholder.
+ * Loads on first import (the game chunk loads on the play click). Until decoded, `drawMascotSprite` returns false and the
+ * caller draws its vector placeholder.
  */
 import sheetUrl from './assets/mascot-game-sheet.webp';
 import { MASCOT_SHEET_ANCHOR, MASCOT_SHEET_LEVELS } from './sprite-sheet.ts';
@@ -34,9 +34,8 @@ export function mascotSpriteReady(): boolean {
 }
 
 /**
- * Draws the mascot facing +x with its feet (bottom center) at the current origin, `height` tall in current units.
- * Mirror, squash, or rotate with the context transform before calling. Picks the smallest mip level that still covers
- * the device pixels it lands on, so it stays crisp at any DPR and scale. Returns false while the sheet is not ready.
+ * Draws the mascot facing +x, feet (bottom center) at the origin, `height` tall in current units; mirror/squash/rotate
+ * via the context transform. Uses the smallest mip level covering the target device px (crisp at any DPR). False until ready.
  */
 export function drawMascotSprite(ctx: CanvasRenderingContext2D, height: number): boolean {
 	if (!ready || !sheet) return false;

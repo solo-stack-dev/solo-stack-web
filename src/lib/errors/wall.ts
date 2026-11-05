@@ -1,9 +1,6 @@
-/**
- * Precomputed geometry for the 500 scene (`GiantWall.svelte`). All layers share one coordinate system: a
- * 1000 × 800 box (`viewBox="0 0 1000 800"`), so separately animated SVGs line up exactly.
- */
+/** Geometry for the 500 scene (`GiantWall.svelte`). All layers share one 1000 × 800 viewBox so separately animated SVGs line up. */
 
-/** Small seeded PRNG, so the stones and dust are the same on server and client. */
+/** Seeded PRNG: stones and dust match on server and client. */
 export function mulberry32(seed: number) {
 	let a = seed >>> 0;
 	return () => {
@@ -48,10 +45,7 @@ function stones(seed: number) {
 
 export const STONES = stones(500);
 
-/**
- * A finger hooked over the coping: a knuckle bulging above the top edge, the finger bending down the wall face,
- * a blunt tip. `lean` tilts the tip sideways.
- */
+/** A finger hooked over the coping: knuckle above the top edge, bending down the wall face. `lean` tilts the tip sideways. */
 function finger(x: number, width: number, length: number, lean: number, rise = 20) {
 	const top = WALL.top;
 	const knuckle = top - rise;
@@ -73,7 +67,7 @@ function palm(x0: number, x1: number, height: number) {
 	return `M${x0} ${top + 2}C${x0 + 6} ${top - height} ${x1 - 6} ${top - height * 1.15} ${x1} ${top + 2}Z`;
 }
 
-/** Two hands gripping the wall, as separate paths (overlapping subpaths would cancel out under nonzero fill). The right hand's first finger taps. */
+/** Separate paths per part: overlapping subpaths would cancel out under nonzero fill. `tapper` is the right hand's first finger. */
 export const HANDS = {
 	leftPalm: palm(598, 742, 34),
 	left: [finger(600, 34, 46, -3, 18), finger(633, 36, 58, -1, 24), finger(668, 36, 54, 1, 23), finger(703, 32, 40, 3, 17)].join(''),

@@ -14,7 +14,7 @@ interface SiteverifyResult {
 	action?: string;
 }
 
-/** The secret for this build. `TURNSTILE_SECRET_KEY` is a Worker secret (`.env.staging` / `.env.production`). */
+/** `TURNSTILE_SECRET_KEY` is a Worker secret (`.env.staging` / `.env.production`). */
 function secretKey(): string | undefined {
 	return TURNSTILE_SECRET_KEY || (TURNSTILE_TESTING ? TEST_SECRET_KEY : undefined);
 }
@@ -26,12 +26,9 @@ export class TurnstileNotConfiguredError extends Error {
 }
 
 /**
- * Checks a Turnstile token with Cloudflare's Siteverify API. Tokens are single use and expire after five minutes.
- * With a real secret the token must also come from our widget (`action`) on the host that received the request;
- * the test secret answers with dummy values for both, so those checks are skipped there.
- *
- * Returns false for a rejected token. Throws `TurnstileNotConfiguredError` when a deploy build has no secret, and
- * rethrows network errors, so the form reports "could not send" instead of blaming the visitor.
+ * Siteverify check; tokens are single use and expire after 5 min. A real secret also requires our `action` and the request's
+ * host (the test secret returns dummy values, so skipped). False = rejected token. Throws `TurnstileNotConfiguredError`
+ * without a secret, and on network errors, so the form says "could not send" instead of blaming the visitor.
  */
 export async function verifyTurnstile(token: string, { ip, hostname }: { ip?: string; hostname: string }): Promise<boolean> {
 	const secret = secretKey();

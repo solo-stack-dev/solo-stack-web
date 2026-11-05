@@ -19,8 +19,8 @@ export const KEY_MAP: Readonly<Record<string, GameButton>> = {
 const BUTTONS: GameButton[] = ['left', 'right', 'up', 'down', 'action'];
 
 /**
- * Unified keyboard + touch input. GameFrame creates one per run, attaches it to the focused game surface, and feeds
- * the on-screen touch buttons into it. Games poll it in their loop:
+ * Unified keyboard + touch input. GameFrame creates one per run, attaches it to the game surface, and feeds the touch
+ * buttons into it. Games poll it:
  *
  * ```ts
  * if (input.isDown('left')) x -= speed * dt;

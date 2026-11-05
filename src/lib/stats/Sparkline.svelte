@@ -1,7 +1,7 @@
 <!--
 	@component
-	Tiny trend line in plain SVG (no chart library): 2px line, a soft wash below, and an end dot with a surface ring.
-	Stretches to its box; the stroke stays 2px through `vector-effect`. Pass `label` to expose it as an image.
+	Tiny plain-SVG trend line: 2px line, soft wash below, end dot with a surface ring. Stretches to its box; `vector-effect` keeps
+	the stroke 2px. Pass `label` to expose it as an image.
 -->
 <script lang="ts">
 	import { cn } from '#lib/utils.js';

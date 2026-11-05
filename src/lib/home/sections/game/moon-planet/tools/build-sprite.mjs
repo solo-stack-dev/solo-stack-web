@@ -1,12 +1,11 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Builds the painted mascot game sprite sheet (../assets/mascot-game-sheet.webp) and its frame table (../sprite-sheet.ts)
-// from docs/art/mascot/mascot-game-sprite-master.png. Shared by the game candidates (stack-to-moon imports it from here).
+// Builds ../assets/mascot-game-sheet.webp and its frame table ../sprite-sheet.ts from docs/art/mascot/mascot-game-sprite-master.png.
 //
-// The sheet holds one pose as a small mip chain (figure heights below), so a canvas can always downscale from the
-// nearest larger level: crisp at DPR 1…3 without the shimmer of drawing a big image very small.
+// One pose as a small mip chain (LEVELS), so the canvas always downscales from the nearest larger level: crisp at
+// DPR 1…3 without the shimmer of drawing a big image very small.
 //
 // Run: node src/lib/home/sections/game/moon-planet/tools/build-sprite.mjs
-// Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
+// Uses `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';

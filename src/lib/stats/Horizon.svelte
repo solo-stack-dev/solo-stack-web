@@ -1,9 +1,8 @@
 <!--
 	@component
-	The page opener, one composition instead of a header plus KPI cards: title and intro, a rubber stamp for the
-	mock data and the data date, the period switch, the total follower count set huge (it counts to the new value when
-	the period changes), and below it the follower curve as a moonlit ridge (Ridge.svelte). At night a few twinkling
-	stars hang over it. The data table behind the ridge is in a disclosure for screen readers and the curious.
+	Page opener as one composition: title, intro, rubber stamp (mock notice, data date), period switch, huge total follower count,
+	and the follower curve as a moonlit ridge (Ridge.svelte); twinkling stars at night. The ridge's data table sits in a disclosure
+	for screen readers and the curious.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';
@@ -26,8 +25,8 @@
 	const values = $derived(periodSlice(total, period));
 	const dates = $derived(values.map((_, index) => dateAt(stats.asOf, LAST_DAY - period + index)));
 
-	// When the period changes, the number replays the period: it jumps to the count at its start and climbs to today,
-	// while the ridge draws itself. SSR and the first render show today's count as is.
+	// On period change the number jumps to the period's start count and climbs to today while the ridge draws. SSR and first
+	// render show today's count.
 	const shown = new Tween(
 		untrack(() => change.value),
 		{ easing: cubicOut }

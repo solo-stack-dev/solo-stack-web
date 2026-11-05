@@ -1,14 +1,13 @@
 /**
- * Painted section transition materials (masters and prompts in docs/art/transitions/), optimized by
- * `node src/lib/home/shared/tools/optimize-transitions.mjs` into ./assets/transitions/. Import URLs from here.
+ * Painted section transition masks (masters and prompts in docs/art/transitions/), built into ./assets/transitions/ by
+ * `node src/lib/home/shared/tools/optimize-transitions.mjs`. Import URLs from here.
  *
- * NightPage exposes the masks as CSS custom properties on `[data-night-page]` (`url(…)` values), so sections use
- * them in plain CSS without importing anything:
- * - `--feather-up` / `--feather-down`: soft low-frequency plate edge (`up`: transparent above, opaque below, for a
- *   plate's top; `down`: the flip, for its bottom). Use through the `[data-feather]` helper (docs/HOMEPAGE-DEV.md §6.5).
- * - `--wash-spread-up`: wet spreading wash ramp, transparent above / opaque below (hero → making wipe);
- *   `--wash-spread-down`: the same ramp opaque above / transparent below (blooms in the retreating sunrise night).
- * - `--wash-dry`: drying wash ramp, opaque above / transparent below (the retreating sunrise night).
+ * NightPage sets them as `url(…)` custom properties on `[data-night-page]`, so sections use them in plain CSS:
+ * - `--feather-up` / `--feather-down`: soft plate edge; `up` is transparent above / opaque below (a plate's top), `down`
+ *   the flip. Use via `[data-feather]` (docs/HOMEPAGE-DEV.md §6.5).
+ * - `--wash-spread-up`: wet spreading wash, transparent above / opaque below (hero → making wipe); `--wash-spread-down`:
+ *   the flip (blooms in the retreating sunrise night).
+ * - `--wash-dry`: drying wash, opaque above / transparent below (the retreating sunrise night).
  */
 import featherDown from './assets/transitions/feather-down.webp';
 import featherUp from './assets/transitions/feather-up.webp';
@@ -24,7 +23,7 @@ export const TRANSITION_MASKS = {
 	washDry
 } as const;
 
-/** The mask URLs as `url("…")` CSS custom properties, for NightPage's wrapper. */
+/** Inline style string for NightPage's wrapper. */
 export const transitionMaskVars = (): string =>
 	[
 		`--feather-up: url("${featherUp}")`,

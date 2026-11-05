@@ -22,8 +22,7 @@
 	let video = $state<VideoFacade>();
 
 	const origin = $derived(page.url.origin);
-	// A post exists in its own language only: canonical and hreflang point to that URL (the root layout skips its
-	// alternates on this route).
+	// A post exists in one language only: canonical and hreflang point to its URL (the root layout skips alternates here).
 	const canonical = $derived(new URL(postHref(post), origin).href);
 	const image = $derived(post.youtubeId ? new URL(thumbnailPath(post.youtubeId), origin).href : null);
 	const watchUrl = $derived(post.youtubeId ? `https://www.youtube.com/watch?v=${post.youtubeId}` : null);
@@ -79,7 +78,7 @@
 		return `M8 1.4A6.6 6.6 0 0 1 8 14.6A${rx.toFixed(2)} 6.6 0 0 ${lit < 0.5 ? 0 : 1} 8 1.4Z`;
 	}
 
-	// Table of contents: the section whose heading last crossed the upper third of the viewport is the current one.
+	// TOC: current section = last heading above the upper third of the viewport.
 	let current = $state<string | null>(null);
 	$effect(() => {
 		const headings = post.outline.map(({ id }) => document.getElementById(id)).filter((heading) => heading !== null);
@@ -127,12 +126,12 @@
 	{@html jsonLdScript(structuredData)}
 </svelte:head>
 
-<!-- Reading progress: a butter hairline under the navbar, driven by a CSS scroll timeline (no JS; absent where unsupported) -->
+<!-- Reading progress hairline: CSS scroll timeline, no JS; absent where unsupported -->
 <div class="progress" aria-hidden="true"></div>
 
 <article class="post" lang={post.lang} style:--bloom="url({bloom.img.src})">
 	<div class="relative isolate">
-		<!-- Night sky over the header, only in the dark theme (like /stats and the blog index) -->
+		<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
 		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
 			<StarField density={0.45} brightness={0.65} seed={71} />
 		</div>
@@ -178,7 +177,7 @@
 		</div>
 	</div>
 
-	<!-- Reading column (about 70 characters per line) beside a sticky table of contents from lg -->
+	<!-- Reading column (~70 ch per line), sticky TOC from lg -->
 	<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-14 pb-24 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_15rem] lg:px-8">
 		<div class="grid min-w-0 content-start gap-14">
 			{#if post.summary}
@@ -212,7 +211,7 @@
 			{#if post.takeaways.length}
 				<section aria-labelledby="takeaways-title">
 					<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
-					<!-- The bullets wax from a crescent to the full moon, like the moon phases of the period switch on /stats -->
+					<!-- Bullets wax from crescent to full moon (as the /stats period switch) -->
 					<ul class="takeaways mt-5">
 						{#each post.takeaways as takeaway, index (index)}
 							<li>
@@ -280,7 +279,7 @@
 			<aside class="hidden lg:block">
 				<nav class="toc" aria-labelledby="toc-title">
 					<p id="toc-title" class="toc-title">
-						<!-- A moon that waxes while you read (same scroll timeline as the progress hairline) -->
+						<!-- Waxes while you read (same scroll timeline as the progress hairline) -->
 						<svg viewBox="0 0 16 16" class="toc-moon" aria-hidden="true">
 							<defs><clipPath id="toc-disc"><circle cx="8" cy="8" r="6.6" /></clipPath></defs>
 							<circle cx="8" cy="8" r="6.6" fill="currentColor" fill-opacity="0.16" />
@@ -343,7 +342,7 @@
 			animation-timeline: scroll(root);
 		}
 
-		/* The toc moon waxes with the same timeline: the lit disc slides in from the right limb */
+		/* Same timeline: the lit disc slides in from the right limb */
 		.toc-lit {
 			animation: wax linear both;
 			animation-timeline: scroll(root);
@@ -368,7 +367,7 @@
 		font-size: clamp(2.4rem, 5.6vw, 4.5rem);
 		line-height: 0.98;
 		padding-bottom: 0.08em;
-		/* Ink on paper; at night it catches the moonlight like the big titles on /blog and /stats */
+		/* Ink on paper; moonlit at night (as the titles on /blog and /stats) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
 		background-clip: text;
 		color: transparent;
@@ -379,7 +378,7 @@
 		background-clip: text;
 	}
 
-	/* A soft moon glow behind the video, so the screen sits in the night instead of on it */
+	/* Moon glow behind the video so it sits in the night, not on it */
 	.stage {
 		position: relative;
 		isolation: isolate;
@@ -400,7 +399,7 @@
 		background: radial-gradient(closest-side, rgb(226 169 59 / 0.22), transparent);
 	}
 
-	/* Section titles: Geist Black over a wash of butter pigment, like the section headings on /stats */
+	/* Section titles: Geist Black over a butter wash (as on /stats) */
 	.section-title {
 		position: relative;
 		isolation: isolate;
@@ -432,7 +431,7 @@
 		mix-blend-mode: normal;
 	}
 
-	/* "Summary" as a rubber stamp, like the mock data stamp on /stats */
+	/* "Summary" as a rubber stamp (as the mock data stamp on /stats) */
 	.stamp {
 		display: inline-block;
 		padding: 0.3rem 0.7rem;
@@ -453,7 +452,7 @@
 		color: rgb(252 215 114 / 0.85);
 	}
 
-	/* Summary: a sheet of butter paper with a pigment edge on the left */
+	/* Butter paper with a pigment left edge */
 	.summary {
 		position: relative;
 		padding: 1.75rem 2rem 1.9rem 2.25rem;
@@ -798,7 +797,7 @@
 		margin-top: 0;
 	}
 
-	/* The opening paragraph reads a little larger, like a lede */
+	/* Lede: the first paragraph a little larger */
 	.prose-post :global(> p:first-child) {
 		font-size: 1.2rem;
 		color: var(--foreground);

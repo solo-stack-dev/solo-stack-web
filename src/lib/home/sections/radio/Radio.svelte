@@ -1,23 +1,18 @@
 <!--
 	@component
-	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): a painted radio on the cliff, one preset key per social
-	platform (real logos), a tuning dial (slider) that snaps to stations, the display strip with the handle and a real
-	follow link, live station content (latest video, latest commit), a short song per station (`track/`), and the
-	printed frequency chart with every link (the accessible, no-JS fallback).
+	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): painted radio with one preset key per platform (real logos), a
+	dial that snaps to stations, a display strip (handle + follow link, live content), a song per station (`track/`),
+	and the printed frequency chart with every link (accessible, no-JS fallback).
 
-	Decisions (documented here for the lead):
-	- Audio never autoplays. Tuning a station (key press, dial release, keyboard step: all user gestures) starts its
-	  song; the shared AudioContext (`audio.unlock()`) is created in that gesture. The Web Audio code (`sound.ts`) is a
-	  lazy chunk, prefetched when the section comes near the viewport. One `<audio preload="none">` element plays the
-	  tuned station's file, so a song is only downloaded when its station is tuned. A station without a song is silent.
-	- Leaving the viewport **pauses** the music (no mini player). It does not resume by itself when the visitor comes
-	  back: resuming without a click would be autoplay. Dragging the needle off the station or tuning another one
-	  stops the song; the strip's play button pauses and resumes it.
-	- Star pulse: the section sets `--radio-pulse` (0…1, smoothed RMS of the playing track) on its root element. The
-	  local star layer reads it for its opacity. 0 when idle, paused, or under reduced motion (never written then).
-	- Reduced motion: needle and knob jump without a sweep, no star pulse, the horizon waveform is one static frame,
-	  the frequency chart (all links) is always visible.
-	- Loops: the waveform's RafLoop runs only while on screen and the tab is visible; the local StarField likewise.
+	- Audio never autoplays. Tuning (key, dial release, keyboard step) is the gesture that calls `audio.unlock()` and
+	  starts the song. `sound.ts` is a lazy chunk, prefetched near the viewport. One `<audio preload="none">` plays the
+	  tuned station, so a song downloads only when tuned. Stations without a song are silent.
+	- Leaving the viewport pauses; it never resumes on return (that would be autoplay). Leaving or changing the
+	  station stops the song; the strip's play button pauses/resumes.
+	- `--radio-pulse` (0…1, smoothed RMS) on the root drives the local stars. Never written when idle, paused or
+	  under reduced motion.
+	- Reduced motion: needle and knob jump, no pulse, static waveform frame, chart always visible.
+	- Waveform RafLoop and local StarField run only while on screen and the tab is visible.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -176,7 +171,7 @@
 	</div>
 
 	<div class="scene">
-		<!-- Landscape plate, aligned so its horizon crosses the radio (top row of the scene) at layout.horizonAt -->
+		<!-- Plate horizon crosses the radio at layout.horizonAt -->
 		<div class="stage" aria-hidden="true">
 			<enhanced:img
 				src="./assets/radio-landscape.webp?w=1920;1440;960"
@@ -246,7 +241,7 @@
 
 	<p class="sr-only" role="status">{selected ? m.home_radio_tuned_status({ name: selected.name }) : ''}</p>
 
-	<!-- The tuned station's song; `select()` sets its src, so nothing downloads before a station with a song is tuned -->
+	<!-- `select()` sets src, so nothing downloads before a station with a song is tuned -->
 	<audio
 		bind:this={player}
 		preload="none"
@@ -290,7 +285,7 @@
 {/snippet}
 
 {#snippet songControls(station: Station)}
-	<!-- Song of the tuned station on the glass: play/pause and volume once it is the committed station -->
+	<!-- Play/pause and volume on the glass, only for the committed station -->
 	{#if station.id === selected?.id}
 		<button type="button" class="song-button" onclick={togglePlay} aria-label={playing ? m.home_radio_pause() : m.home_radio_play()}>
 			{#if playing}
@@ -308,13 +303,12 @@
 
 <style>
 	/*
-	 * Layout. The landscape stage is positioned in the scene, whose first row starts with the radio, so the painted
-	 * horizon always crosses the radio at `horizonAt` (layout.ts) whatever the viewport. The section clips the overflow.
-	 *   --radio-w     rendered radio width
-	 *   --stage-w     landscape width (covers the section with slack); its height is --stage-w × plate aspect
-	 *   --crop        top fraction of the painted master cut off in the plate files (sky with the moon): the stage keeps
-	 *                 the master's box, the plate fills it from there down and fades in at its top edge
-	 *   --radio-pulse star pulse from the music (0…1), written by Waveform via setPulse
+	 * The stage is placed relative to the scene's first row (the radio), so the painted horizon crosses the radio at
+	 * `horizonAt` (layout.ts) on any viewport. The section clips the overflow.
+	 *   --stage-w     landscape width (covers the section with slack); height = --stage-w × plate aspect
+	 *   --crop        top fraction of the master cut from the plate files (moon sky); the stage keeps the master's box,
+	 *                 the plate fills it from there down and fades in at its top
+	 *   --radio-pulse 0…1, written by Waveform via setPulse
 	 */
 	.radio {
 		--radio-pulse: 0;
@@ -332,7 +326,7 @@
 		overflow: clip;
 		min-height: 100svh;
 		padding: var(--heading-top) var(--page-gutter) clamp(3rem, 8vh, 5rem);
-		/* the clipped plate must not end in a straight line: painted soft section edges (NightPage [data-feather]) */
+		/* soft painted section edges so the clipped plate never ends in a straight line (NightPage [data-feather]) */
 		--feather-top: clamp(4rem, 9vw, 8rem);
 		--feather-bottom: clamp(4rem, 9vw, 8rem);
 	}

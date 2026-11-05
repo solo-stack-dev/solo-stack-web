@@ -1,13 +1,12 @@
 <!--
 	@component
-	04:00 Open air cinema (docs/HANDOFF-HOMEPAGE.md §5.6). The mascot sits on the cliff next to his laptop, which projects
-	the latest video into a painted frame in the sky.
+	04:00 Open air cinema (docs/HANDOFF-HOMEPAGE.md §5.6): the mascot's laptop on the cliff projects the latest video into a painted frame.
 
-	- Facade: self-hosted thumbnail (see ./thumbnail.ts) + moon-shaped play button. No request to YouTube before the click.
-	- Click: the window swaps to a youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
-	- No video (empty feed or build without network): an empty, softly lit screen and a link to the channel.
-	- Dust motes drift in the beam (CSS), paused off screen; reduced motion: no motes, no beam animation.
-	- All rects live in ./layout.ts. Dev only: `?cinema=demo` shows a public demo video, `?cinema=empty` the empty state.
+	- Facade: self-hosted thumbnail (./thumbnail.ts) + moon play button; no request to YouTube before the click.
+	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
+	- No video (empty feed or offline build): empty lit screen + channel link.
+	- Dust motes (CSS) pause off screen; reduced motion: no motes, no beam animation.
+	- Rects: ./layout.ts. Dev only: `?cinema=demo` (public demo video), `?cinema=empty`.
 -->
 <script lang="ts">
 	import { dev } from '$app/env';
@@ -25,7 +24,7 @@
 
 	const latest = $derived(await getLatestVideo());
 
-	// Dev-only preview switch (the feed may be empty while building the section). Tree-shaken from production builds.
+	// Dev-only `?cinema=` preview (the feed may be empty in dev); tree-shaken from production.
 	let preview = $state<string | null>(null);
 	$effect(() => {
 		if (dev) preview = new URLSearchParams(window.location.search).get('cinema');
@@ -70,7 +69,7 @@
 		return `${placeVars(mote, mobile)}; --size: ${mote.size}px; --delay: ${mote.delay}s; --duration: ${mote.duration}s; --drift-x: ${mote.drift.x}px; --drift-y: ${mote.drift.y}px`;
 	});
 
-	// The 04:00 sky color, held through the section (see the backdrop note in the styles).
+	// 04:00 sky color for .backdrop (see the note there).
 	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'cinema')!.sky;
 
 	const embedUrl = (id: string) => `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
@@ -96,7 +95,7 @@
 	<div class="stage" {@attach near.attach}>
 		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
 		<enhanced:img src="./assets/cinema-landscape-mobile.webp?w=1080;828;640" alt="" class="layer landscape is-mobile" sizes="100vw" loading="lazy" decoding="async" />
-		<!-- Extra grain over the landscape's sky: the repainted sky (moon removed) is smoother than the original pigment. -->
+		<!-- Extra grain: the plate's repainted sky is smoother than its original pigment. -->
 		<div class="sky-grain" aria-hidden="true"><PaperGrain fixed={false} opacity={0.08} /></div>
 		<enhanced:img
 			src="./assets/cinema-cliff.webp?w=1582;1200;1100;960;760"
@@ -107,7 +106,7 @@
 			loading="lazy"
 			decoding="async"
 		/>
-		<!-- The shiny egg's golden filter fallback and sparkle apply to this .mascot wrapper (there is no golden sitting art). -->
+		<!-- Shiny egg: its golden filter fallback and sparkle target this wrapper (no golden sitting art). -->
 		<div class="placed mascot" style={place.mascot}>
 			<enhanced:img src="./assets/mascot-cinema-sitting.webp?w=480;300" alt="" class="mascot-art" sizes="(min-width: 48rem) 10vw, 19vw" loading="lazy" decoding="async" />
 		</div>
@@ -185,16 +184,14 @@
 	}
 
 	/*
-	 * Own night backdrop in the 04:00 color (NIGHT_HOURS), faded in at the top so it meets the 02:00 sky without a seam.
-	 * Without it the global sky is already blending toward butter here (its 06:00 stop is the page end), and the
-	 * mockups keep 04:00 dark until the sunrise's night edge passes. The global stars fade out in this range too,
-	 * so the backdrop carries a sparse local star field.
+	 * Own 04:00 backdrop (NIGHT_HOURS color + sparse local stars): here the global sky already blends toward butter (its 06:00
+	 * stop is the page end) and its stars fade out, but 04:00 must stay dark until the sunrise's night edge passes.
 	 */
 	.backdrop {
 		position: absolute;
 		inset: 0;
 		background: var(--cinema-sky);
-		/* painted soft edge (shared/transitions.ts): the top ~20 % feathers into the 02:00 sky under the mist bank */
+		/* painted soft edge (shared/transitions.ts): the top ~20 % feathers seamlessly into the 02:00 sky under the mist bank */
 		mask:
 			var(--feather-up) top / 100% 20% no-repeat,
 			linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat;
@@ -229,7 +226,7 @@
 		display: none;
 	}
 
-	/* The landscape plate is opaque: its top melts into the section's own night backdrop above the stage. */
+	/* Opaque plate: its top melts into the backdrop above the stage. */
 	.landscape {
 		mask:
 			var(--feather-up) top / 100% 12% no-repeat,
@@ -243,10 +240,9 @@
 		mask-image: linear-gradient(#000 70%, transparent);
 	}
 
-	/* The bottom melts into the solid night that opens the sunrise section (its ink-wash wipe): the product
-	   (intersect) of two copies of the wet wash at different widths and offsets, tiled sideways near the painted
-	   aspect, so the landscape ends in ink blooms instead of a straight horizontal fade (the wash's even haze squares
-	   away). Opaque at the bottom line, where the sunrise night continues. */
+	/* Bottom melts into the night that opens the sunrise (its ink-wash wipe): intersect of two wet-wash copies at different
+	   widths/offsets, tiled near the painted aspect, so it ends in ink blooms, not a straight fade (the even haze squares away).
+	   Opaque at the bottom line, where the sunrise night continues. */
 	.landscape-fade {
 		position: absolute;
 		/* 2px past the stage bottom: no fractional last pixel row lets the cliff's lit bottom edge through */

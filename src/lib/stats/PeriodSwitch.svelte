@@ -1,7 +1,7 @@
 <!--
 	@component
-	The one filter of the page: 7, 30 or 90 days. Each option carries a moon phase that fills up with the period
-	(crescent, half, full), and a butter disc slides to the chosen one. Native radio inputs, so arrow keys work.
+	The page's only filter: 7, 30 or 90 days, each with a moon phase (crescent, half, full); a butter disc slides to the chosen one.
+	Native radio inputs, so arrow keys work.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

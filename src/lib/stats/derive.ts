@@ -1,4 +1,4 @@
-/** Pure helpers that turn the daily `Stats` series into what the page shows for a period. */
+/** Pure helpers: daily `Stats` series → per-period page values. */
 import { HISTORY_DAYS, type Period, type Stats, type StatPlatformId } from './schema.ts';
 
 const LAST = HISTORY_DAYS - 1;
@@ -7,7 +7,7 @@ const DAY_MS = 86_400_000;
 /** UTC date of a series index (`HISTORY_DAYS - 1` is `asOf`). */
 export const dateAt = (asOf: string, index: number) => new Date(Date.parse(asOf) - (LAST - index) * DAY_MS);
 
-/** The points of a period: its start value plus one point per day (`days + 1` values). */
+/** A period's points: start value plus one per day (`days + 1` values). */
 export const periodSlice = <T>(series: readonly T[], days: Period): T[] => series.slice(LAST - days);
 
 export interface Change {
@@ -33,7 +33,7 @@ export interface PeriodSum {
 	ratio: number;
 }
 
-/** Sum of a per day series (views, watch time, posts) inside the period, and the period before it. */
+/** Sum of a per-day series (views, watch time, posts) over the period and the one before. */
 export function sumOf(series: readonly number[], days: Period): PeriodSum {
 	const sum = (from: number, to: number) => series.slice(from, to).reduce((total, value) => total + value, 0);
 	const value = sum(LAST - days + 1, LAST + 1);
@@ -41,7 +41,7 @@ export function sumOf(series: readonly number[], days: Period): PeriodSum {
 	return { value, previous, ratio: previous > 0 ? (value - previous) / previous : 0 };
 }
 
-/** Growth of a running total compared with its growth in the previous period (e.g. new followers). */
+/** Growth of a running total vs. its growth in the previous period (e.g. new followers). */
 export function newOf(series: readonly number[], days: Period): PeriodSum {
 	const value = series[LAST] - series[LAST - days];
 	const previous = series[LAST - days] - series[Math.max(0, LAST - 2 * days)];
@@ -52,7 +52,7 @@ export function newOf(series: readonly number[], days: Period): PeriodSum {
 export const totalFollowers = (stats: Stats): number[] =>
 	Array.from({ length: HISTORY_DAYS }, (_, day) => stats.platforms.reduce((total, platform) => total + platform.followers[day], 0));
 
-/** Platforms that get their own color in the stacked chart and the share bar, in slot order. The rest is "other". */
+/** Platforms with their own color in the stacked chart and share bar, in slot order; the rest is "other". */
 export const SERIES_PLATFORMS = ['youtube', 'tiktok', 'instagram', 'x'] as const satisfies readonly StatPlatformId[];
 export type SeriesKey = (typeof SERIES_PLATFORMS)[number] | 'other';
 export const SERIES_KEYS: readonly SeriesKey[] = [...SERIES_PLATFORMS, 'other'];

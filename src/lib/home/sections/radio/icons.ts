@@ -1,8 +1,7 @@
 /**
- * Platform logos from Simple Icons 16.36.0 (https://simpleicons.org, CC0 1.0). Only the path data in use, copied
- * verbatim (24×24 viewBox). Brand rules: render each logo unmodified (no distortion, rotation, or effects that change
- * its shape) in a single color. We use ink on the keys (black version) and cream on the dial glass (white version),
- * which all ten platforms permit for monochrome contexts.
+ * Platform logos from Simple Icons 16.36.0 (https://simpleicons.org, CC0 1.0), path data copied verbatim (24×24).
+ * Brand rules: unmodified shape (no distortion, rotation or shape-changing effects), one color. Ink on the keys and
+ * cream on the glass are the black/white versions all ten platforms permit for monochrome use.
  */
 import type { SocialId } from '#lib/home/data/socials.ts';
 

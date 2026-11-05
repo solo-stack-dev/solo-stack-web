@@ -1,7 +1,6 @@
 <!--
 	@component
-	Simple footer for the non-home pages: wordmark with the tagline, legal links, and the social icons (same Simple
-	Icons paths as the sunrise footer). The homepage has its own painted footer (06:00 sunrise).
+	Footer of the non-home pages (the homepage has the sunrise). Social icons use the same Simple Icons paths as the sunrise.
 -->
 <script lang="ts">
 	import { linkedSocials } from '#lib/home/data/socials.ts';
@@ -11,8 +10,8 @@
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 
 	const socials = linkedSocials();
-	// TODO(owner): the imprint and privacy pages do not exist yet (same as in the sunrise footer; /kontakt does). rel="external"
-	// keeps the prerender crawler from failing on them; drop it once the pages exist.
+	// TODO(owner): imprint and privacy pages do not exist yet (/kontakt does; same in the sunrise footer).
+	// rel="external" keeps the prerender crawler from failing on them; drop it once they exist.
 	const legalLabels = { imprint: m.site_footer_imprint, privacy: m.site_footer_privacy, contact: m.site_footer_contact };
 	const year = new Date().getFullYear();
 </script>

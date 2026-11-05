@@ -1,14 +1,12 @@
 <!--
 	@component
-	Watercolor paper grain as a repeating background tile, decoded once, so it costs nothing while scrolling.
-	`pointer-events: none`, `aria-hidden`.
+	Watercolor paper grain as a repeating background tile: decoded once, free while scrolling.
 
-	Default texture: the painted grain (docs/art/shared/paper-grain.png → a two-tone cream/ink alpha tile, 10 kB lossless WebP), which
-	reads on dark night and on butter paper with plain `normal` blending. `texture="generated"` uses the old SVG
-	`feTurbulence` noise; `src` (+ `size`) any other tile.
+	Default: the painted grain (docs/art/shared/paper-grain.png → two-tone cream/ink alpha tile, 10 kB lossless WebP),
+	which reads on night and on butter paper with `normal` blending. `texture="generated"`: SVG `feTurbulence` noise.
 
-	NightPage already renders one fixed grain over the whole page. Use extra instances only for local texture
-	(e.g. a stronger grain on a paper card): `<PaperGrain fixed={false} opacity={0.12} />` inside a positioned parent.
+	NightPage renders one fixed grain over the page. Extra instances only for local texture, e.g.
+	`<PaperGrain fixed={false} opacity={0.12} />` inside a positioned parent.
 -->
 <script lang="ts">
 	import { PAPER_GRAIN } from './materials.ts';

@@ -1,9 +1,8 @@
 <!--
 	@component
-	The platforms as a star chart instead of a card grid. Left: a round night sky (a planisphere disc, also on the
-	paper theme) where every platform is a star; its size is its share of all followers and the faint lines draw the
-	Solo Stack sign. Right: a ruled ledger with the exact numbers, linked profiles and trend lines. Hovering or
-	focusing a row lights its star, and hovering a star lights its row. Discord is an unlit star ("comes later").
+	Platforms as a star chart. Left: a planisphere disc (also on the paper theme), one star per platform, sized by follower share;
+	faint lines draw the Solo Stack sign. Right: ruled ledger with exact numbers, profile links and trends. Hovering or focusing a
+	row lights its star; hovering a star lights its row. Discord is an unlit star ("comes later").
 -->
 <script lang="ts">
 	import { SOCIALS, type SocialId } from '#lib/home/data/socials.ts';

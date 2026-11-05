@@ -1,8 +1,7 @@
 <!--
 	@component
-	Mounts a heavy component (dynamic `import()`, so it becomes its own chunk) when its slot comes near the viewport
-	(IntersectionObserver, default `rootMargin` one viewport). Renders `fallback` until the chunk is loaded, and keeps
-	the fallback if loading fails (or renders `failed`).
+	Mounts a heavy component (dynamic `import()`, own chunk) when its slot comes near the viewport. Renders `fallback`
+	until loaded; on failure keeps it (or renders `failed`).
 
 	```svelte
 	<LazyMount load={() => import('./MoonScene.svelte')} props={{ phase }} when={!reducedMotion.current} idle class="absolute inset-0">
@@ -10,10 +9,9 @@
 	</LazyMount>
 	```
 
-	- `when`: extra condition (e.g. WebGL available, motion allowed, play clicked). Loading starts once it is `true`
-	  and the slot is near.
-	- `idle`: additionally wait for `requestIdleCallback` (hero enhancements after first paint).
-	- The wrapper is a `div` (IntersectionObserver needs a box). Size it with `class` so nothing shifts on mount.
+	- `when`: extra condition (e.g. WebGL available, motion allowed, play clicked).
+	- `idle`: also wait for `requestIdleCallback` (hero enhancements after first paint).
+	- The wrapper is a `div` (IntersectionObserver needs a box); size it with `class` so nothing shifts on mount.
 -->
 <script lang="ts" generics="Props extends Record<string, unknown>">
 	import type { Component, Snippet } from 'svelte';

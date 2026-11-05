@@ -4,9 +4,8 @@ import { THUMBNAIL_FORMATS, THUMBNAIL_WIDTHS, VIDEO_ID_PATTERN, type ThumbnailFo
 import { renderVideoThumbnail } from '#lib/home/sections/cinema/thumbnail.server.ts';
 import type { RequestHandler } from './$types';
 
-// Self-hosted, 16:9-cropped thumbnail variants for the video facades (see src/lib/home/sections/cinema/thumbnail.ts).
-// Prerendered when the crawler meets a variant in a `srcset`, `<img src>` or `og:image`. 'auto' instead of `true`:
-// with an empty feed and no video posts there is nothing to crawl, and an unseen `true` route would fail the build.
+// Self-hosted 16:9 thumbnails (src/lib/home/sections/cinema/thumbnail.ts), prerendered when the crawler meets one in a
+// `srcset`, `<img src>` or `og:image`. 'auto', not `true`: with no videos nothing is crawled and a `true` route would fail the build.
 export const prerender = 'auto';
 
 const CONTENT_TYPES: Record<ThumbnailFormat, string> = { avif: 'image/avif', webp: 'image/webp', jpg: 'image/jpeg' };
@@ -14,7 +13,7 @@ const CONTENT_TYPES: Record<ThumbnailFormat, string> = { avif: 'image/avif', web
 const isFormat = (format: string): format is ThumbnailFormat => (THUMBNAIL_FORMATS as readonly string[]).includes(format);
 
 export const GET: RequestHandler = async ({ params }) => {
-	// Only the prerendered copies are served in production; the Worker never proxies or encodes thumbnails.
+	// Production serves only prerendered copies; the Worker never proxies or encodes thumbnails.
 	if (!building && !dev) error(404);
 	const width = Number(params.width);
 	const { format } = params;

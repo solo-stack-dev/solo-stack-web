@@ -7,15 +7,13 @@
 
 	let { children }: LayoutProps = $props();
 
-	// Absolute URL of the current page in another locale. Used for hreflang alternates, which
-	// Google requires to be fully qualified. The prerender crawler also follows these links,
-	// so every locale variant of a prerendered page gets built.
+	// Absolute (Google requires it for hreflang). The prerender crawler follows these, so every locale variant gets built.
 	const alternateHref = (locale: Locale) => new URL(localizeHref(page.url.pathname, { locale }), page.url.origin).href;
 
 	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]).
 	const ownAlternates = $derived(page.route.id === '/(site)/blog/[slug]');
 
-	// DevTools egg on every page (wordmark + System window, `window.arise()`), loaded once the page is idle
+	// Console egg, loaded on idle
 	const installConsoleEgg = () => import('#lib/components/site/console-egg.ts').then((module) => module.install()).catch(() => {});
 
 	$effect(() => {
@@ -29,7 +27,7 @@
 </script>
 
 <svelte:head>
-	<!-- The navbar crescent on a night tile. static/favicon.ico and static/apple-touch-icon.png are renders of the same SVG. -->
+	<!-- Navbar crescent on a night tile; static/favicon.ico and apple-touch-icon.png are renders of the same SVG. -->
 	<link rel="icon" href="/favicon.ico" sizes="48x48" />
 	<link rel="icon" href={favicon} type="image/svg+xml" />
 	<link rel="apple-touch-icon" href="/apple-touch-icon.png" />

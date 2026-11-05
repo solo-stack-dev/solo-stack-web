@@ -1,19 +1,16 @@
 #!/usr/bin/env node
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Optimizes the painted section transition masters (docs/art/transitions/) into runtime assets under
-// src/lib/home/shared/assets/transitions/. Re-run after the masters change:
+// Masters in docs/art/transitions/ → src/lib/home/shared/assets/transitions/ (usage: shared/transitions.ts). Re-run after
+// the masters change:
 //
 //   node src/lib/home/shared/tools/optimize-transitions.mjs
 //
-// - feather-{down,up}.webp: the soft low-frequency plate edge (alpha; `down` opaque above / transparent below,
-//   `up` its vertical flip), 1280×256, stretched to the plate edge by CSS.
-// - wash-spread-up.webp / wash-spread-down.webp: the wet spreading wash ramp, flipped so the plate is opaque below the
-//   front (hero → making wipe), and as painted (opaque above; adds blooms to the retreating sunrise night), 768×768.
-// - wash-dry.webp: the drying, retreating wash ramp (sunrise night), opaque above the front, 768×768.
-// - mist-{dusk,night,predawn}.webp: painted mist strips with alpha, 1920×540 masters for enhanced-img (Mist.svelte).
+// - feather-{down,up}.webp: 1280×256; `down` opaque above, `up` flipped.
+// - wash-spread-{up,down}.webp: 768×768; `up` flipped, `down` as painted. wash-dry.webp: 768×768, opaque above.
+// - mist-{dusk,night,predawn}.webp: 1920×540 alpha strips, masters for enhanced-img (Mist.svelte).
 //
-// Mask files are white + alpha: only their alpha matters (CSS `mask-mode: alpha`), so RGB is flattened to white,
-// which compresses far better. Uses `sharp` from pnpm's virtual store (no new dependency).
+// Masks: only alpha matters (`mask-mode: alpha`), so RGB is flattened to white, which compresses far better.
+// Uses `sharp` from pnpm's virtual store (no new dependency).
 import { existsSync, mkdirSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
