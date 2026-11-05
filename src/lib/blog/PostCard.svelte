@@ -24,11 +24,11 @@
 
 	let { post, featured = false, eager = false }: Props = $props();
 
-	// Rendered width. Index: max-w-6xl (72rem), px-4/sm:6/lg:8. Featured from md: 1.2fr + 1fr, gap up to 4rem. Rows from md: 17rem art.
+	// Rendered width. Index: max-w-6xl (72rem), px-4/sm:6/lg:8. Featured from md: 7fr + 5fr, gap up to 4rem. Rows from md: 15/19rem art.
 	const SIZES_SINGLE = '(min-width: 40rem) calc(100vw - 3rem), calc(100vw - 2rem)';
 	const sizes = $derived(
 		featured
-			? `(min-width: 72rem) 36rem, (min-width: 48rem) calc((100vw - 7rem) * 0.55), ${SIZES_SINGLE}`
+			? `(min-width: 72rem) 38rem, (min-width: 48rem) calc((100vw - 7rem) * 0.58), ${SIZES_SINGLE}`
 			: `(min-width: 64rem) 19rem, (min-width: 48rem) 15rem, ${SIZES_SINGLE}`
 	);
 </script>
@@ -52,13 +52,13 @@
 			<a href={postHref(post)} hreflang={post.lang}>{post.title}</a>
 		</h2>
 		<p class="teaser" lang={post.lang}>{post.description}</p>
+		<!-- One meta line in one voice: date · reading time · format -->
 		<p class="meta">
-			<span class="format">{FORMAT_LABELS[post.format]()}</span>
-			<span class="facts">
-				<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-				<span aria-hidden="true">·</span>
-				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-			</span>
+			<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+			<span aria-hidden="true">·</span>
+			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+			<span aria-hidden="true">·</span>
+			<span>{FORMAT_LABELS[post.format]()}</span>
 		</p>
 		<!-- A brushed arrow that walks on hover -->
 		<svg class="go" viewBox="0 0 64 16" aria-hidden="true">
@@ -176,8 +176,8 @@
 
 	/* Text ------------------------------------------------------------------------------------------------------ */
 
+	/* Not positioned: the title link's stretched ::after must resolve against .entry, so the art is part of the link */
 	.body {
-		position: relative;
 		display: grid;
 		align-content: start;
 		gap: 0.75rem;
@@ -228,38 +228,11 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
-		gap: 0.4rem 1rem;
+		gap: 0.25rem 0.5rem;
 		margin-top: 0.25rem;
 		color: var(--muted-foreground);
-		font-size: 0.8125rem;
+		font-size: 0.875rem;
 		font-variant-numeric: tabular-nums;
-	}
-
-	.facts {
-		display: inline-flex;
-		gap: 0.5rem;
-	}
-
-	/* Format as an ink label, no pill: a short brush dash leads it */
-	.format {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.55rem;
-		color: var(--ink-lit);
-		font-family: var(--font-mono);
-		font-size: var(--text-label-sm);
-		font-weight: 600;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-	}
-
-	.format::before {
-		content: '';
-		width: 1.1rem;
-		height: 2px;
-		border-radius: 2px;
-		background: currentColor;
-		opacity: 0.8;
 	}
 
 	.go {
@@ -296,13 +269,14 @@
 
 	@media (min-width: 48rem) {
 		.is-featured {
-			grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+			/* art 7/12, text 5/12 */
+			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 			align-items: center;
 			gap: clamp(2rem, 4.5vw, 4rem);
 		}
 
 		.is-featured .title {
-			font-size: clamp(1.9rem, 3vw, 2.75rem);
+			font-size: clamp(1.9rem, 2.7vw, 2.5rem);
 			line-height: 1;
 		}
 

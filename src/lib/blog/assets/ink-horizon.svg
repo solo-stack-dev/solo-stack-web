@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 96">
+	<!-- Interim section break (docs/critique/ROUND-2.md): a sumi horizon, a crooked little tree on a mound (the reading hill
+	     seen from far away). Used as a CSS mask, so only the alpha counts; fill in CSS. Edges roughened by turbulence. -->
+	<filter id="r" x="-4%" y="-30%" width="108%" height="160%">
+		<feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="3" seed="4" />
+		<feDisplacementMap in="SourceGraphic" scale="4" xChannelSelector="R" yChannelSelector="G" />
+	</filter>
+	<filter id="b" x="-2%" y="-200%" width="104%" height="500%">
+		<feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="2" seed="3" />
+		<feDisplacementMap in="SourceGraphic" scale="3" xChannelSelector="R" yChannelSelector="G" result="d" />
+		<feTurbulence type="fractalNoise" baseFrequency="0.02 0.4" numOctaves="2" seed="9" />
+		<feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -7 4.4" result="n" />
+		<feComposite in="d" in2="n" operator="in" />
+	</filter>
+	<path filter="url(#b)" d="M4 78.9Q240 75.4 476 78.7Q240 81.6 4 78.9Z" />
+	<g filter="url(#r)">
+		<path d="M256 79C284 72 308 61 337 60C366 59 390 68.5 418 79Z" />
+		<path d="M333 62C331 53 334 46 341 40C345 36.5 348 34 350 30" fill="none" stroke="#000" stroke-width="3.6" stroke-linecap="round" />
+		<path d="M339 47C330 43 321 40.5 311 39.5M343 40C351 36 359 34.5 368 35M348 33C348 28 345 24 341 21.5" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" />
+		<ellipse cx="305" cy="37.5" rx="5" ry="3.2" /><ellipse cx="312" cy="35.5" rx="6" ry="3.8" /><ellipse cx="319" cy="37" rx="5" ry="3" /><ellipse cx="316" cy="32.5" rx="4.5" ry="3" /><ellipse cx="324" cy="33.5" rx="4" ry="2.8" />
+		<ellipse cx="363" cy="32" rx="5" ry="3.4" /><ellipse cx="371" cy="30.5" rx="6" ry="3.8" /><ellipse cx="378" cy="33" rx="4.5" ry="3" /><ellipse cx="367" cy="28" rx="4" ry="2.8" /><ellipse cx="357" cy="28.5" rx="4" ry="2.6" />
+		<ellipse cx="336" cy="20" rx="4.5" ry="3" /><ellipse cx="343" cy="17.5" rx="5.5" ry="3.6" /><ellipse cx="350" cy="20.5" rx="4.5" ry="3" /><ellipse cx="346" cy="23" rx="3.5" ry="2.4" />
+		<path d="M262 77.5l-2.5-6M266 77l1-6.5M270 76.5l-1.5-4.5M390 72l2.5-6M394 73l-.5-5.5M398 74.5l2-4" stroke="#000" stroke-width="1.1" stroke-linecap="round" />
+	</g>
+</svg>
