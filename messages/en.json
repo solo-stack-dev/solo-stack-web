@@ -33,6 +33,8 @@
 	"home_making_state_moon_title": "The night continues",
 	"home_making_pillars_label": "AI, code, projects and business",
 	"home_making_skip_label": "Skip drawings, go to game",
+	"home_making_pause": "Pause drawing rotation",
+	"home_making_play": "Resume drawing rotation",
 	"home_game_title": "Time for a little round?",
 	"home_game_tabs_label": "Choose a game",
 	"home_game_play": "Play",
