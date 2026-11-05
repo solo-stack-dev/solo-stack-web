@@ -1,6 +1,7 @@
 <!--
 	@component
-	The page's only filter: 7, 30 or 90 days, each with a moon phase (crescent, half, full); a butter disc slides to the chosen one.
+	The page's only filter: 7, 30 or 90 days, each drawn as a slice of the growth tree's trunk with one, two or three growth rings
+	(rings are how a tree keeps time; the moon stays on the homepage); a butter disc slides to the chosen one.
 	Native radio inputs, so arrow keys work.
 -->
 <script lang="ts">
@@ -10,12 +11,13 @@
 
 	let { value = $bindable(), class: className }: { value: Period; class?: string } = $props();
 
-	/** Lit part of the moon per period, as a path in a 16×16 box (light from the right). */
-	const PHASE: Record<Period, string> = {
-		7: 'M8 1.4A6.6 6.6 0 0 1 8 14.6A3.6 6.6 0 0 0 8 1.4Z',
-		30: 'M8 1.4A6.6 6.6 0 0 1 8 14.6Z',
-		90: 'M8 1.4A6.6 6.6 0 0 1 8 14.6A6.6 6.6 0 0 1 8 1.4Z'
-	};
+	/** Growth rings per period in a 16×16 box: slightly eccentric, like a real trunk slice (cx, cy, r). */
+	const RINGS: [number, number, number][] = [
+		[8.35, 8.3, 2.5],
+		[8.15, 8.1, 4.5],
+		[8, 8, 6.5]
+	];
+	const COUNT: Record<Period, number> = { 7: 1, 30: 2, 90: 3 };
 
 	const index = $derived(PERIODS.indexOf(value));
 	const name = $props.id();
@@ -34,8 +36,18 @@
 		>
 			<input type="radio" {name} value={days} bind:group={value} class="sr-only" />
 			<svg viewBox="0 0 16 16" class="size-4 shrink-0" aria-hidden="true">
-				<circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1" />
-				<path d={PHASE[days]} fill="currentColor" />
+				<circle cx="8.45" cy="8.4" r="0.9" fill="currentColor" />
+				{#each RINGS.slice(0, COUNT[days]) as [cx, cy, r], ring (ring)}
+					<circle
+						{cx}
+						{cy}
+						{r}
+						fill="none"
+						stroke="currentColor"
+						stroke-width={ring === COUNT[days] - 1 ? 1.4 : 1}
+						stroke-opacity={ring === COUNT[days] - 1 ? 1 : 0.55}
+					/>
+				{/each}
 			</svg>
 			{m.stats_period_days({ days })}
 		</label>

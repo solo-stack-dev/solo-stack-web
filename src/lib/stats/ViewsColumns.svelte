@@ -1,7 +1,7 @@
 <!--
 	@component
-	Daily YouTube views as columns of light: rounded pigment strokes fading toward the ground, best day marked, dotted guides.
-	Hover or drag to read a day. Plain SVG (measured width).
+	Daily YouTube views as columns of light rising out of a strip of ink ground (silhouette grass, the hill's material), best day
+	marked, dotted guides. Hover or drag to read a day. Plain SVG (measured width).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -13,7 +13,9 @@
 	let height = $state(260);
 	const id = $props.id();
 
-	const PAD = { left: 40, right: 4, top: 26, bottom: 24 };
+	const PAD = { left: 40, right: 4, top: 26, bottom: 30 };
+
+	const fract = (value: number) => value - Math.floor(value);
 
 	const layout = $derived.by(() => {
 		const w = Math.max(240, width);
@@ -37,9 +39,22 @@
 				const barH = Math.max(bar, (row.views / top) * plotH);
 				return { x: PAD.left + slot * index + (slot - bar) / 2, y: PAD.top + plotH - barH, h: barH };
 			}),
-			base: PAD.top + plotH
+			base: PAD.top + plotH,
+			ground: groundPath(w, PAD.top + plotH)
 		};
 	});
+
+	/** Ink ground along the baseline: a low uneven strip with deterministic grass blades in front of the columns' feet. */
+	function groundPath(w: number, base: number) {
+		let d = `M${PAD.left - 6} ${base + 7}L${PAD.left - 6} ${base + 1}`;
+		for (let x = PAD.left - 4, index = 0; x < w - PAD.right; x += 3 + fract(Math.sin(index * 91.7) * 4375.5) * 4, index++) {
+			const a = fract(Math.sin(index * 12.9898) * 43758.5453);
+			const tall = 2.5 + a * a * 9;
+			const lean = (fract(a * 13.1) - 0.5) * 4;
+			d += `L${(x - 1.1).toFixed(1)} ${base + 1}L${(x + lean).toFixed(1)} ${(base - tall).toFixed(1)}L${(x + 1.1).toFixed(1)} ${base + 1}`;
+		}
+		return `${d}L${w - PAD.right + 4} ${base + 1}L${w - PAD.right + 4} ${base + 7}Q${w / 2} ${base + 9} ${PAD.left - 6} ${base + 7}Z`;
+	}
 
 	const labelEvery = $derived(Math.ceil(rows.length / Math.max(2, Math.floor(layout.w / 90))));
 
@@ -88,7 +103,7 @@
 				<text x={bar.x + layout.bar / 2} y={layout.h - 6} text-anchor={index === rows.length - 1 ? 'end' : 'middle'} class="tick">{formatDay(rows[index].date)}</text>
 			{/if}
 		{/each}
-		<line x1={PAD.left} x2={layout.w - PAD.right} y1={layout.base + 0.5} y2={layout.base + 0.5} stroke="currentColor" stroke-opacity="0.35" />
+		<path d={layout.ground} class="ground" />
 	</svg>
 
 	<div
@@ -114,6 +129,14 @@
 		--col-top: var(--color-butter);
 		--col-bottom: var(--color-butter);
 		--col-bottom-alpha: 0.08;
+	}
+
+	.ground {
+		fill: var(--color-ink);
+	}
+
+	:global(.dark) .ground {
+		fill: #0b0b0c;
 	}
 
 	.tick {

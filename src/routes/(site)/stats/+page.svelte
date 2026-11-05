@@ -4,6 +4,7 @@
 	import ActivityCalendar from '#lib/stats/ActivityCalendar.svelte';
 	import Constellation from '#lib/stats/Constellation.svelte';
 	import Horizon from '#lib/stats/Horizon.svelte';
+	import Roots from '#lib/stats/Roots.svelte';
 	import SectionHeading from '#lib/stats/SectionHeading.svelte';
 	import YoutubeSection from '#lib/stats/YoutubeSection.svelte';
 	import { getStats } from '#lib/stats/stats.remote.ts';
@@ -32,20 +33,24 @@
 <div class="overflow-x-clip pb-24 text-foreground">
 	<Horizon {stats} bind:period />
 
-	<div class="mx-auto grid max-w-6xl gap-24 px-4 pt-16 sm:px-6 sm:pt-20 lg:gap-32 lg:px-8">
-		<section class="grid gap-10" aria-labelledby="stats-platforms">
-			<SectionHeading id="stats-platforms" title={m.stats_platforms_title()} description={m.stats_platforms_description()} />
-			<Constellation {stats} {period} />
-		</section>
+	<!-- Below the hill: the tree's root runs down the margin past every section -->
+	<div class="relative">
+		<Roots />
+		<div class="relative mx-auto grid max-w-6xl gap-24 px-4 pt-16 sm:px-6 sm:pt-20 lg:gap-32 lg:px-8">
+			<section class="grid gap-10" aria-labelledby="stats-platforms">
+				<SectionHeading id="stats-platforms" title={m.stats_platforms_title()} description={m.stats_platforms_description()} />
+				<Constellation {stats} {period} />
+			</section>
 
-		<section class="grid gap-10" aria-labelledby="stats-youtube">
-			<SectionHeading id="stats-youtube" title={m.stats_youtube_title()} description={m.stats_youtube_description()} tilt={1.5} />
-			<YoutubeSection {stats} {period} />
-		</section>
+			<section class="grid gap-10" aria-labelledby="stats-youtube">
+				<SectionHeading id="stats-youtube" title={m.stats_youtube_title()} description={m.stats_youtube_description()} tilt={1.5} />
+				<YoutubeSection {stats} {period} />
+			</section>
 
-		<section class="grid gap-10" aria-labelledby="stats-activity">
-			<SectionHeading id="stats-activity" title={m.stats_activity_title()} description={m.stats_activity_description({ weeks })} tilt={-1} />
-			<ActivityCalendar {stats} />
-		</section>
+			<section class="grid gap-10" aria-labelledby="stats-activity">
+				<SectionHeading id="stats-activity" title={m.stats_activity_title()} description={m.stats_activity_description({ weeks })} tilt={-1} />
+				<ActivityCalendar {stats} />
+			</section>
+		</div>
 	</div>
 </div>

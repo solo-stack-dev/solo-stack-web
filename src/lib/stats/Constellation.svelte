@@ -165,7 +165,7 @@
 					aria-hidden="true"
 				></span>
 				<span
-					class="grid size-9 place-items-center rounded-full ring-1 ring-foreground/15 transition-colors group-data-lit/row:bg-night group-data-lit/row:text-butter dark:group-data-lit/row:bg-butter dark:group-data-lit/row:text-night"
+					class="grid size-9 place-items-center rounded-full text-foreground/70 transition-[color,background-color,box-shadow] duration-300 group-data-lit/row:bg-night group-data-lit/row:text-butter group-data-lit/row:shadow-[0_0_18px_rgb(252_215_114/0.45)] dark:group-data-lit/row:bg-butter dark:group-data-lit/row:text-night"
 				>
 					<PlatformIcon id={row.social.id} class="size-4" />
 				</span>
