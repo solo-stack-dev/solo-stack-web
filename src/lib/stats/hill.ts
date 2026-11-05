@@ -33,10 +33,8 @@ export interface LayoutSpec {
 	mascotGap: number;
 	/** Where the land meets the right canvas edge, fraction of the height. */
 	rightEdge: number;
-	/** Where the ink's foot starts to dissolve into the paper, fraction of the height. */
-	dissolve: number;
-	/** Seal (stamp) beside the trunk ('trunk') or right-aligned to the canvas edge on narrow canvases ('edge'). */
-	seal: 'trunk' | 'edge';
+	/** Mean height of the ink's painted foot (where the brush runs out), fraction of the height. */
+	foot: number;
 }
 
 export const LAYOUTS = {
@@ -52,8 +50,7 @@ export const LAYOUTS = {
 		mascot: 0.27,
 		mascotGap: 0.02,
 		rightEdge: 0.66,
-		dissolve: 0.9,
-		seal: 'edge'
+		foot: 0.95
 	},
 	/** From 640 px: the canvas tucks under the big number, the tree rises beside it. */
 	wide: {
@@ -67,8 +64,7 @@ export const LAYOUTS = {
 		mascot: 0.19,
 		mascotGap: 0.08,
 		rightEdge: 0.5,
-		dissolve: 0.86,
-		seal: 'trunk'
+		foot: 0.93
 	}
 } as const satisfies Record<string, LayoutSpec>;
 
@@ -165,11 +161,13 @@ export interface HillGeometry {
 	tree: Placement;
 	rays: Placement;
 	mascot: Placement;
+	/** Mask shape of the ink: everything above an irregular painted foot (dry-brush filter in the component). */
+	foot: string;
 	/** Points in percent of the canvas. */
 	glow: { left: number; top: number };
-	seal: { left: number; top: number; shift: number };
-	startLabel: { left: number; top: number };
-	endLabel: { left: number; top: number };
+	/** Date labels set into the ink just under the path, turned with it (angle in degrees). */
+	startLabel: { left: number; top: number; angle: number };
+	endLabel: { left: number; top: number; angle: number };
 }
 
 export function hill(values: readonly number[], name: LayoutName): HillGeometry {
@@ -270,6 +268,27 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 	const mascotX = rootLeft - mascotW * (spec.mascotGap + (ART.mascot.width - 90 - ART.mascot.centerX) / ART.mascot.width);
 	const mascotY = Math.max(surfaceAt(mascotX - mascotW * 0.25), surfaceAt(mascotX + mascotW * 0.2)) + mascotW * 0.03;
 
+	// Date labels: a little way along the path, offset along its normal into the ink, turned with the slope. The end label
+	// stops short of the painted roots (and of the mascot above them).
+	const along = (x: number, offset: number) => {
+		const y = crestAt(points, slopes, x);
+		const slope = (crestAt(points, slopes, x + 2) - crestAt(points, slopes, x - 2)) / 4;
+		const angle = Math.atan(slope);
+		return { left: pct(x - Math.sin(angle) * offset, w), top: pct(y + Math.cos(angle) * offset, h), angle: Math.round(((angle * 180) / Math.PI) * 10) / 10 };
+	};
+	const labelOffset = h * 0.028;
+	const startLabel = along(sx + w * 0.012, labelOffset);
+	const endLabel = along(Math.max(sx + w * 0.3, rootLeft - w * 0.012), labelOffset);
+
+	// The painted foot: the brush runs out at an uneven height (two slow waves and a quicker one), never a straight edge.
+	const brushEnd = (x: number) => {
+		const u = x / w;
+		return h * (spec.foot - 0.01 + 0.034 * Math.sin(u * 5.3 + 0.7) + 0.02 * Math.sin(u * 17.1 + 2.1) + 0.01 * Math.sin(u * 47 + 0.3));
+	};
+	let foot = `M-420 -60L${w + 420} -60`;
+	for (let x = w + 420; x >= -420; x -= w / 64) foot += `L${r(x)} ${r(brushEnd(x))}`;
+	foot += 'Z';
+
 	return {
 		spec,
 		points,
@@ -280,12 +299,9 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		tree: { left: pct(treeLeft, w), top: pct(treeTop, h), width: pct(treeW, w) },
 		rays: { left: pct(canopyX - ART.rays.originX * raysScale, w), top: pct(raysOriginY - ART.rays.originY * raysScale, h), width: pct(raysW, w) },
 		mascot: { left: pct(mascotX - ART.mascot.centerX * mascotScale, w), top: pct(mascotY - ART.mascot.groundY * mascotScale, h), width: pct(mascotW, w) },
+		foot,
 		glow: { left: pct(canopyX, w), top: pct(canopyY, h) },
-		seal:
-			spec.seal === 'edge'
-				? { left: pct(w - 14, w), top: pct(mound + (h - mound) * 0.5, h), shift: -100 }
-				: { left: pct(ex + treeW * 0.06, w), top: pct(mound + (h - mound) * 0.36, h), shift: 0 },
-		startLabel: { left: pct(sx, w), top: pct(sy + h * 0.045, h) },
-		endLabel: { left: pct(ex - treeW * 0.06, w), top: pct(mound + (h - mound) * (spec.seal === 'edge' ? 0.16 : 0.36), h) }
+		startLabel,
+		endLabel
 	};
 }

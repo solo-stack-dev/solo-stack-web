@@ -1,9 +1,9 @@
 <!--
 	@component
 	Page opener as one illustration: title, intro, the huge total follower count with its change and the period switch, set into
-	the growth hill (GrowthHill.svelte): the follower curve as the glowing path up an ink hill to the tree of light. The rubber
-	stamp (mock notice, data date) is pressed into the ink below the tree like a painter's seal; stars twinkle at night. The
-	curve's data table sits in a disclosure for screen readers and the curious.
+	the growth hill (GrowthHill.svelte): the follower curve as the glowing path up an ink hill to the tree of light; stars
+	twinkle at night. Right under the hill's painted foot runs the chart's caption line: the data table in a disclosure (for
+	screen readers and the curious) and the rubber stamp (mock notice, data date).
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';
@@ -67,21 +67,14 @@
 		</div>
 	</div>
 
-	<GrowthHill {values} {dates} class="stats-hill mx-auto w-full">
-		{#snippet seal()}
-			<!-- A rubber stamp pressed into the ink: mock notice and data date -->
-			<p
-				class="stamp grid w-fit gap-0.5 rounded-md border-[1.5px] border-current px-3 py-1.5 font-mono text-[0.65rem] tracking-[0.18em] whitespace-nowrap text-butter uppercase"
-			>
-				{#if stats.source === 'mock'}<strong class="text-xs tracking-[0.24em]">{m.stats_mock_badge()}</strong>{/if}
-				<time datetime={stats.asOf} class="tracking-normal normal-case">{m.stats_as_of({ date: formatLongDate(new Date(stats.asOf)) })}</time>
-			</p>
-		{/snippet}
-	</GrowthHill>
+	<GrowthHill {values} {dates} class="stats-hill mx-auto w-full" />
 
-	<div class="relative mx-auto -mt-6 max-w-6xl px-4 sm:-mt-10 sm:px-6 lg:px-8">
+	<!-- The chart's caption line, right under the painted foot: its data table, and the rubber stamp (mock notice, data date) -->
+	<div class="relative mx-auto flex max-w-6xl flex-wrap items-start gap-x-6 gap-y-2 px-4 sm:px-6 lg:px-8">
 		<details class="group text-sm text-muted-foreground">
-			<summary class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full font-mono text-xs marker:content-none hover:text-foreground">
+			<summary
+				class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm font-mono text-xs outline-none marker:content-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
+			>
 				<span class="transition-transform group-open:rotate-90" aria-hidden="true">›</span>{m.stats_table_show()}
 			</summary>
 			<div class="ledger mt-2 max-h-72 max-w-md overflow-auto">
@@ -101,6 +94,13 @@
 				</table>
 			</div>
 		</details>
+		<!-- A rubber stamp pressed beside the caption (left: the right margin belongs to the root) -->
+		<p
+			class="stamp mt-2 grid w-fit gap-0.5 rounded-md border-[1.5px] border-current px-3 py-1.5 font-mono text-[0.65rem] tracking-[0.18em] whitespace-nowrap text-(--ink-lit) uppercase"
+		>
+			{#if stats.source === 'mock'}<strong class="text-xs tracking-[0.24em]">{m.stats_mock_badge()}</strong>{/if}
+			<time datetime={stats.asOf} class="tracking-normal normal-case">{m.stats_as_of({ date: formatLongDate(new Date(stats.asOf)) })}</time>
+		</p>
 	</div>
 </section>
 

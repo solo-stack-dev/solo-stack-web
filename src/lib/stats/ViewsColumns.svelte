@@ -21,8 +21,10 @@
 		const w = Math.max(240, width);
 		const h = Math.max(160, height);
 		const max = Math.max(1, ...rows.map((row) => row.views));
-		const step = 10 ** Math.floor(Math.log10(max / 3));
-		const top = Math.ceil(max / step / 3) * step * 3;
+		// Three guides on a nice step, the top guide just above the best day (no empty headroom when the chart stretches)
+		const magnitude = 10 ** Math.floor(Math.log10(max / 3));
+		const tick = [1, 1.5, 2, 2.5, 5, 10].map((nice) => nice * magnitude).find((value) => value * 3 >= max * 1.05) ?? magnitude * 10;
+		const top = tick * 3;
 		const plotW = w - PAD.left - PAD.right;
 		const plotH = h - PAD.top - PAD.bottom;
 		const slot = plotW / rows.length;

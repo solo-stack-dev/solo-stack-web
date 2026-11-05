@@ -1,15 +1,15 @@
 <!--
 	@component
-	The follower curve as one illustration: the area under the curve is an ink silhouette hill (dry brush edge, pigment mottling,
-	the foot dissolving into the paper), the curve is the glowing path along its crest, and it climbs to the tree of light, whose
+	The follower curve as one illustration: the area under the curve is an ink silhouette hill (dry brush edge, faint pigment
+	mottling, a painted foot where the brush runs out at an uneven height), the curve is the glowing path along its crest, and it climbs to the tree of light, whose
 	trunk stands exactly on today's value. God rays fan out behind the canopy, a few golden motes drift down, the mascot sits
 	small at the tree's foot looking up. Light theme: ink on warm paper with a butter wash behind the tree; dark: backlit night.
 
 	Geometry (hill.ts) lives in fixed virtual canvases (one per layout, switched at 640 px) and the art is placed in percent, so
-	the prerendered page is exact at every width. Hover or drag to read a day. Screen readers get the table in Horizon.
+	the prerendered page is exact at every width. Hover or drag to read a day. The first and last date sit in the ink under the
+	path, turned with it (the end date only from 640 px, where it clears the mascot). Screen readers get the table in Horizon.
 -->
 <script lang="ts">
-	import type { Snippet } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960;600&quality=40&enhanced';
 	import { InView } from '#lib/home/shared/motion.svelte.ts';
@@ -22,12 +22,10 @@
 	interface Props {
 		values: readonly number[];
 		dates: readonly Date[];
-		/** Rubber stamp set into the ink below the tree, like a painter's seal. */
-		seal?: Snippet;
 		class?: string;
 	}
 
-	let { values, dates, seal, class: className = '' }: Props = $props();
+	let { values, dates, class: className = '' }: Props = $props();
 
 	const NAMES = Object.keys(LAYOUTS) as LayoutName[];
 	const geometries = $derived(Object.fromEntries(NAMES.map((name) => [name, hill(values, name)])) as Record<LayoutName, HillGeometry>);
@@ -44,10 +42,10 @@
 				...box('rays', g.rays),
 				...box('mascot', g.mascot),
 				...box('glow', g.glow),
-				...box('seal', g.seal),
-				`--${name}-seal-shift:${g.seal.shift}%`,
 				...box('start', g.startLabel),
-				...box('end', g.endLabel)
+				`--${name}-start-a:${g.startLabel.angle}deg`,
+				...box('end', g.endLabel),
+				`--${name}-end-a:${g.endLabel.angle}deg`
 			];
 		}).join(';')
 	);
@@ -119,14 +117,16 @@
 					<feTurbulence type="fractalNoise" baseFrequency="0.35 0.6" numOctaves="1" seed="12" result="fray" />
 					<feDisplacementMap in="bled" in2="fray" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="shape" />
 					<feTurbulence type="fractalNoise" baseFrequency="0.004 0.011" numOctaves="3" seed="21" result="mottle" />
-					<feColorMatrix in="mottle" type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.17  0 0 0 0 0.13  0 0 0 2.2 -1.05" result="pigment" />
+					<feColorMatrix in="mottle" type="matrix" values="0 0 0 0 0.16  0 0 0 0 0.135  0 0 0 0 0.1  0 0 0 1.5 -0.82" result="pigment" />
 					<feComposite in="pigment" in2="shape" operator="in" result="pooled" />
 					<feMerge><feMergeNode in="shape" /><feMergeNode in="pooled" /></feMerge>
 				</filter>
-				<linearGradient id="foot-{name}" gradientUnits="userSpaceOnUse" x1="0" y1={g.spec.h * g.spec.dissolve} x2="0" y2={g.spec.h + 12}>
-					<stop offset="0" stop-color="#fff" />
-					<stop offset="1" stop-color="#fff" stop-opacity="0" />
-				</linearGradient>
+				<!-- The painted foot: dragged dry-brush streaks where the ink runs out, a hair of softness, no grey ramp -->
+				<filter id="brush-{name}" x="-10%" y="-20%" width="120%" height="140%">
+					<feTurbulence type="fractalNoise" baseFrequency="0.012 0.42" numOctaves="2" seed="17" result="streaks" />
+					<feDisplacementMap in="SourceGraphic" in2="streaks" scale={name === 'wide' ? 22 : 16} xChannelSelector="R" yChannelSelector="G" result="ragged" />
+					<feGaussianBlur in="ragged" stdDeviation="0.6" />
+				</filter>
 				<!-- Backlight behind the land: a dusk band along the horizon and a halo around the tree -->
 				<linearGradient id="dusk-{name}" gradientUnits="userSpaceOnUse" x1="0" y1={g.spec.h * 0.15} x2="0" y2={g.spec.h * 0.95}>
 					<stop offset="0" stop-color="var(--dusk)" stop-opacity="0" />
@@ -145,7 +145,7 @@
 					<stop offset="1" stop-color="var(--color-butter)" stop-opacity="0" />
 				</radialGradient>
 				<mask id="dissolve-{name}" maskUnits="userSpaceOnUse" x="-420" y="-40" width={g.spec.w + 840} height={g.spec.h + 80}>
-					<rect x="-420" y="-40" width={g.spec.w + 840} height={g.spec.h + 80} fill="url(#foot-{name})" />
+					<path d={g.foot} fill="#fff" filter="url(#brush-{name})" />
 				</mask>
 			</defs>
 			<rect x="-400" y="0" width={g.spec.w + 800} height={g.spec.h} fill="url(#dusk-{name})" />
@@ -216,10 +216,8 @@
 		{/key}
 	{/each}
 
-	<span class="start label" aria-hidden="true">{formatDay(dates[0])}</span>
-	<span class="end label" aria-hidden="true">{formatDay(dates[dates.length - 1])}</span>
-
-	{#if seal}<div class="seal">{@render seal()}</div>{/if}
+	<span class="start date" aria-hidden="true">{formatDay(dates[0])}</span>
+	<span class="end date" aria-hidden="true">{formatDay(dates[dates.length - 1])}</span>
 
 	{#if marker && index !== null}
 		{@const [mx, my] = active.points[index]}
@@ -272,13 +270,12 @@
 		--mascot-w: var(--narrow-mascot-w);
 		--glow-x: var(--narrow-glow-x);
 		--glow-y: var(--narrow-glow-y);
-		--seal-x: var(--narrow-seal-x);
-		--seal-y: var(--narrow-seal-y);
-		--seal-shift: var(--narrow-seal-shift);
 		--start-x: var(--narrow-start-x);
 		--start-y: var(--narrow-start-y);
+		--start-a: var(--narrow-start-a);
 		--end-x: var(--narrow-end-x);
 		--end-y: var(--narrow-end-y);
+		--end-a: var(--narrow-end-a);
 	}
 
 	.land-wide {
@@ -299,22 +296,20 @@
 			--mascot-w: var(--wide-mascot-w);
 			--glow-x: var(--wide-glow-x);
 			--glow-y: var(--wide-glow-y);
-			--seal-x: var(--wide-seal-x);
-			--seal-y: var(--wide-seal-y);
-			--seal-shift: var(--wide-seal-shift);
 			--start-x: var(--wide-start-x);
 			--start-y: var(--wide-start-y);
+			--start-a: var(--wide-start-a);
 			--end-x: var(--wide-end-x);
 			--end-y: var(--wide-end-y);
+			--end-a: var(--wide-end-a);
 		}
 
 		.land-narrow {
 			display: none;
 		}
 
-		/* Never let the seal run off the canvas on tablets */
-		.hill .seal {
-			left: min(var(--seal-x), 100% - 13.5rem);
+		.hill .end {
+			display: block;
 		}
 
 		.land-wide {
@@ -349,7 +344,8 @@
 		--x: var(--rays-x);
 		--y: var(--rays-y);
 		--w: var(--rays-w);
-		opacity: 0.75;
+		/* Paper: a light touch of rays, so the canopy itself carries the light */
+		opacity: 0.5;
 		mix-blend-mode: multiply;
 	}
 
@@ -365,13 +361,19 @@
 		--w: calc(var(--tree-w) * 2);
 		aspect-ratio: 1604 / 980;
 		translate: -50% -50%;
-		opacity: 0.7;
+		/* Paper: only a thin butter wash behind the canopy (a heavy one fades the tree) */
+		opacity: 0.36;
 		mix-blend-mode: multiply;
 	}
 
 	:global(.dark) .glow {
 		opacity: 0.2;
 		mix-blend-mode: screen;
+	}
+
+	/* Paper: the ochre leaves and veins a little deeper and richer, the pale highlights stay; at night the art is untouched */
+	:global(:root:not(.dark)) .tree :global(img) {
+		filter: saturate(1.25) contrast(1.08);
 	}
 
 	.mascot {
@@ -441,31 +443,30 @@
 		animation-play-state: running;
 	}
 
-	.label {
+	.date {
 		position: absolute;
 		z-index: 1;
-		font: 0.7rem var(--font-mono);
-		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
+		font: 500 0.75rem/1 var(--font-mono);
+		letter-spacing: 0.04em;
+		color: color-mix(in oklab, var(--color-cream) 78%, transparent);
 		white-space: nowrap;
 	}
 
+	/* Hung under the path from its own anchor, turned with the slope */
 	.start {
 		left: var(--start-x);
 		top: var(--start-y);
+		transform-origin: 0 0;
+		rotate: var(--start-a);
 	}
 
 	.end {
+		display: none;
 		left: var(--end-x);
 		top: var(--end-y);
-		transform: translateX(-100%);
-	}
-
-	.seal {
-		position: absolute;
-		z-index: 1;
-		left: var(--seal-x);
-		top: var(--seal-y);
-		translate: var(--seal-shift) -50%;
+		transform-origin: 100% 0;
+		rotate: var(--end-a);
+		translate: -100% 0;
 	}
 
 	.motes {
