@@ -160,6 +160,8 @@ export interface HillGeometry {
 	crest: string;
 	/** Ink body: crest, the knoll the roots stand on, the slope to the right edge, closed along the bottom. */
 	body: string;
+	/** The body's top edge only (open subpaths), for the paper wash that thins with depth below it. */
+	surface: string;
 	/** Faint far ridge for depth. */
 	far: string;
 	end: Point;
@@ -231,16 +233,19 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		[rootLeft + treeW * 0.06, mound]
 	];
 	const right = h * spec.rightEdge;
-	const knoll =
+	const knollTop =
 		`M${pt(flankCurve[0])}C${flankCurve.slice(1).map(pt).join(' ')}` +
 		`C${pt([ex - treeW * 0.22, crown])} ${pt([ex + treeW * 0.22, crown])} ${pt([rootRight - treeW * 0.06, mound])}` +
 		`C${pt([rootRight + treeW * 0.08, mound + 3 * scale])} ${pt([w - treeW * 0.02, right - h * 0.03])} ${pt([w + 12, right])}` +
-		`L${pt([w + 400, right + h * 0.04])}L${pt([w + 400, h * 1.4])}L${pt([footX, h * 1.4])}Z`;
+		`L${pt([w + 400, right + h * 0.04])}`;
+	const knoll = `${knollTop}L${pt([w + 400, h * 1.4])}L${pt([footX, h * 1.4])}Z`;
 
 	// Left of the data the land runs on gently past the canvas edge (the canvas is capped on very wide screens).
 	const [sx, sy] = points[0];
 	const lead = `M${pt([-400, sy + h * 0.04])}L${pt([-12, sy + h * 0.02])}C${pt([sx * 0.4, sy + h * 0.01])} ${pt([sx * 0.7, sy - lift])} ${pt([sx, sy - lift])}`;
 	const body = `${lead}${trace(lift).replace(/^M[^C]+/, '')}L${pt([ex, h * 1.4])}L${pt([-400, h * 1.4])}Z${knoll}`;
+	// The land's top edge (lead-in, crest, knoll, right slope) as open lines: the paper wash is densest along it
+	const surface = `${lead}${trace(lift).replace(/^M[^C]+/, '')}${knollTop}`;
 
 	// Far ridge: the crest flattened and lifted, sinking away behind the tree.
 	const every = Math.max(1, Math.round(points.length / 10));
@@ -305,6 +310,7 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		points,
 		crest,
 		body,
+		surface,
 		far,
 		end: [ex, ey],
 		tree: { left: pct(treeLeft, w), top: pct(treeTop, h), width: pct(treeW, w) },

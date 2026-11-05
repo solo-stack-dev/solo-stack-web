@@ -1,8 +1,10 @@
 <!--
 	@component
 	Posting activity as a sky: one star per day (all platforms), weeks as columns, Monday on top. No post = faint speck; more posts =
-	bigger, brighter star. The sky runs across the whole content column (cells grow up to 2.75 rem, never below 16 px). Phones
-	scroll it sideways: the side with more weeks fades out and a small chevron points on, both gone at the end. The total and the
+	bigger, brighter star. The sky runs across the whole content column (cells grow up to 2.75 rem, never below 18 px). Phones
+	scroll it sideways: it opens on the most recent weeks (once measured; it stays there through late layout shifts until the
+	visitor scrolls, then their position is kept), the weekday labels stay put beside the scrolling weeks, and the side with more
+	weeks fades out under a small chevron, both gone at the end. Below 640 px the stars are at least 10 px. The total and the
 	longest streak sit under it beside the legend.
 
 	A real grid for assistive tech and keyboards: one tab stop (roving focus), arrow keys move by day and week, Home/End jump to
@@ -76,10 +78,22 @@
 		const { scrollLeft, scrollWidth, clientWidth } = scroller;
 		more = { left: scrollLeft > 2, right: scrollLeft + clientWidth < scrollWidth - 2 };
 	}
+	/** Phones: open on the latest weeks, after measurement; follow late layout shifts until the visitor scrolls themselves. */
 	const overflow = (scroller: HTMLElement) => {
-		const observer = new ResizeObserver(() => measure(scroller));
+		let pinned = true;
+		const release = () => (pinned = false);
+		const events = ['pointerdown', 'wheel', 'touchstart', 'keydown'] as const;
+		const observer = new ResizeObserver(() => {
+			if (pinned) scroller.scrollLeft = scroller.scrollWidth - scroller.clientWidth;
+			measure(scroller);
+		});
 		observer.observe(scroller);
-		return () => observer.disconnect();
+		for (const child of scroller.children) observer.observe(child);
+		for (const name of events) scroller.addEventListener(name, release, { passive: true, once: true });
+		return () => {
+			observer.disconnect();
+			for (const name of events) scroller.removeEventListener(name, release);
+		};
 	};
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
 
@@ -117,10 +131,9 @@
 </script>
 
 <div class="grid gap-4">
-	<div class="relative">
+	<div class="calendar relative" style:--weeks={weeks.length}>
 		<div
 			class="sky relative -mx-4 overflow-x-auto px-4 pt-9 pb-2 sm:mx-0 sm:overflow-visible sm:px-0"
-			style:--weeks={weeks.length}
 			data-more-left={more.left || undefined}
 			data-more-right={more.right || undefined}
 			{@attach overflow}
@@ -146,7 +159,7 @@
 				{#each { length: 7 }, d (d)}
 					<div role="row" class="contents">
 						<span role="rowheader" class="flex h-(--cell) items-center font-mono text-xs leading-none text-muted-foreground">
-							<span class={d % 2 === 0 ? '' : 'sr-only'}>{formatWeekdayShort(weekdayDates[d])}</span>
+							<span class={d % 2 === 0 ? 'max-sm:sr-only' : 'sr-only'}>{formatWeekdayShort(weekdayDates[d])}</span>
 						</span>
 						{#each weeks as week, w (w)}
 							{@const cell = week[d]}
@@ -179,8 +192,18 @@
 				</div>
 			{/if}
 		</div>
+		<!-- Phones: the weekday labels stand still beside the scrolling weeks (the grid's own row headers stay for assistive tech) -->
+		<div class="pointer-events-none absolute top-0 left-0 grid pt-9 font-mono text-xs leading-none text-muted-foreground sm:hidden" aria-hidden="true">
+			<span class="mb-2 leading-4">&nbsp;</span>
+			{#each weekdayDates as date, d (d)}<span class="flex h-(--cell) items-center">{d % 2 === 0 ? formatWeekdayShort(date) : ''}</span>{/each}
+		</div>
+		{#if more.left}
+			<svg class="cue pointer-events-none absolute bottom-2 -left-4 h-[calc(7*var(--cell))] w-4 -scale-x-100 sm:hidden" viewBox="0 0 16 16" aria-hidden="true">
+				<path d="M5 3l5 5-5 5" />
+			</svg>
+		{/if}
 		{#if more.right}
-			<svg class="cue pointer-events-none absolute -right-1 bottom-2 h-[calc(7*var(--cue-cell))] w-4 sm:hidden" viewBox="0 0 16 16" aria-hidden="true">
+			<svg class="cue pointer-events-none absolute -right-1 bottom-2 h-[calc(7*var(--cell))] w-4 sm:hidden" viewBox="0 0 16 16" aria-hidden="true">
 				<path d="M5 3l5 5-5 5" />
 			</svg>
 		{/if}
@@ -189,7 +212,7 @@
 	<div class="flex flex-wrap items-start justify-between gap-x-12 gap-y-8">
 		<div class="flex items-center gap-2 font-mono text-xs text-muted-foreground sm:ml-7" aria-hidden="true">
 			<span>{m.stats_activity_less()}</span>
-			{#each LEVELS as value (value)}<span class="grid size-4 place-items-center"><span class="star" data-level={value}></span></span>{/each}
+			{#each LEVELS as value (value)}<span class="grid size-4 place-items-center max-sm:size-[1.125rem]"><span class="star" data-level={value}></span></span>{/each}
 			<span>{m.stats_activity_more()}</span>
 		</div>
 
@@ -207,26 +230,37 @@
 </div>
 
 <style>
-	.sky {
+	/* The content column (the scroller's content box has the same width) sizes the cells */
+	.calendar {
 		container-type: inline-size;
-		--cell: clamp(1rem, (100cqw - 1.75rem) / var(--weeks), 2.75rem);
+		--cell: clamp(1.125rem, (100cqw - 1.75rem) / var(--weeks), 2.75rem);
+	}
+
+	.sky {
 		--fade-left: 0rem;
 		--fade-right: 0rem;
-		mask-image: linear-gradient(90deg, transparent, #000 var(--fade-left), #000 calc(100% - var(--fade-right)), transparent);
+		/* Hidden under the still weekday labels (phones): the gutter and the label column */
+		--under: 0rem;
+		mask-image: linear-gradient(90deg, transparent var(--under), #000 calc(var(--under) + var(--fade-left)), #000 calc(100% - var(--fade-right)), transparent);
 		scrollbar-width: thin;
 	}
 
+	@media (max-width: 39.99rem) {
+		.sky {
+			--under: 2.75rem;
+		}
+	}
+
 	.sky[data-more-left] {
-		--fade-left: 2.5rem;
+		--fade-left: 1.75rem;
 	}
 
 	.sky[data-more-right] {
 		--fade-right: 3rem;
 	}
 
-	/* The chevron beside the faded edge, over the seven rows of days */
+	/* The chevrons beside the faded edges, over the seven rows of days */
 	.cue {
-		--cue-cell: 1rem;
 		fill: none;
 		stroke: var(--color-ochre);
 		stroke-width: 2;
@@ -287,6 +321,35 @@
 		width: min(66%, 1.3rem);
 		height: min(66%, 1.3rem);
 		box-shadow: 0 0 0 2px color-mix(in oklab, var(--star) 25%, transparent);
+	}
+
+	/* Phones: stars at least 10 px in the 18 px cells, a slimmer ring on the brightest so neighbours never touch */
+	@media (max-width: 39.99rem) {
+		.star[data-level='0'] {
+			width: 4px;
+			height: 4px;
+		}
+
+		.star[data-level='1'] {
+			width: 10px;
+			height: 10px;
+		}
+
+		.star[data-level='2'] {
+			width: 12px;
+			height: 12px;
+		}
+
+		.star[data-level='3'] {
+			width: 14px;
+			height: 14px;
+		}
+
+		.star[data-level='4'] {
+			width: 16px;
+			height: 16px;
+			box-shadow: 0 0 0 1px color-mix(in oklab, var(--star) 30%, transparent);
+		}
 	}
 
 	/* Paper: the faint levels stay nearly solid ochre, so they hold their own on the light ground */

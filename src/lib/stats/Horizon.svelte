@@ -70,14 +70,14 @@
 	<GrowthHill {values} {dates} class="stats-hill mx-auto w-full" />
 
 	<!-- The chart's caption, hung just under the painted foot at the curve's start: its data table and the data date -->
-	<div class="caption relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 px-4 sm:px-6 lg:px-8">
-		<details class="group text-sm text-muted-foreground">
+	<div class="caption relative mx-auto grid max-w-6xl justify-items-start px-4 sm:px-6 lg:px-8">
+		<details class="group text-sm">
 			<summary
-				class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm font-mono text-xs outline-none marker:content-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
+				class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm font-medium text-foreground outline-none marker:content-none hover:text-foreground/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
 			>
-				<span class="transition-transform group-open:rotate-90" aria-hidden="true">›</span>{m.stats_table_show()}
+				<span class="chevron transition-transform group-open:rotate-90" aria-hidden="true">›</span>{m.stats_table_show()}
 			</summary>
-			<div class="ledger mt-2 max-h-72 max-w-md overflow-auto">
+			<div class="ledger mt-1 mb-3 max-h-72 max-w-md overflow-auto text-muted-foreground">
 				<table class="w-full text-left text-xs tabular-nums">
 					<thead class="sticky top-0 bg-background">
 						<tr class="border-b border-foreground/25"
@@ -94,13 +94,24 @@
 				</table>
 			</div>
 		</details>
-		<p class="flex min-h-11 items-center self-start font-mono text-xs text-muted-foreground">
+		<p class="-mt-2 pl-4 text-[0.8125rem] text-muted-foreground">
 			<time datetime={stats.asOf}>{m.stats_as_of({ date: formatLongDate(new Date(stats.asOf)) })}</time>
 		</p>
 	</div>
 </section>
 
 <style>
+	.chevron {
+		display: inline-block;
+		width: 0.5rem;
+		color: #8a5a12;
+		font-weight: 700;
+	}
+
+	:global(.dark) .chevron {
+		color: var(--color-butter);
+	}
+
 	.giant {
 		font-size: clamp(5rem, 17vw, 12.5rem);
 		/* Ink on paper; at night the number catches the moonlight */
