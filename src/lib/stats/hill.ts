@@ -9,11 +9,8 @@
 
 /** Art anchors, measured on the alpha channel of the production WebPs (see docs/art/site/README.md). */
 export const ART = {
-	/**
-	 * Trunk axis x; groundY: where the roots meet the painted flat mound strip; rootLeft/Right: ends of that strip; rootTipX:
-	 * where the rightmost painted root visibly runs out on it (the long root, Roots.svelte, continues from there).
-	 */
-	tree: { width: 1190, height: 1322, trunkX: 573, groundY: 1300, rootLeft: 66, rootRight: 1124, rootTipX: 1050, canopyX: 600, canopyY: 470, topY: 117 },
+	/** Trunk axis x; groundY: where the roots meet the painted flat mound strip; rootLeft/Right: ends of that strip. */
+	tree: { width: 1190, height: 1322, trunkX: 573, groundY: 1300, rootLeft: 66, rootRight: 1124, canopyX: 600, canopyY: 470, topY: 117 },
 	rays: { width: 1586, height: 992, originX: 816, originY: 221 },
 	mascot: { width: 700, height: 700, centerX: 330, groundY: 663 }
 } as const;
@@ -36,8 +33,12 @@ export interface LayoutSpec {
 	mascotGap: number;
 	/** Where the land meets the right canvas edge, fraction of the height. */
 	rightEdge: number;
-	/** Mean height of the ink's painted foot (where the brush runs out), fraction of the height. */
-	foot: number;
+	/**
+	 * The painted foot (stats-hill-feather.webp): where its solid top attaches at the left and right canvas edge (fractions of
+	 * the height; a gentle slope, so the ink under the low start of the path stays shallow), and its depth.
+	 */
+	foot: readonly [left: number, right: number];
+	footDepth: number;
 }
 
 export const LAYOUTS = {
@@ -53,7 +54,8 @@ export const LAYOUTS = {
 		mascot: 0.27,
 		mascotGap: 0.02,
 		rightEdge: 0.66,
-		foot: 0.95
+		foot: [0.8, 0.72],
+		footDepth: 0.19
 	},
 	/** From 640 px: the canvas tucks under the big number, the tree rises beside it. */
 	wide: {
@@ -67,7 +69,8 @@ export const LAYOUTS = {
 		mascot: 0.19,
 		mascotGap: 0.08,
 		rightEdge: 0.5,
-		foot: 0.93
+		foot: [0.76, 0.66],
+		footDepth: 0.21
 	}
 } as const satisfies Record<string, LayoutSpec>;
 
@@ -164,15 +167,16 @@ export interface HillGeometry {
 	tree: Placement;
 	rays: Placement;
 	mascot: Placement;
-	/** Mask shape of the ink: everything above an irregular painted foot (dry-brush filter in the component). */
-	foot: string;
+	/**
+	 * Mask of the ink: `solid` is everything above the attach line; the painted feather hangs below it, sheared along the line
+	 * by `transform` (x, y of the image box are -420, 0; width w + 840; height `depth`).
+	 */
+	foot: { solid: string; transform: string; depth: number };
 	/** Points in percent of the canvas. */
 	glow: { left: number; top: number };
 	/** Date labels set into the ink just under the path, turned with it (angle in degrees). */
 	startLabel: { left: number; top: number; angle: number };
 	endLabel: { left: number; top: number; angle: number };
-	/** Where the long root (Roots.svelte) leaves the tree: the tip of its rightmost painted root, on the knoll. */
-	rootTip: { left: number; top: number };
 }
 
 export function hill(values: readonly number[], name: LayoutName): HillGeometry {
@@ -231,12 +235,12 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		`M${pt(flankCurve[0])}C${flankCurve.slice(1).map(pt).join(' ')}` +
 		`C${pt([ex - treeW * 0.22, crown])} ${pt([ex + treeW * 0.22, crown])} ${pt([rootRight - treeW * 0.06, mound])}` +
 		`C${pt([rootRight + treeW * 0.08, mound + 3 * scale])} ${pt([w - treeW * 0.02, right - h * 0.03])} ${pt([w + 12, right])}` +
-		`L${pt([w + 400, right + h * 0.04])}L${pt([w + 400, h + 12])}L${pt([footX, h + 12])}Z`;
+		`L${pt([w + 400, right + h * 0.04])}L${pt([w + 400, h * 1.4])}L${pt([footX, h * 1.4])}Z`;
 
 	// Left of the data the land runs on gently past the canvas edge (the canvas is capped on very wide screens).
 	const [sx, sy] = points[0];
 	const lead = `M${pt([-400, sy + h * 0.04])}L${pt([-12, sy + h * 0.02])}C${pt([sx * 0.4, sy + h * 0.01])} ${pt([sx * 0.7, sy - lift])} ${pt([sx, sy - lift])}`;
-	const body = `${lead}${trace(lift).replace(/^M[^C]+/, '')}L${pt([ex, h + 12])}L${pt([-400, h + 12])}Z${knoll}`;
+	const body = `${lead}${trace(lift).replace(/^M[^C]+/, '')}L${pt([ex, h * 1.4])}L${pt([-400, h * 1.4])}Z${knoll}`;
 
 	// Far ridge: the crest flattened and lifted, sinking away behind the tree.
 	const every = Math.max(1, Math.round(points.length / 10));
@@ -244,7 +248,7 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 	points.forEach(([x, y], index) => {
 		if (index % every === 0) far += `L${pt([x * 0.9, top * 0.82 + (y - top) * 0.42])}`;
 	});
-	far += `L${pt([w * 0.86, top * 0.7])}L${pt([w + 400, top + h * 0.12])}L${pt([w + 400, h + 12])}L${pt([-400, h + 12])}Z`;
+	far += `L${pt([w * 0.86, top * 0.7])}L${pt([w + 400, top + h * 0.12])}L${pt([w + 400, h * 1.4])}L${pt([-400, h * 1.4])}Z`;
 
 	// Highest ink at x (crest or knoll flank): where the mascot sits.
 	const flankPoints = Array.from({ length: 33 }, (_, step) => bezier(flankCurve, step / 32));
@@ -273,8 +277,8 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 	const mascotX = rootLeft - mascotW * (spec.mascotGap + (ART.mascot.width - 90 - ART.mascot.centerX) / ART.mascot.width);
 	const mascotY = Math.max(surfaceAt(mascotX - mascotW * 0.25), surfaceAt(mascotX + mascotW * 0.2)) + mascotW * 0.03;
 
-	// Date labels: a little way along the path, offset along its normal into the ink, turned with the slope. The end label
-	// stops short of the painted roots (and of the mascot above them).
+	// Date labels: offset along the path's normal into the ink, turned with the slope. The start label begins just after the
+	// first point; the end label ends at the last one, under today's light (clear of its beacon).
 	const along = (x: number, offset: number) => {
 		const y = crestAt(points, slopes, x);
 		const slope = (crestAt(points, slopes, x + 2) - crestAt(points, slopes, x - 2)) / 4;
@@ -283,16 +287,18 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 	};
 	const labelOffset = h * 0.028;
 	const startLabel = along(sx + w * 0.012, labelOffset);
-	const endLabel = along(Math.max(sx + w * 0.3, rootLeft - w * 0.012), labelOffset);
+	const endLabel = along(ex - w * 0.004, h * 0.05);
 
-	// The painted foot: the brush runs out at an uneven height (two slow waves and a quicker one), never a straight edge.
-	const brushEnd = (x: number) => {
-		const u = x / w;
-		return h * (spec.foot - 0.01 + 0.034 * Math.sin(u * 5.3 + 0.7) + 0.02 * Math.sin(u * 17.1 + 2.1) + 0.01 * Math.sin(u * 47 + 0.3));
+	// The painted foot: the feather's solid top attaches along a gently sloped line, its brush runs out below it.
+	const [footLeft, footRight] = spec.foot.map((fraction) => h * fraction);
+	const footSlope = (footRight - footLeft) / w;
+	const lineAt = (x: number) => footLeft + footSlope * x;
+	// The solid part reaches 6 units into the feather's opaque top row, so the join never shows.
+	const foot = {
+		solid: `M-420 -400L${w + 420} -400L${w + 420} ${r(lineAt(w + 420) + 6)}L-420 ${r(lineAt(-420) + 6)}Z`,
+		transform: `matrix(1 ${Math.round(footSlope * 100000) / 100000} 0 1 0 ${r(footLeft)})`,
+		depth: r(h * spec.footDepth)
 	};
-	let foot = `M-420 -60L${w + 420} -60`;
-	for (let x = w + 420; x >= -420; x -= w / 64) foot += `L${r(x)} ${r(brushEnd(x))}`;
-	foot += 'Z';
 
 	return {
 		spec,
@@ -307,7 +313,6 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		foot,
 		glow: { left: pct(canopyX, w), top: pct(canopyY, h) },
 		startLabel,
-		endLabel,
-		rootTip: { left: pct(ex + (ART.tree.rootTipX - ART.tree.trunkX) * scale, w), top: pct(mound, h) }
+		endLabel
 	};
 }

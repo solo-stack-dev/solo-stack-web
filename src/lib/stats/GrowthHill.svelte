@@ -1,13 +1,14 @@
 <!--
 	@component
 	The follower curve as one illustration: the area under the curve is an ink silhouette hill (dry brush edge, faint pigment
-	mottling, a painted foot where the brush runs out at an uneven height), the curve is the glowing path along its crest, and it climbs to the tree of light, whose
+	mottling); its foot is a painted feather (stats-hill-feather.webp, docs/art/site/round-3/ink-feather.png) whose brush runs
+	out into the page unevenly, so in the light theme the hill dissolves into the paper instead of ending in a band. The curve is the glowing path along its crest, and it climbs to the tree of light, whose
 	trunk stands exactly on today's value. God rays fan out behind the canopy, a few golden motes drift down, the mascot sits
 	small at the tree's foot looking up. Light theme: ink on warm paper with a butter wash behind the tree; dark: backlit night.
 
 	Geometry (hill.ts) lives in fixed virtual canvases (one per layout, switched at 640 px) and the art is placed in percent, so
 	the prerendered page is exact at every width. Hover or drag to read a day. The first and last date sit in the ink under the
-	path, turned with it (the end date only from 640 px, where it clears the mascot). Screen readers get the table in Horizon.
+	path, turned with it: the first after the first point, the last ending under today's light (only from 640 px). Screen readers get the table in Horizon.
 -->
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
@@ -15,6 +16,7 @@
 	import { InView } from '#lib/home/shared/motion.svelte.ts';
 	import mascot from './assets/stats-mascot-sitting.webp?w=280;180;120&quality=70&enhanced';
 	import rays from './assets/stats-tree-rays.webp?w=1300;900;600&quality=42&enhanced';
+	import feather from './assets/stats-hill-feather.webp';
 	import tree from './assets/stats-growth-tree.webp?w=1190;900;640;440&quality=60&enhanced';
 	import { formatDay, formatNumber } from './format.ts';
 	import { LAYOUTS, hill, type HillGeometry, type LayoutName } from './hill.ts';
@@ -121,12 +123,6 @@
 					<feComposite in="pigment" in2="shape" operator="in" result="pooled" />
 					<feMerge><feMergeNode in="shape" /><feMergeNode in="pooled" /></feMerge>
 				</filter>
-				<!-- The painted foot: dragged dry-brush streaks where the ink runs out, a hair of softness, no grey ramp -->
-				<filter id="brush-{name}" x="-10%" y="-20%" width="120%" height="140%">
-					<feTurbulence type="fractalNoise" baseFrequency="0.012 0.42" numOctaves="2" seed="17" result="streaks" />
-					<feDisplacementMap in="SourceGraphic" in2="streaks" scale={name === 'wide' ? 22 : 16} xChannelSelector="R" yChannelSelector="G" result="ragged" />
-					<feGaussianBlur in="ragged" stdDeviation="0.6" />
-				</filter>
 				<!-- Backlight behind the land: a dusk band along the horizon and a halo around the tree -->
 				<linearGradient id="dusk-{name}" gradientUnits="userSpaceOnUse" x1="0" y1={g.spec.h * 0.15} x2="0" y2={g.spec.h * 0.95}>
 					<stop offset="0" stop-color="var(--dusk)" stop-opacity="0" />
@@ -144,8 +140,10 @@
 					<stop offset="0" stop-color="var(--color-butter)" stop-opacity="var(--halo-alpha)" />
 					<stop offset="1" stop-color="var(--color-butter)" stop-opacity="0" />
 				</radialGradient>
-				<mask id="dissolve-{name}" maskUnits="userSpaceOnUse" x="-420" y="-40" width={g.spec.w + 840} height={g.spec.h + 80}>
-					<path d={g.foot} fill="#fff" filter="url(#brush-{name})" />
+				<!-- Solid above the attach line, the painted feather (white pigment, its own alpha) below it -->
+				<mask id="dissolve-{name}" maskUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
+					<path d={g.foot.solid} fill="#fff" />
+					<image href={feather} x="-420" y="0" width={g.spec.w + 840} height={g.foot.depth} preserveAspectRatio="none" transform={g.foot.transform} />
 				</mask>
 			</defs>
 			<rect x="-400" y="0" width={g.spec.w + 800} height={g.spec.h} fill="url(#dusk-{name})" />
@@ -156,6 +154,18 @@
 			</g>
 		</svg>
 	{/each}
+
+	<!-- Paper: deepen the canopy's ochre midtones (a gamma bend per channel: black and the palest highlights stay put, blue sinks
+		 most, so mid ochre gets richer while cream stays cream). Applied only in the light theme, see .tree img. -->
+	<svg class="absolute size-0" aria-hidden="true">
+		<filter id="stats-canopy-paper" color-interpolation-filters="sRGB">
+			<feComponentTransfer>
+				<feFuncR type="gamma" amplitude="1" exponent="1.12" offset="0" />
+				<feFuncG type="gamma" amplitude="1" exponent="1.38" offset="0" />
+				<feFuncB type="gamma" amplitude="1" exponent="1.7" offset="0" />
+			</feComponentTransfer>
+		</filter>
+	</svg>
 
 	<!-- The tree of light on the end point, the mascot at its foot, motes falling from the canopy -->
 	<div class="art tree pointer-events-none" aria-hidden="true">
@@ -216,9 +226,6 @@
 		{/key}
 	{/each}
 
-	<!-- Anchor for the long root below the hill (Roots.svelte measures it; wide layout only) -->
-	<span class="root-tip" data-root-tip style:left="{geometries.wide.rootTip.left}%" style:top="{geometries.wide.rootTip.top}%"></span>
-
 	<span class="start date" aria-hidden="true">{formatDay(dates[0])}</span>
 	<span class="end date" aria-hidden="true">{formatDay(dates[dates.length - 1])}</span>
 
@@ -247,7 +254,7 @@
 		--path-halo-alpha: 0.55;
 		--dusk: var(--color-butter);
 		--dusk-alpha: 0;
-		--halo-alpha: 0.18;
+		--halo-alpha: 0.1;
 	}
 
 	:global(.dark) .hill {
@@ -320,12 +327,6 @@
 		}
 	}
 
-	.root-tip {
-		position: absolute;
-		width: 0;
-		height: 0;
-	}
-
 	.art {
 		position: absolute;
 		left: var(--x);
@@ -363,26 +364,29 @@
 		mix-blend-mode: screen;
 	}
 
-	/* The wash is wider than the canopy and centered on it */
+	/* The wash is centered on the canopy. Paper: small and thin, held inside the crown, so the outer leaves stand on clean
+	   paper (a wide wash fades them); night: wider than the canopy, glowing */
 	.glow {
 		--x: var(--glow-x);
 		--y: var(--glow-y);
-		--w: calc(var(--tree-w) * 2);
+		--w: calc(var(--tree-w) * 1.35);
 		aspect-ratio: 1604 / 980;
 		translate: -50% -50%;
-		/* Paper: only a thin butter wash behind the canopy (a heavy one fades the tree) */
-		opacity: 0.36;
+		opacity: 0.22;
 		mix-blend-mode: multiply;
+		mask-image: radial-gradient(closest-side, #000 35%, transparent);
 	}
 
 	:global(.dark) .glow {
+		--w: calc(var(--tree-w) * 2);
 		opacity: 0.2;
 		mix-blend-mode: screen;
+		mask-image: none;
 	}
 
-	/* Paper: the ochre leaves and veins a little deeper and richer, the pale highlights stay; at night the art is untouched */
+	/* Paper: the canopy's ochre midtones deeper, pale highlights and the dark trunk unchanged; at night the art is untouched */
 	:global(:root:not(.dark)) .tree :global(img) {
-		filter: saturate(1.25) contrast(1.08);
+		filter: url(#stats-canopy-paper);
 	}
 
 	.mascot {

@@ -2,8 +2,8 @@
 	@component
 	Page opener as one illustration: title, intro, the huge total follower count with its change and the period switch, set into
 	the growth hill (GrowthHill.svelte): the follower curve as the glowing path up an ink hill to the tree of light; stars
-	twinkle at night. Right under the hill's painted foot runs the chart's caption line: the data table in a disclosure (for
-	screen readers and the curious) and the rubber stamp (mock notice, data date).
+	twinkle at night. Just under the hill's painted foot, at the curve's start, hangs the chart's caption: the data table in a
+	disclosure (for screen readers and the curious) and the data date. The mock notice is the italic line under the intro.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';
@@ -69,8 +69,8 @@
 
 	<GrowthHill {values} {dates} class="stats-hill mx-auto w-full" />
 
-	<!-- The chart's caption line, right under the painted foot: its data table, and the rubber stamp (mock notice, data date) -->
-	<div class="relative mx-auto flex max-w-6xl flex-wrap items-start gap-x-6 gap-y-2 px-4 sm:px-6 lg:px-8">
+	<!-- The chart's caption, hung just under the painted foot at the curve's start: its data table and the data date -->
+	<div class="caption relative mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 px-4 sm:px-6 lg:px-8">
 		<details class="group text-sm text-muted-foreground">
 			<summary
 				class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-sm font-mono text-xs outline-none marker:content-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--focus-ring)"
@@ -94,12 +94,8 @@
 				</table>
 			</div>
 		</details>
-		<!-- A rubber stamp pressed beside the caption (left: the right margin belongs to the root) -->
-		<p
-			class="stamp mt-2 grid w-fit gap-0.5 rounded-md border-[1.5px] border-current px-3 py-1.5 font-mono text-[0.65rem] tracking-[0.18em] whitespace-nowrap text-(--ink-lit) uppercase"
-		>
-			{#if stats.source === 'mock'}<strong class="text-xs tracking-[0.24em]">{m.stats_mock_badge()}</strong>{/if}
-			<time datetime={stats.asOf} class="tracking-normal normal-case">{m.stats_as_of({ date: formatLongDate(new Date(stats.asOf)) })}</time>
+		<p class="flex min-h-11 items-center self-start font-mono text-xs text-muted-foreground">
+			<time datetime={stats.asOf}>{m.stats_as_of({ date: formatLongDate(new Date(stats.asOf)) })}</time>
 		</p>
 	</div>
 </section>
@@ -119,11 +115,11 @@
 		text-shadow: 0 0 60px rgb(252 215 114 / 0.15);
 	}
 
-	.stamp {
-		transform: rotate(-3deg);
-		/* Pressed unevenly, like ink on a rubber stamp */
-		mask-image: radial-gradient(circle at 30% 40%, #000 55%, rgb(0 0 0 / 0.75) 90%);
-		opacity: 0.88;
+	/* The caption hangs ~16px under where the painted foot runs out at the curve's start. That point sits a fixed share of the
+	   hill's height above its box (hill.ts: foot attach + depth), so the pull-up is a share of the width (margin % = width):
+	   phones 0.035 × (470 / 390), wide 0.06 × (480 / 1440), capped with the 100rem hill. */
+	.caption {
+		margin-top: calc(-4.2% - 0.75rem);
 	}
 
 	/* From 640 px the hill tucks under the big number and the tree rises beside it */
@@ -131,6 +127,10 @@
 		:global(.stats-hill) {
 			max-width: 100rem;
 			margin-top: calc(min(100vw, 100rem) * -0.17);
+		}
+
+		.caption {
+			margin-top: calc(max(-2%, -2rem) - 0.75rem);
 		}
 	}
 </style>
