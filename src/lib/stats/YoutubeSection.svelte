@@ -1,12 +1,15 @@
 <!--
 	@component
-	YouTube detail. The four channel numbers stand like waymarks on a strip of ink ground (the hill's material, the same in both
-	themes): a glowing path runs along its crest, each number stands on it above a lit marker, its label and change engraved into
-	the ink below. Subgrid rows give every number one shared baseline, however the labels wrap. Below: daily views (columns of
-	light rising from the ink ground) beside the top videos, the chart as tall as the list.
+	YouTube detail. The four channel numbers stand like waymarks on one path: a single line with a node under every number, and
+	below it a painted ink ground (stats-kpi-ground.webp, docs/art/site/round-3/ink-ground-a.png) holding label and change. At
+	night the ground is solid ink and the path butter; on paper the same brush stroke is a pale sumi wash under an ochre line,
+	so the strip never reads as a black band. The ground is one painting per row: every figure shows its slice of it (container
+	units of the list), so the brush runs on unbroken across the figures. Subgrid rows give every number one shared baseline,
+	however the labels wrap. Below: daily views (columns of light) beside the top videos, the chart as tall as the list.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
+	import ground from './assets/stats-kpi-ground.webp';
 	import { LAST_DAY, changeOf, dateAt, sumOf } from './derive.ts';
 	import Delta from './Delta.svelte';
 	import { formatDuration, formatHours, formatNumber, formatSigned } from './format.ts';
@@ -32,28 +35,11 @@
 	const rows = $derived(
 		Array.from({ length: period }, (_, offset) => LAST_DAY - period + 1 + offset).map((day) => ({ date: dateAt(stats.asOf, day), views: stats.youtube.views[day] }))
 	);
-
-	/** One stretch of crest per figure (0…100 × 0…16, stretched in x only): flat where the marker stands, a gentle swell after
-	 * it. Neighbouring stretches meet at the same height, so a row reads as one strip of ground. */
-	const crestOf = (seed: number) => {
-		const wobble = (index: number) => Math.sin(seed * 12.9898 + index * 78.233);
-		const up = (6 - 1.6 - wobble(1) * 0.9).toFixed(2);
-		const dip = (6 + 0.6 + wobble(2) * 0.5).toFixed(2);
-		const crest = `M0 6L18 6C32 6 40 ${up} 54 ${up}C68 ${up} 74 ${dip} 86 ${dip}C94 ${dip} 97 6 100 6`;
-		return { crest, area: `${crest}L100 16L0 16Z` };
-	};
-
-	/** Dry-brush foot of a stretch (0…100 × 0…12). */
-	const footOf = (seed: number) => {
-		let d = 'M0 0L100 0';
-		for (let x = 100; x >= 0; x -= 2.5) d += `L${x} ${(3 + Math.abs(Math.sin(seed * 3.1 + x * 0.41) * Math.cos(seed + x * 0.13)) * 8).toFixed(2)}`;
-		return `${d}Z`;
-	};
 </script>
 
 <div class="grid gap-14">
 	<div class="grid gap-4">
-		<dl class="ridge grid grid-cols-2 lg:grid-cols-4">
+		<dl class="ridge grid grid-cols-2 lg:grid-cols-4" style:--ground="url({ground})">
 			{#if subscribers}
 				{@render figure(m.stats_youtube_subscribers(), formatNumber(subscribers.value), subscribers.ratio, formatSigned(subscribers.delta), 0)}
 			{/if}
@@ -77,28 +63,18 @@
 </div>
 
 {#snippet figure(label: string, value: string, ratio: number, amount: string | undefined, index: number, unit?: [string, string])}
-	{@const piece = crestOf(index + 3)}
 	<div class="figure" data-index={index}>
-		<div class="ground" aria-hidden="true">
-			<svg viewBox="0 0 100 16" preserveAspectRatio="none" class="top">
-				<path d={piece.area} class="ink" />
-				<path d={piece.crest} class="crest-halo" />
-				<path d={piece.crest} class="crest" />
-			</svg>
-			<div class="body"></div>
-			<svg viewBox="0 0 100 12" preserveAspectRatio="none" class="foot"><path d={footOf(index + 5)} class="ink" /></svg>
-			<span class="marker"></span>
-		</div>
+		<div class="ground" aria-hidden="true"><span class="path"></span><span class="marker"></span></div>
 		<dt class="caption text-xs text-pretty sm:text-sm">{label}</dt>
 		<dd class="value font-display text-4xl leading-[0.85] font-black tracking-tight whitespace-nowrap text-foreground tabular-nums sm:text-5xl">
 			{#if unit?.[0]}<span class="unit">{unit[0]}</span>{/if}{value}{#if unit?.[1]}<span class="unit">{unit[1]}</span>{/if}
 		</dd>
-		<dd class="change"><Delta {ratio} {amount} tone="ink" /></dd>
+		<dd class="change"><Delta {ratio} {amount} /></dd>
 	</div>
 {/snippet}
 
 <style>
-	/* Every figure spans three shared rows: the number on the crest, label and change in the ink */
+	/* Every figure spans three shared rows: the number on the path, label and change on the painted ground */
 	.figure {
 		position: relative;
 		display: grid;
@@ -146,6 +122,10 @@
 		grid-row: 2;
 		grid-column: 1;
 		padding-top: 1.2rem;
+		color: var(--foreground);
+	}
+
+	:global(.dark) .caption {
 		color: color-mix(in oklab, var(--color-cream) 84%, transparent);
 	}
 
@@ -156,98 +136,99 @@
 		padding: 0.3rem 0 1.15rem;
 	}
 
+	/* The list is the painting's frame: figures place their slice of the row's ground in its container units */
+	.ridge {
+		container-type: inline-size;
+		--cols: 2;
+		/* How far the brush runs on past the content column at both ends of a row */
+		--run: 1rem;
+	}
+
+	@media (min-width: 64rem) {
+		.ridge {
+			--cols: 4;
+			--run: 2rem;
+		}
+	}
+
+	.figure {
+		--col: 0;
+		--row: 0;
+	}
+
+	.figure[data-index='1'] {
+		--col: 1;
+	}
+
+	.figure[data-index='2'] {
+		--row: 1;
+	}
+
+	.figure[data-index='3'] {
+		--col: 1;
+		--row: 1;
+	}
+
+	@media (min-width: 64rem) {
+		.figure[data-index='2'] {
+			--col: 2;
+			--row: 0;
+		}
+
+		.figure[data-index='3'] {
+			--col: 3;
+			--row: 0;
+		}
+	}
+
 	.ground {
 		position: relative;
 		grid-row: 2 / span 2;
 		grid-column: 1;
-		display: flex;
-		flex-direction: column;
 		/* Reach under the figure's padding and a hair into the neighbour, so a row is one strip; at the ends of a row the brush
-		   runs on past the column a little and frays out there, clear of the text */
-		margin-inline: calc(-1 * var(--pad-left) - var(--run-left, 0rem)) calc(-1 * var(--pad-right) - 1px - var(--run-right, 0rem));
-		--ink: var(--color-ink);
+		   runs on past the column and frays out there, clear of the text. The painted fringe hangs below the change. */
+		margin-inline: calc(-1 * var(--pad-left) - var(--run-left, 0rem)) calc(-1 * var(--pad-right) - var(--run-right, 0rem));
+		margin-bottom: -1.1rem;
+		/* The row's painting: one stroke from -run to 100% + run. A second row uses the other half of a double-width stroke. */
+		--paint-w: calc((100cqw + 2 * var(--run)) * (1 + var(--row)));
+		--left: calc(var(--col) * 100cqw / var(--cols) - var(--pad-left) - var(--run-left, 0rem) + var(--run));
 	}
 
-	:global(.dark) .ground {
-		--ink: #0b0b0c;
+	/* The painted stroke itself (a layer of its own, so the paper wash fades only the pigment, never the path and its nodes) */
+	.ground::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--wash);
+		mask-image: var(--ground);
+		mask-repeat: no-repeat;
+		mask-size: var(--paint-w) 100%;
+		mask-position: calc(-1 * var(--left) - var(--row) * (100cqw + 2 * var(--run))) 0;
+		/* Neighbouring slices share one pixel-snapped edge: no overlap, so the paper wash never doubles at a join */
+		--wash: #0b0b0c;
 	}
 
-	.top {
-		display: block;
-		width: 100%;
-		height: 1rem;
-		overflow: visible;
+	/* Paper: the same stroke as a pale warm sumi wash, multiplied into the grain */
+	:global(:root:not(.dark)) .ground::before {
+		--wash: color-mix(in oklab, var(--color-ink) 65%, #8a5a12);
+		opacity: 0.09;
+		mix-blend-mode: multiply;
 	}
 
-	.body {
-		flex: 1;
-		margin-top: -1px;
-		background: var(--ink);
+	/* The path: one line along the top of the ground, a node under every number. Night: butter with a breath of glow; paper:
+	   deep ochre ink, no glow */
+	.path {
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1.5px;
+		background: var(--color-butter);
+		opacity: 0.85;
+		box-shadow: 0 0 6px rgb(252 215 114 / 0.3);
 	}
 
-	.foot {
-		display: block;
-		width: 100%;
-		height: 0.75rem;
-		margin-top: -1px;
-	}
-
-	/* Outer ends of a row fray out (outside the text) instead of stopping square */
-	.figure:is([data-index='0'], [data-index='2']) .ground {
-		--run-left: 1rem;
-		mask-image: linear-gradient(90deg, transparent, #000 1rem);
-	}
-
-	.figure:is([data-index='1'], [data-index='3']) .ground {
-		--run-right: 1rem;
-		mask-image: linear-gradient(270deg, transparent, #000 1rem);
-	}
-
-	@media (min-width: 64rem) {
-		.figure:is([data-index='0'], [data-index='2']) .ground {
-			--run-left: 2rem;
-			mask-image: linear-gradient(90deg, transparent, #000 2rem);
-		}
-
-		.figure:is([data-index='1'], [data-index='3']) .ground {
-			--run-right: 2rem;
-			mask-image: linear-gradient(270deg, transparent, #000 2rem);
-		}
-
-		.figure:is([data-index='1'], [data-index='2']) .ground {
-			--run-left: 0rem;
-			--run-right: 0rem;
-			mask-image: none;
-		}
-	}
-
-	.ink {
-		fill: var(--ink);
-	}
-
-	.crest,
-	.crest-halo {
-		fill: none;
-		stroke: var(--color-butter);
-		vector-effect: non-scaling-stroke;
-		stroke-linecap: round;
-	}
-
-	.crest {
-		stroke-width: 1.6;
-		opacity: 0.9;
-	}
-
-	.crest-halo {
-		stroke-width: 7;
-		opacity: 0.2;
-		filter: blur(3px);
-	}
-
-	/* A small light where each number stands on the path (the crest sits 6 of 16 units into the 1 rem strip) */
 	.marker {
 		position: absolute;
-		top: calc(6 / 16 * 1rem - 0.25rem);
+		top: calc(-0.25rem + 0.75px);
 		left: calc(var(--pad-left) + var(--run-left, 0rem));
 		width: 0.5rem;
 		height: 0.5rem;
@@ -256,6 +237,36 @@
 		box-shadow:
 			0 0 0 3px rgb(252 215 114 / 0.25),
 			0 0 10px 2px rgb(252 215 114 / 0.55);
+	}
+
+	:global(:root:not(.dark)) .path {
+		background: #a8721a;
+		opacity: 1;
+		box-shadow: none;
+	}
+
+	:global(:root:not(.dark)) .marker {
+		background: var(--color-ochre);
+		box-shadow: 0 0 0 1.5px #8a5a12;
+	}
+
+	/* Outer ends of a row fray out (outside the text) instead of stopping square */
+	.figure:is([data-index='0'], [data-index='2']) .ground {
+		--run-left: var(--run);
+		mask-image: linear-gradient(90deg, transparent, #000 var(--run));
+	}
+
+	.figure:is([data-index='1'], [data-index='3']) .ground {
+		--run-right: var(--run);
+		mask-image: linear-gradient(270deg, transparent, #000 var(--run));
+	}
+
+	@media (min-width: 64rem) {
+		.figure:is([data-index='1'], [data-index='2']) .ground {
+			--run-left: 0rem;
+			--run-right: 0rem;
+			mask-image: none;
+		}
 	}
 
 	.unit {

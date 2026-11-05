@@ -1,8 +1,9 @@
 <!--
 	@component
 	Posting activity as a sky: one star per day (all platforms), weeks as columns, Monday on top. No post = faint speck; more posts =
-	bigger, brighter star. The sky runs across the whole content column (cells grow up to 2.75 rem, never below 12 px; narrower
-	screens scroll it sideways), the total and the longest streak sit under it beside the legend.
+	bigger, brighter star. The sky runs across the whole content column (cells grow up to 2.75 rem, never below 16 px). Phones
+	scroll it sideways: the side with more weeks fades out and a small chevron points on, both gone at the end. The total and the
+	longest streak sit under it beside the legend.
 
 	A real grid for assistive tech and keyboards: one tab stop (roving focus), arrow keys move by day and week, Home/End jump to
 	the ends of a row; the focused or hovered day shows its tooltip.
@@ -68,6 +69,18 @@
 	const focusCell = $derived(current ?? latest);
 
 	let grid = $state<HTMLElement>();
+
+	/** Which sides of the sideways scrolling sky (phones) hide more weeks. */
+	let more = $state({ left: false, right: false });
+	function measure(scroller: HTMLElement) {
+		const { scrollLeft, scrollWidth, clientWidth } = scroller;
+		more = { left: scrollLeft > 2, right: scrollLeft + clientWidth < scrollWidth - 2 };
+	}
+	const overflow = (scroller: HTMLElement) => {
+		const observer = new ResizeObserver(() => measure(scroller));
+		observer.observe(scroller);
+		return () => observer.disconnect();
+	};
 	let tip = $state<{ text: string; x: number; y: number } | null>(null);
 
 	function showAt(target: HTMLElement) {
@@ -104,58 +117,72 @@
 </script>
 
 <div class="grid gap-4">
-	<div class="sky relative -mx-4 overflow-x-auto px-4 pt-9 pb-2 sm:mx-0 sm:overflow-visible sm:px-0" style:--weeks={weeks.length}>
-		<div class="mb-2 grid font-mono text-xs text-muted-foreground" style:grid-template-columns="1.75rem repeat({weeks.length}, var(--cell))" aria-hidden="true">
-			<span></span>
-			{#each monthLabels as label, index (index)}<span class="overflow-visible whitespace-nowrap">{label}</span>{/each}
-		</div>
+	<div class="relative">
 		<div
-			bind:this={grid}
-			class="grid w-max"
-			style:grid-template-columns="1.75rem repeat({weeks.length}, var(--cell))"
-			role="grid"
-			tabindex="-1"
-			aria-label="{m.stats_activity_total({ count: formatNumber(total) })}. {m.stats_activity_streak({ days: formatNumber(streak) })}"
-			onpointerover={hover}
-			onpointerleave={() => !grid?.contains(document.activeElement) && (tip = null)}
-			onkeydown={move}
-			onfocusin={(event) => showAt(event.target as HTMLElement)}
-			onfocusout={(event) => !grid?.contains(event.relatedTarget as Node) && (tip = null)}
+			class="sky relative -mx-4 overflow-x-auto px-4 pt-9 pb-2 sm:mx-0 sm:overflow-visible sm:px-0"
+			style:--weeks={weeks.length}
+			data-more-left={more.left || undefined}
+			data-more-right={more.right || undefined}
+			{@attach overflow}
+			onscroll={(event) => measure(event.currentTarget)}
 		>
-			{#each { length: 7 }, d (d)}
-				<div role="row" class="contents">
-					<span role="rowheader" class="flex h-(--cell) items-center font-mono text-xs leading-none text-muted-foreground">
-						<span class={d % 2 === 0 ? '' : 'sr-only'}>{formatWeekdayShort(weekdayDates[d])}</span>
-					</span>
-					{#each weeks as week, w (w)}
-						{@const cell = week[d]}
-						{#if cell}
-							<span
-								role="gridcell"
-								class="day grid size-(--cell) place-items-center rounded-full outline-none"
-								data-index="{w}:{d}"
-								tabindex={focusCell[0] === w && focusCell[1] === d ? 0 : -1}
-								aria-label={labelOf(cell)}
-								onfocus={() => (current = [w, d])}
-							>
-								<span class="star pointer-events-none" data-level={level(cell.count)}></span>
-							</span>
-						{:else}
-							<span role="gridcell" class="size-(--cell)"></span>
-						{/if}
-					{/each}
-				</div>
-			{/each}
-		</div>
-		{#if tip}
-			<div
-				class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-full bg-night px-2.5 py-0.5 font-mono text-xs whitespace-nowrap text-cream shadow-lg dark:bg-cream dark:text-night"
-				style:left="clamp(7rem, {tip.x}px, 100% - 7rem)"
-				style:top="{tip.y - 6}px"
-				aria-hidden="true"
-			>
-				{tip.text}
+			<div class="mb-2 grid font-mono text-xs text-muted-foreground" style:grid-template-columns="1.75rem repeat({weeks.length}, var(--cell))" aria-hidden="true">
+				<span></span>
+				{#each monthLabels as label, index (index)}<span class="overflow-visible whitespace-nowrap">{label}</span>{/each}
 			</div>
+			<div
+				bind:this={grid}
+				class="grid w-max"
+				style:grid-template-columns="1.75rem repeat({weeks.length}, var(--cell))"
+				role="grid"
+				tabindex="-1"
+				aria-label="{m.stats_activity_total({ count: formatNumber(total) })}. {m.stats_activity_streak({ days: formatNumber(streak) })}"
+				onpointerover={hover}
+				onpointerleave={() => !grid?.contains(document.activeElement) && (tip = null)}
+				onkeydown={move}
+				onfocusin={(event) => showAt(event.target as HTMLElement)}
+				onfocusout={(event) => !grid?.contains(event.relatedTarget as Node) && (tip = null)}
+			>
+				{#each { length: 7 }, d (d)}
+					<div role="row" class="contents">
+						<span role="rowheader" class="flex h-(--cell) items-center font-mono text-xs leading-none text-muted-foreground">
+							<span class={d % 2 === 0 ? '' : 'sr-only'}>{formatWeekdayShort(weekdayDates[d])}</span>
+						</span>
+						{#each weeks as week, w (w)}
+							{@const cell = week[d]}
+							{#if cell}
+								<span
+									role="gridcell"
+									class="day grid size-(--cell) place-items-center rounded-full outline-none"
+									data-index="{w}:{d}"
+									tabindex={focusCell[0] === w && focusCell[1] === d ? 0 : -1}
+									aria-label={labelOf(cell)}
+									onfocus={() => (current = [w, d])}
+								>
+									<span class="star pointer-events-none" data-level={level(cell.count)}></span>
+								</span>
+							{:else}
+								<span role="gridcell" class="size-(--cell)"></span>
+							{/if}
+						{/each}
+					</div>
+				{/each}
+			</div>
+			{#if tip}
+				<div
+					class="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-full bg-night px-2.5 py-0.5 font-mono text-xs whitespace-nowrap text-cream shadow-lg dark:bg-cream dark:text-night"
+					style:left="clamp(7rem, {tip.x}px, 100% - 7rem)"
+					style:top="{tip.y - 6}px"
+					aria-hidden="true"
+				>
+					{tip.text}
+				</div>
+			{/if}
+		</div>
+		{#if more.right}
+			<svg class="cue pointer-events-none absolute -right-1 bottom-2 h-[calc(7*var(--cue-cell))] w-4 sm:hidden" viewBox="0 0 16 16" aria-hidden="true">
+				<path d="M5 3l5 5-5 5" />
+			</svg>
 		{/if}
 	</div>
 
@@ -182,7 +209,33 @@
 <style>
 	.sky {
 		container-type: inline-size;
-		--cell: clamp(0.75rem, (100cqw - 1.75rem) / var(--weeks), 2.75rem);
+		--cell: clamp(1rem, (100cqw - 1.75rem) / var(--weeks), 2.75rem);
+		--fade-left: 0rem;
+		--fade-right: 0rem;
+		mask-image: linear-gradient(90deg, transparent, #000 var(--fade-left), #000 calc(100% - var(--fade-right)), transparent);
+		scrollbar-width: thin;
+	}
+
+	.sky[data-more-left] {
+		--fade-left: 2.5rem;
+	}
+
+	.sky[data-more-right] {
+		--fade-right: 3rem;
+	}
+
+	/* The chevron beside the faded edge, over the seven rows of days */
+	.cue {
+		--cue-cell: 1rem;
+		fill: none;
+		stroke: var(--color-ochre);
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	:global(:root:not(.dark)) .cue {
+		stroke: #8a5a12;
 	}
 
 	.day:focus-visible {

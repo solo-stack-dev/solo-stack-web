@@ -40,8 +40,10 @@
 							style:width="{(video.views[period] / max) * 100}%"
 						></span>
 					</span>
-					<span class="text-right font-mono text-xs text-muted-foreground tabular-nums">{m.stats_youtube_top_views({ count: formatNumber(video.views[period]) })}</span>
-					<span class="text-right font-mono text-xs text-muted-foreground tabular-nums">{formatDuration(video.durationSeconds)}</span>
+					<span class="text-right text-xs whitespace-nowrap text-muted-foreground tabular-nums"
+						><span class="font-medium text-foreground">{formatNumber(video.views[period])}</span> {m.stats_youtube_views()}</span
+					>
+					<span class="text-right text-xs text-muted-foreground tabular-nums">{formatDuration(video.durationSeconds)}</span>
 				</div>
 			</div>
 		</li>

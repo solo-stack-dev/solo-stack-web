@@ -4,7 +4,6 @@
 	import ActivityCalendar from '#lib/stats/ActivityCalendar.svelte';
 	import Constellation from '#lib/stats/Constellation.svelte';
 	import Horizon from '#lib/stats/Horizon.svelte';
-	import Roots from '#lib/stats/Roots.svelte';
 	import SectionHeading from '#lib/stats/SectionHeading.svelte';
 	import YoutubeSection from '#lib/stats/YoutubeSection.svelte';
 	import { getStats } from '#lib/stats/stats.remote.ts';
@@ -49,7 +48,4 @@
 			<ActivityCalendar {stats} />
 		</section>
 	</div>
-
-	<!-- The tree's painted root: from the hill down the right margin past every section into the footer horizon -->
-	<Roots />
 </div>
