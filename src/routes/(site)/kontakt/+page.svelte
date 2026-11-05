@@ -1,9 +1,10 @@
 <!--
-	/kontakt: a letter written at night (giant title, butter wash, the night owl messenger, ruled-line form, topic pill track).
+	/kontakt: a letter written at night (giant title, butter wash, the night owl messenger, ruled-line form, topics ticked on the ruled lines).
 	Prerendered; only the submission runs in the Worker: `sendContact` (`#lib/contact/contact.remote.ts`), valibot preflight
 	plus the same schema on the server, Turnstile against spam. Issue codes map to `contact_error_*` messages.
 -->
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { page } from '$app/state';
 	import { sendContact } from '#lib/contact/contact.remote.ts';
 	import { CONTACT_LIMITS, CONTACT_TOPICS, ContactSchema, type ContactTopic } from '#lib/contact/schema.ts';
@@ -58,6 +59,24 @@
 		window.scrollTo({ top: 0, behavior: reducedMotion.current ? 'instant' : 'smooth' });
 	});
 
+	/**
+	 * A failed preflight leaves the issues on the fields but focus on the send button, often a screen below the first error.
+	 * Once the issues are on the page, scroll that field's block under the sticky nav (`scroll-margin-top`) and focus its
+	 * control (the topic: its first choice). The Turnstile input is hidden, so its message is only brought into view.
+	 */
+	function revealFirstIssue(event: SubmitEvent) {
+		const form = event.currentTarget as HTMLFormElement;
+		setTimeout(async () => {
+			await tick();
+			if (sent || contact.pending > 0) return;
+			const control = form.querySelector<HTMLElement>('[aria-invalid="true"]');
+			if (!control) return;
+			const block = control.closest<HTMLElement>('[data-issue-anchor]') ?? control;
+			block.scrollIntoView({ block: 'start', behavior: reducedMotion.current ? 'instant' : 'smooth' });
+			if (!(control instanceof HTMLInputElement && control.type === 'hidden')) control.focus({ preventScroll: true });
+		});
+	}
+
 	const invalid = {
 		topic: () => !!fields.topic.issues(),
 		name: () => !!fields.name.issues(),
@@ -88,173 +107,194 @@
 	</p>
 {/snippet}
 
-<div class="contact relative isolate overflow-x-clip">
+<div class="contact relative isolate overflow-x-clip" data-sent={sent || undefined}>
 	<!-- Night sky over the header, dark theme only -->
 	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[34rem] mask-b-from-30% dark:block" aria-hidden="true">
 		<StarField density={0.5} brightness={0.7} seed={71} />
 	</div>
 
-	<!-- The night owl messenger, perched at the right edge; the branch runs off the viewport -->
-	<OwlMessenger
-		class="perch"
-		flown={sent}
-		watching={hovering || focused}
-		sizes="(min-width: 80rem) clamp(24rem, 67vw - 29.5rem, 42rem), (min-width: 48rem) calc(34.7vw - 6rem), 14rem"
-	/>
+	<!--
+		The night owl messenger, perched at the right edge (the branch runs off the viewport). It sits on a rail as tall as the
+		page: on wide screens it stays beside the letter while you write (sticky) and comes to rest where the page ends.
+	-->
+	<div class="rail" aria-hidden="true">
+		<OwlMessenger
+			class="perch"
+			flown={sent}
+			watching={hovering || focused}
+			sizes="(min-width: 80rem) clamp(24rem, 67vw - 29.5rem, 42rem), (min-width: 48rem) calc(34.7vw - 6rem), 14rem"
+		/>
+	</div>
 
-	<div class="mx-auto max-w-6xl px-4 pt-10 pb-24 sm:px-6 sm:pt-16 lg:px-8">
-		<header class="hero relative grid gap-5">
-			<div class="relative isolate w-fit">
-				<span
-					class="bloom pointer-events-none absolute top-[30%] -left-6 -z-10 block h-[90%] w-[85%] opacity-55 mix-blend-multiply dark:opacity-25 dark:mix-blend-normal"
-					style:background-image="url({bloom.img.src})"
-					aria-hidden="true"
-				></span>
-				<h1 class="giant font-display leading-[0.8] font-black tracking-wordmark text-balance">{m.contact_title()}</h1>
-			</div>
-			<p class="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">{m.contact_intro()}</p>
-		</header>
-
-		<div class="mt-14 max-w-3xl sm:mt-20">
-			{#if sent}
-				<section class="sent grid justify-items-start gap-5 py-6" aria-labelledby="contact-sent">
-					<h2
-						id="contact-sent"
-						tabindex="-1"
-						bind:this={successHeading}
-						class="sent-title font-display text-5xl leading-none font-black tracking-wordmark focus:outline-none sm:text-6xl"
-					>
-						{m.contact_success_title()}
-					</h2>
-					<p class="max-w-xl text-lg text-pretty text-muted-foreground" role="status">{m.contact_success_body()}</p>
+	<div class="mx-auto max-w-6xl px-4 pt-10 pb-8 sm:px-6 sm:pt-16 lg:px-8">
+		<!-- One headline group: the invitation, or once the owl has the letter, the thanks in its place -->
+		{#key sent}
+			<header class={['hero relative grid justify-items-start gap-5', sent && 'sent']}>
+				<div class="relative isolate w-fit">
+					<span
+						class="bloom pointer-events-none absolute top-[30%] -left-6 -z-10 block h-[90%] w-[85%] opacity-55 mix-blend-multiply dark:opacity-25 dark:mix-blend-normal"
+						style:background-image="url({bloom.img.src})"
+						aria-hidden="true"
+					></span>
+					{#if sent}
+						<h1
+							id="contact-sent"
+							tabindex="-1"
+							bind:this={successHeading}
+							aria-describedby="contact-sent-body"
+							class="giant sent-title font-display leading-[0.8] font-black tracking-wordmark text-balance focus:outline-none"
+						>
+							{m.contact_success_title()}
+						</h1>
+					{:else}
+						<h1 class="giant font-display leading-[0.8] font-black tracking-wordmark text-balance">{m.contact_title()}</h1>
+					{/if}
+				</div>
+				{#if sent}
+					<p id="contact-sent-body" class="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg" role="status">{m.contact_success_body()}</p>
 					<button type="button" class="again" onclick={() => (sent = false)}>{m.contact_success_again()}</button>
-				</section>
-			{:else}
-				<form
-					{...enhanced}
-					class="letter relative grid gap-12"
-					data-sending={contact.pending > 0 || undefined}
-					novalidate
-					onpointerenter={() => (hovering = true)}
-					onpointerleave={() => (hovering = false)}
-					onfocusin={() => (focused = true)}
-					onfocusout={(event) => (focused = event.currentTarget.contains(event.relatedTarget as Node | null))}
-				>
-					<fieldset class="grid min-w-0 gap-4" aria-describedby="contact-topic-error">
-						<legend class="mb-4 label">{m.contact_topic_legend()}</legend>
-						<div class="track-scroll">
-							<div class="track">
-								{#each CONTACT_TOPICS as topic (topic)}
-									<label class="topic">
-										<input class="sr-only" {...fields.topic.as('radio', topic)} />
-										<span>{TOPIC_LABELS[topic]()}</span>
-									</label>
-								{/each}
-							</div>
-						</div>
-						{@render fieldError('contact-topic-error', invalid.topic(), m.contact_error_topic())}
-					</fieldset>
+				{:else}
+					<p class="max-w-xl text-base text-pretty text-muted-foreground sm:text-lg">{m.contact_intro()}</p>
+				{/if}
+			</header>
+		{/key}
 
-					<div class="grid gap-12 sm:grid-cols-2 sm:gap-8">
-						<div class="field">
-							<label class="label" for="contact-name">{m.contact_name_label()}</label>
-							<div class="write">
-								<input
-									id="contact-name"
-									class="line"
-									autocomplete="name"
-									maxlength={CONTACT_LIMITS.name}
-									required
-									aria-describedby="contact-name-error"
-									{...fields.name.as('text')}
-								/>
-								<span class="rule" aria-hidden="true"></span>
-							</div>
-							{@render fieldError('contact-name-error', invalid.name(), m.contact_error_name())}
-						</div>
-
-						<div class="field">
-							<label class="label" for="contact-email">{m.contact_email_label()}</label>
-							<div class="write">
-								<input
-									id="contact-email"
-									class="line"
-									autocomplete="email"
-									maxlength={CONTACT_LIMITS.email}
-									required
-									aria-describedby="contact-email-hint contact-email-error"
-									{...fields.email.as('email')}
-								/>
-								<span class="rule" aria-hidden="true"></span>
-							</div>
-							<p id="contact-email-hint" class="hint">{m.contact_email_hint()}</p>
-							{@render fieldError('contact-email-error', invalid.email(), m.contact_error_email())}
-						</div>
+		{#if !sent}
+			<form
+				{...enhanced}
+				class="letter relative mt-14 grid gap-12 sm:mt-20"
+				data-sending={contact.pending > 0 || undefined}
+				novalidate
+				onsubmit={revealFirstIssue}
+				onpointerenter={() => (hovering = true)}
+				onpointerleave={() => (hovering = false)}
+				onfocusin={() => (focused = true)}
+				onfocusout={(event) => (focused = event.currentTarget.contains(event.relatedTarget as Node | null))}
+			>
+				<!-- The topic: four lines of the letter to tick, each with an ink circle that fills with butter -->
+				<fieldset class="topics grid min-w-0 gap-3" aria-describedby="contact-topic-error" data-issue-anchor>
+					<legend class="mb-3 label">{m.contact_topic_legend()}</legend>
+					<div class="choices">
+						{#each CONTACT_TOPICS as topic (topic)}
+							<label class="choice">
+								<input class="sr-only" {...fields.topic.as('radio', topic)} />
+								<span class="mark" aria-hidden="true"></span>
+								<span>{TOPIC_LABELS[topic]()}</span>
+							</label>
+						{/each}
 					</div>
+					{@render fieldError('contact-topic-error', invalid.topic(), m.contact_error_topic())}
+				</fieldset>
 
-					<div class="field">
-						<label class="label" for="contact-message">{m.contact_message_label()}</label>
+				<div class="grid gap-10 sm:grid-cols-2 sm:gap-8">
+					<div class="field" data-issue-anchor>
+						<label class="label" for="contact-name">{m.contact_name_label()}</label>
 						<div class="write">
-							<textarea
-								id="contact-message"
-								class="pad"
-								rows="7"
-								minlength={CONTACT_LIMITS.messageMin}
-								maxlength={CONTACT_LIMITS.messageMax}
+							<input
+								id="contact-name"
+								class="line"
+								autocomplete="name"
+								maxlength={CONTACT_LIMITS.name}
 								required
-								placeholder={m.contact_message_placeholder()}
-								aria-describedby="contact-message-error"
-								{...fields.message.as('text')}></textarea>
+								aria-describedby="contact-name-error"
+								{...fields.name.as('text')}
+							/>
 							<span class="rule" aria-hidden="true"></span>
 						</div>
-						{@render fieldError('contact-message-error', invalid.message(), m.contact_error_message())}
+						{@render fieldError('contact-name-error', invalid.name(), m.contact_error_name())}
 					</div>
 
-					<!-- Honeypot: off screen, out of the tab order -->
-					<div class="pointer-events-none absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
-						<label for="contact-website">{m.contact_honeypot_label()}</label>
-						<input id="contact-website" tabindex="-1" autocomplete="off" {...fields.website.as('text')} />
+					<div class="field" data-issue-anchor>
+						<label class="label" for="contact-email">{m.contact_email_label()}</label>
+						<div class="write">
+							<input
+								id="contact-email"
+								class="line"
+								autocomplete="email"
+								maxlength={CONTACT_LIMITS.email}
+								required
+								aria-describedby="contact-email-hint contact-email-error"
+								{...fields.email.as('email')}
+							/>
+							<span class="rule" aria-hidden="true"></span>
+						</div>
+						<p id="contact-email-hint" class="hint">{m.contact_email_hint()}</p>
+						{@render fieldError('contact-email-error', invalid.email(), m.contact_error_email())}
 					</div>
+				</div>
 
-					<div class="grid gap-6">
+				<div class="field" data-issue-anchor>
+					<label class="label" for="contact-message">{m.contact_message_label()}</label>
+					<!-- On focus a margin line runs down the left of the pad and the first writing line inks in, where the caret is -->
+					<div class="write write-pad">
+						<textarea
+							id="contact-message"
+							class="pad"
+							rows="7"
+							minlength={CONTACT_LIMITS.messageMin}
+							maxlength={CONTACT_LIMITS.messageMax}
+							required
+							placeholder={m.contact_message_placeholder()}
+							aria-describedby="contact-message-error"
+							{...fields.message.as('text')}></textarea>
+						<span class="rule" aria-hidden="true"></span>
+					</div>
+					{@render fieldError('contact-message-error', invalid.message(), m.contact_error_message())}
+				</div>
+
+				<!-- Honeypot: off screen, out of the tab order -->
+				<div class="pointer-events-none absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
+					<label for="contact-website">{m.contact_honeypot_label()}</label>
+					<input id="contact-website" tabindex="-1" autocomplete="off" {...fields.website.as('text')} />
+				</div>
+
+				<div class="grid gap-6">
+					<div class="grid gap-6" data-issue-anchor>
 						<input {...fields.turnstile.as('hidden', token)} />
 						<TurnstileWidget bind:this={turnstile} ontoken={(value) => (token = value)} onerror={(value) => (challengeFailed = value)} />
 						{@render fieldError('contact-turnstile-error', invalid.turnstile(), m.contact_error_turnstile())}
-
-						<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
-							<button type="submit" class="send" disabled={contact.pending > 0}>
-								<span class="dot" aria-hidden="true"></span>
-								{contact.pending > 0 ? m.contact_sending() : m.contact_submit()}
-							</button>
-							<p class="max-w-sm text-sm text-pretty text-muted-foreground">
-								{m.contact_privacy_note()}
-								<!-- TODO(owner): drop rel="external" once /datenschutz exists (keeps the prerender crawler from failing on it) -->
-								<a href={localizeHref('/datenschutz')} rel="external" class="privacy">
-									{m.contact_privacy_link()}
-								</a>
-							</p>
-						</div>
-
-						<p class="error" role="alert">
-							{#if failed}{m.contact_error_failed()}{/if}
-						</p>
-						<noscript><p class="text-sm text-muted-foreground">{m.contact_noscript()}</p></noscript>
 					</div>
-				</form>
-			{/if}
-		</div>
+
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+						<button type="submit" class="send" disabled={contact.pending > 0}>
+							<span class="dot" aria-hidden="true"></span>
+							{contact.pending > 0 ? m.contact_sending() : m.contact_submit()}
+						</button>
+						<p class="max-w-sm text-sm text-pretty text-muted-foreground">
+							{m.contact_privacy_note()}
+							<!-- TODO(owner): drop rel="external" once /datenschutz exists (keeps the prerender crawler from failing on it) -->
+							<a href={localizeHref('/datenschutz')} rel="external" class="privacy">
+								{m.contact_privacy_link()}
+							</a>
+						</p>
+					</div>
+
+					<p class="error" role="alert">
+						{#if failed}{m.contact_error_failed()}{/if}
+					</p>
+					<noscript><p class="text-sm text-muted-foreground">{m.contact_noscript()}</p></noscript>
+				</div>
+			</form>
+		{/if}
 	</div>
 </div>
 
 <style>
 	.giant {
-		font-size: clamp(4.5rem, 14vw, 10rem);
+		/* Phones: one line at any width (the title is ≈ 5.3em wide); from 48rem the owl's clearance below is computed for 14vw */
+		font-size: clamp(3rem, 16vw, 10rem);
 		/* Ink on paper; moonlit at night (as /blog) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
 		background-clip: text;
 		color: transparent;
 		padding-bottom: 0.16em;
 		margin-bottom: -0.16em;
+	}
+
+	@media (min-width: 48rem) {
+		.giant {
+			font-size: clamp(4.5rem, 14vw, 10rem);
+		}
 	}
 
 	:global(.dark) .giant {
@@ -272,17 +312,44 @@
 	/*
 	 * The owl is one illustration with the title: a square canvas (`--owl`) flush with the right viewport edge, sized so its
 	 * head (26–53 % of the canvas) keeps 2.5rem clear of the title (≈ 75vw up to the 10rem cap, then 50vw + 19rem).
-	 * Below 48rem the title wraps and the owl perches above it instead.
+	 * Below 48rem the owl perches above the title instead.
+	 *
+	 * It rides a rail from the hero to the end of the page. From 64rem the letter column stops short of the twigs (they reach
+	 * 8 % into the canvas) and the owl stays pinned beside the letter while you write: head just under the nav, the empty
+	 * night under the branch is its backlight. The page is at least as tall as the bird down to its twigs, so the empty
+	 * branch of the sent state is never cut off.
 	 */
 	.contact {
 		--owl: calc(34.7vw - 6rem);
+		--owl-top: calc(4rem - var(--owl) * 0.12);
+		min-height: calc(var(--owl-top) + var(--owl) * 0.86);
 	}
 
-	.contact :global(.perch) {
+	.rail {
 		position: absolute;
-		top: calc(4rem - var(--owl) * 0.12);
+		top: var(--owl-top);
 		right: 0;
+		/* The canvas is empty below the twigs (95 %): they may hang into the sky above the footer horizon */
+		bottom: calc(var(--owl) * -0.1);
 		z-index: -1;
+		width: var(--owl);
+		pointer-events: none;
+	}
+
+	.letter {
+		max-width: 48rem;
+	}
+
+	@media (min-width: 64rem) {
+		.contact :global(.perch) {
+			position: sticky;
+			/* The head (15 % into the canvas) rests 5.5rem below the top of the viewport */
+			top: calc(5.5rem - var(--owl) * 0.15);
+		}
+
+		.letter {
+			max-width: min(48rem, calc(100vw - var(--owl) * 0.92 - 4rem - max(2rem, (100vw - 72rem) / 2 + 2rem)));
+		}
 	}
 
 	/* Above the title's 10rem cap the title stops growing (it ends at 50vw + 19rem), so the owl may: its head keeps 2.5rem clear */
@@ -292,32 +359,43 @@
 		}
 	}
 
+	/* Phones: the owl perches above the title; its twigs fade out (OwlMessenger) a clear 1.5rem above the title's ink */
 	@media (max-width: 47.99rem) {
 		.contact {
 			--owl: min(14rem, 58vw);
-		}
-
-		.contact :global(.perch) {
-			top: calc(2.5rem - var(--owl) * 0.1);
+			--owl-top: calc(2.5rem - var(--owl) * 0.1);
+			min-height: 0;
 		}
 
 		.hero {
-			padding-top: calc(var(--owl) * 0.66);
+			padding-top: calc(var(--owl) * 0.86);
 		}
 	}
 
 	/*
 	 * The letter: no boxes. Every field is a ruled line on the page; focus is drawn in the material (the ink runs in from the
-	 * left and glows, the label lights up with a drop of ink, the caret is butter). Colors are the `--ink-*` tokens in layout.css.
+	 * left and glows, the label lights up with a drop of ink, the caret is butter). Colors are the `--ink-*` tokens in layout.css;
+	 * the resting rules are strengthened here to ≥ 3:1 against the paper (light 52 %, night 40 % of the ink).
 	 */
 	.letter {
-		--pad-rule: color-mix(in oklab, var(--color-ochre) 30%, transparent);
-		--pad-rule-lit: color-mix(in oklab, var(--color-ochre) 48%, transparent);
+		--ink-rule: color-mix(in oklab, var(--foreground) 52%, transparent);
+		--ink-rule-hover: color-mix(in oklab, var(--foreground) 74%, transparent);
+		--pad-rule: color-mix(in oklab, var(--color-ochre) 42%, transparent);
+		--pad-rule-lit: color-mix(in oklab, var(--color-ochre) 66%, transparent);
+		--mark-ink: color-mix(in oklab, var(--foreground) 68%, transparent);
 	}
 
 	:global(.dark) .letter {
-		--pad-rule: color-mix(in oklab, var(--color-cream) 9%, transparent);
-		--pad-rule-lit: color-mix(in oklab, var(--color-butter) 16%, transparent);
+		--ink-rule: color-mix(in oklab, var(--foreground) 40%, transparent);
+		--ink-rule-hover: color-mix(in oklab, var(--foreground) 60%, transparent);
+		--pad-rule: color-mix(in oklab, var(--color-cream) 14%, transparent);
+		--pad-rule-lit: color-mix(in oklab, var(--color-butter) 26%, transparent);
+		--mark-ink: color-mix(in oklab, var(--foreground) 64%, transparent);
+	}
+
+	/* A failed send scrolls the first issue's block here: clear of the sticky nav */
+	[data-issue-anchor] {
+		scroll-margin-top: 7rem;
 	}
 
 	/* Mono captions, quieter than the writing */
@@ -331,7 +409,8 @@
 	}
 
 	/* A drop of ink hangs in front of the label of the field being written */
-	.field > .label::before {
+	.field > .label::before,
+	.topics > .label::before {
 		content: '';
 		position: absolute;
 		top: 50%;
@@ -348,30 +427,36 @@
 
 	/* Phones: no gutter to hang it in, so it follows the label */
 	@media (max-width: 39.99rem) {
-		.field > .label::before {
+		.field > .label::before,
+		.topics > .label::before {
 			left: calc(100% + 0.35rem);
 		}
 	}
 
-	.field:focus-within > .label {
+	.field:focus-within > .label,
+	.topics:focus-within > .label {
 		color: var(--ink-lit);
 	}
 
-	.field:focus-within > .label::before {
+	.field:focus-within > .label::before,
+	.topics:focus-within > .label::before {
 		scale: 1;
 	}
 
+	/* Label 6px above the writing, the rule 2.75rem below it */
 	.field {
 		display: grid;
-		gap: 0.5rem;
+		gap: 0.375rem;
 		align-content: start;
 	}
 
 	/* An invalid field writes in warm red: line, glow, label drop */
-	.field:has([aria-invalid='true']) {
+	.field:has([aria-invalid='true']),
+	.topics:has([aria-invalid='true']) {
 		--ink-lit: var(--ink-error);
 		--ink-wet: var(--ink-error);
 		--ink-glow: color-mix(in oklab, var(--ink-error) 35%, transparent);
+		--mark-ink: var(--ink-error);
 	}
 
 	.write {
@@ -395,13 +480,16 @@
 	}
 
 	.line {
-		min-height: 3rem;
-		padding: 0.375rem 0 0.5rem;
+		min-height: 2.75rem;
+		padding: 0.25rem 0 0.4rem;
 	}
 
 	/* Lined letter pad: the rules scroll with the text; the last one is the ruled baseline below */
-	.pad {
+	.write-pad {
 		--rule: 2.25rem;
+	}
+
+	.pad {
 		display: block;
 		min-height: calc(var(--rule) * 7 + 0.25rem);
 		padding: 0.25rem 0 0;
@@ -434,6 +522,66 @@
 
 	.pad:focus::placeholder {
 		opacity: 0.45;
+	}
+
+	/*
+	 * Focus at the caret: a margin line inks down the left edge of the pad from the label's drop of ink (wet at the top,
+	 * running dry), and the first writing line inks in from the left a beat later. Together with the baseline they frame the
+	 * page you are writing on.
+	 */
+	.write-pad::before,
+	.write-pad::after {
+		content: '';
+		position: absolute;
+		pointer-events: none;
+		opacity: 0;
+		transition:
+			opacity var(--dur-state) ease,
+			transform 0s linear var(--dur-state);
+	}
+
+	.write-pad::before {
+		top: -0.25rem;
+		bottom: 0;
+		left: calc(-0.7625rem - 1px);
+		width: 2px;
+		border-radius: 2px;
+		background: linear-gradient(180deg, var(--ink-wet), var(--ink-lit) 22%, var(--ink-lit) 62%, color-mix(in oklab, var(--ink-lit) 30%, transparent));
+		box-shadow: 0 0 0.6rem var(--ink-glow);
+		transform: scaleY(0);
+		transform-origin: top;
+	}
+
+	.write-pad::after {
+		top: calc(0.25rem + var(--rule) - 1.5px);
+		left: 0;
+		right: 0;
+		height: 2px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, var(--ink-lit), color-mix(in oklab, var(--ink-lit) 55%, transparent) 70%, transparent);
+		box-shadow: 0 0.1rem 0.6rem var(--ink-glow);
+		transform: scaleX(0);
+		transform-origin: left;
+	}
+
+	/* Phones: the margin line sits in the 1rem gutter */
+	@media (max-width: 39.99rem) {
+		.write-pad::before {
+			left: calc(-0.5rem - 1px);
+		}
+	}
+
+	.write-pad:focus-within::before,
+	.write-pad:focus-within::after {
+		opacity: 1;
+		transform: none;
+		transition:
+			opacity 120ms ease,
+			transform 640ms var(--ease-settle);
+	}
+
+	.write-pad:focus-within::after {
+		transition-delay: 0ms, 140ms;
 	}
 
 	/* The ruled baseline; the ink runs in from the left on focus (bright wet tip leading) and dries off when you leave */
@@ -570,98 +718,149 @@
 	}
 
 	/*
-	 * Topic pills on a pressed-in track; the chosen one is a lit butter disc (as the blog filter). Phones: the pills wrap into
-	 * full rows, so every choice is in view (no sideways scrolling inside a form).
+	 * Topics: lines of the letter to tick, no tray. Each choice sits on a ruled line with a hand-drawn ink circle; the chosen one
+	 * fills with butter and its line is inked in (dry ink); the focused one lights its line with wet ink, keyboard focus also
+	 * rings the circle.
+	 * Two columns of lines on paper, one full-width line per choice on phones.
 	 */
-	.track-scroll {
-		margin: -0.5rem -1rem;
-		padding: 0.5rem 1rem;
-		overflow-x: auto;
-		scrollbar-width: none;
+	.choices {
+		display: grid;
+		column-gap: 2.5rem;
 	}
 
-	.track-scroll::-webkit-scrollbar {
-		display: none;
+	@media (min-width: 40rem) {
+		.choices {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
-	.track {
+	.choice {
+		position: relative;
 		display: flex;
-		width: max-content;
-		gap: 0.125rem;
-		/* Room for the focus ring inside the track */
-		padding: 0.3125rem;
-		border-radius: 999px;
-		background: color-mix(in oklab, var(--foreground) 5%, transparent);
-		box-shadow:
-			inset 0 0 0 1px color-mix(in oklab, var(--foreground) 10%, transparent),
-			inset 0 1px 3px color-mix(in oklab, var(--color-ink) 14%, transparent);
-	}
-
-	.topic {
-		display: inline-flex;
 		align-items: center;
-		min-height: 2.75rem;
-		padding: 0 1.1rem;
-		border-radius: 999px;
-		color: var(--muted-foreground);
-		font-size: 0.9375rem;
-		font-weight: 500;
-		white-space: nowrap;
+		gap: 0.875rem;
+		min-height: 3rem;
+		padding-block: 0.375rem;
+		color: color-mix(in oklab, var(--foreground) 80%, transparent);
+		font-size: 1.0625rem;
+		line-height: 1.3;
 		cursor: pointer;
 		user-select: none;
 		-webkit-tap-highlight-color: transparent;
+		transition: color var(--dur-state) ease;
+	}
+
+	/* The ruled line under each choice, and the ink that runs in along it */
+	.choice::before,
+	.choice::after {
+		content: '';
+		position: absolute;
+		inset: auto 0 0;
+		pointer-events: none;
+	}
+
+	.choice::before {
+		height: 1px;
+		background: var(--pad-rule);
+	}
+
+	.choice::after {
+		height: 2px;
+		bottom: -0.5px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, var(--ink-lit) 0 70%, color-mix(in oklab, var(--ink-lit) 20%, transparent));
+		opacity: 0;
+		transform: scaleX(0);
+		transform-origin: left;
 		transition:
-			color var(--dur-state) ease,
-			background-color var(--dur-state) ease,
-			box-shadow var(--dur-state) ease,
-			scale var(--dur-hover) var(--ease-settle);
+			opacity var(--dur-state) ease,
+			transform 0s linear var(--dur-state),
+			box-shadow var(--dur-state) ease;
 	}
 
-	.topic:hover {
+	.choice:has(:checked)::after,
+	.choice:has(:focus)::after {
+		opacity: 0.7;
+		transform: none;
+		transition:
+			opacity 120ms ease,
+			transform 520ms var(--ease-settle),
+			box-shadow var(--dur-state) ease;
+	}
+
+	.choice:has(:focus)::after {
+		opacity: 1;
+		box-shadow: 0 0.1rem 0.7rem var(--ink-glow);
+	}
+
+	.choice:hover {
 		color: var(--foreground);
-		background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
 	}
 
-	.topic:active {
-		scale: 0.97;
+	.choice:has(:checked) {
+		color: var(--foreground);
+		font-weight: 600;
 	}
 
-	.topic:has(:checked) {
-		background: radial-gradient(110% 130% at 50% -25%, color-mix(in oklab, var(--color-moonlight) 80%, transparent), transparent 62%) var(--color-butter);
-		color: var(--color-night);
-		box-shadow:
-			inset 0 0 0 1px color-mix(in oklab, var(--color-ochre) 50%, transparent),
-			0 2px 14px -3px color-mix(in oklab, var(--color-ochre) 70%, transparent);
+	/* The ink circle: a hand-drawn ring (its stroke overlaps where the brush lifted), butter fills it when chosen */
+	.mark {
+		position: relative;
+		flex: none;
+		width: 1.375rem;
+		height: 1.375rem;
+		border-radius: 50%;
+		transition: scale var(--dur-hover) var(--ease-settle);
 	}
 
-	:global(.dark) .topic:has(:checked) {
-		box-shadow:
-			inset 0 0 0 1px color-mix(in oklab, var(--color-moonlight) 40%, transparent),
-			0 2px 16px -2px color-mix(in oklab, var(--color-butter) 55%, transparent);
+	.mark::before,
+	.mark::after {
+		content: '';
+		position: absolute;
 	}
 
-	.topic:has(:focus-visible) {
+	.mark::before {
+		inset: 0;
+		z-index: 1;
+		background: var(--mark-ink);
+		mask: var(--ink-ring) center / 100% 100% no-repeat;
+		transition: background-color var(--dur-state) ease;
+	}
+
+	.mark::after {
+		inset: 17%;
+		border-radius: 52% 48% 55% 45% / 47% 55% 45% 53%;
+		background: radial-gradient(circle at 36% 30%, var(--color-moonlight), var(--color-butter) 52%, color-mix(in oklab, var(--color-butter) 72%, var(--color-ochre)));
+		scale: 0;
+		transition: scale 260ms cubic-bezier(0.3, 1.4, 0.5, 1);
+	}
+
+	.choice:hover .mark::before {
+		background: var(--foreground);
+	}
+
+	.choice:active .mark {
+		scale: 0.9;
+	}
+
+	.choice:has(:checked) .mark::before {
+		background: var(--ink-lit);
+	}
+
+	.choice:has(:checked) .mark::after {
+		scale: 1;
+	}
+
+	:global(.dark) .choice:has(:checked) .mark::after {
+		box-shadow: 0 0 0.75rem 0.1rem color-mix(in oklab, var(--color-butter) 45%, transparent);
+	}
+
+	.choice:has(:focus-visible) .mark {
 		outline: 2px solid var(--focus-ring);
-		outline-offset: 2px;
+		outline-offset: 3px;
 	}
 
-	@media (max-width: 39.99rem) {
-		.track-scroll {
-			margin: 0;
-			padding: 0;
-			overflow: visible;
-		}
-
-		.track {
-			flex-wrap: wrap;
-			width: auto;
-			border-radius: 1.7rem;
-		}
-
-		.topic {
-			flex: 1 1 auto;
-			justify-content: center;
-		}
+	.topics {
+		--ink-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.6 2.9C18.4 3.4 21.4 7.4 21 12.2c-.4 4.7-4.4 8.2-9.3 7.9C7 19.8 3.1 16 3.2 11.6 3.3 6.7 7.4 2.8 12.4 3.1c1.6.1 2.9.6 4 1.3' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3C/svg%3E");
 	}
 
 	/* Butter pill, lit from above; its moon rises on hover, it presses in, and a sheen runs while sending */
@@ -761,6 +960,7 @@
 		color: var(--foreground);
 		text-decoration: underline 1.5px var(--color-ochre);
 		text-underline-offset: 4px;
+		border-radius: 4px;
 		transition: text-decoration-color var(--dur-hover) ease;
 	}
 
@@ -768,8 +968,13 @@
 		text-decoration-color: currentColor;
 	}
 
-	/* Sent: the page settles, the heading is underlined by hand in ink */
+	.privacy:focus-visible {
+		outline-offset: 3px;
+	}
+
+	/* Sent: the thanks takes the title's place, the heading is underlined by hand in ink (room for it above the line below) */
 	.sent {
+		row-gap: 2rem;
 		animation: sent-in var(--dur-reveal) var(--ease-settle) both;
 	}
 
@@ -782,16 +987,15 @@
 
 	.sent-title {
 		position: relative;
-		padding-bottom: 0.2em;
 	}
 
 	.sent-title::after {
 		content: '';
 		position: absolute;
-		left: 0;
+		left: 0.02em;
 		right: 0.05em;
-		bottom: -0.04em;
-		height: 0.17em;
+		bottom: 0.03em;
+		height: 0.1em;
 		background: var(--ink-lit);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
 		clip-path: inset(0 100% 0 0);
@@ -804,26 +1008,42 @@
 		}
 	}
 
+	/* Back to a new letter: a written line with its hand-drawn underline, no button chrome */
 	.again {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		min-height: 2.75rem;
-		padding: 0 1.35rem;
-		border-radius: 999px;
+		margin-top: 0.5rem;
+		border-radius: 4px;
+		color: var(--foreground);
+		font-size: 1.0625rem;
 		font-weight: 600;
-		box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--foreground) 25%, transparent);
-		transition:
-			box-shadow var(--dur-hover) ease,
-			background-color var(--dur-hover) ease;
+		-webkit-tap-highlight-color: transparent;
 	}
 
-	.again:hover {
-		background-color: color-mix(in oklab, var(--color-butter) 14%, transparent);
-		box-shadow: inset 0 0 0 1.5px var(--color-ochre);
+	.again::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0.3rem;
+		height: 0.4rem;
+		background: var(--ink-lit);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		opacity: 0.75;
+		transition:
+			opacity var(--dur-hover) ease,
+			translate var(--dur-hover) var(--ease-settle);
+	}
+
+	.again:hover::after {
+		opacity: 1;
+		translate: 0 2px;
 	}
 
 	.again:focus-visible {
-		box-shadow: inset 0 0 0 1.5px var(--color-ochre);
+		outline-offset: 3px;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -835,16 +1055,19 @@
 			clip-path: none;
 			animation: none;
 		}
-	}
 
-	@media (prefers-reduced-motion: reduce) {
 		.send:disabled .dot {
 			animation: none;
 		}
 
 		.send,
 		.dot,
-		.topic {
+		.mark,
+		.mark::after,
+		.choice::after,
+		.write-pad::before,
+		.write-pad::after,
+		.again::after {
 			transition: none;
 		}
 	}

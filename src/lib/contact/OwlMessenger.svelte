@@ -2,8 +2,8 @@
 	@component
 	The night owl messenger of /kontakt (docs/SITE-REDESIGN.md): a silhouette owl on a gnarled branch with the sealed letter,
 	backlit by the pigment wash. It blinks now and then (random 4–9 s, sometimes twice), its eyes light up while `watching`
-	(someone writes the letter), and when `flown` turns true it takes off with the letter, arcs up and out to the right, and the
-	empty branch springs back. Back to `flown = false`: it lands again.
+	(someone writes the letter), and when `flown` turns true it takes off with the letter, glides off low behind the title (never up
+	into the nav), and the empty branch springs back. Back to `flown = false`: it lands again.
 
 	Size and position come from the parent: the root is `var(--owl)` square (the 1254 px master canvas), the branch runs off its
 	right edge, so place it flush with the viewport edge. Every layer shares that canvas, so the frames stack pixel-exactly.
@@ -172,7 +172,7 @@
 	}
 
 	:global(.dark) .owl[data-flown] .wash {
-		opacity: 0.42;
+		opacity: 0.2;
 		mix-blend-mode: screen;
 	}
 
@@ -282,7 +282,10 @@
 		}
 	}
 
-	/* 0–34 %: take-off and the climb into the distance (≈ 2.4 s); then a slow glide away that fades out */
+	/*
+	 * 0–34 %: take-off and the climb into the distance (≈ 2.4 s); then a slow glide away that fades out. The path stays low,
+	 * level with the owl's head and behind the title, so the bird never rises into the nav above the canvas.
+	 */
 	@keyframes fly {
 		0% {
 			opacity: 0;
@@ -293,21 +296,21 @@
 			opacity: 1;
 		}
 		6% {
-			transform: translate(-3%, -6%) scale(0.96) rotate(2deg);
+			transform: translate(-4%, -4%) scale(0.95) rotate(2deg);
 			animation-timing-function: ease-in-out;
 		}
 		18% {
-			transform: translate(-28%, -26%) scale(0.5) rotate(5deg);
+			transform: translate(-30%, -13%) scale(0.5) rotate(4deg);
 			animation-timing-function: ease-out;
 		}
 		34% {
 			opacity: 1;
-			transform: translate(-58%, -41%) scale(0.13) rotate(1deg);
+			transform: translate(-62%, -19%) scale(0.14) rotate(1deg);
 			animation-timing-function: linear;
 		}
 		100% {
 			opacity: 0;
-			transform: translate(-80%, -43%) scale(0.08) rotate(-1deg);
+			transform: translate(-88%, -21%) scale(0.08) rotate(-1deg);
 		}
 	}
 
@@ -343,10 +346,10 @@
 		}
 	}
 
-	/* Phones: the owl perches above the title, so the twigs that hang below the branch fade before they reach it */
+	/* Phones: the owl perches above the title, so the twigs that hang below the branch fade out 1.5rem above its ink */
 	@media (max-width: 47.99rem) {
 		.bough {
-			mask: linear-gradient(to bottom, #000 72%, transparent 88%);
+			mask: linear-gradient(to bottom, #000 72%, transparent 86%);
 		}
 	}
 
