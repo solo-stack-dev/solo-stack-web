@@ -1,7 +1,6 @@
 <!--
-	Error page for every route (also unmatched URLs, which SvelteKit renders at runtime with status 404).
-	404 → the World Tree (Hunter x Hunter homage); everything else → the giant at the wall (Attack on Titan homage). The art lives in src/lib/errors/.
-	The root layout only emits hreflang alternates for status 200, so error pages advertise none.
+	All errors, incl. unmatched URLs (404 at runtime). 404 → World Tree (Hunter x Hunter); else → giant at the wall (Attack on
+	Titan). Art: src/lib/errors/. No hreflang: the root layout emits alternates only for status 200.
 -->
 <script lang="ts">
 	import { page } from '$app/state';

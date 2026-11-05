@@ -8,12 +8,9 @@ export type ContactTopic = (typeof CONTACT_TOPICS)[number];
 export const CONTACT_LIMITS = { name: 120, email: 254, messageMin: 20, messageMax: 5000 } as const;
 
 /**
- * The contact form, validated in the browser (`preflight`) and again on the server. Issue messages are not shown to
- * visitors: they are stable codes, the page shows the localized `contact_error_*` message of the field instead (the
- * remote endpoint has no locale in its URL, so the server could only answer in the base locale).
- *
- * `turnstile` is a hidden input holding the token of the Turnstile widget (`TurnstileWidget` `ontoken`). `website` is a
- * honeypot: hidden from people, bots fill it in.
+ * Validated in the browser (`preflight`) and on the server. Issue messages are field codes; the page shows `contact_error_*`
+ * instead (the remote endpoint has no locale in its URL, so the server could only answer in the base locale).
+ * `turnstile`: hidden input with the widget token. `website`: honeypot, hidden from people.
  */
 export const ContactSchema = v.object({
 	topic: v.picklist(CONTACT_TOPICS, 'topic'),

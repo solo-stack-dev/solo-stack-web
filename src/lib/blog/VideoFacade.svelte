@@ -1,10 +1,8 @@
 <!--
 	@component
-	YouTube facade for a blog post. Before the click only the self-hosted thumbnail is shown (prerendered by
-	/media/video-thumbnail/[id]/[width].[format], so no request reaches YouTube); the click swaps in a youtube-nocookie iframe with
-	autoplay. `seek(seconds)` (chapter links) starts the player at that time, or seeks the running player through the
-	IFrame API postMessage protocol (no API script needed). Without a `youtubeId` it shows the painted night with a
-	"video follows" note instead.
+	YouTube facade: a self-hosted thumbnail (/media/video-thumbnail/…, no request reaches YouTube) until the click swaps in a
+	youtube-nocookie iframe with autoplay. `seek()` seeks a running player via the IFrame API postMessage protocol (no API
+	script). Without `youtubeId`: painted night with a "video follows" note.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -36,7 +34,7 @@
 		iframe?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func, args }), YOUTUBE_ORIGIN);
 	}
 
-	/** Jump to `seconds`: starts the player there, or seeks the running one. Brings the player into view. */
+	/** Starts the player at `seconds` or seeks the running one, and scrolls it into view. */
 	export function seek(seconds: number) {
 		if (!youtubeId) return;
 		if (playing) {
@@ -98,7 +96,7 @@
 		scroll-margin-top: 5rem;
 	}
 
-	/* No video yet: a wide, calmer band instead of a big empty 16:9 screen */
+	/* No video yet: a calmer wide band instead of an empty 16:9 */
 	.video.is-placeholder {
 		aspect-ratio: 16 / 7;
 	}

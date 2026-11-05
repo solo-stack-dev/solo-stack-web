@@ -1,11 +1,7 @@
 <!--
-	Layout for every page except the homepage (blog, stats, later contact and legal pages): the calm site shell with
-	light/dark mode, the sticky navbar, and the footer. Pages render their own content into <main>; keep this layout
-	generic (no page specific data), so new pages just drop into src/routes/(site)/.
-
-	Theme: mode-watcher, default "system", the visitor's choice is remembered in localStorage. Its head script sets the
-	`dark` class on <html> before the first paint (no flash). `data-site-surface` lets layout.css switch the html
-	background and color-scheme from the homepage night to the theme while this layout is mounted.
+	Shell for every page but the homepage. Keep it generic (no page data) so new pages just drop into src/routes/(site)/.
+	mode-watcher (default "system", stored in localStorage) sets `dark` on <html> before first paint. `data-site-surface`
+	lets layout.css switch the html background and color-scheme to the theme while mounted.
 -->
 <script lang="ts">
 	import { ModeWatcher } from 'mode-watcher';
@@ -46,6 +42,6 @@
 
 	<SiteFooter />
 
-	<!-- The watercolor paper of the brand, very faint: warm tooth on the light paper, a little grain in the night -->
+	<!-- Faint watercolor paper grain -->
 	<PaperGrain opacity={0.05} />
 </div>

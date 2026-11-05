@@ -4,8 +4,7 @@ import type { Handle } from '@sveltejs/kit/hooks';
 import { baseLocale, deLocalizeUrl, getTextDirection } from '#lib/paraglide/runtime.js';
 import { paraglideMiddleware } from '#lib/paraglide/server.js';
 
-// The base locale lives at unprefixed URLs (`/blog`). Paraglide also accepts `/de/blog` for it,
-// which would be duplicate content, so redirect it permanently to the canonical URL.
+// Base locale is unprefixed (`/blog`); Paraglide also accepts `/de/blog`, which is duplicate content: 308 to canonical.
 const handleBaseLocalePrefix: Handle = ({ event, resolve }) => {
 	const { pathname } = event.url;
 	if (pathname === `/${baseLocale}` || pathname.startsWith(`/${baseLocale}/`)) {

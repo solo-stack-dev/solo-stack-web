@@ -4,10 +4,10 @@ import { m } from '#lib/paraglide/messages.js';
 import { getLocale, localizeHref, type Locale } from '#lib/paraglide/runtime.js';
 import type { PostFormat } from './schema.ts';
 
-/** The rendered Markdown body of every post, one lazy chunk each. */
+/** Rendered post bodies, one lazy chunk each. */
 const bodies = import.meta.glob<{ default: Component }>('/src/content/blog/*.md');
 
-/** Body of a post. Unknown slugs are a 404 like in `getPost`, which this races against in `Promise.all`. */
+/** Unknown slugs 404 like `getPost`, which this races in `Promise.all`. */
 export async function loadPostBody(slug: string): Promise<Component> {
 	const load = bodies[`/src/content/blog/${slug}.md`];
 	if (!load) error(404);
@@ -21,10 +21,10 @@ export const FORMAT_LABELS: Record<PostFormat, () => string> = {
 	business: m.blog_format_business
 };
 
-/** URL of a post. Posts live in their own language (`lang`), so the link never points to a missing translation. */
+/** Uses the post's own `lang`, so the link never points to a missing translation. */
 export const postHref = (post: { slug: string; lang: Locale }) => localizeHref(`/blog/${post.slug}`, { locale: post.lang });
 
-/** `2026-11-01` → a localized long date ("1. November 2026"), in UTC so build and browser agree. */
+/** `2026-11-01` → "1. November 2026", in UTC so build and browser agree. */
 export function formatDate(isoDate: string, locale: string = getLocale()) {
 	return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${isoDate}T00:00:00Z`));
 }
@@ -47,5 +47,5 @@ export function isoDuration(seconds: number) {
 	return `PT${h ? `${h}H` : ''}${min ? `${min}M` : ''}${s || (!h && !min) ? `${s}S` : ''}`;
 }
 
-/** A `<script type="application/ld+json">` tag for `{@html}`, safe to inline (`<` escaped, so no `</script>` breakout). */
+/** JSON-LD tag for `{@html}`; `<` is escaped, so no `</script>` breakout. */
 export const jsonLdScript = (data: unknown) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;

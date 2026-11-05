@@ -1,7 +1,6 @@
 /**
- * Section ids of a post body. The `##` headings get an `id` at compile time (`rehypeHeadingIds`, registered with
- * mdsvex in vite.config.ts) and the post page lists them in its table of contents (`outlineOf` over the raw Markdown).
- * Both sides use `headingId`, so the links always match. Dependency free on purpose: vite.config.ts imports this file.
+ * Section ids of a post body: `rehypeHeadingIds` (mdsvex, vite.config.ts) sets them on `##` headings, `outlineOf` builds
+ * the TOC from raw Markdown; both use `headingId`, so links match. Keep dependency free: vite.config.ts imports this file.
  */
 
 /** A heading's plain text → a readable URL fragment (`Erst die Stimmung, dann der Code` → `erst-die-stimmung-dann-der-code`). */

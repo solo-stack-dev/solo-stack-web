@@ -18,10 +18,8 @@
 
 <!--
 	One night, 20:00 → 06:00. Order must match NIGHT_HOURS in src/lib/home/night.ts.
-	Transitions (docs/HOMEPAGE-DEV.md §6.5): every plate feathers its own edges with the painted soft edge, and a
-	partly transparent painted mist bank (shared/Mist.svelte) drifts across the boundary. Two boundaries are
-	scroll-driven ink-wash wipes owned by the sections themselves: 20→21 (the making plate floods up over the hero)
-	and 04→06 (the sunrise night dries and pulls back), so they get no mist.
+	Transitions (docs/HOMEPAGE-DEV.md §6.5): plates feather their own edges and a painted Mist bank covers each boundary,
+	except 20→21 and 04→06, which are scroll-driven ink-wash wipes owned by the sections (no mist).
 -->
 <NightPage>
 	<Hero />

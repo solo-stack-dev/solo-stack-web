@@ -1,8 +1,6 @@
 /**
- * Drizzle schema of the D1 database `DB` (docs/ARCHITECTURE.md#database). Single source of truth for the tables:
- * change it here, then run `pnpm db:generate` to write the next migration into `migrations/`.
- *
- * Dates are UTC `YYYY-MM-DD` strings and timestamps ISO strings (`…Z`), so they sort and compare as text.
+ * Drizzle schema of D1 `DB` (docs/ARCHITECTURE.md#database), the source of truth: edit, then `pnpm db:generate` a migration.
+ * Dates are UTC `YYYY-MM-DD`, timestamps ISO (`…Z`), so both sort and compare as text.
  */
 import { sql } from 'drizzle-orm';
 import { check, index, integer, primaryKey, sqliteTable, text } from 'drizzle-orm/sqlite-core';
@@ -11,23 +9,18 @@ const DAY_GLOB = `'[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'`;
 const nowIso = sql`(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))`;
 
 // ---------------------------------------------------------------------------------------------------------------
-// /stats history (docs/ARCHITECTURE.md#stats-page). The KV snapshot `stats:v1` is rebuilt from these tables after
-// every collector run.
+// /stats history (docs/ARCHITECTURE.md#stats-page). KV snapshot `stats:v1` is rebuilt from these after every collector run.
 
 /**
- * Metrics stored per platform and day.
- * - `followers`: end-of-day followers (subscribers on YouTube), every platform
- * - `views`: channel views that day (YouTube)
- * - `watch_minutes`: watch time that day in minutes (YouTube)
+ * Per platform and day:
+ * - `followers`: end-of-day followers (YouTube: subscribers), all platforms
+ * - `views`, `watch_minutes`: channel views and watch time that day (YouTube only)
  * - `posts`: posts published that day (videos, shorts, posts, streams), per platform
  */
 export const METRICS = ['followers', 'views', 'watch_minutes', 'posts'] as const;
 export type Metric = (typeof METRICS)[number];
 
-/**
- * One value per platform, metric and UTC day. Re-running the collector on the same day overwrites the row
- * (`onConflictDoUpdate`), so the last fetch of a day wins.
- */
+/** One value per platform, metric and UTC day; the day's last collector run wins (`onConflictDoUpdate`). */
 export const dailyMetrics = sqliteTable(
 	'daily_metrics',
 	{
@@ -60,10 +53,7 @@ export const videos = sqliteTable(
 	(t) => [check('videos_duration_positive', sql`${t.durationSeconds} >= 0`)]
 );
 
-/**
- * Views per video and UTC day (YouTube Analytics, dimensions `day` + `video`). Period totals for the top list are
- * sums over this table.
- */
+/** Views per video and UTC day (YouTube Analytics, dimensions `day` + `video`); top-list period totals sum over it. */
 export const videoDailyViews = sqliteTable(
 	'video_daily_views',
 	{

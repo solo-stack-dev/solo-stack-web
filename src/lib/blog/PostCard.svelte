@@ -1,9 +1,7 @@
 <!--
 	@component
-	Blog index entry: thumbnail (self-hosted YouTube thumbnail, or the painted night while the video is not public, with
-	a rubber stamp like the one on /stats), format, date, reading time, title, teaser. No card box: the picture glows
-	and lifts on hover, the title sits on the page. The title link stretches over the whole entry (one tab stop, one
-	link name). `featured` lays it out wide (image beside a big title from `md`).
+	Blog index entry. Thumbnail: self-hosted, or the painted night with a stamp while the video is not public. No card box.
+	The title link covers the whole entry (one tab stop, one link name). `featured`: image beside a big title from `md`.
 -->
 <script lang="ts">
 	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
@@ -22,8 +20,7 @@
 
 	let { post, featured = false, eager = false }: Props = $props();
 
-	// Rendered thumbnail width. Blog index: max-w-6xl (72rem) container with px-4 (sm: px-6, lg: px-8), grid column gap
-	// 2rem with 1/2/3 columns (md/lg). Featured from md: image column 1.15fr beside 1fr with a 3rem gap.
+	// Rendered width. Index: max-w-6xl (72rem), px-4/sm:6/lg:8, gap 2rem, 1/2/3 columns (md/lg). Featured from md: 1.15fr + 1fr, gap 3rem.
 	const SIZES_SINGLE = '(min-width: 40rem) calc(100vw - 3rem), calc(100vw - 2rem)';
 	const sizes = $derived(
 		featured
@@ -32,7 +29,7 @@
 	);
 </script>
 
-<!-- `lang` marks only the post's own text: the format, date and reading time are page UI in the page locale -->
+<!-- `lang` marks only the post's own text; format, date and reading time are page UI -->
 <article class={['post-card group', featured && 'is-featured']}>
 	<div class="thumb">
 		{#if post.youtubeId}
@@ -89,7 +86,7 @@
 			box-shadow 300ms ease;
 	}
 
-	/* Hover: the picture lifts and catches the moonlight */
+	/* Hover: lifts and catches the moonlight */
 	.post-card:hover .thumb {
 		translate: 0 -4px;
 		box-shadow:
@@ -111,7 +108,7 @@
 		scale: 1.04;
 	}
 
-	/* "Video follows": a butter rubber stamp on the painted night, like the mock data stamp on /stats */
+	/* "Video follows" stamp (as the mock data stamp on /stats) */
 	.stamp {
 		position: absolute;
 		top: 1rem;

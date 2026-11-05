@@ -1,10 +1,8 @@
 <!--
 	@component
-	A small painted night for the blog: anthracite sky, a few stars, a glowing butter moon, and the sitting mascot
-	looking up at it. CSS gradients plus one 28 kB cutout, so it is cheap anywhere (video placeholder, card thumbnail
-	without a video, the blog header). Always night, also in light mode: it is a window into the homepage's world.
-	`variant="moonrise"`: no mascot, a big moon rising over a dark ridge (post cards, so the cards do not repeat the
-	blog header). Decorative: content goes into `children`, which sits above the art.
+	Small painted night (sky, stars, moon, mascot): CSS gradients plus one 28 kB cutout, cheap anywhere (video placeholder,
+	cards, blog header). Always night, also in light mode (a window into the homepage). `moonrise` is used on post cards so
+	they do not repeat the blog header. Decorative; `children` sit above the art.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -54,7 +52,7 @@
 		position: absolute;
 		inset: 0;
 		z-index: -1;
-		/* A handful of stars: tiny radial dots, no canvas */
+		/* Stars as radial dots, no canvas */
 		background-image:
 			radial-gradient(1.5px 1.5px at 12% 22%, rgb(251 243 221 / 0.85), transparent), radial-gradient(1px 1px at 28% 12%, rgb(251 243 221 / 0.7), transparent),
 			radial-gradient(1.5px 1.5px at 44% 30%, rgb(251 243 221 / 0.6), transparent), radial-gradient(1px 1px at 58% 9%, rgb(251 243 221 / 0.8), transparent),
@@ -78,7 +76,7 @@
 			0 0 7rem rgb(252 215 114 / 0.18);
 	}
 
-	/* A warm glow at the bottom, like the light on the cliff */
+	/* Warm bottom glow, like the cliff light */
 	.horizon {
 		position: absolute;
 		inset: auto 0 0;

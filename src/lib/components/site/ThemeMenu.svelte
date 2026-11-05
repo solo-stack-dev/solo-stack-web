@@ -1,10 +1,7 @@
 <!--
 	@component
-	Light / dark / system choice for the non-home pages (mode-watcher; the (site) layout mounts <ModeWatcher>).
-	The choice is stored in localStorage by mode-watcher; "system" follows the device. The icon swaps via the `dark`
-	class (CSS only), so server HTML and hydration always agree.
-
-	Heavy (bits-ui dropdown): never import statically. ThemeToggle loads it on the first tap and mounts it open.
+	Light / dark / system (mode-watcher, mounted by the (site) layout). The icon swaps via the `dark` class (CSS only), so
+	server HTML and hydration agree. Heavy (bits-ui dropdown): never import statically; ThemeToggle loads it on first tap.
 -->
 <script lang="ts">
 	import MonitorIcon from '@lucide/svelte/icons/monitor';

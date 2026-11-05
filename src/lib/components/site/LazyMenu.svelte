@@ -1,8 +1,7 @@
 <!--
 	@component
-	A navbar menu whose heavy implementation (bits-ui dropdown/sheet + floating-ui) loads on demand: until the first
-	tap a plain button with the same look stands in for the real trigger. Hover, focus and pointerdown start the
-	download early; the click swaps in the real menu, mounted open. Keeps ~35 kB gzip off every blog and stats page.
+	Navbar menu loaded on demand (bits-ui + floating-ui, ~35 kB gzip off every site page). A look-alike button stands in;
+	hover, focus and pointerdown preload, the click mounts the real menu open.
 -->
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';

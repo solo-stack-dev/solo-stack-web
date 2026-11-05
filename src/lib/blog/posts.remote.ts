@@ -6,15 +6,14 @@ import { outlineOf } from './outline.ts';
 import { PostFrontmatterSchema, type Post, type PostSummary } from './schema.ts';
 
 /*
- * Blog posts are Markdown files in src/content/blog (rendered by mdsvex). These functions read their frontmatter and
- * raw text at build time and are prerendered, so the Worker never touches the files. The rendered body is loaded on
- * the page itself (`loadPostBody` in ./content.ts), one lazy chunk per post.
+ * Frontmatter and raw text of src/content/blog/*.md, read and prerendered at build time (the Worker never touches the
+ * files). The rendered body is a lazy chunk per post (`loadPostBody`, ./content.ts).
  */
 
 const metadata = import.meta.glob<Record<string, unknown>>('/src/content/blog/*.md', { eager: true, import: 'metadata' });
 const sources = import.meta.glob<string>('/src/content/blog/*.md', { eager: true, query: '?raw', import: 'default' });
 
-/** Words per minute for the reading time (German prose, a calm reading pace). */
+/** Calm reading pace for German prose. */
 const WORDS_PER_MINUTE = 200;
 
 function countReadingMinutes(source: string) {

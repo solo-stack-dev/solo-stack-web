@@ -2,25 +2,18 @@
 import { env } from 'cloudflare:workers';
 import type { ContactMessage } from './schema.ts';
 
-/**
- * Sender of the notification mails. Must be on a domain onboarded to Cloudflare Email Sending (solo-stack.dev is) and
- * is pinned by `allowed_sender_addresses` of the `CONTACT_EMAIL` binding in `wrangler.jsonc`.
- */
+/** Must be on a domain onboarded to Cloudflare Email Sending; pinned by `allowed_sender_addresses` of `CONTACT_EMAIL` (`wrangler.jsonc`). */
 const FROM = { email: 'kontakt@solo-stack.dev', name: 'solo-stack.dev Kontakt' } as const;
 
 /**
- * Public business address. Email Routing forwards it to the owner's private inbox (dashboard > Email Service > Email
- * Routing), so the private address never appears in this public repo. Must match `destination_address` of the binding.
+ * Public address; Email Routing (dashboard) forwards it to the owner's private inbox, which thus stays out of this public repo.
+ * Must match the binding's `destination_address`.
  */
 const TO = 'business@solo-stack.dev';
 
 /**
- * Hands a verified contact message to the owner by mail (Cloudflare Email Sending, `send_email` binding `CONTACT_EMAIL`).
- * The binding pins sender and recipient, so the Worker cannot be abused to mail anyone else.
- * `Reply-To` is the visitor, so answering the mail answers them.
- *
- * `pnpm dev` / `pnpm preview` simulate the binding: the mail is only printed to the console, nothing is sent.
- * Throws when sending fails; the form then tells the visitor to try again later.
+ * Mails a verified message to the owner. The binding pins sender and recipient, so the Worker cannot mail anyone else;
+ * `Reply-To` is the visitor. `pnpm dev`/`preview` only print the mail. Throws on failure (the form asks to retry later).
  */
 export async function deliverContactMessage(message: ContactMessage): Promise<void> {
 	const { messageId } = await env.CONTACT_EMAIL.send({
