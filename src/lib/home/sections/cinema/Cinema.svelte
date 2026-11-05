@@ -4,7 +4,8 @@
 
 	- Facade: self-hosted thumbnail (./thumbnail.ts) + moon play button; no request to YouTube before the click.
 	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
-	- No video (empty feed or offline build): empty lit screen + channel link.
+	- No video (empty feed or offline build): a quiet painted projection in the screen (docs/art/site/round-2/cinema-projection.png)
+	  with the message and the channel link on it; the frame's outer bloom is toned down so the screen, not the fire, leads.
 	- Dust motes (CSS) pause off screen; reduced motion: no motes, no beam animation.
 	- Rects: ./layout.ts. Dev only: `?cinema=demo` (public demo video), `?cinema=empty`.
 -->
@@ -82,7 +83,7 @@
 <section
 	id="cinema"
 	data-night-hour="04:00"
-	class={['cinema', playing && 'is-playing', near.current && 'is-near']}
+	class={['cinema', playing && 'is-playing', near.current && 'is-near', !video && 'is-empty']}
 	aria-labelledby="home-cinema-title"
 	style:--cinema-sky={SKY}
 >
@@ -142,7 +143,20 @@
 				</button>
 			{:else}
 				<div class="empty">
-					<p class="empty-line font-mono text-xs tracking-wide md:text-sm">{m.home_cinema_empty()}</p>
+					<enhanced:img
+						src="./assets/cinema-projection.webp?w=1664;1280;960;640"
+						alt=""
+						class="projection"
+						sizes="(min-width: 48rem) 53vw, 84vw"
+						loading="lazy"
+						decoding="async"
+					/>
+					<div class="empty-copy">
+						<p class="empty-line">{m.home_cinema_empty()}</p>
+						<a class="link label" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
+							{m.home_cinema_channel_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+						</a>
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -156,18 +170,14 @@
 			decoding="async"
 		/>
 
-		<div class={['placed caption font-mono', d.caption.align === 'center' && 'd-center', mo.caption.align === 'center' && 'm-center']} style={place.caption}>
-			{#if video}
+		{#if video}
+			<div class={['placed caption font-mono', d.caption.align === 'center' && 'd-center', mo.caption.align === 'center' && 'm-center']} style={place.caption}>
 				<p class="title text-sm tracking-wide md:text-base">{video.title}</p>
 				<a class="link label" href={video.url} target="_blank" rel="noopener">
 					{m.home_cinema_watch_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
 				</a>
-			{:else}
-				<a class="link label" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
-					{m.home_cinema_channel_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
-				</a>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 </section>
 
@@ -181,6 +191,15 @@
 		justify-content: flex-end;
 		overflow-x: clip;
 		--ink-fade: var(--color-night);
+		/* Pulled up under the radio's rock foreground: the cinema's painted sky meets the rocks, no dead band between them (the
+		   seam's mist and cloud sit on the overlap). Only its own links and buttons take pointer events there. */
+		margin-top: calc(var(--cinema-overlap) * -1);
+		--cinema-overlap: clamp(3rem, 11vw, 11rem);
+		pointer-events: none;
+	}
+
+	.cinema :is(a, button, iframe) {
+		pointer-events: auto;
 	}
 
 	/*
@@ -461,16 +480,59 @@
 			0 0 90px 30px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
+	/* Empty screen: the projection runs quietly (dimmed on ink), the sentence and the channel link sit in its calm upper left. */
 	.empty {
 		position: relative;
 		display: grid;
-		place-content: center;
-		justify-items: center;
-		gap: 1.25rem;
-		padding: 1.5rem;
-		text-align: center;
-		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
-		background: radial-gradient(ellipse at 50% 45%, color-mix(in oklab, var(--color-butter) 16%, transparent), transparent 70%), var(--color-ink);
+		align-content: center;
+		padding: 0 9% 6%;
+		background: var(--color-ink);
+	}
+
+	.empty :global(.projection) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0.62;
+		user-select: none;
+	}
+
+	.empty-copy {
+		position: relative;
+		display: grid;
+		justify-items: start;
+		gap: clamp(0.75rem, 1.6vw, 1.5rem);
+	}
+
+	.empty-line {
+		max-width: 20ch;
+		font-size: clamp(1rem, 1.35vw, 1.25rem);
+		line-height: 1.45;
+		text-wrap: balance;
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+	}
+
+	/* A sharp lit inner edge on the aperture (over the screen's content) */
+	.is-empty .screen::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		box-shadow:
+			inset 0 0 0 1px color-mix(in oklab, var(--color-moonlight) 55%, transparent),
+			inset 0 0 0.9rem color-mix(in oklab, var(--color-butter) 18%, transparent);
+	}
+
+	/* Empty state: the frame's outer bloom fades out toward its ragged edge; the rim at the aperture keeps full light. */
+	.is-empty .frame {
+		mask:
+			linear-gradient(to right, color-mix(in oklab, #000 35%, transparent), #000 6.5%, #000 93.5%, color-mix(in oklab, #000 35%, transparent)),
+			linear-gradient(to bottom, color-mix(in oklab, #000 35%, transparent), #000 11.5%, #000 88.5%, color-mix(in oklab, #000 35%, transparent));
+		mask-composite: intersect;
+		filter: saturate(0.9) brightness(0.9);
 	}
 
 	.caption {

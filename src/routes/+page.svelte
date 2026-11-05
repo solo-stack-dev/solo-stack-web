@@ -8,6 +8,7 @@
 	import NightShift from '#lib/home/sections/night-shift/NightShift.svelte';
 	import Radio from '#lib/home/sections/radio/Radio.svelte';
 	import Sunrise from '#lib/home/sections/sunrise/Sunrise.svelte';
+	import DawnTint from '#lib/home/shared/DawnTint.svelte';
 	import Mist from '#lib/home/shared/Mist.svelte';
 </script>
 
@@ -24,13 +25,45 @@
 <NightPage>
 	<Hero />
 	<Making />
-	<Mist variant="dusk" height="clamp(7rem, 15vw, 14rem)" above={0.3} opacity={0.6} gaps={[18, 64]} />
+	<Mist
+		variant="dusk"
+		height="clamp(5rem, 10vw, 9rem)"
+		above={0.45}
+		opacity={0.4}
+		gaps={[18, 64]}
+		cloud={{ strip: 'b', height: 'clamp(6rem, 16vw, 15rem)', above: 0.78, stretch: 1.3, shift: 8 }}
+	/>
 	<Game />
-	<Mist variant="night" height="clamp(8rem, 18vw, 16rem)" above={0.35} opacity={0.6} gaps={[40, 86]} mirror />
+	<Mist
+		variant="night"
+		height="clamp(5rem, 11vw, 10rem)"
+		above={0.55}
+		opacity={0.35}
+		gaps={[40, 86]}
+		mirror
+		cloud={{ strip: 'a', height: 'clamp(6rem, 16vw, 15rem)', above: 0.34, mirror: true, stretch: 1.25, shift: 4 }}
+	/>
 	<NightShift />
-	<Mist variant="night" height="clamp(8rem, 17vw, 15rem)" above={0.5} opacity={0.55} gaps={[30, 72]} offset={37} />
+	<Mist
+		variant="night"
+		height="clamp(5rem, 10vw, 9rem)"
+		above={0.6}
+		opacity={0.3}
+		gaps={[30, 72]}
+		offset={37}
+		cloud={{ strip: 'c', height: 'clamp(6rem, 14vw, 13rem)', above: 0.86, stretch: 1.3, shift: 10 }}
+	/>
 	<Radio />
-	<Mist variant="predawn" height="clamp(8rem, 18vw, 16rem)" above={0.45} opacity={0.65} gaps={[24, 58]} mirror />
+	<Mist
+		variant="predawn"
+		height="clamp(5rem, 11vw, 10rem)"
+		above={0.5}
+		opacity={0.4}
+		gaps={[24, 58]}
+		mirror
+		cloud={{ strip: 'a', height: 'clamp(6rem, 16vw, 15rem)', above: 0.82, stretch: 1.5, shift: -10 }}
+	/>
 	<Cinema />
+	<DawnTint />
 	<Sunrise />
 </NightPage>

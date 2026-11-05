@@ -2,7 +2,7 @@
 	@component
 	The game frame of the 22:00 section.
 
-	Poster (`poster` snippet + play button) → click imports the game chunk via `load` → playing. The frame owns pause
+	Poster (`poster` snippet; `title` + play button set into its lower left, the whole poster clicks) → click imports the game chunk via `load` → playing. The frame owns pause
 	(button, P/Escape, off screen, hidden tab), restart (remounts the game), score + local high score, focus on the game
 	surface, and touch buttons. Games get their default `tuning` values.
 
@@ -30,10 +30,12 @@
 		label: string;
 		/** Painted poster shown before play (fills the frame). */
 		poster?: Snippet;
+		/** Game title shown on the poster beside the play button (a message). */
+		title?: string;
 		class?: string;
 	}
 
-	let { gameId, load, label, poster, class: className = '' }: Props = $props();
+	let { gameId, load, label, poster, title, class: className = '' }: Props = $props();
 
 	type Status = 'poster' | 'loading' | 'playing' | 'error';
 
@@ -160,17 +162,22 @@
 			<TouchControls {input} buttons={controls} />
 		{:else}
 			<div class="poster">{@render poster?.()}</div>
+			<div class="scrim" aria-hidden="true"></div>
 			<div class="overlay is-static">
-				<button type="button" class="play-cta font-display font-black tracking-wordmark uppercase" onclick={play} disabled={status === 'loading'}>
+				<!-- One button: disc + title + label; its ::after stretches over the whole poster -->
+				<button type="button" class="play-cta" onclick={play} disabled={status === 'loading'}>
 					<span class="play-button" aria-hidden="true">
 						<svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
 					</span>
-					{m.home_game_play()}
+					<span class="play-text">
+						{#if title}<span class="play-title font-display font-black tracking-wordmark uppercase">{title}</span>{/if}
+						<span class="play-label label">{m.home_game_play()}</span>
+					</span>
 				</button>
 				{#if status === 'loading'}
-					<p class="font-mono text-xs tracking-clock text-cream/70" role="status">{m.home_game_loading()}</p>
+					<p class="status font-mono text-xs tracking-clock" role="status">{m.home_game_loading()}</p>
 				{:else if status === 'error'}
-					<p class="text-sm text-cream/80" role="alert">{m.home_game_load_error()}</p>
+					<p class="status text-sm" role="alert">{m.home_game_load_error()}</p>
 				{/if}
 			</div>
 		{/if}
@@ -272,21 +279,105 @@
 		cursor: pointer;
 	}
 
+	/* Resting poster: no veil over the art. The title and play button sit in the poster's calm lower left (every poster keeps
+	   that third quiet); a soft ink pool there carries the cream type. */
 	.overlay.is-static {
+		place-content: end start;
+		justify-items: start;
+		gap: 0.6rem;
+		padding: clamp(1.25rem, 4.5%, 3rem);
+		background: none;
 		cursor: auto;
 	}
 
+	.scrim {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: radial-gradient(
+			ellipse 62% 58% at 0% 100%,
+			color-mix(in oklab, var(--color-ink) 72%, transparent),
+			color-mix(in oklab, var(--color-ink) 38%, transparent) 55%,
+			transparent
+		);
+	}
+
 	.play-cta {
-		display: grid;
-		justify-items: center;
-		gap: 0.75rem;
-		font-size: clamp(1rem, 2.5vw, 1.5rem);
+		display: flex;
+		align-items: center;
+		gap: clamp(0.9rem, 2vw, 1.4rem);
+		text-align: start;
 		cursor: pointer;
+	}
+
+	/* the whole poster is the play target */
+	.play-cta::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+	}
+
+	.play-cta:focus-visible {
+		outline-offset: 6px;
 	}
 
 	.play-cta:disabled {
 		cursor: progress;
+	}
+
+	.play-cta:disabled .play-button {
 		opacity: 0.7;
+	}
+
+	.play-text {
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.play-title {
+		font-size: clamp(1.6rem, 3vw, 2.9rem);
+		line-height: 0.92;
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+		text-wrap: balance;
+		/* two short lines rather than one long one into the art (every poster's subject starts right of the lower-left third) */
+		max-width: 11ch;
+	}
+
+	.play-label {
+		color: var(--color-butter);
+		text-shadow: var(--halo-ink);
+	}
+
+	.status {
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+	}
+
+	.play-cta .play-button {
+		flex: none;
+		transition:
+			scale var(--dur-hover) var(--ease-settle),
+			box-shadow var(--dur-hover) ease;
+	}
+
+	.play-cta:hover .play-button,
+	.play-cta:focus-visible .play-button {
+		scale: 1.06;
+		box-shadow: var(--glow-md), var(--glow-lg);
+	}
+
+	/* Phones (4:5 crop, the subject fills more of it): a painted ink feather from below instead of the corner pool. */
+	@media (max-width: 40rem) {
+		.scrim {
+			background: color-mix(in oklab, var(--color-ink) 78%, transparent);
+			mask: var(--feather-up) bottom / 100% 48% no-repeat;
+		}
+
+		.play-cta .play-button {
+			width: 3.75rem;
+			height: 3.75rem;
+		}
 	}
 
 	.play-button {
