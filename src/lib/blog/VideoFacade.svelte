@@ -2,8 +2,9 @@
 	@component
 	YouTube facade: a self-hosted thumbnail (/media/video-thumbnail/…, no request reaches YouTube) until the click swaps in a
 	youtube-nocookie iframe with autoplay. `seek()` seeks a running player via the IFrame API postMessage protocol (no API
-	script). Without `youtubeId`: the format's silhouette vignette with the "video follows" note set into its night. The
-	thumbnail and the vignette sit on a torn paper edge; the running player gets clean corners.
+	script). Without `youtubeId`: the format's silhouette vignette with the "video follows" note on an ink scrim in its sky
+	(phones: as a caption below the art). The thumbnail and the vignette sit on a torn paper edge; the running player gets
+	clean corners.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -25,7 +26,7 @@
 	const SIZES = '(min-width: 64rem) min(calc(100vw - 4rem), 68rem), (min-width: 40rem) calc(100vw - 3rem), calc(100vw - 2rem)';
 	const YOUTUBE_ORIGIN = 'https://www.youtube-nocookie.com';
 
-	let root: HTMLElement;
+	let root = $state<HTMLElement>();
 	let iframe = $state<HTMLIFrameElement>();
 	let playing = $state(false);
 	let startAt = $state(0);
@@ -52,37 +53,43 @@
 			playing = true;
 		}
 		const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-		root.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
+		root?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
 	}
 </script>
 
-<div bind:this={root} class={['video', !youtubeId && 'is-placeholder', playing && 'is-playing']} style:--deckle={DECKLE_MASK}>
-	{#if youtubeId && playing}
-		<iframe
-			bind:this={iframe}
-			class="frame"
-			src={embedUrl}
-			{title}
-			allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
-			referrerpolicy="strict-origin-when-cross-origin"
-			{@attach (element) => element.focus()}
-		></iframe>
-	{:else if youtubeId}
-		<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} onclick={() => (playing = true)}>
-			<VideoThumbnail id={youtubeId} class="frame thumbnail" sizes={SIZES} fetchpriority="high" />
-			<span class="play" aria-hidden="true">
-				<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
-			</span>
-		</button>
-	{:else}
-		<FormatVignette class="frame placeholder-art" {format} sizes={SIZES} deckle={false} eager>
-			<div class="placeholder">
-				<p class="placeholder-title"><span class="spark" aria-hidden="true"></span>{m.blog_video_placeholder_title()}</p>
-				<p class="placeholder-body">{m.blog_video_placeholder_body()}</p>
-			</div>
-		</FormatVignette>
-	{/if}
-</div>
+{#if youtubeId}
+	<div bind:this={root} class={['video', playing && 'is-playing']} style:--deckle={DECKLE_MASK}>
+		{#if playing}
+			<iframe
+				bind:this={iframe}
+				class="frame"
+				src={embedUrl}
+				{title}
+				allow="autoplay; encrypted-media; fullscreen; picture-in-picture; web-share"
+				referrerpolicy="strict-origin-when-cross-origin"
+				{@attach (element) => element.focus()}
+			></iframe>
+		{:else}
+			<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} onclick={() => (playing = true)}>
+				<VideoThumbnail id={youtubeId} class="frame thumbnail" sizes={SIZES} fetchpriority="high" />
+				<span class="play" aria-hidden="true">
+					<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
+				</span>
+			</button>
+		{/if}
+	</div>
+{:else}
+	<!-- No video yet: the note hangs in the night sky on a dark scrim (desktop), or sits under the art as a caption (phones) -->
+	<div bind:this={root} class="pending">
+		<div class="video is-placeholder" style:--deckle={DECKLE_MASK}>
+			<FormatVignette class="frame placeholder-art" {format} sizes={SIZES} deckle={false} eager />
+		</div>
+		<div class="placeholder">
+			<p class="placeholder-title"><span class="spark" aria-hidden="true"></span>{m.blog_video_placeholder_title()}</p>
+			<p class="placeholder-body">{m.blog_video_placeholder_body()}</p>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.video {
@@ -100,18 +107,18 @@
 		border-radius: 0.375rem;
 	}
 
-	/* No video yet: a calmer wide band instead of an empty 16:9 */
+	/* No video yet: a calmer wide band instead of an empty 16:9 (phones keep 16:9, the note moves below) */
 	.video.is-placeholder {
 		aspect-ratio: 16 / 7;
 	}
 
 	@media (max-width: 40rem) {
 		.video.is-placeholder {
-			aspect-ratio: 5 / 4;
+			aspect-ratio: 16 / 9;
 		}
 	}
 
-	/* Cropped to a band: keep the lit horizon low so the sky above carries the note */
+	/* Cropped to a band: keep the lit horizon and the landmark */
 	.video :global(.placeholder-art img) {
 		object-position: 72% 75%;
 	}
@@ -179,15 +186,33 @@
 		box-shadow: none;
 	}
 
-	/* The note hangs in the dark sky top left, above the lit horizon and away from the landmark */
+	.pending {
+		position: relative;
+		container-type: inline-size;
+	}
+
+	/*
+	 * Desktop: the note hangs in the sky top left. The painted sky turns bright orange toward the horizon, so an ink scrim
+	 * spreads from the corner behind the text (inside the torn edge): cream on ≥ 85 % ink, well over 4.5:1.
+	 */
 	.placeholder {
+		position: absolute;
+		inset: 0 auto auto 0;
 		display: grid;
-		align-content: start;
 		gap: 0.6rem;
-		height: 100%;
-		padding: clamp(1.25rem, 5cqi, 3rem);
-		padding-right: 45cqi;
-		background: linear-gradient(to bottom, rgb(14 15 16 / 0.45), transparent 40%);
+		max-width: min(30rem, 52cqi);
+		padding: clamp(1.5rem, 4.5cqi, 3rem);
+		color: var(--color-cream);
+	}
+
+	.video.is-placeholder::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background:
+			radial-gradient(70% 95% at 0% 0%, rgb(14 15 16 / 0.9) 0 32%, rgb(14 15 16 / 0.6) 52%, transparent 78%),
+			linear-gradient(to bottom, rgb(14 15 16 / 0.35), transparent 45%);
+		pointer-events: none;
 	}
 
 	.placeholder-title {
@@ -195,7 +220,7 @@
 		align-items: baseline;
 		gap: 0.75rem;
 		font-family: var(--font-display);
-		font-size: clamp(1.5rem, 4.6cqi, 2.75rem);
+		font-size: clamp(1.75rem, 4cqi, 2.75rem);
 		font-weight: 900;
 		letter-spacing: var(--tracking-wordmark);
 		line-height: 1;
@@ -204,11 +229,36 @@
 	}
 
 	.placeholder-body {
-		max-width: 36ch;
-		color: rgb(251 243 221 / 0.8);
-		font-size: clamp(0.875rem, 1.9cqi, 1.0625rem);
+		max-width: 34ch;
+		color: var(--color-cream);
+		font-size: clamp(0.9375rem, 1.6cqi, 1.0625rem);
 		line-height: 1.5;
 		text-wrap: pretty;
+		text-shadow: 0 1px 2px rgb(14 15 16 / 0.8);
+	}
+
+	/* Phones: the art stays a clean 16:9 window, the note becomes its caption in the page's own ink */
+	@media (max-width: 40rem) {
+		.placeholder {
+			position: static;
+			max-width: none;
+			padding: 1.1rem 0 0;
+			color: var(--foreground);
+		}
+
+		.video.is-placeholder::after {
+			display: none;
+		}
+
+		.placeholder-title {
+			font-size: 1.5rem;
+			text-shadow: none;
+		}
+
+		.placeholder-body {
+			color: var(--muted-foreground);
+			text-shadow: none;
+		}
 	}
 
 	/* A firefly as the pilot light of the note */
@@ -225,9 +275,11 @@
 	}
 
 	@media (max-width: 40rem) {
-		.placeholder {
-			padding-right: clamp(1.25rem, 5cqi, 3rem);
-			background: linear-gradient(to bottom, rgb(14 15 16 / 0.7), transparent 55%);
+		:global(html:not(.dark)) .spark {
+			background: #f1b73e;
+			box-shadow:
+				0 0 2px 1px rgb(226 169 59 / 0.9),
+				0 0 10px 3px rgb(252 215 114 / 0.75);
 		}
 	}
 </style>

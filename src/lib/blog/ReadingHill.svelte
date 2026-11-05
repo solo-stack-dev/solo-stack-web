@@ -4,7 +4,8 @@
 	glowing on his lap, on a hill that runs off the right and bottom. Behind it a butter pigment bloom (dark: backlight on
 	the night; light: a wash on the paper), in front a few CSS fireflies rising from the laptop. The left 45 % of the art is
 	empty sky for the page title. Fireflies animate transform/opacity only, pause off screen and stand still under reduced
-	motion. Decorative. Fills the box the parent gives it (aspect 1672 / 941).
+	motion. Decorative. Fills the box the parent gives it (aspect 1672 / 941). A parent may set `--fade-right` (e.g.
+	`DRY_BRUSH_FADE_RIGHT`) where the art stops short of the viewport edge, so the hill breaks up there too.
 -->
 <script lang="ts">
 	import wash from '#lib/components/site/assets/backlight-wash.webp?w=1200;800;480&quality=55&enhanced';
@@ -72,43 +73,49 @@
 		position: relative;
 		isolation: isolate;
 		aspect-ratio: 1672 / 941;
+		/* optional: hill, glow and fireflies break up together at the right edge */
+		mask: var(--fade-right, none) center / 100% 100% no-repeat;
 		pointer-events: none;
 		user-select: none;
 	}
 
-	/* The pigment bloom sits behind the crown and the laptop: backlight at night, a butter wash on paper */
+	/*
+	 * The pigment bloom sits tight behind the crown and the laptop: backlight at night, a butter wash on paper. Kept small,
+	 * so clean night (or paper) stays between the art and the title.
+	 */
 	.wash {
 		position: absolute;
-		left: 44%;
-		top: 4%;
+		left: 54%;
+		top: 10%;
 		z-index: -2;
-		width: 64%;
+		width: 46%;
 		height: auto;
-		opacity: 0.55;
+		opacity: 0.5;
 		mix-blend-mode: multiply;
 		rotate: -4deg;
 	}
 
-	/* Night: warmer and brighter than the pigment itself, so the ink reads as backlit (butter at low alpha turns khaki on the dark, so it leans to ochre) */
+	/* Night: the pigment alone turns khaki on the dark, so it stays faint and the light comes from warm amber cores below */
 	:global(.dark) .wash {
-		opacity: 0.4;
+		opacity: 0.16;
 		mix-blend-mode: screen;
-		filter: hue-rotate(-22deg) saturate(1.7);
+		filter: hue-rotate(-28deg) saturate(1.8);
 	}
 
-	/* A warmer core where the laptop light meets the sky, and the horizon glow behind the hill crest */
+	/* Laptop light and the horizon glow behind the hill crest */
 	.glow {
 		position: absolute;
 		inset: 0;
 		z-index: -1;
 		background:
-			radial-gradient(14% 18% at 73% 60%, rgb(252 215 114 / 0.55), transparent 70%), radial-gradient(40% 34% at 80% 72%, rgb(226 169 59 / 0.22), transparent 72%);
+			radial-gradient(10% 14% at 73% 60%, rgb(252 215 114 / 0.6), transparent 70%), radial-gradient(26% 24% at 78% 58%, rgb(226 169 59 / 0.18), transparent 72%);
 	}
 
+	/* Night: a small moonlight core at the screen, a warm amber halo around the reader and the lower canopy, a low ember on the crest */
 	:global(.dark) .glow {
 		background:
-			radial-gradient(12% 16% at 73% 61%, rgb(255 244 214 / 0.4), transparent 70%), radial-gradient(38% 30% at 80% 74%, rgb(226 150 50 / 0.5), transparent 72%),
-			radial-gradient(60% 52% at 78% 58%, rgb(240 170 70 / 0.16), transparent 75%);
+			radial-gradient(7% 10% at 73% 61%, rgb(255 244 214 / 0.45), transparent 70%), radial-gradient(24% 28% at 75% 54%, rgb(236 146 48 / 0.36), transparent 72%),
+			radial-gradient(34% 20% at 82% 68%, rgb(226 124 36 / 0.34), transparent 75%), radial-gradient(24% 20% at 78% 28%, rgb(236 156 56 / 0.16), transparent 75%);
 	}
 
 	.hill {

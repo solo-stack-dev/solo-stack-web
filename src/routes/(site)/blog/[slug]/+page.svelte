@@ -4,7 +4,9 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { page } from '$app/state';
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
-	import { getPost } from '#lib/blog/posts.remote.ts';
+	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
+	import { breakArt } from '#lib/blog/section-breaks.ts';
+	import inkHorizon from '#lib/blog/assets/ink-horizon.svg?url';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
 	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=webp&quality=50&enhanced';
 	import StarField from '#lib/home/shared/StarField.svelte';
@@ -16,8 +18,25 @@
 
 	let { params }: PageProps = $props();
 
-	// Data and the rendered body chunk load in parallel
-	const [post, Body] = $derived(await Promise.all([getPost(params.slug), loadPostBody(params.slug)]));
+	// Data, the rendered body chunk and the index (for the neighbours at the end) load in parallel
+	const [post, Body, posts] = $derived(await Promise.all([getPost(params.slug), loadPostBody(params.slug), getPosts()]));
+
+	// The ending: the newer and the older neighbour in the index (newest first)
+	const neighbours = $derived.by(() => {
+		const index = posts.findIndex((candidate) => candidate.slug === post.slug);
+		if (index < 0) return [];
+		const newer = posts[index - 1];
+		const older = posts[index + 1];
+		return [newer && { post: newer, label: m.blog_post_newer() }, older && { post: older, label: m.blog_post_older() }].filter((item) => !!item);
+	});
+
+	const breaks = breakArt();
+
+	/** `https://www.svelte.dev/docs/kit/` → `svelte.dev/docs/kit` */
+	const linkHost = (href: string) => {
+		const url = new URL(href);
+		return url.host.replace(/^www\./, '') + url.pathname.replace(/\/$/, '');
+	};
 
 	let video = $state<VideoFacade>();
 
@@ -126,41 +145,39 @@
 <!-- Reading progress hairline: CSS scroll timeline, no JS; absent where unsupported -->
 <div class="progress" aria-hidden="true"></div>
 
-<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
+{#snippet contents(labelId: string)}
+	<ol class="toc-list" aria-labelledby={labelId}>
+		{#each post.outline as section (section.id)}
+			<li><a href="#{section.id}" aria-current={current === section.id ? 'location' : undefined}>{section.title}</a></li>
+		{/each}
+	</ol>
+{/snippet}
+
+<article class="post" lang={post.lang} style:--wash="url({wash.img.src})" style:--ink-horizon={`url("${inkHorizon}")`}>
 	<div class="relative isolate">
 		<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
 		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
 			<StarField density={0.45} brightness={0.65} seed={71} />
 		</div>
 
-		<header class="mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8">
+		<header class="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-10 lg:px-8">
 			<a href={localizeHref('/blog')} class="back">
 				<ArrowLeftIcon class="size-4" aria-hidden="true" />
 				{m.blog_post_back()}
 			</a>
 
-			<h1 class="headline mt-8 max-w-4xl font-display font-black tracking-wordmark text-balance sm:mt-10">{post.title}</h1>
-			<!-- Byline under the title (no eyebrow): format as an ink label, date and reading time, then the topics -->
-			<div class="byline mt-6">
-				<p class="meta">
-					<span class="format">{FORMAT_LABELS[post.format]()}</span>
-					<span class="facts">
-						<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
-						<span aria-hidden="true">·</span>
-						<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-					</span>
-				</p>
-				{#if post.tags.length}
-					<ul class="tags" aria-label={m.blog_tags_label()}>
-						{#each post.tags as tag, index (index)}
-							<li>{tag}</li>
-						{/each}
-					</ul>
-				{/if}
-			</div>
+			<h1 class="headline mt-5 max-w-4xl font-display font-black tracking-wordmark text-balance sm:mt-8">{post.title}</h1>
+			<!-- One quiet line under the title: date, reading time, format (the topics follow the summary) -->
+			<p class="meta mt-4 sm:mt-6">
+				<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
+				<span aria-hidden="true">·</span>
+				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+				<span aria-hidden="true">·</span>
+				<span>{FORMAT_LABELS[post.format]()}</span>
+			</p>
 		</header>
 
-		<div class="mx-auto mt-10 max-w-6xl px-4 sm:mt-14 sm:px-6 lg:px-8">
+		<div class="mx-auto mt-7 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
 			<div class="stage">
 				<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} format={post.format} />
 			</div>
@@ -176,14 +193,25 @@
 		</div>
 	</div>
 
-	<!-- Reading column (~70 ch per line), sticky TOC from lg -->
-	<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-14 pb-24 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_15rem] lg:px-8">
-		<div class="grid min-w-0 content-start gap-14">
-			{#if post.summary}
-				<section aria-labelledby="summary-title" class="summary">
-					<h2 id="summary-title" class="label-title">{m.blog_summary_title()}</h2>
-					<p class="summary-text">{post.summary}</p>
-				</section>
+	<!-- Reading column (66 ch at body size), sticky contents from lg -->
+	<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-12 pb-8 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_17rem] lg:px-8">
+		<div class="read">
+			{#if post.summary || post.tags.length}
+				<div class="opening">
+					{#if post.summary}
+						<section aria-labelledby="summary-title" class="summary">
+							<h2 id="summary-title" class="sr-only">{m.blog_summary_title()}</h2>
+							<p class="summary-text">{post.summary}</p>
+						</section>
+					{/if}
+					{#if post.tags.length}
+						<ul class="tags" aria-label={m.blog_tags_label()}>
+							{#each post.tags as tag, index (index)}
+								<li>{tag}</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
 			{/if}
 
 			{#if post.chapters.length}
@@ -222,7 +250,19 @@
 				</section>
 			{/if}
 
-			<div class="prose-post">
+			{#if post.outline.length}
+				<!-- Below lg: the same contents as a compact disclosure before the body -->
+				<details class="toc-mobile lg:hidden">
+					<summary>
+						<span class="toc-fly" aria-hidden="true"></span>
+						<span id="toc-mobile-title">{m.blog_toc_title()}</span>
+						<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
+					</summary>
+					{@render contents('toc-mobile-title')}
+				</details>
+			{/if}
+
+			<div class="prose-post" data-break-art={breaks.slots} style={breaks.style || undefined}>
 				<Body />
 			</div>
 
@@ -251,13 +291,12 @@
 			{#if post.links.length}
 				<section aria-labelledby="links-title">
 					<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
-					<ul class="links mt-5">
+					<ul class="links mt-6">
 						{#each post.links as link, index (index)}
 							<li>
 								<a href={link.url} target="_blank" rel="noopener">
-									<span>{link.label}</span>
-									<span class="host">{new URL(link.url).host.replace(/^www\./, '')}{new URL(link.url).pathname.replace(/\/$/, '')}</span>
-									<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" />
+									<span class="link-name"><span>{link.label}</span><ArrowUpRightIcon class="arrow size-4" aria-hidden="true" /></span>
+									<span class="host">{linkHost(link.url)}</span>
 								</a>
 							</li>
 						{/each}
@@ -265,10 +304,25 @@
 				</section>
 			{/if}
 
-			<p class="generated">
-				<span class="firefly" aria-hidden="true"></span>
-				{m.blog_generated_note({ model: post.generatedBy })}
-			</p>
+			<!-- The ending: who wrote it, then the way back into the blog (or on to the neighbouring articles) -->
+			<footer class="post-end">
+				<p class="generated">
+					<span class="firefly" aria-hidden="true"></span>
+					{m.blog_generated_note({ model: post.generatedBy })}
+				</p>
+				<nav class="onward" aria-label={m.blog_post_more_label()}>
+					<a href={localizeHref('/blog')} class="home">
+						<ArrowLeftIcon class="size-4" aria-hidden="true" />
+						{m.blog_post_back()}
+					</a>
+					{#each neighbours as item (item.post.slug)}
+						<a href={postHref(item.post)} hreflang={item.post.lang} class="neighbour">
+							<span class="neighbour-label">{item.label}</span>
+							<span class="neighbour-title" lang={item.post.lang}>{item.post.title}</span>
+						</a>
+					{/each}
+				</nav>
+			</footer>
 		</div>
 
 		{#if post.outline.length}
@@ -279,11 +333,7 @@
 						<span class="toc-fly" aria-hidden="true"></span>
 						{m.blog_toc_title()}
 					</p>
-					<ol class="toc-list">
-						{#each post.outline as section (section.id)}
-							<li><a href="#{section.id}" aria-current={current === section.id ? 'location' : undefined}>{section.title}</a></li>
-						{/each}
-					</ol>
+					{@render contents('toc-title')}
 				</nav>
 			</aside>
 		{/if}
@@ -297,6 +347,7 @@
 	.firefly,
 	.toc-fly {
 		display: block;
+		flex: none;
 		width: 0.5rem;
 		height: 0.5rem;
 		border-radius: 50%;
@@ -315,7 +366,8 @@
 
 	/* Header ------------------------------------------------------------------------------------------------- */
 
-	.back {
+	.back,
+	.home {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -328,21 +380,24 @@
 		transition: color var(--dur-hover) ease;
 	}
 
-	.back :global(svg) {
+	.back :global(svg),
+	.home :global(svg) {
 		transition: translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1);
 	}
 
-	.back:hover {
+	.back:hover,
+	.home:hover {
 		color: var(--foreground);
 	}
 
-	.back:hover :global(svg) {
+	.back:hover :global(svg),
+	.home:hover :global(svg) {
 		translate: -0.25rem 0;
 	}
 
 	.headline {
-		font-size: clamp(2.4rem, 6vw, 4.75rem);
-		line-height: 0.96;
+		font-size: clamp(2.25rem, 6vw, 4.75rem);
+		line-height: 0.98;
 		padding-bottom: 0.08em;
 		/* Ink on paper; lit from behind at night (as the title on /blog) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
@@ -355,64 +410,15 @@
 		background-clip: text;
 	}
 
-	.byline {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0.75rem 2rem;
-	}
-
+	/* Date · reading time · format, one voice (as on the index) */
 	.meta {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
-		gap: 0.4rem 1rem;
+		gap: 0.25rem 0.5rem;
 		color: var(--muted-foreground);
 		font-size: 0.9375rem;
 		font-variant-numeric: tabular-nums;
-	}
-
-	.facts {
-		display: inline-flex;
-		gap: 0.5rem;
-	}
-
-	/* Format as an ink label led by a brush dash (as on the index), no pill */
-	.format {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.55rem;
-		color: var(--ink-lit);
-		font-family: var(--font-mono);
-		font-size: var(--text-label-sm);
-		font-weight: 600;
-		letter-spacing: 0.18em;
-		text-transform: uppercase;
-	}
-
-	.format::before {
-		content: '';
-		width: 1.1rem;
-		height: 2px;
-		border-radius: 2px;
-		background: currentColor;
-		opacity: 0.8;
-	}
-
-	/* Topics as a quiet run of words, slashes between */
-	.tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem 0;
-		color: var(--muted-foreground);
-		font-size: 0.875rem;
-	}
-
-	/* after each word, so a wrapped line never starts with a slash */
-	.tags li:not(:last-child)::after {
-		content: '/';
-		margin: 0 0.6rem;
-		color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
 	}
 
 	/* The video sits in a pigment bloom: backlight at night, a butter wash on paper */
@@ -437,18 +443,28 @@
 		mix-blend-mode: normal;
 	}
 
-	/* Section titles ------------------------------------------------------------------------------------------ */
+	/* Reading column ----------------------------------------------------------------------------------------- */
 
-	/* Geist Black over a small pigment wash */
+	/* Every block shares one measure: about 66 characters of German prose per line at body size (18px) */
+	.read {
+		display: grid;
+		align-content: start;
+		gap: clamp(3rem, 6vw, 3.75rem);
+		min-width: 0;
+		max-width: 34em;
+		font-size: 1.125rem;
+	}
+
+	/* Section titles: Geist Black over a small pigment wash */
 	.section-title {
 		position: relative;
 		isolation: isolate;
 		width: fit-content;
 		font-family: var(--font-display);
-		font-size: clamp(1.6rem, 3vw, 2.1rem);
+		font-size: clamp(1.5rem, 2.6vw, 1.85rem);
 		font-weight: 900;
 		letter-spacing: -0.035em;
-		line-height: 1.1;
+		line-height: 1.15;
 	}
 
 	.section-title::before {
@@ -472,58 +488,53 @@
 		mix-blend-mode: normal;
 	}
 
-	/* Small label heading with the brushed ink stroke under it (summary) */
-	.label-title {
-		position: relative;
-		width: fit-content;
-		color: var(--ink-lit);
-		font-family: var(--font-mono);
-		font-size: var(--text-label);
-		font-weight: 600;
-		letter-spacing: var(--tracking-label);
-		text-transform: uppercase;
+	/* Opening: the summary is the lede, marked by a lit margin stroke (no label); the topics follow as one quiet line */
+	.opening {
+		display: grid;
+		gap: 1.25rem;
 	}
 
-	.label-title::after {
-		content: '';
-		position: absolute;
-		inset: auto -0.2rem -0.55rem;
-		height: 0.5rem;
-		background: currentColor;
-		mask: var(--ink-underline) center / 100% 100% no-repeat;
-		opacity: 0.7;
-	}
-
-	/* Summary: the lede of the page, set large on a pigment wash, no box */
 	.summary {
 		position: relative;
-		isolation: isolate;
-		max-width: 46rem;
+		padding-left: clamp(1.1rem, 2.5vw, 1.5rem);
 	}
 
+	/* A brushed butter stroke down the margin, thinning out at both ends */
 	.summary::before {
 		content: '';
 		position: absolute;
-		inset: -2.5rem -3rem -2rem -3.5rem;
-		z-index: -1;
-		background: var(--wash) center / 100% 100% no-repeat;
-		opacity: 0.28;
-		mix-blend-mode: multiply;
-		pointer-events: none;
+		inset: 0.3em auto 0.3em 0;
+		width: 3px;
+		border-radius: 3px;
+		background: linear-gradient(180deg, transparent, var(--color-ochre) 12%, var(--color-butter) 55%, var(--color-ochre) 88%, transparent);
 	}
 
 	:global(.dark) .summary::before {
-		opacity: 0.08;
-		mix-blend-mode: normal;
+		background: linear-gradient(180deg, transparent, var(--color-butter) 12%, var(--color-moonlight) 55%, var(--color-butter) 88%, transparent);
+		box-shadow: 0 0 12px rgb(252 215 114 / 0.35);
 	}
 
 	.summary-text {
-		margin-top: 1.5rem;
-		font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+		font-size: clamp(1.1875rem, 2vw, 1.375rem);
 		font-weight: 500;
 		letter-spacing: -0.012em;
-		line-height: 1.5;
+		line-height: 1.55;
 		text-wrap: pretty;
+	}
+
+	/* Topics: words with a middle dot between, after each word so a wrapped line never starts with one */
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0;
+		padding-left: clamp(1.1rem, 2.5vw, 1.5rem);
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+	}
+
+	.tags li:not(:last-child)::after {
+		content: '·';
+		margin: 0 0.55rem;
 	}
 
 	/* Chapters ----------------------------------------------------------------------------------------------- */
@@ -536,8 +547,7 @@
 		position: relative;
 	}
 
-	.chapters li + li::before,
-	.links li + li::before {
+	.chapters li + li::before {
 		content: '';
 		position: absolute;
 		inset: 0 0 auto;
@@ -551,6 +561,7 @@
 		gap: 1.25rem;
 		min-height: 3rem;
 		padding: 0.75rem 0.25rem;
+		font-size: 1rem;
 		cursor: pointer;
 		transition: color var(--dur-hover) ease;
 	}
@@ -576,7 +587,6 @@
 	.takeaways {
 		display: grid;
 		gap: 1.1rem;
-		max-width: 46rem;
 	}
 
 	.takeaways li {
@@ -595,203 +605,17 @@
 		scale: calc(0.75 + var(--glow) * 0.35);
 	}
 
-	/* Transcript --------------------------------------------------------------------------------------------- */
+	/* Contents ----------------------------------------------------------------------------------------------- */
 
-	.transcript {
-		position: relative;
-	}
-
-	.transcript::before,
-	.transcript::after {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		height: 1px;
-		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
-	}
-
-	.transcript::after {
-		inset: auto 0 0;
-	}
-
-	.transcript summary {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		min-height: 3.25rem;
-		padding: 0 0.25rem;
-		font-weight: 600;
-		cursor: pointer;
-		list-style: none;
-		transition: color var(--dur-hover) ease;
-	}
-
-	.transcript summary:hover {
-		color: var(--ink-lit);
-	}
-
-	.transcript summary::-webkit-details-marker {
-		display: none;
-	}
-
-	.transcript :global(.chevron) {
-		transition: rotate var(--dur-state) ease;
-	}
-
-	.transcript[open] :global(.chevron) {
-		rotate: 180deg;
-	}
-
-	.transcript-body {
-		display: grid;
-		gap: 0.85rem;
-		max-height: 32rem;
-		overflow-y: auto;
-		margin-bottom: 1.25rem;
-		padding: 0.25rem 1rem 0.5rem 1.25rem;
-		border-left: 2px solid color-mix(in oklab, var(--color-butter) 60%, transparent);
-		color: var(--muted-foreground);
-		line-height: 1.75;
-		scrollbar-width: thin;
-	}
-
-	.transcript-body .time {
-		display: inline-block;
-		min-width: auto;
-		margin-right: 0.6rem;
-	}
-
-	/* Links -------------------------------------------------------------------------------------------------- */
-
-	.links {
-		display: grid;
-	}
-
-	.links li {
-		position: relative;
-	}
-
-	.links a {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-		gap: 0.15rem 1rem;
-		min-height: 3.75rem;
-		padding: 0.85rem 0.25rem;
-	}
-
-	.links a > span:first-child {
-		font-weight: 600;
-		text-decoration: underline;
-		text-decoration-color: transparent;
-		text-decoration-thickness: 2px;
-		text-underline-offset: 0.2em;
-		transition: text-decoration-color var(--dur-state) ease;
-	}
-
-	.links a:hover > span:first-child {
-		text-decoration-color: var(--color-ochre);
-	}
-
-	:global(.dark) .links a:hover > span:first-child {
-		text-decoration-color: var(--color-butter);
-	}
-
-	.host {
-		grid-row: 2;
-		color: var(--muted-foreground);
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		overflow-wrap: anywhere;
-	}
-
-	.links :global(.arrow) {
-		grid-row: 1 / span 2;
-		grid-column: 2;
-		color: var(--muted-foreground);
-		transition:
-			translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
-			color var(--dur-state) ease;
-	}
-
-	.links a:hover :global(.arrow) {
-		translate: 0.2rem -0.2rem;
-		color: var(--ink-lit);
-	}
-
-	/* Generated note ----------------------------------------------------------------------------------------- */
-
-	.generated {
-		position: relative;
-		padding: 1.5rem 0 0 1.75rem;
-		color: var(--muted-foreground);
-		font-size: 0.875rem;
-	}
-
-	.generated::before {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		height: 1px;
-		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
-	}
-
-	.generated .firefly {
-		position: absolute;
-		left: 0.2rem;
-		top: calc(1.5rem + 0.45em);
-		width: 0.45rem;
-		height: 0.45rem;
-	}
-
-	/* Reading progress ---------------------------------------------------------------------------------------- */
-
-	.progress {
-		display: none;
-	}
-
-	@supports (animation-timeline: scroll()) {
-		.progress {
-			position: fixed;
-			inset: 0 0 auto;
-			z-index: 60;
-			display: block;
-			height: 3px;
-			background: linear-gradient(90deg, var(--color-ochre), var(--color-butter));
-			box-shadow: 0 0 12px rgb(252 215 114 / 0.55);
-			transform-origin: 0 50%;
-			animation: read linear both;
-			animation-timeline: scroll(root);
-		}
-
-		/* Same timeline: the TOC firefly lights up */
-		.toc-fly {
-			animation: kindle linear both;
-			animation-timeline: scroll(root);
-		}
-	}
-
-	@keyframes read {
-		from {
-			scale: 0 1;
-		}
-	}
-
-	@keyframes kindle {
-		from {
-			opacity: 0.3;
-			scale: 0.6;
-		}
-	}
-
-	/* Table of contents ------------------------------------------------------------------------------------- */
-
+	/* Desktop: sticky beside the column. Inner padding keeps the focus rings inside the scroll box. */
 	.toc {
 		position: sticky;
 		top: 6rem;
 		display: grid;
 		gap: 1rem;
 		max-height: calc(100svh - 8rem);
+		margin: -0.375rem;
+		padding: 0.375rem;
 		overflow-y: auto;
 		scrollbar-width: none;
 	}
@@ -814,12 +638,17 @@
 	.toc-list a {
 		position: relative;
 		display: block;
-		padding: 0.45rem 0 0.45rem 1rem;
+		padding: 0.45rem 0.25rem 0.45rem 1rem;
+		border-radius: 0.25rem;
 		color: var(--muted-foreground);
-		font-size: 0.875rem;
-		line-height: 1.4;
-		text-wrap: pretty;
+		font-size: 0.8125rem;
+		line-height: 1.45;
+		text-wrap: balance;
 		transition: color 200ms ease;
+	}
+
+	.toc-list a:focus-visible {
+		outline-offset: 1px;
 	}
 
 	.toc-list a:hover {
@@ -858,9 +687,278 @@
 		scale: 1;
 	}
 
+	/* Below lg: a disclosure before the body, same list, same current-section mark */
+	.toc-mobile {
+		margin-block: -1rem;
+	}
+
+	.toc-mobile summary {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		width: fit-content;
+		min-height: 2.75rem;
+		padding-right: 0.25rem;
+		border-radius: 0.25rem;
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 800;
+		letter-spacing: -0.01em;
+		cursor: pointer;
+		list-style: none;
+	}
+
+	.toc-mobile summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.toc-mobile :global(.chevron),
+	.transcript :global(.chevron) {
+		color: var(--muted-foreground);
+		transition: rotate var(--dur-state) ease;
+	}
+
+	.toc-mobile[open] :global(.chevron),
+	.transcript[open] :global(.chevron) {
+		rotate: 180deg;
+	}
+
+	.toc-mobile .toc-list {
+		margin: 0.5rem 0 0 0.2rem;
+	}
+
+	.toc-mobile .toc-list a {
+		font-size: 0.9375rem;
+		padding-block: 0.6rem;
+	}
+
+	/* Transcript --------------------------------------------------------------------------------------------- */
+
+	.transcript {
+		position: relative;
+	}
+
+	.transcript summary {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		width: fit-content;
+		min-height: 3rem;
+		padding: 0 0.25rem;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		list-style: none;
+		transition: color var(--dur-hover) ease;
+	}
+
+	.transcript summary:hover {
+		color: var(--ink-lit);
+	}
+
+	.transcript summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.transcript-body {
+		display: grid;
+		gap: 0.85rem;
+		max-height: 32rem;
+		overflow-y: auto;
+		margin-top: 0.5rem;
+		padding: 0.25rem 1rem 0.5rem 1.25rem;
+		border-left: 2px solid color-mix(in oklab, var(--color-butter) 60%, transparent);
+		color: var(--muted-foreground);
+		font-size: 1rem;
+		line-height: 1.75;
+		scrollbar-width: thin;
+	}
+
+	.transcript-body .time {
+		display: inline-block;
+		min-width: auto;
+		margin-right: 0.6rem;
+	}
+
+	/* Links: a clean two-column list, the address in mono under each name, no rules ------------------------------ */
+
+	.links {
+		display: grid;
+		gap: 0.5rem 2.5rem;
+	}
+
+	@media (min-width: 40rem) {
+		.links {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.links a {
+		display: grid;
+		gap: 0.2rem;
+		min-height: 2.75rem;
+		padding: 0.5rem 0.25rem;
+		margin-left: -0.25rem;
+		border-radius: 0.25rem;
+	}
+
+	/* The arrow stays with the name (never wraps alone onto a line) */
+	.links .link-name {
+		display: flex;
+		align-items: baseline;
+		gap: 0.35rem;
+		font-size: 1rem;
+		font-weight: 600;
+		line-height: 1.35;
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+		transition: text-decoration-color var(--dur-state) ease;
+	}
+
+	.links a:hover .link-name {
+		text-decoration-color: var(--color-ochre);
+	}
+
+	:global(.dark) .links a:hover .link-name {
+		text-decoration-color: var(--color-butter);
+	}
+
+	.links :global(.arrow) {
+		flex: none;
+		align-self: center;
+		color: var(--muted-foreground);
+		transition:
+			translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
+			color var(--dur-state) ease;
+	}
+
+	.links a:hover :global(.arrow) {
+		translate: 0.2rem -0.2rem;
+		color: var(--ink-lit);
+	}
+
+	.host {
+		color: var(--muted-foreground);
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		overflow-wrap: anywhere;
+	}
+
+	/* Ending ------------------------------------------------------------------------------------------------- */
+
+	.post-end {
+		display: grid;
+		gap: 1.75rem;
+		margin-top: 0.5rem;
+	}
+
+	.generated {
+		display: flex;
+		align-items: baseline;
+		gap: 0.85rem;
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+	}
+
+	.generated .firefly {
+		width: 0.45rem;
+		height: 0.45rem;
+		translate: 0 -0.1em;
+	}
+
+	/* Back into the blog, and the neighbouring articles (newer / older) when there are any */
+	.onward {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: start;
+		justify-content: space-between;
+		gap: 1rem 2.5rem;
+	}
+
+	.home {
+		margin-left: -0.25rem;
+		color: var(--foreground);
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	.neighbour {
+		display: grid;
+		gap: 0.2rem;
+		max-width: 22rem;
+		padding: 0.35rem 0.25rem;
+		border-radius: 0.25rem;
+	}
+
+	.neighbour-label {
+		color: var(--muted-foreground);
+		font-size: 0.8125rem;
+	}
+
+	.neighbour-title {
+		font-family: var(--font-display);
+		font-size: 1.125rem;
+		font-weight: 800;
+		letter-spacing: -0.02em;
+		line-height: 1.2;
+		text-wrap: balance;
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+		transition: text-decoration-color var(--dur-state) ease;
+	}
+
+	.neighbour:hover .neighbour-title {
+		text-decoration-color: var(--ink-lit);
+	}
+
+	/* Reading progress ---------------------------------------------------------------------------------------- */
+
+	.progress {
+		display: none;
+	}
+
+	@supports (animation-timeline: scroll()) {
+		.progress {
+			position: fixed;
+			inset: 0 0 auto;
+			z-index: 60;
+			display: block;
+			height: 3px;
+			background: linear-gradient(90deg, var(--color-ochre), var(--color-butter));
+			box-shadow: 0 0 12px rgb(252 215 114 / 0.55);
+			transform-origin: 0 50%;
+			animation: read linear both;
+			animation-timeline: scroll(root);
+		}
+
+		/* Same timeline: the contents firefly lights up */
+		.toc-fly {
+			animation: kindle linear both;
+			animation-timeline: scroll(root);
+		}
+	}
+
+	@keyframes read {
+		from {
+			scale: 0 1;
+		}
+	}
+
+	@keyframes kindle {
+		from {
+			opacity: 0.3;
+			scale: 0.6;
+		}
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		.toc-list a::before,
 		.back :global(svg),
+		.home :global(svg),
 		.links :global(.arrow) {
 			transition: none;
 		}
@@ -868,9 +966,8 @@
 
 	/* Article body (mdsvex) ----------------------------------------------------------------------------------- */
 
+	/* One paragraph style throughout (the summary above is the lede) */
 	.prose-post {
-		max-width: 68ch;
-		font-size: 1.125rem;
 		line-height: 1.8;
 		text-wrap: pretty;
 		hyphens: auto;
@@ -880,11 +977,15 @@
 		margin-top: 1.3em;
 	}
 
+	.prose-post :global(> :first-child) {
+		margin-top: 0;
+	}
+
 	.prose-post :global(h2) {
 		scroll-margin-top: 6rem;
 		margin-top: 2.6em;
 		font-family: var(--font-display);
-		font-size: clamp(1.55rem, 2.6vw, 1.85rem);
+		font-size: clamp(1.5rem, 2.6vw, 1.85rem);
 		font-weight: 900;
 		letter-spacing: -0.035em;
 		line-height: 1.2;
@@ -892,7 +993,7 @@
 		hyphens: manual;
 	}
 
-	/* A short brushed ink stroke over each section */
+	/* A short brushed ink stroke over each section (not after a section break, which already marks the pause) */
 	.prose-post :global(h2::before) {
 		content: '';
 		display: block;
@@ -901,6 +1002,14 @@
 		margin-bottom: 0.85rem;
 		background: var(--ink-lit);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
+	}
+
+	.prose-post :global(hr + h2) {
+		margin-top: 0;
+	}
+
+	.prose-post :global(hr + h2::before) {
+		display: none;
 	}
 
 	.prose-post :global(h3) {
@@ -915,18 +1024,30 @@
 		margin-top: 0.75em;
 	}
 
-	.prose-post :global(> :first-child) {
-		margin-top: 0;
-	}
-
-	/* Lede: the first paragraph a little larger */
-	.prose-post :global(> p:first-child) {
-		font-size: 1.22rem;
-		color: var(--foreground);
-	}
-
 	.prose-post :global(p) {
 		color: color-mix(in oklab, var(--foreground) 88%, var(--muted-foreground));
+	}
+
+	/* The end of the article: a firefly settles after the last word */
+	.prose-post :global(> p:last-child::after) {
+		content: '';
+		display: inline-block;
+		width: 0.42em;
+		height: 0.42em;
+		margin-left: 0.55em;
+		border-radius: 50%;
+		background: var(--color-moonlight);
+		box-shadow:
+			0 0 3px 1px var(--color-butter),
+			0 0 12px 3px rgb(252 215 114 / 0.55);
+		vertical-align: 0.08em;
+	}
+
+	:global(html:not(.dark)) .prose-post :global(> p:last-child::after) {
+		background: #f1b73e;
+		box-shadow:
+			0 0 2px 1px rgb(226 169 59 / 0.9),
+			0 0 10px 3px rgb(252 215 114 / 0.75);
 	}
 
 	.prose-post :global(a) {
@@ -965,11 +1086,11 @@
 		color: var(--color-ochre);
 	}
 
+	/* A real quotation: quiet, set in from a thin butter rule */
 	.prose-post :global(blockquote) {
 		position: relative;
 		padding-left: 1.4em;
 		color: var(--muted-foreground);
-		font-size: 1.2rem;
 		font-style: italic;
 	}
 
@@ -980,6 +1101,110 @@
 		width: 3px;
 		border-radius: 3px;
 		background: linear-gradient(var(--color-butter), var(--color-ochre));
+	}
+
+	/*
+	 * Pull quote (section-breaks.ts): a sentence of the post set large, a lit butter stroke hanging in the gutter left of
+	 * the column, so the words stay on the text edge.
+	 */
+	.prose-post :global(.pull-quote) {
+		position: relative;
+		margin-block: 1.5em 1.6em;
+		padding-left: 1.25rem;
+		color: var(--foreground);
+		font-family: var(--font-display);
+		font-size: clamp(1.45rem, 2.6vw, 1.75rem);
+		font-weight: 900;
+		letter-spacing: -0.03em;
+		line-height: 1.18;
+		text-wrap: balance;
+		hyphens: manual;
+	}
+
+	.prose-post :global(.pull-quote::before) {
+		content: '';
+		position: absolute;
+		inset: 0.12em auto 0.12em 0;
+		width: 4px;
+		border-radius: 4px;
+		background: linear-gradient(180deg, var(--color-butter), var(--color-ochre));
+	}
+
+	:global(.dark) .prose-post :global(.pull-quote::before) {
+		background: linear-gradient(180deg, var(--color-moonlight), var(--color-butter));
+		box-shadow: 0 0 14px rgb(252 215 114 / 0.45);
+	}
+
+	@media (min-width: 64rem) {
+		.prose-post :global(.pull-quote) {
+			margin-left: -1.75rem;
+			padding-left: 1.75rem;
+		}
+	}
+
+	/*
+	 * Section break (`* * *`): a painted pause between sections. Interim: the sumi horizon with the crooked tree, backlit at
+	 * night (amber horizon glow, two fireflies over the crown), ink on a butter wash on paper. Every second break mirrors.
+	 * Painted slots (data-break-art) swap in their silhouette strip.
+	 */
+	.prose-post :global(hr) {
+		position: relative;
+		isolation: isolate;
+		height: clamp(5.5rem, 12vw, 7.5rem);
+		margin-block: 3.25em 2.25em;
+		border: 0;
+		overflow: visible;
+	}
+
+	/* The light behind: a low warm horizon and two fireflies above the crown */
+	.prose-post :global(hr::before) {
+		content: '';
+		position: absolute;
+		inset: -10% -6% -20%;
+		z-index: -1;
+		background:
+			radial-gradient(0.25rem 0.25rem at 66% 22%, var(--color-moonlight) 40%, rgb(252 215 114 / 0.5) 60%, transparent),
+			radial-gradient(0.2rem 0.2rem at 78% 10%, var(--color-moonlight) 40%, rgb(252 215 114 / 0.5) 60%, transparent),
+			radial-gradient(22% 50% at 71% 74%, rgb(236 146 48 / 0.32), transparent 72%), radial-gradient(9% 22% at 71% 52%, rgb(252 215 114 / 0.12), transparent 75%);
+	}
+
+	:global(html:not(.dark)) .prose-post :global(hr::before) {
+		background:
+			radial-gradient(0.25rem 0.25rem at 66% 22%, #f1b73e 40%, rgb(252 215 114 / 0.7) 60%, transparent),
+			radial-gradient(0.2rem 0.2rem at 78% 10%, #f1b73e 40%, rgb(252 215 114 / 0.7) 60%, transparent),
+			radial-gradient(24% 58% at 71% 70%, rgb(252 215 114 / 0.5), transparent 72%);
+	}
+
+	/* The ink: theme agnostic black, as every silhouette */
+	.prose-post :global(hr::after) {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--color-ink);
+		mask: var(--ink-horizon) center bottom / 100% auto no-repeat;
+	}
+
+	.prose-post :global(hr:nth-of-type(even)) {
+		scale: -1 1;
+	}
+
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
+		background: var(--break-art) center / cover no-repeat;
+		mask: none;
+	}
+
+	.prose-post :global(hr:nth-of-type(3n + 1)) {
+		--break-art: var(--break-art-1);
+	}
+
+	.prose-post :global(hr:nth-of-type(3n + 2)) {
+		--break-art: var(--break-art-2);
+	}
+
+	.prose-post :global(hr:nth-of-type(3n)) {
+		--break-art: var(--break-art-3);
 	}
 
 	.prose-post :global(code) {
@@ -1003,13 +1228,5 @@
 	.prose-post :global(pre code) {
 		padding: 0;
 		background: none;
-	}
-
-	.prose-post :global(hr) {
-		height: 0.6rem;
-		margin-block: 2.5em;
-		border: 0;
-		background: var(--border);
-		mask: var(--ink-underline) center / 6rem 100% no-repeat;
 	}
 </style>
