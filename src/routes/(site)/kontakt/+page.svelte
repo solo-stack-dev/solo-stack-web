@@ -1,5 +1,5 @@
 <!--
-	/kontakt: a letter written at night (giant title, butter wash, painted moon, ruled-line form, topic pill track).
+	/kontakt: a letter written at night (giant title, butter wash, the night owl messenger, ruled-line form, topic pill track).
 	Prerendered; only the submission runs in the Worker: `sendContact` (`#lib/contact/contact.remote.ts`), valibot preflight
 	plus the same schema on the server, Turnstile against spam. Issue codes map to `contact_error_*` messages.
 -->
@@ -7,9 +7,10 @@
 	import { page } from '$app/state';
 	import { sendContact } from '#lib/contact/contact.remote.ts';
 	import { CONTACT_LIMITS, CONTACT_TOPICS, ContactSchema, type ContactTopic } from '#lib/contact/schema.ts';
+	import OwlMessenger from '#lib/contact/OwlMessenger.svelte';
 	import TurnstileWidget from '#lib/contact/TurnstileWidget.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
-	import moon from '#lib/home/sections/hero/assets/hero-moon-disc.webp?w=480;300&quality=42&enhanced';
+	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
@@ -30,6 +31,9 @@
 	let token = $state('');
 	let turnstile = $state<ReturnType<typeof TurnstileWidget>>();
 	let successHeading = $state<HTMLElement>();
+	/** Someone is at the letter (pointer over it or focus in it): the owl watches. */
+	let hovering = $state(false);
+	let focused = $state(false);
 
 	// Runs after preflight passed, so every call reaches the server and spends the Turnstile token.
 	const enhanced = contact.enhance(async (instance) => {
@@ -47,8 +51,11 @@
 		}
 	});
 
+	// The owl takes off with the letter at the top of the page: bring it into view, then hand focus to the thanks
 	$effect(() => {
-		if (sent) successHeading?.focus();
+		if (!sent) return;
+		successHeading?.focus({ preventScroll: true });
+		window.scrollTo({ top: 0, behavior: reducedMotion.current ? 'instant' : 'smooth' });
 	});
 
 	const invalid = {
@@ -81,17 +88,22 @@
 	</p>
 {/snippet}
 
-<div class="relative isolate overflow-x-clip">
+<div class="contact relative isolate overflow-x-clip">
 	<!-- Night sky over the header, dark theme only -->
 	<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[34rem] mask-b-from-30% dark:block" aria-hidden="true">
 		<StarField density={0.5} brightness={0.7} seed={71} />
 	</div>
 
+	<!-- The night owl messenger, perched at the right edge; the branch runs off the viewport -->
+	<OwlMessenger
+		class="perch"
+		flown={sent}
+		watching={hovering || focused}
+		sizes="(min-width: 80rem) clamp(24rem, 67vw - 29.5rem, 42rem), (min-width: 48rem) calc(34.7vw - 6rem), 14rem"
+	/>
+
 	<div class="mx-auto max-w-6xl px-4 pt-10 pb-24 sm:px-6 sm:pt-16 lg:px-8">
-		<header class="relative grid gap-5">
-			<div class="moon" aria-hidden="true">
-				<enhanced:img src={moon} alt="" sizes="(min-width: 48rem) 15rem, 9rem" class="size-full" fetchpriority="high" />
-			</div>
+		<header class="hero relative grid gap-5">
 			<div class="relative isolate w-fit">
 				<span
 					class="bloom pointer-events-none absolute top-[30%] -left-6 -z-10 block h-[90%] w-[85%] opacity-55 mix-blend-multiply dark:opacity-25 dark:mix-blend-normal"
@@ -118,7 +130,16 @@
 					<button type="button" class="again" onclick={() => (sent = false)}>{m.contact_success_again()}</button>
 				</section>
 			{:else}
-				<form {...enhanced} class="letter relative grid gap-12" data-sending={contact.pending > 0 || undefined} novalidate>
+				<form
+					{...enhanced}
+					class="letter relative grid gap-12"
+					data-sending={contact.pending > 0 || undefined}
+					novalidate
+					onpointerenter={() => (hovering = true)}
+					onpointerleave={() => (hovering = false)}
+					onfocusin={() => (focused = true)}
+					onfocusout={(event) => (focused = event.currentTarget.contains(event.relatedTarget as Node | null))}
+				>
 					<fieldset class="grid min-w-0 gap-4" aria-describedby="contact-topic-error">
 						<legend class="mb-4 label">{m.contact_topic_legend()}</legend>
 						<div class="track-scroll">
@@ -248,23 +269,40 @@
 		transform: rotate(-2deg);
 	}
 
-	/* Painted moon over the header's right edge, breathing its glow */
-	.moon {
-		position: absolute;
-		top: -1.5rem;
-		right: -2rem;
-		z-index: -1;
-		width: clamp(9rem, 24vw, 15rem);
-		aspect-ratio: 1;
-		border-radius: 50%;
-		pointer-events: none;
-		filter: drop-shadow(0 0 40px rgb(252 215 114 / 0.35));
-		animation: breathe 7s ease-in-out infinite alternate;
+	/*
+	 * The owl is one illustration with the title: a square canvas (`--owl`) flush with the right viewport edge, sized so its
+	 * head (26–53 % of the canvas) keeps 2.5rem clear of the title (≈ 75vw up to the 10rem cap, then 50vw + 19rem).
+	 * Below 48rem the title wraps and the owl perches above it instead.
+	 */
+	.contact {
+		--owl: calc(34.7vw - 6rem);
 	}
 
-	@keyframes breathe {
-		to {
-			filter: drop-shadow(0 0 64px rgb(252 215 114 / 0.55));
+	.contact :global(.perch) {
+		position: absolute;
+		top: calc(4rem - var(--owl) * 0.12);
+		right: 0;
+		z-index: -1;
+	}
+
+	/* Above the title's 10rem cap the title stops growing (it ends at 50vw + 19rem), so the owl may: its head keeps 2.5rem clear */
+	@media (min-width: 80rem) {
+		.contact {
+			--owl: clamp(24rem, 67vw - 29.5rem, 42rem);
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.contact {
+			--owl: min(14rem, 58vw);
+		}
+
+		.contact :global(.perch) {
+			top: calc(2.5rem - var(--owl) * 0.1);
+		}
+
+		.hero {
+			padding-top: calc(var(--owl) * 0.66);
 		}
 	}
 
@@ -800,7 +838,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.moon,
 		.send:disabled .dot {
 			animation: none;
 		}
