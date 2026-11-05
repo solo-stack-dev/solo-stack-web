@@ -50,16 +50,17 @@
 			<a href={postHref(post)} hreflang={post.lang}>{post.title}</a>
 		</h2>
 		<p class="teaser" lang={post.lang}>{post.description}</p>
-		<!-- One meta line in one voice: date · reading time · format, and while the video is not public a firefly and "video follows" -->
+		<!--
+			One meta line in one voice: date · reading time · format, and while the video is not public a firefly and "video
+			follows". "Video follows" is bound to the format (one unbreakable pair), so on a narrow column the line breaks into
+			two even halves, never leaving the status alone; a line never starts with a middle dot (see .meta).
+		-->
 		<p class="meta">
-			<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-			<span aria-hidden="true">·</span>
-			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-			<span aria-hidden="true">·</span>
-			<span>{FORMAT_LABELS[post.format]()}</span>
-			{#if !post.youtubeId}
-				<span class="soon"><span class="spark" aria-hidden="true"></span>{m.blog_card_no_video()}</span>
-			{/if}
+			<time class="item" datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+			<span class="item">{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+			<span class="item"
+				>{FORMAT_LABELS[post.format]()}{#if !post.youtubeId}<span class="soon"><span class="spark" aria-hidden="true"></span>{m.blog_card_no_video()}</span>{/if}</span
+			>
 		</p>
 		<!-- A brushed arrow that walks on hover -->
 		<svg class="go" viewBox="0 0 64 16" aria-hidden="true">
@@ -134,7 +135,7 @@
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.5rem;
-		margin-left: 0.35rem;
+		margin-left: 0.75rem;
 		color: var(--foreground);
 	}
 
@@ -219,15 +220,38 @@
 		text-wrap: pretty;
 	}
 
+	/*
+	 * Each item carries its middle dot in a 1.15rem lead-in. The line starts 1.15rem left of the column and that strip is
+	 * clipped, so whichever item opens a line (the first, or one after a wrap) shows no dot; the clip leaves the firefly's
+	 * glow room above, below and to the right.
+	 */
 	.meta {
+		--lead: 1.15rem;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: baseline;
-		gap: 0.25rem 0.5rem;
+		row-gap: 0.25rem;
 		margin-top: 0.25rem;
+		margin-left: calc(var(--lead) * -1);
 		color: var(--muted-foreground);
 		font-size: 0.875rem;
 		font-variant-numeric: tabular-nums;
+		clip-path: inset(-1rem -1rem -1rem var(--lead));
+	}
+
+	.meta .item {
+		display: inline-flex;
+		align-items: baseline;
+		padding-left: var(--lead);
+		white-space: nowrap;
+	}
+
+	.meta .item::before {
+		content: '·' / '';
+		flex: none;
+		width: var(--lead);
+		margin-left: calc(var(--lead) * -1);
+		text-align: center;
 	}
 
 	.go {

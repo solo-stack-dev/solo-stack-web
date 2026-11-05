@@ -7,7 +7,8 @@
  *   breaks of one post differ in kind or at least in scale and place.
  * - **Pull quote:** `<aside class="pull-quote" aria-hidden="true">…</aside>` (blank lines around it). Its text must be a
  *   sentence that already stands in the post (it repeats it, hence hidden from assistive tech); never new text. Set it at
- *   least two paragraphs away from the paragraph it quotes, so it never reads as a duplicate of its neighbour.
+ *   least a section away from the sentence it quotes: the two must never share a 1440×900 or a 390×844 viewport, so it
+ *   never reads as a duplicate of its neighbour.
  *
  * Two kinds of art:
  * - `scene`: a painted homepage plate, cropped wide and shallow, across the whole reading measure on a torn paper edge.
@@ -77,7 +78,8 @@ const OPAQUE = 'linear-gradient(#000, #000)';
 /**
  * The custom properties the post page's break rules read: `--art`, `--ratio` (of the painting), `--h` / `--h-sm` (box
  * height from / below 40rem), `--box-ratio`, `--x` / `--right` / `--shift` (placement), `--glow`, `--edge` (the paper
- * edge mask), `--night-fade` (at night a plate's sky dissolves into the page), `--rim` (night filter).
+ * edge mask), `--night-fade` (at night a plate's sky dissolves into the page), `--night-feather` (at night its sides fade
+ * out over 3rem, so only the torn edge below remains), `--rim` (night filter).
  */
 function properties(art: BreakArt) {
 	const ratio = art.image.img.w / art.image.img.h;
@@ -91,6 +93,7 @@ function properties(art: BreakArt) {
 					'--x': '50%',
 					'--edge': DECKLE_MASK_WIDE,
 					'--night-fade': 'linear-gradient(transparent, #000 42%)',
+					'--night-feather': 'linear-gradient(90deg, transparent, #000 3rem, #000 calc(100% - 3rem), transparent)',
 					'--rim': 'none'
 				}
 			: {
@@ -100,6 +103,7 @@ function properties(art: BreakArt) {
 					...(art.x === 'right' ? { '--x': 'auto', '--right': '0', '--shift': '0' } : { '--x': art.x }),
 					'--edge': OPAQUE,
 					'--night-fade': OPAQUE,
+					'--night-feather': OPAQUE,
 					'--rim': art.ink ? 'drop-shadow(0 0 1px rgb(251 243 221 / 0.3)) drop-shadow(0 0 9px rgb(252 215 114 / 0.2))' : 'none'
 				};
 	return Object.entries({ ...shared, ...placed })
