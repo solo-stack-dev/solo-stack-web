@@ -13,6 +13,10 @@
 	}
 
 	let { stamp = false, class: className = '' }: Props = $props();
+	// one filter per instance: a copy hidden with display: none (the 404 shows its seal in one of two places) would switch off
+	// a shared one for every other copy
+	const uid = $props.id();
+	const pressId = `seal-press-${uid}`;
 
 	// 100 × 100 box, center (50, 50). Hour dots on r = 38.5, every 30°.
 	const dots = Array.from({ length: 12 }, (_, hour) => {
@@ -27,14 +31,14 @@
 {#if stamp}
 	<svg class="hunter-emblem {className}" viewBox="0 0 100 100" aria-hidden="true">
 		<!-- Pressed ink: the outline wanders a little, and the pigment skips in places, like a seal on rough paper -->
-		<filter id="seal-press" x="-6%" y="-6%" width="112%" height="112%">
+		<filter id={pressId} x="-6%" y="-6%" width="112%" height="112%">
 			<feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="4" result="wander" />
 			<feDisplacementMap in="SourceGraphic" in2="wander" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="inked" />
 			<feTurbulence type="fractalNoise" baseFrequency="0.22" numOctaves="3" seed="11" result="paper" />
 			<feColorMatrix in="paper" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -3.2 0 0 0 2.45" result="skips" />
 			<feComposite in="inked" in2="skips" operator="in" />
 		</filter>
-		<g filter="url(#seal-press)">
+		<g filter="url(#{pressId})">
 			<circle cx="50" cy="50" r="45.5" fill="none" stroke="currentColor" stroke-width="3.4" />
 			<circle cx="50" cy="50" r="34.5" fill="none" stroke="currentColor" stroke-width="1.5" />
 			{#each dots as dot, index (index)}
