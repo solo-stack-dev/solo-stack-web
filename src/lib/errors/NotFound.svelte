@@ -1,7 +1,7 @@
 <!--
 	@component
-	404: the page went missing, like Ging. Scene: `WorldTree.svelte`. A license seal sticker (an original World Tree seal,
-	`HunterEmblem.svelte`) on the status digits opens a holographic license card issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
+	404: the page went missing, like Ging. Scene: `WorldTree.svelte`. A license seal (an original World Tree seal,
+	`HunterEmblem.svelte`), pressed into the painting like an artist's seal, opens a holographic license card issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -21,8 +21,8 @@
 
 <ErrorShell status={404} title={m.error_404_title()} body={m.error_404_body()} variant="tree">
 	{#snippet badge()}
-		<button type="button" class="sticker" popovertarget="hunter-license" aria-label={m.error_404_license_label()}>
-			<HunterEmblem sticker />
+		<button type="button" class="seal" popovertarget="hunter-license" aria-label={m.error_404_license_label()}>
+			<HunterEmblem stamp />
 		</button>
 
 		<div id="hunter-license" class="license-popover" popover>
@@ -56,44 +56,48 @@
 </ErrorShell>
 
 <style>
-	/* Sticker on the status digits ------------------------------------------------------------------------------ */
-
-	.sticker {
+	/*
+	 * The seal on the painting ----------------------------------------------------------------------------------
+	 * Pressed into the scene like an artist's seal on a scroll: one butter pigment, a little uneven, set where the painting
+	 * is dark (desktop: the lower right corner, on the cloud sea's shadow; phones: the open sky right of the tree, above the
+	 * text). No outline, no shadow, no sticker. Hover: the pigment lights up a little. At least a 44px target.
+	 */
+	.seal {
 		position: absolute;
-		right: -2.4rem;
-		top: -1.1rem;
-		width: clamp(3.75rem, 8vw, 5rem);
+		right: max(1.25rem, 3vw);
+		bottom: max(1.5rem, 4svh);
+		width: clamp(3.25rem, 4.2vw, 4rem);
 		padding: 0;
-		rotate: 14deg;
+		rotate: -7deg;
+		color: var(--color-butter);
+		opacity: 0.8;
 		cursor: pointer;
-		filter: drop-shadow(0 0.25rem 0.4rem rgb(14 15 16 / 0.55));
+		-webkit-tap-highlight-color: transparent;
 		transition:
+			opacity var(--dur-hover) ease,
 			rotate 220ms cubic-bezier(0.3, 1.5, 0.5, 1),
-			translate 220ms cubic-bezier(0.3, 1.5, 0.5, 1),
-			filter 220ms ease;
+			filter var(--dur-hover) ease;
 	}
 
-	.sticker:hover {
-		rotate: 6deg;
-		translate: 0 -0.25rem;
-		filter: drop-shadow(0 0.7rem 0.8rem rgb(14 15 16 / 0.6)) drop-shadow(0 0 0.8rem rgb(252 215 114 / 0.45));
+	.seal:hover {
+		opacity: 1;
+		rotate: -3deg;
+		filter: drop-shadow(0 0 0.6rem rgb(252 215 114 / 0.35));
 	}
 
-	.sticker:active {
-		translate: 0 0;
-		rotate: 10deg;
-	}
-
-	.sticker:focus-visible {
-		outline: 2px solid var(--color-butter);
+	.seal:focus-visible {
+		opacity: 1;
+		outline: 2px dashed var(--color-butter);
 		outline-offset: 0.3rem;
-		border-radius: 0.5rem;
+		border-radius: 50%;
 	}
 
 	@media (max-width: 63.99rem) {
-		.sticker {
-			right: -1.6rem;
-			top: -0.6rem;
+		.seal {
+			top: calc(30svh - 4rem);
+			bottom: auto;
+			right: 1.25rem;
+			width: 3.25rem;
 		}
 	}
 

@@ -2,7 +2,8 @@
 	@component
 	Frame for every error page: the site navbar in its night look (crescent wordmark, the pages, and the 03:00 clock, the hour
 	the homepage night skips, in place of the menu), mono status, copy, home link, optional retry, the homepage sections as one
-	column of plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind.
+	column of plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind; the optional `badge` sits on the
+	scene, outside the text column (the 404's seal, stamped into the painting).
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -23,7 +24,7 @@
 		/** `tree` (404) or `wall` (500 and everything else): layout and intro timing. */
 		variant: 'tree' | 'wall';
 		scene: Snippet;
-		/** Something stuck onto the status digits (the 404's Hunter sticker). */
+		/** Something stamped onto the scene, outside the text column (the 404's license seal). */
 		badge?: Snippet;
 	}
 
@@ -56,7 +57,6 @@
 	<main class="panel" aria-labelledby="error-title">
 		<div class="status-row">
 			<p class="status font-mono tabular-nums" aria-hidden="true" style:--grain="url({grain})">{status}</p>
-			{@render badge?.()}
 		</div>
 		<h1 id="error-title" class="title font-display font-black tracking-wordmark text-balance">
 			<span class="sr-only">{status}</span>
@@ -65,15 +65,9 @@
 		<p class="body text-pretty">{body}</p>
 
 		<div class="actions">
-			<a class="action is-home swash-focus" href={home}>
-				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4l8 7.2V20a1 1 0 0 1-1 1h-4.6v-5.6H9.6V21H5a1 1 0 0 1-1-1z" /></svg>
-				<span>{m.error_home_link()}</span>
-			</a>
+			<a class="action is-home" href={home}>{m.error_home_link()}</a>
 			{#if retry}
-				<button type="button" class="action is-retry swash-focus" onclick={() => location.reload()}>
-					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4.5V8.2h-3.7" /></svg>
-					<span>{m.error_retry()}</span>
-				</button>
+				<button type="button" class="action is-retry" onclick={() => location.reload()}>{m.error_retry()}</button>
 			{/if}
 		</div>
 
@@ -91,6 +85,10 @@
 			</ul>
 		</nav>
 	</main>
+
+	{#if badge}
+		<div class="badge">{@render badge()}</div>
+	{/if}
 
 	<PaperGrain src={grain} size={256} opacity={0.16} blend="soft-light" />
 </div>
@@ -199,77 +197,69 @@
 	.actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.75rem;
-		margin-top: 1.75rem;
+		gap: 0.25rem 2rem;
+		margin-top: 1.25rem;
 	}
 
+	/*
+	 * The way home is a sentence-case link with the shell's ink swash under it (as on the contact page's thanks), not a
+	 * button: cream on the night, the swash in butter. Hover and focus: butter, the swash darkens and settles, soft light.
+	 * Retry (server errors) is the quieter second link: its swash only inks in on hover and focus.
+	 */
 	.action {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.6rem;
-		min-height: 3rem;
-		padding: 0 1.35rem 0 1.05rem;
-		border: 2px solid var(--color-butter);
-		border-radius: 999px;
+		min-height: 2.75rem;
+		color: var(--color-cream);
+		font-size: 1.125rem;
 		font-weight: 600;
 		cursor: pointer;
-		transition:
-			background-color 160ms ease,
-			color 160ms ease,
-			translate 160ms ease;
+		-webkit-tap-highlight-color: transparent;
+		transition: color var(--dur-hover) ease;
 	}
 
-	/* Focus: the swash inks in under the pill, which lifts like on hover */
-	.action {
-		--swash-x: 1.25rem;
-		--swash-y: -0.75rem;
-		--swash-h: 0.4rem;
-	}
-
-	.action:focus-visible {
-		translate: 0 -2px;
-	}
-
-	.action svg {
-		width: 1.25rem;
-		height: 1.25rem;
-		flex: none;
-	}
-
-	.is-home {
+	.action::after {
+		content: '';
+		position: absolute;
+		left: -0.05em;
+		right: -0.1em;
+		bottom: 0.2rem;
+		height: 0.42rem;
 		background: var(--color-butter);
-		color: var(--color-night);
-	}
-
-	.is-home svg {
-		fill: currentColor;
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		opacity: 0.75;
+		transform-origin: left;
+		pointer-events: none;
+		transition:
+			opacity var(--dur-hover) ease,
+			translate var(--dur-hover) var(--ease-settle),
+			scale var(--dur-state) var(--ease-settle);
 	}
 
 	.is-retry {
+		color: color-mix(in oklab, var(--color-cream) 85%, transparent);
+	}
+
+	.is-retry::after {
+		scale: 0 1;
+	}
+
+	.action:hover,
+	.action:focus-visible {
 		color: var(--color-butter);
-		background: rgb(14 15 16 / 0.55);
 	}
 
-	.is-retry svg {
-		fill: none;
-		stroke: currentColor;
-		stroke-width: 2.2;
-		stroke-linecap: round;
-		stroke-linejoin: round;
+	.action:hover::after,
+	.action:focus-visible::after {
+		opacity: 1;
+		scale: 1 1;
+		translate: 0 2px;
 	}
 
-	.action:hover {
-		translate: 0 -2px;
-	}
-
-	.is-home:hover {
-		background: var(--color-cream);
-		border-color: var(--color-cream);
-	}
-
-	.is-retry:hover {
-		background: var(--color-butter);
-		color: var(--color-night);
+	.action:focus-visible {
+		outline: none;
+		filter: drop-shadow(0 0 0.4rem var(--focus-halo));
 	}
 
 	.sections {
@@ -317,6 +307,18 @@
 		color: var(--color-butter);
 	}
 
+	/* The badge stands on the scene, above the text's ink wash, under the paper grain */
+	.badge {
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		pointer-events: none;
+	}
+
+	.badge > :global(*) {
+		pointer-events: auto;
+	}
+
 	/* Layout per scene ----------------------------------------------------------------------------------------- */
 
 	/* Phones: scene on top, text below on an ink wash */
@@ -328,9 +330,10 @@
 			background: linear-gradient(to bottom, transparent 38svh, rgb(14 15 16 / 0.88) 47svh, var(--color-ink) 60svh);
 		}
 
+		/* 390 × 844: the whole way home (status to link) above the fold; the tree and its climb stay above the text */
 		.is-tree .panel {
-			padding-top: 58svh;
-			background: linear-gradient(to bottom, transparent 50svh, rgb(14 15 16 / 0.82) 62svh, var(--color-ink) 78svh);
+			padding-top: 42svh;
+			background: linear-gradient(to bottom, transparent 36svh, rgb(14 15 16 / 0.82) 46svh, var(--color-ink) 60svh);
 		}
 
 		.is-wall .panel {
