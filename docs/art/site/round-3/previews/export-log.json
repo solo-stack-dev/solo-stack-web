@@ -1,0 +1,121 @@
+[
+  {
+    "file": "dawn-cloud-bank.png",
+    "native": [
+      2115,
+      743
+    ],
+    "crop": [
+      0,
+      0,
+      2115,
+      743
+    ],
+    "export": [
+      2560,
+      900
+    ]
+  },
+  {
+    "file": "dawn-cloud-bank-mobile.png",
+    "native": [
+      1143,
+      1376
+    ],
+    "crop": [
+      0,
+      0,
+      1143,
+      1376
+    ],
+    "export": [
+      1080,
+      1300
+    ]
+  },
+  {
+    "file": "wax-seal.png",
+    "native": [
+      1254,
+      1254
+    ],
+    "crop": [
+      0,
+      0,
+      1254,
+      1254
+    ],
+    "export": [
+      800,
+      800
+    ]
+  },
+  {
+    "file": "ink-ground-a.png",
+    "native": [
+      2172,
+      724
+    ],
+    "crop": [
+      0,
+      231,
+      2172,
+      519
+    ],
+    "export": [
+      2560,
+      360
+    ]
+  },
+  {
+    "file": "ink-ground-b.png",
+    "native": [
+      2172,
+      724
+    ],
+    "crop": [
+      0,
+      186,
+      2172,
+      581
+    ],
+    "export": [
+      2560,
+      360
+    ]
+  },
+  {
+    "file": "ink-feather.png",
+    "native": [
+      2172,
+      724
+    ],
+    "crop": [
+      0,
+      0,
+      2172,
+      434
+    ],
+    "export": [
+      2560,
+      300
+    ]
+  },
+  {
+    "file": "wax-seal-pressed.png",
+    "native": [
+      1254,
+      1254
+    ],
+    "crop": [
+      0,
+      0,
+      1254,
+      1254
+    ],
+    "export": [
+      800,
+      800
+    ]
+  }
+]

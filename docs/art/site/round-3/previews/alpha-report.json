@@ -1,0 +1,163 @@
+[
+  {
+    "file": "dawn-cloud-bank.png",
+    "dimensions": [
+      2560,
+      900
+    ],
+    "mode": "RGBA",
+    "bytes": 2590538,
+    "sha256": "5e32590bca2b41d521206cbdae8c722c501d65d2a8b97ac7e7597d36c53e3279",
+    "alpha_zero": 952420,
+    "alpha_partial": 176521,
+    "alpha_opaque": 1175059,
+    "alpha_levels": 248,
+    "bounds": [
+      0,
+      76,
+      2560,
+      830
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  },
+  {
+    "file": "dawn-cloud-bank-mobile.png",
+    "dimensions": [
+      1080,
+      1300
+    ],
+    "mode": "RGBA",
+    "bytes": 1613121,
+    "sha256": "8566d8481f18e05b07392134d1fc15e9726d970db9a1765f1e2b73a9727723f2",
+    "alpha_zero": 648663,
+    "alpha_partial": 70174,
+    "alpha_opaque": 685163,
+    "alpha_levels": 248,
+    "bounds": [
+      0,
+      112,
+      1080,
+      1268
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  },
+  {
+    "file": "ink-ground-a.png",
+    "dimensions": [
+      2560,
+      360
+    ],
+    "mode": "RGBA",
+    "bytes": 640270,
+    "sha256": "aba53bdb6a199697133a4d8ebf1a8ab8429451eca7dba7bf8fca7b3066f73e84",
+    "alpha_zero": 415017,
+    "alpha_partial": 82703,
+    "alpha_opaque": 423880,
+    "alpha_levels": 248,
+    "bounds": [
+      0,
+      22,
+      2560,
+      338
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  },
+  {
+    "file": "ink-ground-b.png",
+    "dimensions": [
+      2560,
+      360
+    ],
+    "mode": "RGBA",
+    "bytes": 656605,
+    "sha256": "732d08ab5c848b2670f4c5b9568f453c9b34308ed8b8fb4931f93dee50b54524",
+    "alpha_zero": 443867,
+    "alpha_partial": 101100,
+    "alpha_opaque": 376633,
+    "alpha_levels": 248,
+    "bounds": [
+      0,
+      17,
+      2560,
+      343
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  },
+  {
+    "file": "ink-feather.png",
+    "dimensions": [
+      2560,
+      300
+    ],
+    "mode": "RGBA",
+    "bytes": 661436,
+    "sha256": "33ec275f6812f7db22fbd861ec3a1e1f98d5cc15da37d0208bb74480fc4c1022",
+    "alpha_zero": 265984,
+    "alpha_partial": 64623,
+    "alpha_opaque": 437393,
+    "alpha_levels": 248,
+    "bounds": [
+      0,
+      0,
+      2560,
+      286
+    ],
+    "top_clear": false,
+    "bottom_clear": true,
+    "top_opaque": true
+  },
+  {
+    "file": "wax-seal.png",
+    "dimensions": [
+      800,
+      800
+    ],
+    "mode": "RGBA",
+    "bytes": 637616,
+    "sha256": "6b79d9fe900b915730798a7bf5ca8eff15c842e8de74e790caf0358dbe4aaf78",
+    "alpha_zero": 333014,
+    "alpha_partial": 3610,
+    "alpha_opaque": 303376,
+    "alpha_levels": 248,
+    "bounds": [
+      77,
+      79,
+      718,
+      721
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  },
+  {
+    "file": "wax-seal-pressed.png",
+    "dimensions": [
+      800,
+      800
+    ],
+    "mode": "RGBA",
+    "bytes": 570704,
+    "sha256": "ebc64f50537b897e729688f0283d75bfd8eedd2cf378106301fcdca931b09a14",
+    "alpha_zero": 333910,
+    "alpha_partial": 3467,
+    "alpha_opaque": 302623,
+    "alpha_levels": 248,
+    "bounds": [
+      77,
+      79,
+      718,
+      722
+    ],
+    "top_clear": true,
+    "bottom_clear": true,
+    "top_opaque": false
+  }
+]
