@@ -14,6 +14,7 @@
 	import wanderer from './assets/error-wanderer.webp?enhanced';
 	import climber from './assets/error-mascot-climb.webp?enhanced';
 	import arrived from './assets/error-mascot-top.webp?enhanced';
+	import grain from './assets/error-paper-grain.webp';
 	import { CLIMB_STOPS, FIGURE, TOP, TREE_ASPECT } from './tree.ts';
 
 	const LAST = CLIMB_STOPS.length;
@@ -41,7 +42,7 @@
 	}
 </script>
 
-<div class="world-tree" class:is-sunrise={atTop}>
+<div class="world-tree" class:is-sunrise={atTop} style:--grain="url({grain})">
 	<!-- Sky plate, the sun behind the cloud sea, light, birds -->
 	<div class="sky-layer" aria-hidden="true">
 		<enhanced:img class="sky" src={sky} alt="" sizes="100vw" fetchpriority="high" />
@@ -319,26 +320,60 @@
 		outline-offset: -0.5rem;
 	}
 
+	/*
+	 * What they say is written on a scrap of cream paper torn from a notebook: a straight cut on top, a torn lower edge
+	 * (clip-path, fixed px depths so it stays a tear at any width), the paper grain, ink type, set a little askew. No
+	 * rounded box, no tail, no shadow. Ink #1c1a16 on the paper: ≥ 13:1.
+	 */
 	.bubble {
+		--tear: polygon(
+			0 0,
+			100% 0,
+			100% calc(100% - 5px),
+			97% calc(100% - 2px),
+			94.5% calc(100% - 4px),
+			90% calc(100% - 1px),
+			87% calc(100% - 3px),
+			81% calc(100% - 2px),
+			77% calc(100% - 6px),
+			73% calc(100% - 3px),
+			66% 100%,
+			61% calc(100% - 2px),
+			57% calc(100% - 5px),
+			52% calc(100% - 4px),
+			46% calc(100% - 1px),
+			41% calc(100% - 2px),
+			35% calc(100% - 6px),
+			31% calc(100% - 3px),
+			25% calc(100% - 1px),
+			19% calc(100% - 4px),
+			15% calc(100% - 2px),
+			9% calc(100% - 5px),
+			5% calc(100% - 1px),
+			2% calc(100% - 3px),
+			0 calc(100% - 2px)
+		);
 		position: absolute;
 		z-index: 1;
 		width: max-content;
 		max-width: 15rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.9rem;
-		background: var(--color-cream);
-		color: var(--color-night);
+		padding: 0.5rem 0.75rem 0.7rem;
+		background:
+			var(--grain) 0 0 / 160px,
+			linear-gradient(172deg, #f6ecd2, #ecdcb6);
+		background-blend-mode: soft-light, normal;
+		clip-path: var(--tear);
+		color: #1c1a16;
 		font-size: 0.85rem;
 		font-weight: 600;
 		line-height: 1.3;
 		text-wrap: balance;
-		box-shadow: 0 0.4rem 1.2rem rgb(14 15 16 / 0.4);
 		opacity: 0;
-		scale: 0.6;
+		scale: 0.85;
 		pointer-events: none;
 		transition:
 			opacity 220ms ease,
-			scale 340ms cubic-bezier(0.3, 1.6, 0.5, 1);
+			scale 340ms cubic-bezier(0.3, 1.4, 0.5, 1);
 	}
 
 	.bubble.is-shown {
@@ -349,7 +384,7 @@
 	.is-climber {
 		left: 70%;
 		bottom: 92%;
-		border-bottom-left-radius: 0.2rem;
+		rotate: -2deg;
 		transform-origin: 0 100%;
 	}
 
@@ -357,7 +392,7 @@
 	.is-wanderer {
 		translate: 1.4rem 0;
 		max-width: min(14rem, 42vw);
-		border-top-left-radius: 0.2rem;
+		rotate: 1.5deg;
 		transform-origin: 0 0;
 	}
 

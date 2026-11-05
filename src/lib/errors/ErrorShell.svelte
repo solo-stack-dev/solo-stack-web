@@ -3,7 +3,8 @@
 	Frame for every error page: the site navbar in its night look (crescent wordmark, the pages, and the 03:00 clock, the hour
 	the homepage night skips, in place of the menu), mono status, copy, home link, optional retry, the homepage sections as one
 	column of plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind; the optional `badge` sits on the
-	scene, outside the text column (the 404's seal, stamped into the painting).
+	scene, outside the text column (the 404's seal, stamped into the painting); the optional `stamp` is pressed beside the status
+	numerals (the same seal on phones, where the painting has no quiet corner for it).
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -26,9 +27,11 @@
 		scene: Snippet;
 		/** Something stamped onto the scene, outside the text column (the 404's license seal). */
 		badge?: Snippet;
+		/** Something pressed beside the status numerals, like a seal beside a signature (the 404's seal on phones). */
+		stamp?: Snippet;
 	}
 
-	let { status, title, body, retry = false, variant, scene, badge }: Props = $props();
+	let { status, title, body, retry = false, variant, scene, badge, stamp }: Props = $props();
 
 	const sectionLabels: Record<SectionId, () => string> = {
 		hero: m.home_nav_section_hero,
@@ -57,6 +60,7 @@
 	<main class="panel" aria-labelledby="error-title">
 		<div class="status-row">
 			<p class="status font-mono tabular-nums" aria-hidden="true" style:--grain="url({grain})">{status}</p>
+			{#if stamp}{@render stamp()}{/if}
 		</div>
 		<h1 id="error-title" class="title font-display font-black tracking-wordmark text-balance">
 			<span class="sr-only">{status}</span>

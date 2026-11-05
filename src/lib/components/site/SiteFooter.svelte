@@ -7,7 +7,8 @@
 	from the left, so the laptop cliff stays in view.
 
 	The near ridge runs into one ink ground down to the page's bottom edge, in both themes (no paper band between ink
-	layers): tagline and platforms (small glyphs, 44px targets, a balanced 5 + 4 block on phones), then © and the legal links.
+	layers): tagline and platforms (small glyphs, 44px tall targets, one row on phones too), then © and the legal links, on the
+	content's left edge on phones as on desktop.
 
 	Spacing budget (docs/critique/ROUND-2.md): pages end without a bottom runway; the footer pulls its sky up so the top of
 	the wordmark sits `--gap` under the page's last content (104px desktop, 72px phones). The screen glow and three fireflies
@@ -102,6 +103,8 @@
 		--land-w: 200cqw;
 		--anchor: 1;
 		--gap: 4.5rem;
+		/* the content column (the wordmark's width) */
+		--column: calc(min(100cqw, var(--content-max)) - 2 * var(--content-gutter));
 		position: relative;
 		isolation: isolate;
 		container-type: inline-size;
@@ -114,12 +117,20 @@
 		}
 	}
 
+	/*
+	 * Desktop: the laptop (its lit base starts at 85.5% of the strip) keeps 4% of the column clear of the K (`--laptop-x`; the
+	 * K's leg ends ~0.8% inside the column's right edge). Where the margin beside the column is too narrow for that, the strip
+	 * grows just enough to keep the laptop on that line: at 1280px it stands on the screen's edge, below ~1260px it leaves the
+	 * screen and only its glow spills in. It never touches the K.
+	 */
 	@media (min-width: 64rem) {
 		.site-footer {
-			--land-w: 110cqw;
+			--laptop-x: calc(50cqw + var(--column) * 0.532);
+			--land-w: max(110cqw, var(--laptop-x) / 0.855);
 			--anchor: 0.45;
 			--gap: 6.5rem;
 		}
+
 	}
 
 	/*
@@ -141,7 +152,6 @@
 	.horizon {
 		--far-rise: clamp(1.25rem, 3cqw, 3rem);
 		--land-h: calc(var(--land-w) * 299 / 2172);
-		--column: calc(min(100cqw, var(--content-max)) - 2 * var(--content-gutter));
 		/* "SOLO STACK" at 900 / -0.045em inks 6.0 em wide: 16.6% of the column fills it; Geist caps are 0.71 em */
 		--mark-size: calc(var(--column) * 0.166);
 		--cap-h: calc(var(--mark-size) * 0.71);
@@ -198,6 +208,27 @@
 			linear-gradient(#000 0 0) bottom / 100% calc(var(--far-lift) + 2px) no-repeat;
 	}
 
+	/*
+	 * Paper: a lighter wash, and almost none of it behind the wordmark, so the sumi letters themselves are the silhouette
+	 * above the near ridge (no grey band through them); the far hills stay as depth beside the column.
+	 */
+	:global(html:not(.dark)) .far {
+		--clear: calc(var(--column) / 2);
+		background: linear-gradient(to bottom, color-mix(in oklab, #3b3226 24%, transparent) 64%, color-mix(in oklab, #3b3226 6%, transparent) 78%, transparent 92%);
+		mask:
+			linear-gradient(
+					to right,
+					#000 calc(50% - var(--clear) - 8cqw),
+					rgb(0 0 0 / 0.12) calc(50% - var(--clear) + 3cqw),
+					rgb(0 0 0 / 0.12) calc(50% + var(--clear) - 3cqw),
+					#000 calc(50% + var(--clear) + 8cqw)
+				)
+				0 0 / 100% 100% no-repeat,
+			var(--ridge) top / 100% calc(100% - var(--far-lift)) no-repeat,
+			linear-gradient(#000 0 0) bottom / 100% calc(var(--far-lift) + 2px) no-repeat;
+		mask-composite: intersect, add, add;
+	}
+
 	:global(.dark) .far {
 		background: #2b2620;
 	}
@@ -212,7 +243,7 @@
 	 * paper. Night: cream (#efe5cc) granulating to butter at the feet, where the afterglow is.
 	 */
 	.mark {
-		--mark-pigment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='128'%3E%3Cdefs%3E%3ClinearGradient id='p' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23373530'/%3E%3Cstop offset='.5' stop-color='%23373530'/%3E%3Cstop offset='1' stop-color='%233a342b'/%3E%3C/linearGradient%3E%3ClinearGradient id='d' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.3'/%3E%3Cstop offset='.6' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='640' height='128' fill='url(%23d)'/%3E%3C/mask%3E%3Cfilter id='w' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .035' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.055 0 0 0 0 0.051 0 0 0 0 0.043 1.4 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.071 0 0 0 0 0.067 0 0 0 0 0.063 6 0 0 0 -3.2'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.42' numOctaves='2' seed='19' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.992 0 0 0 0 0.976 0 0 0 0 0.933 4 0 0 0 -2.95'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='640' height='128' fill='url(%23p)'/%3E%3Crect width='640' height='128' filter='url(%23w)'/%3E%3Crect width='640' height='128' filter='url(%23g)' mask='url(%23m)'/%3E%3Crect width='640' height='128' filter='url(%23l)'/%3E%3C/svg%3E");
+		--mark-pigment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='128'%3E%3Cdefs%3E%3ClinearGradient id='p' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23262420'/%3E%3Cstop offset='.5' stop-color='%23262420'/%3E%3Cstop offset='1' stop-color='%232a251d'/%3E%3C/linearGradient%3E%3ClinearGradient id='d' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.3'/%3E%3Cstop offset='.6' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='640' height='128' fill='url(%23d)'/%3E%3C/mask%3E%3Cfilter id='w' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .035' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.055 0 0 0 0 0.051 0 0 0 0 0.043 1.4 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.071 0 0 0 0 0.067 0 0 0 0 0.063 6 0 0 0 -3.2'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='640' height='128' fill='url(%23p)'/%3E%3Crect width='640' height='128' filter='url(%23w)'/%3E%3Crect width='640' height='128' filter='url(%23g)' mask='url(%23m)'/%3E%3C/svg%3E");
 		position: absolute;
 		inset: auto 0 var(--base);
 		width: 100%;
@@ -261,6 +292,13 @@
 		margin-left: calc((100cqw - var(--land-w)) * var(--anchor));
 		aspect-ratio: 2172 / 299;
 		margin-bottom: -1px;
+	}
+
+	/* desktop: never closer to the K than `--laptop-x` (see the 64rem block above) */
+	@media (min-width: 64rem) {
+		.land {
+			margin-left: max((100cqw - var(--land-w)) * var(--anchor), var(--laptop-x) - var(--land-w) * 0.855);
+		}
 	}
 
 	.land :global(picture) {
@@ -409,12 +447,13 @@
 		padding-bottom: clamp(1rem, 2.5cqw, 1.75rem);
 	}
 
+	/* Phones: one column on the content's left edge, like the desktop rows (no centred stack) */
 	.ground-grid {
 		display: grid;
-		justify-items: center;
-		gap: 0.75rem;
+		justify-items: start;
+		gap: 0.5rem;
 		padding-top: 0.75rem;
-		text-align: center;
+		text-align: left;
 	}
 
 	.tagline {
@@ -424,16 +463,27 @@
 		font-weight: 600;
 		line-height: 1.4;
 		color: color-mix(in oklab, var(--color-cream) 88%, var(--ground));
-		text-wrap: balance;
+		text-wrap: pretty;
 	}
 
-	/* 44px targets; a balanced 5 / 4 block on phones (9 in a row would not fit 390px) */
+	/*
+	 * Phones: all platforms in one row across the column. Each target is 44px tall and shares the column's width (~40px at
+	 * 390px, more on wider phones); the row reaches 0.8rem past both edges, so the first and last glyph sit on the edges
+	 * and every target stays wider than 36px without overlapping its neighbour.
+	 */
+	.socials {
+		justify-self: stretch;
+	}
+
 	.socials ul {
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		max-width: calc(5 * 2.75rem + 4 * 0.75rem);
-		gap: 0.25rem 0.75rem;
+		margin-inline: -0.8125rem;
+	}
+
+	.socials li {
+		flex: 1 1 0;
+		min-width: 0;
+		max-width: 2.75rem;
 	}
 
 	.socials a {
@@ -442,7 +492,7 @@
 		--swash-h: 0.32rem;
 		display: grid;
 		place-items: center;
-		width: 2.75rem;
+		width: 100%;
 		height: 2.75rem;
 		color: var(--quiet);
 		transition: color var(--dur-hover) ease;
@@ -472,7 +522,6 @@
 	.legal {
 		display: flex;
 		flex-wrap: wrap;
-		justify-content: center;
 		column-gap: 1.5rem;
 	}
 
@@ -509,16 +558,22 @@
 			max-width: none;
 		}
 
-		.socials,
 		.legal-nav {
 			justify-self: end;
 		}
 
+		.socials {
+			justify-self: end;
+		}
+
 		.socials ul {
-			max-width: none;
-			flex-wrap: nowrap;
 			gap: 0.125rem;
-			margin-right: -0.8125rem;
+			margin-inline: 0 -0.8125rem;
+		}
+
+		.socials li {
+			flex: none;
+			width: 2.75rem;
 		}
 
 		.copy {
