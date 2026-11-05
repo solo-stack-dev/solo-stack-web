@@ -30,27 +30,26 @@
 	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
-<div class="overflow-x-clip pb-8 text-foreground">
+<div class="relative overflow-x-clip pb-8 text-foreground">
 	<Horizon {stats} bind:period />
 
-	<!-- Below the hill: the tree's root runs down the margin past every section -->
-	<div class="relative">
-		<Roots />
-		<div class="relative mx-auto grid max-w-6xl gap-24 px-4 pt-14 sm:px-6 sm:pt-16 lg:gap-32 lg:px-8">
-			<section class="grid gap-10" aria-labelledby="stats-platforms">
-				<SectionHeading id="stats-platforms" title={m.stats_platforms_title()} description={m.stats_platforms_description()} />
-				<Constellation {stats} {period} />
-			</section>
+	<div class="relative mx-auto grid max-w-6xl gap-24 px-4 pt-14 sm:px-6 sm:pt-16 lg:gap-32 lg:px-8">
+		<section class="grid gap-10" aria-labelledby="stats-platforms">
+			<SectionHeading id="stats-platforms" title={m.stats_platforms_title()} description={m.stats_platforms_description()} />
+			<Constellation {stats} {period} />
+		</section>
 
-			<section class="grid gap-10" aria-labelledby="stats-youtube">
-				<SectionHeading id="stats-youtube" title={m.stats_youtube_title()} description={m.stats_youtube_description()} tilt={1.5} />
-				<YoutubeSection {stats} {period} />
-			</section>
+		<section class="grid gap-10" aria-labelledby="stats-youtube">
+			<SectionHeading id="stats-youtube" title={m.stats_youtube_title()} description={m.stats_youtube_description()} tilt={1.5} />
+			<YoutubeSection {stats} {period} />
+		</section>
 
-			<section class="grid gap-10" aria-labelledby="stats-activity">
-				<SectionHeading id="stats-activity" title={m.stats_activity_title()} description={m.stats_activity_description({ weeks })} tilt={-1} />
-				<ActivityCalendar {stats} />
-			</section>
-		</div>
+		<section class="grid gap-10" aria-labelledby="stats-activity">
+			<SectionHeading id="stats-activity" title={m.stats_activity_title()} description={m.stats_activity_description({ weeks })} tilt={-1} />
+			<ActivityCalendar {stats} />
+		</section>
 	</div>
+
+	<!-- The tree's painted root: from the hill down the right margin past every section into the footer horizon -->
+	<Roots />
 </div>
