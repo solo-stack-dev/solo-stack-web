@@ -1,4 +1,5 @@
 import type { Commit } from '#lib/home/data/github.ts';
+import { clipWords } from './log-filter.ts';
 
 export interface TerminalLine {
 	kind: 'command' | 'commit' | 'note';
@@ -19,8 +20,9 @@ function seeded(seed: number) {
 	return () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 }
 
+/** Cut at a word boundary, never mid-word. */
 function clip(text: string): string {
-	return text.length > MAX_COLUMNS ? `${text.slice(0, MAX_COLUMNS - 1)}…` : text;
+	return clipWords(text, MAX_COLUMNS);
 }
 
 /**

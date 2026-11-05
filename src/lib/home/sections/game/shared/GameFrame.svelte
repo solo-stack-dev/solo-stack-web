@@ -20,6 +20,7 @@
 	import { GameInput, type GameButton } from './input.svelte.ts';
 	import { PauseController } from './pause.svelte.ts';
 	import TouchControls from './TouchControls.svelte';
+	import { DECKLE_TALL, DECKLE_TALL_BACK, DECKLE_WIDE, DECKLE_WIDE_BACK } from './deckle.ts';
 	import { defaultTuning, type GameLoader, type GameModule } from './types.ts';
 
 	interface Props {
@@ -116,7 +117,16 @@
 	const pad = (value: number) => String(Math.floor(value)).padStart(6, '0');
 </script>
 
-<div class={['game-frame', className]} data-game={gameId} data-status={status} {@attach pause.attach}>
+<div
+	class={['game-frame', className]}
+	data-game={gameId}
+	data-status={status}
+	style:--deckle-wide={DECKLE_WIDE}
+	style:--deckle-tall={DECKLE_TALL}
+	style:--deckle-wide-back={DECKLE_WIDE_BACK}
+	style:--deckle-tall-back={DECKLE_TALL_BACK}
+	{@attach pause.attach}
+>
 	<div class="stage">
 		{#if status === 'playing' && module}
 			<!-- The game surface must take focus and keys (arrows, A/D, Space, P, R); role="application" passes them through to it. -->
@@ -197,14 +207,15 @@
 		width: 100%;
 	}
 
-	/* Ink-ruled mat: one closed cream hairline a little outside the stage, corners meeting (no crop marks sticking out). Outside the
-	   clipping stage so the game never covers it. */
+	/* A torn-out sheet (deckle.ts, the blog's feature-art edge): no ruled hairline, no outer glow. The mask clips everything in the
+	   stage, so controls keep ≥ 0.85rem from its edge. The posters' night runs to their edges, so a warm torn backing sheet a few px
+	   larger (own seed) lies under the stage: the paper edge reads against the sky without any light around it. */
 	.game-frame::before {
 		content: '';
 		position: absolute;
-		inset: -0.45rem;
-		border: 1px solid color-mix(in oklab, var(--color-cream) 26%, transparent);
-		border-radius: 3px;
+		inset: -0.4rem -0.45rem;
+		background: color-mix(in oklab, var(--color-ochre) 24%, var(--color-ink));
+		mask: var(--deckle-wide-back) center / 100% 100% no-repeat;
 		pointer-events: none;
 	}
 
@@ -212,14 +223,18 @@
 		position: relative;
 		overflow: hidden;
 		aspect-ratio: var(--game-aspect, 16 / 9);
-		border-radius: 2px;
 		background: var(--color-ink);
-		box-shadow: var(--glow-lg);
+		mask: var(--deckle-wide) center / 100% 100% no-repeat;
 	}
 
 	@media (max-width: 40rem) {
 		.stage {
 			aspect-ratio: var(--game-aspect-mobile, 4 / 5);
+			mask-image: var(--deckle-tall);
+		}
+
+		.game-frame::before {
+			mask-image: var(--deckle-tall-back);
 		}
 	}
 
@@ -229,15 +244,16 @@
 		inset: 0;
 	}
 
+	/* inside the torn edge */
 	.surface:focus-visible {
-		outline-offset: -3px;
+		outline-offset: -0.75rem;
 	}
 
 	.hud {
 		position: absolute;
 		z-index: 2;
-		top: 0.9rem;
-		left: 1rem;
+		top: 1rem;
+		left: 1.1rem;
 		display: grid;
 		gap: 0.3rem;
 		pointer-events: none;
@@ -246,8 +262,8 @@
 	.hud-buttons {
 		position: absolute;
 		z-index: 2;
-		top: 0.6rem;
-		right: 0.6rem;
+		top: 0.85rem;
+		right: 0.85rem;
 		display: flex;
 		gap: 0.4rem;
 	}

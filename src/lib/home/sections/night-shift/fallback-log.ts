@@ -4,87 +4,87 @@ import type { Commit } from '#lib/home/data/github.ts';
 /** Real recent commits of this site's repository, newest first: the monitor's log when the live GitHub feed is empty. */
 export const FALLBACK_LOG: Commit[] = [
 	{
-		hash: 'ed6417a',
-		message: 'Critique round 1 (Opus 7.8, gpt-6.1-sol 7.9), screenshots and round 2 fix plan',
+		hash: '23b6ad8',
+		message: 'Home B round 3: dawn cloud bank seam, finished 04:00 cinema, 02:00 pulled up',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T04:20:17+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/ed6417a5ff37129d4daa5c0acec8412719a66b23'
+		date: '2026-11-05T06:22:37+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/23b6ad87fcca2f0099c42369943f5a60d8bb7d18'
 	},
 	{
-		hash: '19e8839',
-		message: 'Contact night owl messenger and silhouette horizon footer',
+		hash: '224fefd',
+		message: 'Stats round 3: painted hill foot and KPI ground, no root, chart details',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:56:11+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/19e88398b9d128c60d7c61552974c5ff3c727537'
+		date: '2026-11-05T06:10:51+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/224fefd8fd0788b48dba94ddf7bd95443d33448c'
 	},
 	{
-		hash: '8b83a81',
-		message: 'QA: --theme flag for scroll-screens and a full-site critique screenshot script',
+		hash: 'f4cd368',
+		message: 'Contact round 3: wax-seal send, sentence-case captions, live error clearing, tighter mobile opening',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:49:30+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/8b83a819717db2c9cb26d86a947dde894e79c4fe'
+		date: '2026-11-05T06:09:54+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/f4cd36877a92f0d3531e5b513f822d7ef45b4a92'
 	},
 	{
-		hash: 'd127249',
-		message: 'Stats: the growth tree hero and a root that runs down the page',
+		hash: '596fefe',
+		message: 'Round 3 shell: painted footer wordmark on one ink ground, swash focus, opaque home menu, paper theme chooser',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:48:24+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/d12724956a6d70dab52334456d1e6340091f3497'
+		date: '2026-11-05T06:05:44+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/596fefe6dc92db655b33fa1258374fd012796451'
 	},
 	{
-		hash: 'cc4a394',
-		message: 'Blog: the reading hill, silhouette vignettes, moon-free index and post pages',
+		hash: '2a314d2',
+		message: 'Blog round 3: meta-line video status, mobile masthead, lit hill, section-tied breaks, reliable TOC',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:37:31+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/cc4a39488a54d0629aa50f4845670d54818bed5b'
+		date: '2026-11-05T06:02:15+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/2a314d29c629f0d044c727e1612d9040481489c6'
 	},
 	{
-		hash: '5c4f3a0',
-		message: 'Making: autoplay rotation instead of pinned scroll scrub',
+		hash: '94ca627',
+		message: 'Home A round 3: 21→22 overlap, title crossfade, 22:00 on the grid, desk edge, mobile 21:00 group',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:16:40+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/5c4f3a08f3a57c5f0ff8632fb40d3fd47fbadcd1'
+		date: '2026-11-05T06:01:09+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/94ca627b5d5fb8bdd614839ef27bce0d105fea8f'
 	},
 	{
-		hash: '22d4dca',
-		message: 'Stage silhouette art sources (WebP q92) in their owning asset folders',
+		hash: 'b685133',
+		message: 'Add round 3 dawn, ink ground and crescent seal artwork',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:13:01+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/22d4dca7a0b498948e4600436b98cbefb144d1d7'
+		date: '2026-11-05T05:54:09+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/b6851333bf62f8796e21008701c16056ef502789'
 	},
 	{
-		hash: '1a91e2d',
-		message: 'art: add Silhouettennacht site illustration set',
+		hash: '2cfb3b2',
+		message: 'Home art round 2: painted game posters, cinema projection, varied seam clouds, dawn tint',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:11:17+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/1a91e2d48fa71e95232e825802666bc275c4d3ac'
+		date: '2026-11-05T05:15:22+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/2cfb3b227a8a1f7e41e99eb07a14da0772a824db'
 	},
 	{
-		hash: '1d04c3e',
-		message: 'Site shell: painted night paper, on-brand focus ring, contact letter field states',
+		hash: 'b48e7bc',
+		message: 'Stats: painted long root from the tree into the footer horizon',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T03:03:44+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/1d04c3e2dd789bc789e8885d688d2ba116a693e1'
+		date: '2026-11-05T05:14:27+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/b48e7bc44afe1f94dbf91367bb4ef766dc6298dd'
 	},
 	{
-		hash: '1a05c19',
-		message: 'Docs: site redesign brief (silhouette night) and owner references',
+		hash: 'dc95227',
+		message: 'Blog post: painted section breaks, crafted mobile contents',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T02:45:04+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/1a05c1968ebc827a9f95b80ca5a4312c86a52f61'
+		date: '2026-11-05T05:12:51+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/dc95227765aa0425d1e4c166f494799676839c76'
 	},
 	{
-		hash: '3628df0',
-		message: 'Delete retired sunrise walk masters, puppet parts and build script',
+		hash: 'c581a0e',
+		message: 'Home round 2: 21:00 composition and ink, hero cue, 01:00 fallback log, radio glass and ground, sunrise print',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T02:30:29+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/3628df0024db9376be07b4674e1ae549140e7ff4'
+		date: '2026-11-05T05:01:34+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/c581a0eb2fb5d66dfc78eed32c8631073ccb58fc'
 	},
 	{
-		hash: 'c0c6c45',
-		message: 'Homepage art-director fixes: full-width mist, seamless reduced-motion sunrise, clock ink, aligned chrome, nav scrim',
+		hash: '21ab600',
+		message: 'Round 2 shell: one nav language, painted scrim, horizon footer, 404 seal',
 		repo: 'solo-stack-web',
-		date: '2026-11-05T02:25:38+01:00',
-		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/c0c6c456c563a32abaf48fcf7f95273d0f5a25fd'
+		date: '2026-11-05T04:58:07+01:00',
+		url: 'https://github.com/solo-stack-dev/solo-stack-web/commit/21ab600b871c3ac07693796abf64535363c5e580'
 	}
 ];
