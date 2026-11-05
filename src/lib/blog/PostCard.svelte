@@ -1,8 +1,8 @@
 <!--
 	@component
-	Blog index entry, no card box. Art: the self-hosted video thumbnail, or the format's silhouette vignette with the
-	"video follows" sign lit in its sky while the video is not public; both on a torn paper edge. The title link covers the
-	whole entry (one tab stop, one link name).
+	Blog index entry, no card box. Art: the self-hosted video thumbnail, or the format's silhouette vignette while the video
+	is not public (the meta line then says "video follows", after a firefly); both on a torn paper edge. The title link
+	covers the whole entry (one tab stop, one link name).
 
 	`featured` (the newest post): art beside a big title from `md`. Otherwise an index row: meta column, title and teaser,
 	art on the right (stacked on phones).
@@ -41,9 +41,7 @@
 				<VideoThumbnail id={post.youtubeId} {sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
 			</div>
 		{:else}
-			<FormatVignette class="thumb" format={post.format} {sizes} {eager}>
-				<span class="sign"><span class="spark" aria-hidden="true"></span>{m.blog_card_no_video()}</span>
-			</FormatVignette>
+			<FormatVignette class="thumb" format={post.format} {sizes} {eager} />
 		{/if}
 	</div>
 
@@ -52,13 +50,16 @@
 			<a href={postHref(post)} hreflang={post.lang}>{post.title}</a>
 		</h2>
 		<p class="teaser" lang={post.lang}>{post.description}</p>
-		<!-- One meta line in one voice: date · reading time · format -->
+		<!-- One meta line in one voice: date · reading time · format, and while the video is not public a firefly and "video follows" -->
 		<p class="meta">
 			<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
 			<span aria-hidden="true">·</span>
 			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
 			<span aria-hidden="true">·</span>
 			<span>{FORMAT_LABELS[post.format]()}</span>
+			{#if !post.youtubeId}
+				<span class="soon"><span class="spark" aria-hidden="true"></span>{m.blog_card_no_video()}</span>
+			{/if}
 		</p>
 		<!-- A brushed arrow that walks on hover -->
 		<svg class="go" viewBox="0 0 64 16" aria-hidden="true">
@@ -117,51 +118,45 @@
 		filter: brightness(1.08) saturate(1.06);
 	}
 
-	/* Paper shadow under the torn sheet (the mask would clip a box-shadow) */
-	.art::after {
+	/* Night: a faint warm light under the torn sheet (the mask would clip a box-shadow); on paper the sheet lies flat */
+	:global(.dark) .art::after {
 		content: '';
 		position: absolute;
 		inset: auto 6% -0.9rem;
 		z-index: -1;
 		height: 1.6rem;
 		border-radius: 50%;
-		background: radial-gradient(closest-side, rgb(24 25 27 / 0.22), transparent);
-		transition: opacity var(--dur-state) ease;
-	}
-
-	:global(.dark) .art::after {
 		background: radial-gradient(closest-side, rgb(252 215 114 / 0.1), transparent);
 	}
 
-	/* "Video follows", lit in the dark sky of the vignette like a sign over the hills */
-	.sign {
-		position: absolute;
-		top: clamp(0.8rem, 6cqi, 1.75rem);
-		left: clamp(0.9rem, 6cqi, 2rem);
+	/* "Video follows": the last word of the meta line, a firefly instead of the middle dot before it */
+	.soon {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.6rem;
-		color: var(--color-moonlight);
-		font-family: var(--font-mono);
-		font-size: clamp(0.625rem, 2.4cqi, 0.8125rem);
-		font-weight: 500;
-		letter-spacing: var(--tracking-label-sm);
-		text-transform: uppercase;
-		text-shadow:
-			0 0 8px rgb(252 215 114 / 0.55),
-			0 1px 2px rgb(14 15 16 / 0.8);
+		align-items: baseline;
+		gap: 0.5rem;
+		margin-left: 0.35rem;
+		color: var(--foreground);
 	}
 
-	/* A firefly as the sign's pilot light */
 	.spark {
+		flex: none;
+		align-self: center;
 		width: 5px;
 		height: 5px;
 		border-radius: 50%;
 		background: var(--color-moonlight);
 		box-shadow:
 			0 0 3px 1px var(--color-butter),
-			0 0 12px 3px rgb(252 215 114 / 0.6);
+			0 0 10px 3px rgb(252 215 114 / 0.55);
+		translate: 0 -0.05em;
 		animation: blink 3.6s ease-in-out infinite;
+	}
+
+	:global(html:not(.dark)) .spark {
+		background: #f1b73e;
+		box-shadow:
+			0 0 2px 1px rgb(226 169 59 / 0.9),
+			0 0 8px 2px rgb(252 215 114 / 0.75);
 	}
 
 	@keyframes blink {
@@ -260,6 +255,10 @@
 	}
 
 	/* Featured ------------------------------------------------------------------------------------------------- */
+
+	.is-featured {
+		gap: 1rem;
+	}
 
 	.is-featured .title {
 		font-size: clamp(1.9rem, 6.4vw, 2.4rem);

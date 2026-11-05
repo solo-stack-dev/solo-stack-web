@@ -5,9 +5,8 @@
 	import { page } from '$app/state';
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
 	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
-	import { breakArt } from '#lib/blog/section-breaks.ts';
+	import { breakStyles } from '#lib/blog/section-breaks.ts';
 	import inkGround from '#lib/blog/assets/ink-ground.svg?url';
-	import inkHorizon from '#lib/blog/assets/ink-horizon.svg?url';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
 	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=webp&quality=50&enhanced';
 	import StarField from '#lib/home/shared/StarField.svelte';
@@ -31,7 +30,13 @@
 		return [newer && { post: newer, label: m.blog_post_newer() }, older && { post: older, label: m.blog_post_older() }].filter((item) => !!item);
 	});
 
-	const breaks = breakArt();
+	const breakSheet = `<style>${breakStyles()}</style>`;
+
+	/** `SvelteKit Dokumentation lesen` → [`SvelteKit Dokumentation `, `lesen`]: the last word travels with the arrow. */
+	const splitLast = (label: string) => {
+		const at = label.trimEnd().lastIndexOf(' ');
+		return at < 0 ? ['', label] : [label.slice(0, at + 1), label.slice(at + 1)];
+	};
 
 	/** `https://www.svelte.dev/docs/kit/` → `svelte.dev/docs/kit` */
 	const linkHost = (href: string) => {
@@ -95,24 +100,45 @@
 	/** Takeaway fireflies glow brighter down the list, 0.35…1. */
 	const glow = (index: number, count: number) => (count > 1 ? 0.35 + (0.65 * index) / (count - 1) : 1);
 
-	// TOC: current section = last heading above the upper third of the viewport.
+	let body = $state<HTMLElement>();
+
+	/*
+	 * TOC: the current section is the last heading above the upper third of the viewport; scrolled to the very bottom, the
+	 * last section (a short final section never reaches the line). Measured on scroll and resize, at most once per frame, so
+	 * jumps (End, Page Down, a fling, a TOC link) land on the right entry. Starts once the post body is in the DOM and again
+	 * for each post.
+	 */
 	let current = $state<string | null>(null);
 	$effect(() => {
+		if (!body || !Body) return;
 		const headings = post.outline.map(({ id }) => document.getElementById(id)).filter((heading) => heading !== null);
-		if (!headings.length) return;
+		if (!headings.length) {
+			current = null;
+			return;
+		}
+		let frame = 0;
 		const update = () => {
+			frame = 0;
+			const atBottom = innerHeight + scrollY >= document.documentElement.scrollHeight - 2;
 			const line = innerHeight * 0.33;
-			current = headings.findLast((heading) => heading.getBoundingClientRect().top < line)?.id ?? null;
+			current = (atBottom ? headings.at(-1) : headings.findLast((heading) => heading.getBoundingClientRect().top < line))?.id ?? null;
 		};
-		const observer = new IntersectionObserver(update, { rootMargin: '0px 0px -67% 0px' });
-		for (const heading of headings) observer.observe(heading);
-		return () => observer.disconnect();
+		const schedule = () => {
+			frame ||= requestAnimationFrame(update);
+		};
+		update();
+		addEventListener('scroll', schedule, { passive: true });
+		addEventListener('resize', schedule, { passive: true });
+		return () => {
+			cancelAnimationFrame(frame);
+			removeEventListener('scroll', schedule);
+			removeEventListener('resize', schedule);
+		};
 	});
 
 	// Painted section breaks load their image only once they come near the viewport (section-breaks.ts)
-	let body = $state<HTMLElement>();
 	$effect(() => {
-		if (!body || !Body || !breaks.slots) return; // re-runs for each post body
+		if (!body || !Body) return; // re-runs for each post body
 		const observer = new IntersectionObserver(
 			(entries) => {
 				for (const entry of entries) {
@@ -126,6 +152,15 @@
 		for (const rule of body.querySelectorAll(':scope > hr')) observer.observe(rule);
 		return () => observer.disconnect();
 	});
+
+	/** The phone contents close once an entry is chosen (before the jump, so the target lands where the layout settles). */
+	function closeOnPick(details: HTMLDetailsElement) {
+		const close = (event: Event) => {
+			if (event.target instanceof Element && event.target.closest('a')) details.open = false;
+		};
+		details.addEventListener('click', close);
+		return () => details.removeEventListener('click', close);
+	}
 
 	function seek(event: MouseEvent, seconds: number) {
 		if (!video || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
@@ -159,6 +194,8 @@
 	<meta name="twitter:title" content={post.title} />
 	<meta name="twitter:description" content={post.description} />
 	{@html jsonLdScript(structuredData)}
+	<!-- The art of the section breaks (static, from section-breaks.ts) -->
+	{@html breakSheet}
 	<!-- Without scripts the painted breaks load right away -->
 	<noscript
 		><style>
@@ -180,7 +217,7 @@
 	</ol>
 {/snippet}
 
-<article class="post" lang={post.lang} style:--wash="url({wash.img.src})" style:--ink-horizon={`url("${inkHorizon}")`}>
+<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
 	<div class="relative isolate">
 		<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
 		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
@@ -202,6 +239,26 @@
 				<span aria-hidden="true">·</span>
 				<span>{FORMAT_LABELS[post.format]()}</span>
 			</p>
+
+			{#if post.outline.length}
+				<!-- Below lg: the same contents as a disclosure right under the metadata. Closed, it shows the article as a trail of
+				     fireflies on an ink thread, one per section; the section you are in glows. A chosen entry closes it. -->
+				<details class="toc-mobile lg:hidden" style:--ink-ground={`url("${inkGround}")`} {@attach closeOnPick}>
+					<summary>
+						<span class="toc-head">
+							<span class="toc-fly" aria-hidden="true"></span>
+							<span id="toc-mobile-title">{m.blog_toc_title()}</span>
+						</span>
+						<span class="trail" aria-hidden="true">
+							{#each post.outline as section (section.id)}
+								<i class:lit={current === section.id}></i>
+							{/each}
+						</span>
+						<span class="toggle" aria-hidden="true"><ChevronDownIcon class="chevron size-4" /></span>
+					</summary>
+					{@render contents('toc-mobile-title')}
+				</details>
+			{/if}
 		</header>
 
 		<div class="mx-auto mt-7 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
@@ -277,27 +334,7 @@
 				</section>
 			{/if}
 
-			{#if post.outline.length}
-				<!-- Below lg: the same contents as a disclosure before the body. Closed, it shows the article as a trail of
-				     fireflies on an ink thread, one per section; the section you are in glows. -->
-				<details class="toc-mobile lg:hidden" style:--ink-ground={`url("${inkGround}")`}>
-					<summary>
-						<span class="toc-head">
-							<span class="toc-fly" aria-hidden="true"></span>
-							<span id="toc-mobile-title">{m.blog_toc_title()}</span>
-						</span>
-						<span class="trail" aria-hidden="true">
-							{#each post.outline as section (section.id)}
-								<i class:lit={current === section.id}></i>
-							{/each}
-						</span>
-						<span class="toggle" aria-hidden="true"><ChevronDownIcon class="chevron size-4" /></span>
-					</summary>
-					{@render contents('toc-mobile-title')}
-				</details>
-			{/if}
-
-			<div class="prose-post" bind:this={body} data-break-art={breaks.slots} style={breaks.style || undefined}>
+			<div class="prose-post" bind:this={body}>
 				<Body />
 			</div>
 
@@ -328,9 +365,10 @@
 					<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
 					<ul class="links mt-6">
 						{#each post.links as link, index (index)}
+							{@const [head, last] = splitLast(link.label)}
 							<li>
 								<a href={link.url} target="_blank" rel="noopener">
-									<span class="link-name"><span>{link.label}</span><ArrowUpRightIcon class="arrow size-4" aria-hidden="true" /></span>
+									<span class="link-name">{head}<span class="last">{last}<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" /></span></span>
 									<span class="host">{linkHost(link.url)}</span>
 								</a>
 							</li>
@@ -434,8 +472,8 @@
 		font-size: clamp(2.25rem, 6vw, 4.75rem);
 		line-height: 0.98;
 		padding-bottom: 0.08em;
-		/* Ink on paper; lit from behind at night (as the title on /blog) */
-		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
+		/* Ink on paper, warming to burnt umber on the last line (no olive); lit from behind at night (as the title on /blog) */
+		background: linear-gradient(180deg in oklab, var(--foreground) 42%, #8a5a12);
 		background-clip: text;
 		color: transparent;
 	}
@@ -727,9 +765,11 @@
 	 * (the stroke under the reading hill on /blog, heavy under the title); between title and toggle the article runs as a
 	 * trail of fireflies on a thread, one per section, and the section you are reading glows.
 	 */
+	/* Right under the metadata, on the reading measure */
 	.toc-mobile {
 		position: relative;
-		margin-block: -0.75rem -0.25rem;
+		max-width: 38rem;
+		margin-top: 1.25rem;
 	}
 
 	.toc-mobile summary {
@@ -966,11 +1006,8 @@
 		border-radius: 0.25rem;
 	}
 
-	/* The arrow stays with the name (never wraps alone onto a line) */
+	/* The arrow travels with the last word (never alone on a line, never adrift at the end of a wrapped name) */
 	.links .link-name {
-		display: flex;
-		align-items: baseline;
-		gap: 0.35rem;
 		font-size: 1rem;
 		font-weight: 600;
 		line-height: 1.35;
@@ -989,9 +1026,14 @@
 		text-decoration-color: var(--color-butter);
 	}
 
+	.links .last {
+		white-space: nowrap;
+	}
+
 	.links :global(.arrow) {
-		flex: none;
-		align-self: center;
+		display: inline-block;
+		margin-left: 0.3rem;
+		vertical-align: -0.1em;
 		color: var(--muted-foreground);
 		transition:
 			translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
@@ -1307,143 +1349,63 @@
 	}
 
 	/*
-	 * Section break (`* * *`): a painted pause between sections. Interim: the sumi horizon with the crooked tree, backlit at
-	 * night (amber horizon glow, two fireflies over the crown), ink on a butter wash on paper. Every second break mirrors.
-	 * Painted slots (data-break-art) draw their own silhouette instead (below).
+	 * Section break (section-breaks.ts): a painted pause tied to the section it opens. Its art comes from the break style
+	 * sheet as custom properties: a `scene` is a wide, shallow plate across the whole measure on a torn edge (box height
+	 * from its ratio); an `object` is a cut-out painting at its own height (phones 85 %) and place in the column. On paper
+	 * the paint stands on the page; at night a warm light spills from the painting's own light source. The image loads once
+	 * the break nears the viewport (`data-near`).
 	 */
 	.prose-post :global(hr) {
 		position: relative;
 		isolation: isolate;
-		height: clamp(5.5rem, 12vw, 7.5rem);
-		margin-block: 3.25em 2.25em;
+		height: var(--h-sm, 6rem);
+		aspect-ratio: var(--box-ratio, auto);
+		margin-block: 2.75em 2.4em;
 		border: 0;
 		overflow: visible;
 	}
 
-	/* The light behind: a low warm horizon and two fireflies above the crown */
-	.prose-post :global(hr::before) {
-		content: '';
-		position: absolute;
-		inset: -10% -6% -20%;
-		z-index: -1;
-		background:
-			radial-gradient(0.25rem 0.25rem at 66% 22%, var(--color-moonlight) 40%, rgb(252 215 114 / 0.5) 60%, transparent),
-			radial-gradient(0.2rem 0.2rem at 78% 10%, var(--color-moonlight) 40%, rgb(252 215 114 / 0.5) 60%, transparent),
-			radial-gradient(22% 50% at 71% 74%, rgb(236 146 48 / 0.32), transparent 72%), radial-gradient(9% 22% at 71% 52%, rgb(252 215 114 / 0.12), transparent 75%);
-	}
-
-	:global(html:not(.dark)) .prose-post :global(hr::before) {
-		background:
-			radial-gradient(0.25rem 0.25rem at 66% 22%, #f1b73e 40%, rgb(252 215 114 / 0.7) 60%, transparent),
-			radial-gradient(0.2rem 0.2rem at 78% 10%, #f1b73e 40%, rgb(252 215 114 / 0.7) 60%, transparent),
-			radial-gradient(24% 58% at 71% 70%, rgb(252 215 114 / 0.5), transparent 72%);
-	}
-
-	/* The ink: theme agnostic black, as every silhouette */
+	.prose-post :global(hr::before),
 	.prose-post :global(hr::after) {
 		content: '';
 		position: absolute;
-		inset: 0;
-		background: var(--color-ink);
-		mask: var(--ink-horizon) center bottom / 100% auto no-repeat;
-	}
-
-	.prose-post :global(hr:nth-of-type(even)) {
-		scale: -1 1;
-	}
-
-	/*
-	 * Painted slots (section-breaks.ts): the slot's silhouette at its own height and place in the column, ink on paper;
-	 * at night a warm rim of light around the ink and a glow at the painting's own light source, so the black reads on the
-	 * night surface. The image loads once the break nears the viewport (`data-near`).
-	 */
-	.prose-post :global(hr:nth-of-type(3n + 1)) {
-		--art: var(--break-art-1);
-		--ratio: var(--break-ratio-1);
-		--h: var(--break-h-1);
-		--x: var(--break-x-1);
-		--glow: var(--break-glow-1);
-	}
-
-	.prose-post :global(hr:nth-of-type(3n + 2)) {
-		--art: var(--break-art-2);
-		--ratio: var(--break-ratio-2);
-		--h: var(--break-h-2);
-		--x: var(--break-x-2);
-		--glow: var(--break-glow-2);
-	}
-
-	.prose-post :global(hr:nth-of-type(3n)) {
-		--art: var(--break-art-3);
-		--ratio: var(--break-ratio-3);
-		--h: var(--break-h-3);
-		--x: var(--break-x-3);
-		--glow: var(--break-glow-3);
-	}
-
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)) {
-		height: calc(var(--h) * 0.85);
-		margin-block: 2.75em 2.4em;
-		scale: none;
-	}
-
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
-		inset: 0 auto auto var(--x);
-		width: auto;
+		inset: 0 var(--right, auto) auto var(--x, 50%);
 		height: 100%;
-		aspect-ratio: var(--ratio);
-		translate: -50% 0;
-		mask: none;
+		aspect-ratio: var(--ratio, 4);
+		translate: var(--shift, -50%) 0;
 	}
 
-	/* Paper: no light behind, the ink stands on the page */
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before) {
-		background: none;
-	}
-
-	/* Night: a low warm glow around the light source, blurred past the painting's edges */
-	:global(.dark) .prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
-	:global(.dark) .prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
-	:global(.dark) .prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before) {
+	/* Night: the light behind, blurred past the painting's edges */
+	:global(.dark) .prose-post :global(hr::before) {
+		z-index: -1;
 		background:
-			radial-gradient(38% 52% at var(--glow), rgb(252 215 114 / 0.26), transparent 75%), radial-gradient(60% 34% at 50% 88%, rgb(236 146 48 / 0.16), transparent 80%),
-			radial-gradient(50% 50% at 50% 55%, rgb(251 243 221 / 0.06), transparent 80%);
+			radial-gradient(38% 52% at var(--glow, 50% 50%), rgb(252 215 114 / 0.26), transparent 75%),
+			radial-gradient(60% 34% at 50% 88%, rgb(236 146 48 / 0.16), transparent 80%), radial-gradient(50% 50% at 50% 55%, rgb(251 243 221 / 0.06), transparent 80%);
 		filter: blur(16px);
 	}
 
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
+	.prose-post :global(hr::after) {
 		background: none center / contain no-repeat;
+		mask: var(--edge, linear-gradient(#000, #000)) center / 100% 100% no-repeat;
 	}
 
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)[data-near]::after),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)[data-near]::after),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)[data-near]::after) {
+	.prose-post :global(hr[data-near]::after) {
 		background-image: var(--art);
 	}
 
-	/* Night: moonlit rim on the ink */
-	:global(.dark) .prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
-	:global(.dark) .prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
-	:global(.dark) .prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
-		filter: drop-shadow(0 0 1px rgb(251 243 221 / 0.3)) drop-shadow(0 0 9px rgb(252 215 114 / 0.2));
+	/* Night: a plate's sky dissolves into the page (torn edge left, right and below); an ink cut-out gets a moonlit rim */
+	:global(.dark) .prose-post :global(hr::after) {
+		mask:
+			var(--edge, linear-gradient(#000, #000)) center / 100% 100% no-repeat,
+			var(--night-fade, linear-gradient(#000, #000)) center / 100% 100% no-repeat;
+		mask-composite: intersect;
+		filter: var(--rim, none);
 	}
 
+	/* From 40rem a cut-out stands at its full height */
 	@media (min-width: 40rem) {
-		.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)),
-		.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)),
-		.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)) {
-			height: var(--h);
+		.prose-post :global(hr) {
+			height: var(--h, 7rem);
 		}
 	}
 

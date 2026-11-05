@@ -6,6 +6,10 @@
 export const DECKLE_MASK =
 	"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900' preserveAspectRatio='none'%3E%3Cfilter id='d' x='-2%25' y='-2%25' width='104%25' height='104%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='3' seed='7'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='16' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='10' y='10' width='1580' height='880' rx='4' filter='url(%23d)'/%3E%3C/svg%3E\")";
 
+/** `DECKLE_MASK` for a wide, shallow sheet (about 4:1): the same torn edge, drawn in a viewBox of that shape so it keeps its width. */
+export const DECKLE_MASK_WIDE =
+	"url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400' preserveAspectRatio='none'%3E%3Cfilter id='d' x='-2%25' y='-5%25' width='104%25' height='110%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='3' seed='11'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='14' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='9' y='9' width='1582' height='382' rx='3' filter='url(%23d)'/%3E%3C/svg%3E\")";
+
 /**
  * Dry brush fade for the bottom of an ink silhouette (alpha mask, stretched to the element): a vertical gradient pushed
  * through fractal noise and a hard alpha curve, so the ink breaks up in ragged strokes over the lowest fifth instead of

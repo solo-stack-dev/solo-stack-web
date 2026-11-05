@@ -47,9 +47,9 @@ Ich bin Softwareentwickler und baue eigene Apps und Projekte mit viel AI. Mit So
 
 Der Ausgangspunkt war das Kanalbanner Nachtstudio: ein Laptop auf einer Klippe unter dem Mond. Darin steckte schon die Bildwelt für die Website, mit warmem Buttergelb, dunklem Anthrazit, Aquarellpapier und gezeichneten Tintenlinien. Dazu kommt eine gemalte Chibi Version von mir, mit kurzen dunklen Haaren, Bartstoppeln und schwarzem Shirt.
 
-<aside class="pull-quote" aria-hidden="true">Für mich war das ein konkreter Hinweis, dass ein aufgeräumtes Layout allein noch keine passende Gestaltung ergibt.</aside>
-
 Die erste Runde mit HTML Entwürfen habe ich verworfen. Die Layouts waren ordentlich, aber sie hätten auch zu vielen anderen Websites passen können. Viel flaches Anthrazit, wenig von den gemalten Materialien, die Solo Stack ausmachen sollten. Für mich war das ein konkreter Hinweis, dass ein aufgeräumtes Layout allein noch keine passende Gestaltung ergibt.
+
+<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
 
 Danach entstanden gemalte Bildentwürfe für die einzelnen Abschnitte. Ich habe Favoriten ausgewählt und das Konzept besprochen, bevor neue Entwürfe entstanden. So bekam die Website eine gemeinsame Richtung, bevor die Umsetzung in einzelne Aufgaben zerlegt wurde.
 
@@ -63,7 +63,7 @@ Auch die Bilder mussten für die Umsetzung vorbereitet werden. Ein flaches Bild 
 
 Die Git Historie enthält 67 Commits einschließlich der Zusammenführungen der parallelen Branches. Sie sind auf den 1. November 2026 zwischen 01:27 und 08:09 Uhr datiert.
 
----
+<hr data-art="horizon" />
 
 ## Vom Mond bis zu den Spielen
 
@@ -79,15 +79,15 @@ Für 22:00 entstanden parallel drei Spielprototypen. Auf einem kleinen Mond mit 
 
 Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt. Die Nachtschicht um 01:00 musste neu gemalt werden, weil mein Maskottchen, der Stuhl, die Tastatur und die Maus nicht zusammenpassten. Jetzt sitzt die Figur mit Kopfhörern am Schreibtisch, während auf dem Monitor echte Commits aus meinem GitHub wie bei `git log` eingetippt werden.
 
-<aside class="pull-quote" aria-hidden="true">Das klingt klein, fällt an einer solchen Naht aber auf.</aside>
-
 Die tippenden Hände waren zunächst ein separates Bildstück. Auf dem Telefon verschoben sie sich um ungefähr einen halben Pixel gegenüber der Szene. Das klingt klein, fällt an einer solchen Naht aber auf. Inzwischen stecken Hände und Szene in derselben Bilddatei.
 
 Die deckend gemalten Bänder zwischen den Abschnitten zerschnitten die Seite in einzelne Stücke. Ich habe sie durch gemalten Nebel ersetzt, der über die Seite zieht und die Abschnitte ineinander übergehen lässt. Dazu kommen zwei Übergänge mit verwaschener Tinte. Von 20:00 bis 21:00 flutet nasse Tinte von unten über den Mond im Hero, während du scrollst. Von 04:00 bis 06:00 zieht sich die Nachttinte zurück und trocknet mit dem Sonnenaufgang.
 
+<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
+
 Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem buttergelben Papier dampft der Kaffee neben einem geschlossenen Laptop. Neben dem SOLO STACK Schriftzug siehst du ein Foto von mir, als wäre es mit anthrazitfarbener Tinte auf das Papier gedruckt. Danach kommen die Footer Links.
 
----
+<hr data-art="radio" />
 
 ## Musik und Kino für die späten Stunden
 

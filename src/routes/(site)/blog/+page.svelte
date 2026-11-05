@@ -84,7 +84,7 @@
 		ground line that closes the header (phones: the art on top, the title in its sky). The filter words stand on that line.
 	-->
 	<header class="hill-header mx-auto max-w-6xl px-4 sm:px-6 lg:px-8" style:--ground={`url("${groundLine}")`}>
-		<div class="hill-art" style:--wide-fade={DRY_BRUSH_FADE_RIGHT}><ReadingHill sizes="(min-width: 48rem) min(58vw, 54rem), 118vw" /></div>
+		<div class="hill-art" style:--wide-fade={DRY_BRUSH_FADE_RIGHT}><ReadingHill sizes="(min-width: 48rem) min(58vw, 54rem), 100vw" /></div>
 		<div class="hill-copy">
 			<h1 class="giant font-display leading-[0.8] font-black tracking-wordmark">{m.blog_index_title()}</h1>
 			<div class="intro-block">
@@ -137,19 +137,24 @@
 	/* Header: the reading hill ----------------------------------------------------------------------------------- */
 
 	.hill-header {
-		--art-w: 118vw;
+		--art-w: 100vw;
+		/* the art's height (aspect 1672 / 941) */
+		--art-h: calc(var(--art-w) * 941 / 1672);
 		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	/* Phones: the art first, bleeding off the right edge; its empty sky (top left) holds the title */
+	/*
+	 * Phones: the art first, as wide as the screen and anchored to its right edge; its empty sky (the left 45 %, the top
+	 * 15 %) holds the title. The empty top tucks under the nav; the hill's foot breaks up in dry brush just above the intro.
+	 */
 	.hill-art {
 		grid-area: 1 / 1;
+		justify-self: end;
 		width: var(--art-w);
 		max-width: none;
-		/* right edge flush with the viewport, the transparent top tenth tucked under the nav */
-		margin: calc(var(--art-w) * -0.05) 0 0 calc(100% - var(--art-w) + 1rem);
+		margin: calc(var(--art-h) * -0.19) calc((100vw - 100%) / -2) 0 0;
 		pointer-events: none;
 	}
 
@@ -162,11 +167,11 @@
 		align-self: end;
 		position: relative;
 		z-index: 1;
-		/* sits in the sky left of the crown, above the hill's slope */
-		margin-bottom: calc(var(--art-w) * 0.2);
-		font-size: clamp(4.5rem, 21vw, 5.5rem);
-		/* Ink on paper; lit from behind at night */
-		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
+		/* sits in the sky left of the tree, its foot level with the hill's toe (which the dry brush dissolves) */
+		margin-bottom: calc(var(--art-h) * 0.12);
+		font-size: clamp(4.25rem, 20vw, 5.25rem);
+		/* Ink on paper, warming to burnt umber at the foot (no olive); lit from behind at night */
+		background: linear-gradient(180deg in oklab, var(--foreground) 50%, #8a5a12);
 		background-clip: text;
 		color: transparent;
 		/* room for the g's descender inside the clipped background */
@@ -183,13 +188,12 @@
 	.intro-block {
 		position: relative;
 		z-index: 1;
-		margin-top: 0.75rem;
 	}
 
 	.intro {
 		max-width: 34rem;
 		font-size: clamp(1.0625rem, 1.4vw, 1.1875rem);
-		line-height: 1.6;
+		line-height: 1.55;
 	}
 
 	/* The ground line the hill stands on (and the filter words, when there are enough posts) */
@@ -197,7 +201,7 @@
 		position: relative;
 		z-index: 1;
 		min-height: 1px;
-		margin-top: 1.75rem;
+		margin-top: 1rem;
 	}
 
 	.ground::after {
@@ -232,6 +236,7 @@
 			position: absolute;
 			right: calc(var(--bleed) * -1);
 			bottom: 0;
+			width: var(--art-w);
 			margin: 0;
 			/* the dry brush foot dips just over the line */
 			translate: 0 7%;
@@ -347,7 +352,7 @@
 	}
 
 	.posts > .is-featured {
-		padding-block: clamp(2rem, 4.5vw, 3.25rem) clamp(2.5rem, 5vw, 4rem);
+		padding-block: clamp(1.25rem, 4.5vw, 3.25rem) clamp(2.5rem, 5vw, 4rem);
 	}
 
 	.posts > .is-row {
