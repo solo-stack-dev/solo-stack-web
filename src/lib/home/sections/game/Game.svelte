@@ -62,6 +62,13 @@
 		reveal(id);
 	}
 
+	/** Phones: which ends of the scrolling tab row still hide tabs (drives the edge fades where scroll timelines are missing). */
+	function onTabsScroll(event: Event) {
+		const row = event.currentTarget as HTMLElement;
+		row.toggleAttribute('data-scrolled', row.scrollLeft > 2);
+		row.toggleAttribute('data-at-end', row.scrollLeft + row.clientWidth >= row.scrollWidth - 2);
+	}
+
 	/** Phones: the tab row scrolls; keep the selected tab in view. */
 	function reveal(id: CandidateId) {
 		document.getElementById(`game-tab-${id}`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
@@ -74,7 +81,7 @@
 	<div class="content">
 		<!-- Tabs in the page-wide selection idiom (label + hand-drawn underline): a row on the gutter under the heading, or a list in the
 		     game column beside the frame -->
-		<div class="tabs label" role="tablist" aria-label={m.home_game_tabs_label()} aria-orientation={columns.current ? 'vertical' : 'horizontal'}>
+		<div class="tabs label" role="tablist" aria-label={m.home_game_tabs_label()} aria-orientation={columns.current ? 'vertical' : 'horizontal'} onscroll={onTabsScroll}>
 			{#each CANDIDATE_IDS as id (id)}
 				<button
 					type="button"
@@ -284,18 +291,18 @@
 		}
 	}
 
-	/* Phones: still one row, scrolling sideways under a soft fade at the open edge(s); the row runs to the screen edge. The fade is a
-	   wide eased ramp (about one tab word), so a tab running off the edge dissolves instead of being cut; the scroll padding lets the
-	   last tab leave the ramp completely. */
+	/* Phones: still one row, scrolling sideways under a fade at the open edge(s); the row runs to the screen edge. The fade is a
+	   wide ramp (about one tab word) that is fully clear a little before the edge, so a tab running off the edge visibly dissolves
+	   instead of reading as cut; it lifts once the row is scrolled to its end. The scroll padding lets the last tab leave it. */
 	@media (max-width: 40rem) {
 		.tabs {
 			--fade-start: 0rem;
-			--fade-end: 6rem;
+			--fade-end: 7rem;
 			margin-right: calc(var(--page-gutter) * -1);
 			padding-right: calc(var(--page-gutter) + 3rem);
 			overflow-x: auto;
 			overscroll-behavior-x: contain;
-			scroll-padding-inline: 3rem 6rem;
+			scroll-padding-inline: 3rem 7rem;
 			scrollbar-width: none;
 			mask-image: linear-gradient(
 				to right,
@@ -303,9 +310,22 @@
 				color-mix(in oklab, #000 45%, transparent) calc(var(--fade-start) * 0.45),
 				#000 var(--fade-start),
 				#000 calc(100% - var(--fade-end)),
-				color-mix(in oklab, #000 45%, transparent) calc(100% - var(--fade-end) * 0.45),
-				transparent
+				color-mix(in oklab, #000 50%, transparent) calc(100% - var(--fade-end) * 0.6),
+				color-mix(in oklab, #000 12%, transparent) calc(100% - var(--fade-end) * 0.3),
+				transparent calc(100% - var(--fade-end) * 0.12)
 			);
+			transition:
+				--fade-start var(--dur-state) ease,
+				--fade-end var(--dur-state) ease;
+		}
+
+		/* Without scroll timelines: the scroll handler's flags move the fades */
+		.tabs:global([data-scrolled]) {
+			--fade-start: 4rem;
+		}
+
+		.tabs:global([data-at-end]) {
+			--fade-end: 0rem;
 		}
 
 		.tabs::-webkit-scrollbar {
@@ -329,19 +349,19 @@
 	@property --fade-end {
 		syntax: '<length>';
 		inherits: false;
-		initial-value: 6rem;
+		initial-value: 7rem;
 	}
 
 	/* The fade moves to the side that still has tabs to reveal */
 	@keyframes tab-fades {
 		0% {
 			--fade-start: 0rem;
-			--fade-end: 6rem;
+			--fade-end: 7rem;
 		}
 		15%,
 		85% {
 			--fade-start: 4rem;
-			--fade-end: 6rem;
+			--fade-end: 7rem;
 		}
 		100% {
 			--fade-start: 4rem;

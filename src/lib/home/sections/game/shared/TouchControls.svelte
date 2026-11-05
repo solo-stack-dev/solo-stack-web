@@ -61,7 +61,8 @@
 		display: none;
 		justify-content: flex-start;
 		gap: 0.75rem;
-		padding: 0.75rem;
+		/* clear of the frame's torn edge */
+		padding: 1rem;
 		pointer-events: none;
 		user-select: none;
 		-webkit-user-select: none;

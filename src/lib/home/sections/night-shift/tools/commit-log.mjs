@@ -1,13 +1,15 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
 // Bakes the monitor's fallback log: the latest real commit subjects of this repository (`git log`, merges skipped) into
 // ../fallback-log.ts. NightShift shows them when the build's GitHub fetch comes back empty (rate limit, network), so the painted
-// monitor never shows an error. Live data only: subjects are copied verbatim, nothing is written by hand.
+// monitor never shows an error. Live data only: subjects are copied verbatim, nothing is written by hand. Housekeeping subjects
+// (merges, critiques, screenshots, scores, parentheses) are skipped by `isPublicSubject` (../log-filter.ts), the same rule the page applies.
 //
 // Run before a release build (or whenever the log should move on):
 //   node src/lib/home/sections/night-shift/tools/commit-log.mjs && pnpm exec oxfmt src/lib/home/sections/night-shift/fallback-log.ts
 import { execFileSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { isPublicSubject } from '../log-filter.ts';
 
 /** Same count as the live feed (GITHUB_COMMIT_LIMIT): two monitor pages. */
 const COUNT = 12;
@@ -15,7 +17,9 @@ const REPO = 'solo-stack-web';
 const OWNER = 'solo-stack-dev';
 
 const SEP = '\u001f';
-const raw = execFileSync('git', ['log', '--no-merges', `-n${COUNT}`, `--format=%H${SEP}%cI${SEP}%s`], { encoding: 'utf8' });
+/** How far back to look for COUNT public subjects. */
+const SCAN = 400;
+const raw = execFileSync('git', ['log', '--no-merges', `-n${SCAN}`, `--format=%H${SEP}%cI${SEP}%s`], { encoding: 'utf8' });
 const commits = raw
 	.trim()
 	.split('\n')
@@ -23,7 +27,9 @@ const commits = raw
 	.map((line) => {
 		const [sha, date, message] = line.split(SEP);
 		return { hash: sha.slice(0, 7), message: message.trim(), repo: REPO, date, url: `https://github.com/${OWNER}/${REPO}/commit/${sha}` };
-	});
+	})
+	.filter((commit) => isPublicSubject(commit.message))
+	.slice(0, COUNT);
 
 const out = fileURLToPath(new URL('../fallback-log.ts', import.meta.url));
 writeFileSync(

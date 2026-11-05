@@ -1,8 +1,8 @@
 <!--
 	@component
 	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): painted radio with one preset key per platform (real logos), a
-	dial that snaps to stations, a display strip (handle + follow link, live content), a song per station (`track/`),
-	and the printed frequency chart with every link (accessible, no-JS fallback).
+	dial that snaps to stations, a display strip (tuned station name + handle, follow disc), a song per station (`track/`),
+	and a visually hidden list of every link (StationList: accessible, no-JS fallback; no printed card).
 
 	- Audio never autoplays. Tuning (key, dial release, keyboard step) is the gesture that calls `audio.unlock()` and
 	  starts the song. `sound.ts` is a lazy chunk, prefetched near the viewport. One `<audio preload="none">` plays the
@@ -11,7 +11,7 @@
 	  station stops the song; the strip's play button pauses/resumes.
 	- `--radio-pulse` (0…1, smoothed RMS) on the root drives the local stars. Never written when idle, paused or
 	  under reduced motion.
-	- Reduced motion: needle and knob jump, no pulse, static waveform frame, chart always visible.
+	- Reduced motion: needle and knob jump, no pulse, static waveform frame.
 	- Waveform RafLoop and local StarField run only while on screen and the tab is visible.
 -->
 <script lang="ts">
@@ -21,7 +21,7 @@
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import BrandIconSprite from './BrandIconSprite.svelte';
-	import FrequencyChart from './FrequencyChart.svelte';
+	import StationList from './StationList.svelte';
 	import RadioSet from './RadioSet.svelte';
 	import Waveform from './Waveform.svelte';
 	import { LANDSCAPE, RADIO_LAYOUT, WAVEFORM_BAND } from './layout.ts';
@@ -236,7 +236,7 @@
 			</div>
 		</div>
 
-		<FrequencyChart stations={STATIONS} active={selected?.id ?? null} class="chart" />
+		<StationList stations={STATIONS} />
 	</div>
 
 	<p class="sr-only" role="status">{selected ? m.home_radio_tuned_status({ name: selected.name }) : ''}</p>
@@ -270,17 +270,16 @@
 			<span class="strip-hint font-mono">{m.home_radio_strip_idle()}</span>
 		</div>
 	{:else}
-		<div class="strip-row">
-			<span class="strip-handle font-mono">{station.handle ?? station.name}</span>
-			<span class="strip-freq font-mono" aria-hidden="true">{station.frequency}</span>
-		</div>
-		<div class="strip-row strip-sub">
-			<a class="strip-button strip-follow" href={station.url} rel="me noopener" target="_blank">
-				<span class="strip-button-text">{m.home_radio_follow_label({ platform: station.name })}</span>
-				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
-				<span class="sr-only">{m.home_radio_opens_new_tab()}</span>
-			</a>
-		</div>
+		<!-- The tuned station on the lower display: name · handle, and the follow disc (primary action idiom) -->
+		<p class="strip-station">
+			<span class="strip-name">{station.name}</span>
+			{#if station.handle}<span class="strip-dot" aria-hidden="true">·</span>
+				<span class="strip-handle font-mono">{station.handle}</span>{/if}
+		</p>
+		<a class="strip-follow" href={station.url} rel="me noopener" target="_blank">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg>
+			<span class="sr-only">{m.home_radio_follow_label({ platform: station.name })} {m.home_radio_opens_new_tab()}</span>
+		</a>
 	{/if}
 {/snippet}
 
@@ -326,13 +325,14 @@
 		isolation: isolate;
 		container-type: inline-size;
 		overflow: clip;
-		min-height: 100svh;
-		padding: var(--heading-top) var(--page-gutter) clamp(3rem, 8vh, 5rem);
+		/* The section ends just under the rock's edge on every width (no printed card below any more, so no forced full screen of
+		   dark night before the cinema); its own feather is short, so it never touches the radio. */
+		padding: var(--heading-top) var(--page-gutter) calc(var(--ground) + 0.5rem);
 		/* soft painted section edges so the clipped plate never ends in a straight line (NightPage [data-feather]) */
 		--feather-top: clamp(1.5rem, 3vw, 3rem);
-		--feather-bottom: clamp(4rem, 9vw, 8rem);
+		--feather-bottom: calc(var(--ground) * 0.5);
 		/* Pulled up under the desk's dissolving bottom edge: 02:00 follows the night shift without a dead band of black. The
-		   overlap holds only the heading's top padding (the top feather stays short, above the clock); only the scene (radio, chart) takes pointer events. */
+		   overlap holds only the heading's top padding (the top feather stays short, above the clock); only the scene (radio, station list) takes pointer events. */
 		--radio-overlap: clamp(4rem, 9.5vw, 9rem);
 		margin-top: calc(var(--radio-overlap) * -1);
 		pointer-events: none;
@@ -423,38 +423,18 @@
 		display: none;
 	}
 
-	/* Station strip contents: one row in the wide radio's long window, two rows in the tall radio's */
+	/* Station strip: idle = dashes + hint; tuned = "Name · handle" (truncates) and the follow disc at the right, one row on both radios */
 	.strip-body {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 0.9rem;
+		gap: 0.5rem;
 		min-width: 0;
 	}
 
-	/* The handle (or station name) keeps its width up to 55 %; the button or line takes the rest and truncates */
-	.strip-wide > :first-child {
-		flex: 0 0 auto;
-		max-width: 55%;
-	}
-
-	/* Wide radio: the glass right above already names the handle; the strip keeps the frequency and a follow button that fits whole */
-	.strip-wide .strip-handle {
-		display: none;
-	}
-
-	.strip-wide .strip-freq {
-		font-size: 0.85rem;
-	}
-
-	.strip-wide > .strip-sub {
-		flex: 1 1 auto;
-	}
-
-	.strip-tall {
-		flex-direction: column;
-		align-items: stretch;
-		gap: 0.25rem;
+	/* the follow disc sits close to the window's right end, the text gets the room */
+	.strip-wide:not(.strip-idle) {
+		margin-right: -1.2cqw;
 	}
 
 	.strip-row {
@@ -472,29 +452,17 @@
 		color: color-mix(in oklab, var(--color-cream) 85%, transparent);
 	}
 
-	.strip-tall .strip-sub {
-		justify-content: flex-start;
-		font-size: 0.75rem;
+	.strip-wide > .strip-sub {
+		flex: 1 1 auto;
 	}
 
-	/* Idle (nothing tuned): one centered line on both radios; the tall strip has no room for two (it clipped the hint) */
+	/* Idle on the tall radio: one centered line (no room for two) */
 	.strip-tall.strip-idle {
-		flex-direction: row;
-		align-items: center;
 		justify-content: center;
 	}
 
 	.strip-tall.strip-idle .strip-dash-row {
 		display: none;
-	}
-
-	.strip-tall .strip-handle {
-		font-size: 0.85rem;
-	}
-
-	.strip-tall .strip-button {
-		padding: 0.25rem 0.55rem;
-		font-size: 0.75rem;
 	}
 
 	/* idle: cream, not butter (butter only once a station is tuned) */
@@ -512,58 +480,97 @@
 		padding-block: 0.1em;
 	}
 
-	.strip-handle {
+	.strip-station {
+		display: flex;
+		align-items: baseline;
+		gap: 0.35em;
 		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		margin: 0;
+		line-height: 1.2;
 		white-space: nowrap;
-		font-size: 1.05rem;
+		animation: tune-strip 0.45s ease-out;
+	}
+
+	.strip-name {
+		flex: none;
 		font-weight: 700;
+		font-size: 0.9rem;
 		color: var(--color-butter);
 		text-shadow: var(--glow-sm);
 	}
 
-	.strip-freq {
+	.strip-dot {
 		flex: none;
-		font-size: 0.75rem;
-		color: color-mix(in oklab, var(--color-butter) 85%, transparent);
+		color: color-mix(in oklab, var(--color-butter) 70%, transparent);
 	}
 
-	.strip-button-text {
+	.strip-handle {
 		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		font-size: 0.75rem;
+		color: color-mix(in oklab, var(--color-cream) 92%, transparent);
 	}
 
-	.strip-button {
-		flex: 0 1 auto;
-		min-width: 0;
-		white-space: nowrap;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		padding: 0.4rem 0.75rem;
-		border: 0;
+	/* Tall radio: the short strip stacks name over handle so the longest handle (Bluesky) keeps most of its text */
+	.strip-tall .strip-station {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.1rem;
+		line-height: 1.1;
+	}
+
+	.strip-tall .strip-dot {
+		display: none;
+	}
+
+	.strip-tall .strip-name {
+		font-size: 0.8rem;
+	}
+
+	.strip-tall .strip-handle {
+		max-width: 100%;
+	}
+
+	/* Follow: the butter disc (same idiom as play), 1.75rem = 28px target */
+	.strip-follow {
+		display: inline-grid;
+		flex: none;
+		place-items: center;
+		width: 1.75rem;
+		height: 1.75rem;
 		border-radius: 999px;
 		background: var(--color-butter);
 		color: var(--color-night);
-		font-weight: 800;
-		font-size: 0.8rem;
-		line-height: 1;
-		text-decoration: none;
 		box-shadow:
 			0 0 0 1.5px var(--color-ink),
 			var(--glow-sm);
-		cursor: pointer;
 	}
 
-	.strip-button:hover {
+	.strip-follow:hover {
 		background: var(--color-cream);
 	}
 
-	.strip-button svg {
+	.strip-follow:focus-visible {
+		outline: 2px solid var(--color-butter);
+		outline-offset: 2px;
+	}
+
+	.strip-follow svg {
 		width: 0.95rem;
 		height: 0.95rem;
+	}
+
+	@keyframes tune-strip {
+		from {
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.strip-station {
+			animation: none;
+		}
 	}
 
 	/* Song controls on the glass (snippet rendered by RadioSet) */
@@ -603,38 +610,13 @@
 		accent-color: var(--color-butter);
 	}
 
-	/* Desktop: chart beside the radio. The section ends just under the rock's edge (no forced full screen of dark night before the
-	   cinema); its own feather is short, so it never touches the radio. */
-	@media (min-width: 80rem) {
-		.radio {
-			min-height: 0;
-			padding-bottom: calc(var(--ground) + 0.5rem);
-			--feather-bottom: calc(var(--ground) * 0.5);
-		}
-
-		.scene {
-			grid-template-columns: auto minmax(16rem, 19rem);
-			justify-content: center;
-			column-gap: clamp(2rem, 4vw, 4rem);
-		}
-	}
-
 	@media (min-width: 40rem) and (max-width: 79.99rem) {
 		.radio {
 			--radio-w: min(56rem, 88cqw, calc((100svh - 18rem) / var(--aspect-wide)));
 		}
-
-		.scene :global(.chart) {
-			width: min(100%, 34rem);
-		}
-
-		.scene :global(.chart ul) {
-			grid-template-columns: 1fr 1fr;
-			column-gap: 1rem;
-		}
 	}
 
-	/* Phones: tall radio, tall plate, chart below */
+	/* Phones: tall radio, tall plate */
 	@media (max-width: 39.99rem) {
 		.radio {
 			--plate-aspect: calc(2340 / 1080);
@@ -645,6 +627,30 @@
 			--band: var(--band-tall);
 			--radio-w: min(calc(100cqw - 0.5rem), 25rem);
 			--stage-w: max(118cqw, calc(100svh / var(--plate-aspect)));
+			/* Pulled further under the desk's floor: half the flat black between the 01:00 tap hint and the 02:00 clock */
+			--radio-overlap: 7rem;
+		}
+
+		/* The idle waveform crosses the narrow plate almost flat: break it into uneven dry-brush segments and dim it, so the
+		   horizon glow is painted, not ruled */
+		.horizon {
+			opacity: 0.7;
+			mask-image: linear-gradient(
+				90deg,
+				transparent 4%,
+				#0008 11%,
+				#000 19%,
+				#0005 26%,
+				#000d 33%,
+				#0002 41%,
+				#0009 47%,
+				#000 57%,
+				#0004 64%,
+				#000a 71%,
+				#0003 80%,
+				#0008 87%,
+				transparent 95%
+			);
 		}
 
 		.head {
@@ -665,11 +671,6 @@
 
 		.stage :global(.plate-tall) {
 			display: block;
-		}
-
-		.scene :global(.chart) {
-			width: 100%;
-			rotate: -0.6deg;
 		}
 	}
 </style>

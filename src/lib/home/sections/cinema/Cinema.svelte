@@ -6,7 +6,8 @@
 	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
 	- No video (empty feed or offline build): the painted projection fills the screen (docs/art/site/round-2/cinema-projection.png);
 	  the message and the channel link sit centered on a soft ink scrim over its calm sky.
-	- The frame's outer bloom is halved in every state and the aperture has a thin bright inner edge: the screen, not the fire, leads.
+	- The frame's outer bloom is cut another third with a tighter falloff, except where the beam arrives
+	  (left edge on desktop, bottom edge on mobile); the aperture keeps a thin bright inner edge: the screen, not the fire, leads.
 	- Heading: left of the screen, level with its top, above the mascot (desktop); above the frame (mobile).
 	- The 06:00 dawn cloud bank (shared/DawnBank.svelte) rolls over the landscape's bottom: the cliff dissolves into it; cliff,
 	  mascot, beam, frame, screen and heading paint in front of it (z-index 3), the plate behind.
@@ -161,8 +162,8 @@
 					/>
 					<div class="empty-copy">
 						<p class="empty-line">{m.home_cinema_empty()}</p>
-						<a class="link label" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
-							{m.home_cinema_channel_link()}<span class="arrow" aria-hidden="true"> →</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
+						<a class="link empty-link" href={YOUTUBE_CHANNEL_URL} target="_blank" rel="noopener">
+							{m.home_cinema_channel_link()}<span class="arrow" aria-hidden="true">&thinsp;→</span><span class="sr-only"> ({m.home_cinema_new_tab()})</span>
 						</a>
 					</div>
 				</div>
@@ -506,10 +507,6 @@
 	   projector hotspot in the middle); the sentence and the channel link sit centered on a soft ink scrim over its calm sky. */
 	.empty {
 		position: relative;
-		display: grid;
-		place-content: center;
-		justify-items: center;
-		padding: 0 8% 14%;
 		background: var(--color-ink);
 	}
 
@@ -540,13 +537,28 @@
 		pointer-events: none;
 	}
 
+	/* The text block's center sits at 38 % of the screen's height, over the calm sky, clear of the hills */
 	.empty-copy {
-		position: relative;
+		position: absolute;
 		z-index: 2;
+		left: 50%;
+		top: 38%;
+		width: 84%;
+		translate: -50% -50%;
 		display: grid;
 		justify-items: center;
 		text-align: center;
 		gap: clamp(0.75rem, 1.4vw, 1.25rem);
+	}
+
+	/* Sentence case Geist Medium, like the other in-text actions ("Noch eine Nachricht schreiben"), not the mono label */
+	.empty-link {
+		font-family: var(--font-body);
+		font-size: 1rem;
+		font-weight: 500;
+		line-height: 1.3;
+		letter-spacing: normal;
+		text-transform: none;
 	}
 
 	/* Soft radial ink scrim behind the copy, no box */
@@ -585,29 +597,43 @@
 			inset 0 0 1.1rem color-mix(in oklab, var(--color-butter) 26%, transparent);
 	}
 
-	/* The frame's outer bloom at about half its painted strength: the halo beyond the burnt band fades out, the band itself is
-	   a little darker; full light stays at the aperture rim. */
+	/* The frame's outer bloom another third down (round 3: 12 % / 45 % → 8 % / 22 %) with a tighter falloff: the halo stays faint
+	   and the band only darkens close to the rim; full light stays at the aperture. Where the beam arrives
+	   (--spill-at: left edge on desktop, bottom edge on mobile) a soft spot adds the spill back, so the light reads as coming from
+	   the projector, not as an applied perimeter. Layers: spill ∪ (horizontal ∩ vertical). */
 	.frame {
+		--spill-at: 0% 64%;
+		--spill-size: 16% 48%;
 		mask:
+			radial-gradient(
+				ellipse var(--spill-size) at var(--spill-at),
+				color-mix(in oklab, #000 62%, transparent),
+				color-mix(in oklab, #000 26%, transparent) 55%,
+				transparent
+			),
 			linear-gradient(
 				to right,
-				color-mix(in oklab, #000 12%, transparent),
-				color-mix(in oklab, #000 45%, transparent) 3.5%,
+				color-mix(in oklab, #000 8%, transparent),
+				color-mix(in oklab, #000 22%, transparent) 2.5%,
+				color-mix(in oklab, #000 62%, transparent) 4.6%,
 				#000 6%,
 				#000 94%,
-				color-mix(in oklab, #000 45%, transparent) 96.5%,
-				color-mix(in oklab, #000 12%, transparent)
+				color-mix(in oklab, #000 62%, transparent) 95.4%,
+				color-mix(in oklab, #000 22%, transparent) 97.5%,
+				color-mix(in oklab, #000 8%, transparent)
 			),
 			linear-gradient(
 				to bottom,
-				color-mix(in oklab, #000 12%, transparent),
-				color-mix(in oklab, #000 45%, transparent) 5.5%,
+				color-mix(in oklab, #000 8%, transparent),
+				color-mix(in oklab, #000 22%, transparent) 4%,
+				color-mix(in oklab, #000 62%, transparent) 7.8%,
 				#000 10%,
 				#000 89%,
-				color-mix(in oklab, #000 45%, transparent) 95%,
-				color-mix(in oklab, #000 12%, transparent)
+				color-mix(in oklab, #000 62%, transparent) 91.6%,
+				color-mix(in oklab, #000 22%, transparent) 95.5%,
+				color-mix(in oklab, #000 8%, transparent)
 			);
-		mask-composite: intersect;
+		mask-composite: add, intersect;
 		filter: saturate(0.88) brightness(0.8);
 	}
 
@@ -679,6 +705,8 @@
 		.cinema {
 			/* sky above the portrait stage: clock and heading sit in it, above the frame */
 			min-height: max(100svh, calc(216.67vw + 6rem));
+			/* the radio ends on its rock now (no printed station card below it): rise further under the rock, no dead band */
+			--cinema-overlap: 6.5rem;
 			--stage-top: calc(100% - 100cqw * 2340 / 1080);
 			--night-clock-top: calc(var(--stage-top) + 100cqw * 2340 / 1080 * var(--frame-top-m) - 7.25rem);
 			--cliff-cut: var(--dawn-cliff-cut-m);
@@ -688,6 +716,12 @@
 		.heading {
 			width: auto;
 			right: var(--page-gutter);
+		}
+
+		/* the beam rises from the laptop below */
+		.frame {
+			--spill-at: 50% 100%;
+			--spill-size: 46% 22%;
 		}
 
 		.stage {

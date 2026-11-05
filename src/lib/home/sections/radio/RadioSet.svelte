@@ -114,7 +114,7 @@
 		<enhanced:img src={needleImage} alt="" class="fill" sizes="1rem" loading="lazy" />
 	</div>
 
-	<!-- Big station logo, name, handle, live content on the glass -->
+	<!-- Big station logo, name, song, live content on the glass (the handle is on the display strip below) -->
 	<div
 		class="glass"
 		style:left={pct(layout.glassContent).left}
@@ -128,7 +128,6 @@
 					<BrandIcon id={tuned.id} class="glass-logo" />
 					<div class="glass-text">
 						<p class="glass-name">{tuned.name}</p>
-						{#if tuned.handle}<p class="glass-handle font-mono">{tuned.handle}</p>{/if}
 						{#if tuned.track}
 							<div class={['glass-song', playing && tuned.id === selected?.id && 'on']}>
 								{@render song(tuned)}
@@ -381,12 +380,6 @@
 		text-shadow: 0 0 1.2cqw color-mix(in oklab, var(--color-butter) 60%, transparent);
 	}
 
-	.glass-handle {
-		margin: 0;
-		font-size: var(--small);
-		color: color-mix(in oklab, var(--color-butter) 85%, white);
-	}
-
 	/* Clickable over the dial */
 	.glass-song {
 		display: flex;
@@ -397,11 +390,6 @@
 		font-size: var(--small);
 		color: color-mix(in oklab, var(--color-cream) 90%, transparent);
 		pointer-events: auto;
-	}
-
-	/* Tall radio: the strip below already shows the handle; hide it so name, song and live content fit */
-	.set-tall .glass-text:has(.glass-song) .glass-handle {
-		display: none;
 	}
 
 	.glass-song-title {
