@@ -120,7 +120,7 @@
 
 <!-- Two stacks with identical stage geometry: the masked art below the section heading, the hotspots above it. -->
 <div class="scene" data-variant={variant} {onpointerdown} onpointerenter={want} role="presentation" style={stageVars}>
-	<div class="frame art" data-feather>
+	<div class="frame art">
 		<div class="stage" {@attach measure}>
 			<!-- 1 · opaque plate with the mascot painted in (complete static fallback: moonless window, hands at rest). The file
 			     also carries the typing-hands band below the scene, clipped here. -->
@@ -232,22 +232,41 @@
 		container-type: size;
 	}
 
+	/* Soft edges into the night. Top: the shared painted feather. Bottom: the desk dissolves in irregular pigment lobes, never along a
+	   line: two copies of the painted wash (different widths, offsets and depths, intersected) eat into the room by up to --dissolve,
+	   the shorter one fully clear well before the section's edge. The solid middle ends inside both washes' opaque top. Both washes put
+	   their deep opaque bay (at 58 % of the tile) under the handheld (--keep-x), so the hotspot object stays on the desk. */
 	.art {
 		z-index: 1;
-		/* soft edges into the night (NightPage [data-feather]); ~14 % of the section height */
 		--feather-top: min(14svh, 7.9vw);
-		--feather-bottom: min(16svh, 9vw);
+		--dissolve: min(28svh, 16vw);
+		--keep-x: 13.4vw;
+		mask-image: var(--feather-up), linear-gradient(#000 0 0), var(--wash-spread-down), var(--wash-spread-down);
+		mask-repeat: no-repeat, no-repeat, repeat-x, repeat-x;
+		mask-size:
+			100% var(--feather-top),
+			100% calc(100% - var(--feather-top) - var(--dissolve) * 0.86 + 2px),
+			calc(var(--dissolve) * 1.7) var(--dissolve),
+			calc(var(--dissolve) * 0.95) calc(var(--dissolve) * 0.78);
+		mask-position:
+			0 0,
+			0 calc(var(--feather-top) - 1px),
+			calc(var(--keep-x) - var(--dissolve) * 1.7 * 0.58) 100%,
+			calc(var(--keep-x) - var(--dissolve) * 0.95 * 0.58) calc(100% - var(--dissolve) * 0.1);
+		mask-composite: add, add, intersect, add;
 	}
 
 	@media (max-aspect-ratio: 4/5) {
 		.art {
 			--feather-top: min(9svh, 19.5vw);
-			--feather-bottom: min(10svh, 21.7vw);
+			/* shallow: the dumbbells (a hotspot) stand near the bottom of the portrait room */
+			--dissolve: min(13svh, 28vw);
+			--keep-x: 78vw;
 		}
 	}
 
-	/* Night-ink vignette inside the feathered mask, so the lit room sinks into darkness before dissolving into the sky
-	   instead of floating in it; the page's mist banks drift over the edges. */
+	/* Night-ink vignette inside the mask, so the lit room sinks into darkness before dissolving into the sky instead of floating in it;
+	   at the bottom the ink pools in painted lobes (the wash), so the desk's front edge never reads as a ruled line. */
 	.art::after {
 		content: '';
 		position: absolute;
@@ -258,7 +277,7 @@
 		pointer-events: none;
 		mask:
 			var(--feather-down) top / 100% 34% no-repeat,
-			var(--feather-up) bottom / 100% 30% no-repeat,
+			var(--wash-spread-up) 62% 100% / calc(var(--dissolve) * 1.5) calc(var(--dissolve) * 1.25) repeat-x,
 			radial-gradient(ellipse 70% 90% at 50% 50%, transparent 55%, #000 100%);
 	}
 

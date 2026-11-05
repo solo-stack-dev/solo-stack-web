@@ -31,6 +31,11 @@ export interface MakingLayout {
 	leaveDir: Point;
 	/** Exit curve handle lengths (at the shape, at the anchor) as fractions of the distance. */
 	exitHandles: [number, number];
+	/**
+	 * Optional waypoint of the exit curve: the line passes it heading `dir` (handle lengths at the shape/anchor side as fractions of each
+	 * leg). Portrait routes the line down the right margin, around the title and control group, into the laptop.
+	 */
+	via?: { point: Point; dir: Point; handles: [number, number] };
 	/** End of the line and the direction it arrives in. */
 	anchor: Point;
 	anchorDir: Point;
@@ -59,12 +64,13 @@ export const LAPTOP_SCREEN = {
 } as const satisfies Record<LayoutId, readonly [Point, Point, Point, Point]>;
 
 /**
- * Line end: left edge of the laptop screen, slightly above its middle, so the line plugs into the screen instead of crossing it.
- * Desktop arrives from the shape on the left, portrait from the shape above.
+ * Line end: an edge of the laptop screen, so the line plugs into the screen instead of crossing it. Desktop: the left edge, slightly above
+ * its middle, arriving from the shape on the left. Portrait: the right edge, arriving from the right margin (the line runs around the
+ * title and the control group under the drawing).
  */
 export const SCREEN_ANCHOR = {
 	desktop: { x: 2247, y: 972 },
-	mobile: { x: 885, y: 1758 }
+	mobile: { x: 963, y: 1762 }
 } as const satisfies Record<LayoutId, Point>;
 
 const norm = (x: number, y: number): Point => {
@@ -94,18 +100,21 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 	mobile: {
 		width: 1080,
 		height: 2340,
-		center: { x: 540, y: 950 },
-		scale: 0.82,
+		// drawing, title and control group sit high enough that the group clears the laptop on the cliff
+		center: { x: 540, y: 840 },
+		scale: 0.78,
 		entry: { x: 820, y: -40 },
 		entryDir: norm(-0.15, 1),
 		arriveDir: norm(1, 0.15),
 		entryHandles: [0.42, 0.22],
-		leaveDir: { x: 0, y: 0.25 },
-		exitHandles: [0.62, 0.38],
+		leaveDir: { x: 0.2, y: 0.1 },
+		exitHandles: [0.45, 0.5],
+		// down the right margin, clear of the title and the control group
+		via: { point: { x: 1004, y: 1420 }, dir: norm(0.02, 1), handles: [0.55, 0.5] },
 		anchor: SCREEN_ANCHOR.mobile,
-		anchorDir: norm(0.8, 1),
+		anchorDir: norm(-1, 0.3),
 		stroke: 8.5,
-		titleY: 1240,
+		titleY: 1110,
 		screen: LAPTOP_SCREEN.mobile
 	}
 };
@@ -169,19 +178,30 @@ export function composeLine(layoutId: LayoutId, state: MakingStateId): Float32Ar
 		true,
 		false
 	);
-	const outLength = Math.hypot(layout.anchor.x - end.x, layout.anchor.y - end.y);
 	// Leave along the shape's end tangent (over the last sample step, ~13 local units) so the line runs on without a kink.
 	const n = shape.length;
 	const leave = norm(shape[n - 2] - shape[n - 4] + layout.leaveDir.x, shape[n - 1] - shape[n - 3] + layout.leaveDir.y);
-	const exit = cubicPoints(
-		end,
-		{ x: end.x + leave.x * outLength * layout.exitHandles[0], y: end.y + leave.y * outLength * layout.exitHandles[0] },
-		{ x: layout.anchor.x - layout.anchorDir.x * outLength * layout.exitHandles[1], y: layout.anchor.y - layout.anchorDir.y * outLength * layout.exitHandles[1] },
-		layout.anchor,
-		EXIT_POINTS,
-		false,
-		true
-	);
+	/** One exit leg: from `from` heading `fromDir` to `to` arriving along `toDir`. */
+	const leg = (from: Point, fromDir: Point, to: Point, toDir: Point, [a, b]: [number, number], count: number, includeEnd: boolean) => {
+		const length = Math.hypot(to.x - from.x, to.y - from.y);
+		return cubicPoints(
+			from,
+			{ x: from.x + fromDir.x * length * a, y: from.y + fromDir.y * length * a },
+			{ x: to.x - toDir.x * length * b, y: to.y - toDir.y * length * b },
+			to,
+			count,
+			false,
+			includeEnd
+		);
+	};
+	const { via } = layout;
+	const exit = via
+		? [
+				// the waypoint itself is the last point of the first leg
+				...leg(end, leave, via.point, via.dir, [layout.exitHandles[0], via.handles[0]], EXIT_POINTS / 2, true),
+				...leg(via.point, via.dir, layout.anchor, layout.anchorDir, [via.handles[1], layout.exitHandles[1]], EXIT_POINTS / 2, true)
+			]
+		: leg(end, leave, layout.anchor, layout.anchorDir, layout.exitHandles, EXIT_POINTS, true);
 
 	const line = new Float32Array(LINE_POINTS * 2);
 	line.set(entry, 0);

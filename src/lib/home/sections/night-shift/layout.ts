@@ -34,8 +34,8 @@ export interface Spot {
 	tip?: Point;
 	/** Part of the tooltip on the anchor; `end` for right-edge spots so it opens leftwards. */
 	tipAlign?: 'start' | 'center' | 'end';
-	/** Tap marker ("tap to explore" ring) in % of `rect`. Default: center. */
-	dot?: Point;
+	/** Tap marker ("tap to explore" ring) in % of `rect`, or `null` for none. Default: center. */
+	dot?: Point | null;
 }
 
 export interface SceneLayout {
@@ -212,9 +212,11 @@ export const mobile: SceneLayout = {
 	props: { bonsai: place(M, PROPS.bonsai, BONSAI_TO_MOBILE), golden: place(M, PROPS.golden, BONSAI_TO_MOBILE), handheld: place(M, PROPS.handheld, HANDHELD_TO_MOBILE) },
 	sheet: sheetPct(SCENES.mobile),
 	hands: hands(SCENES.mobile),
+	// Tap rings stay ≥ 96 CSS px clear of the 01:00 heading box (top left, two lines): the window lies wholly under the heading, so it
+	// keeps its hit area and tooltip (opened below the heading) but no ring; the manga ring sits at the shelf's foot.
 	spots: [
-		{ id: 'window', rect: rectPct(M, 60, 20, 662, 700), tip: { x: 50, y: 50 } },
-		{ id: 'manga', rect: rectPct(M, 872, 300, 208, 514), tip: { x: 45, y: 10 }, tipAlign: 'end' },
+		{ id: 'window', rect: rectPct(M, 60, 20, 662, 700), tip: { x: 50, y: 86 }, dot: null },
+		{ id: 'manga', rect: rectPct(M, 872, 300, 208, 514), tip: { x: 45, y: 62 }, tipAlign: 'end', dot: { x: 50, y: 97 } },
 		{ id: 'coffee', rect: rectPct(M, 40, 1190, 140, 150), tipAlign: 'start' },
 		{ id: 'handheld', rect: rectPct(M, 90, 1340, 200, 120), tipAlign: 'start' },
 		{ id: 'bonsai', rect: rectPct(M, 900, 950, 180, 220), tip: { x: 45, y: 0 }, tipAlign: 'end' },
