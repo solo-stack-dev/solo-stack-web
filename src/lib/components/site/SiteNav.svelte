@@ -3,7 +3,7 @@
 	The site navbar: wordmark (home), top level links, `actions` snippet on the right.
 	- `variant="site"`: sticky blurred bar. The (site) layout passes theme toggle and phone menu as `actions`; links move into it below `sm`.
 	- `variant="night"` (homepage): fixed, no bar; cream ink with an opposite-ink halo to read over any art; current page gets
-	  `--ink-underline`. Sits on `--page-gutter` / `--nav-pad-y`. NightPage passes its menu button as `actions` and lists the site
+	  `--ink-underline`, and a soft scrim in the ink under it (off while the hero shows the giant wordmark). Sits on `--page-gutter` / `--nav-pad-y`. NightPage passes its menu button as `actions` and lists the site
 	  links in that overlay on phones, so the homepage has one header. `tone="paper"` = anthracite ink over the sunrise.
 	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown/sheet here: the homepage must not ship them.
 -->
@@ -36,7 +36,7 @@
 	$effect(restoreEclipseMoon);
 </script>
 
-<header bind:this={ref} class={['site-nav', `is-${variant}`]} data-tone={variant === 'night' ? tone : undefined}>
+<header bind:this={ref} class={['site-nav', `is-${variant}`, hideWordmark && 'is-bare']} data-tone={variant === 'night' ? tone : undefined}>
 	<div class="bar">
 		<a class={['wordmark', hideWordmark && 'is-hidden']} href={wordmarkHref ?? localizeHref('/')} aria-label={m.site_nav_wordmark_label()}>
 			<span class="moon" aria-hidden="true"></span>
@@ -218,6 +218,47 @@
 	.is-night[data-tone='paper'] {
 		color: var(--color-night);
 		--nav-halo: color-mix(in oklab, var(--color-butter) 80%, transparent);
+	}
+
+	/* Scrim: content scrolling under the bar dissolves into the sky (night ink) or the sunrise paper (butter), eased so it has no edge.
+	   Two layers crossfade with the tone. */
+	.is-night::before,
+	.is-night::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		z-index: -1;
+		height: 7rem;
+		pointer-events: none;
+		background: linear-gradient(
+			var(--scrim) 0% 40%,
+			color-mix(in oklab, var(--scrim) 58%, transparent) 64%,
+			color-mix(in oklab, var(--scrim) 20%, transparent) 84%,
+			transparent
+		);
+		transition: opacity var(--dur-state) ease;
+	}
+
+	.is-night::before {
+		--scrim: color-mix(in oklab, var(--color-night) 85%, transparent);
+	}
+
+	.is-night::after {
+		--scrim: color-mix(in oklab, var(--color-butter) 85%, transparent);
+		opacity: 0;
+	}
+
+	.is-night[data-tone='paper']::before,
+	.is-night.is-bare::after {
+		opacity: 0;
+	}
+
+	.is-night[data-tone='paper']::after {
+		opacity: 1;
+	}
+
+	.is-night.is-bare::before {
+		opacity: 0;
 	}
 
 	.is-night .bar {

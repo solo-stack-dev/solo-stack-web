@@ -91,9 +91,10 @@
 		width: 112%;
 		top: calc(var(--mist-height) * var(--mist-above) * -1);
 		height: var(--mist-height);
-		/* two soft gaps, intersected */
+		/* two soft gaps and a soft base (the painted strip's bottom is nearly flat), intersected */
 		mask-image:
-			radial-gradient(ellipse 20% 95% at var(--gap-a) 50%, transparent 15%, #000 100%), radial-gradient(ellipse 16% 95% at var(--gap-b) 55%, transparent 10%, #000 100%);
+			radial-gradient(ellipse 20% 95% at var(--gap-a) 50%, transparent 15%, #000 100%), radial-gradient(ellipse 16% 95% at var(--gap-b) 55%, transparent 10%, #000 100%),
+			linear-gradient(#000 50%, color-mix(in oklab, #000 45%, transparent) 72%, transparent 96%);
 		mask-composite: intersect;
 		overflow: clip;
 	}
@@ -103,6 +104,11 @@
 		width: 100%;
 		height: 100%;
 		translate: calc(var(--mist-offset) * -1) 0;
+	}
+
+	/* enhanced:img renders a <picture>: let its <img> be the flex item, or the tile shrinks to its intrinsic width */
+	.tiles :global(picture) {
+		display: contents;
 	}
 
 	.strip :global(img) {
