@@ -1,16 +1,12 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Builds the 21:00 section's optimized layers from the painted masters in docs/art/making:
-//
-// - plates (2560×1440 desktop, 1080×2340 portrait masters): high quality WebP at their native generation size
-//   (1672×941, 852×1846; the masters are bilinear upscales without extra detail). enhanced-img makes the
-//   responsive AVIF/WebP at build time. The scene keeps working in master plate pixels (morph.ts).
-// - blooms (1400² masters): cropped to their alpha bounding box (offsets printed below; the crop only drops the
-//   empty margin, every bloom keeps ≥ 97 % of its canvas) and downscaled to 900 px, which covers the largest
-//   rendered bloom box (~430 CSS px desktop) at 2×. The crop makes the wash fill the mask box slightly fuller,
-//   which the art notes ask for ("size it slightly beyond its SVG mask").
+// Builds the 21:00 layers from the masters in docs/art/making:
+// - plates (2560×1440 desktop, 1080×2340 portrait masters): WebP at native generation size (1672×941, 852×1846; the masters are bilinear
+//   upscales). enhanced-img makes the responsive AVIF/WebP. The scene stays in master plate px (morph.ts).
+// - blooms (1400² masters): cropped to the alpha box (only empty margin, each keeps ≥ 97 % of its canvas), downscaled to 900 px = the
+//   largest bloom box (~430 CSS px desktop) at 2×. The crop fills the mask box slightly fuller, as the art notes ask.
 //
 // Run: node src/lib/home/sections/making/tools/build-assets.mjs
-// Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
+// `sharp` comes from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 

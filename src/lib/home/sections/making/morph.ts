@@ -1,7 +1,6 @@
 /**
- * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates), the scroll timeline, and the one continuous
- * line (entry → current shape → exit to the laptop screen) interpolated between the six precomputed shapes from paths.ts.
- * Pure functions plus small caches; no DOM. See docs/HANDOFF-HOMEPAGE.md §5.2.
+ * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates), scroll timeline, and the one continuous line (entry → shape →
+ * exit to the laptop screen) interpolated between the six shapes in paths.ts. Pure functions plus small caches; no DOM. HANDOFF-HOMEPAGE §5.2.
  */
 import { SHAPES, SHAPE_MASKS, SHAPE_POINTS, STATE_IDS, type MakingStateId } from './paths.ts';
 
@@ -24,8 +23,7 @@ export interface MakingLayout {
 	/** Start of the line (just off the plate edge) and the direction it travels from there. */
 	entry: Point;
 	entryDir: Point;
-	/** Direction the line travels when it reaches the shape's first point, and how far the entry curve swings out
-	 * (Bézier handle lengths at the entry point and at the shape, as fractions of the distance). */
+	/** Direction at the shape's first point; entry Bézier handle lengths (at entry, at shape) as fractions of the distance. */
 	arriveDir: Point;
 	entryHandles: [number, number];
 	/** Bias added to the shape's own end tangent when the line leaves it (0,0 = follow the shape exactly). */
@@ -43,10 +41,7 @@ export interface MakingLayout {
 	screen: readonly [Point, Point, Point, Point];
 }
 
-/**
- * The blank laptop screen on the cliff of the final plates (docs/art/making, 2560×1440 and 1080×2340), inner edge
- * of the bezel in plate pixels, clockwise from the top left. Measured on zoomed crops of the masters.
- */
+/** Blank laptop screen on the plates (docs/art/making): inner bezel edge in plate px, clockwise from top left, measured on zoomed master crops. */
 export const LAPTOP_SCREEN = {
 	desktop: [
 		{ x: 2260, y: 938 },
@@ -63,9 +58,8 @@ export const LAPTOP_SCREEN = {
 } as const satisfies Record<'desktop' | 'mobile', readonly [Point, Point, Point, Point]>;
 
 /**
- * Where the line ends: on the left edge of the laptop screen, a little above its middle, so the line plugs into the
- * screen (which then lights up) instead of crossing it. Desktop arrives from the shape on the left, portrait comes
- * down from the shape above.
+ * Line end: left edge of the laptop screen, slightly above its middle, so the line plugs into the screen instead of crossing it.
+ * Desktop arrives from the shape on the left, portrait from the shape above.
  */
 export const SCREEN_ANCHOR = {
 	desktop: { x: 2247, y: 972 },
@@ -143,7 +137,7 @@ const ENTRY_POINTS = 32;
 const EXIT_POINTS = 40;
 export const LINE_POINTS = ENTRY_POINTS + SHAPE_POINTS + EXIT_POINTS;
 
-/** Cubic Bézier from p0 to p3, resampled to `count` points evenly spaced by arc length (t ∈ [from, to]). */
+/** Cubic Bézier p0 → p3 resampled to `count` points evenly spaced by arc length; endpoints included on request. */
 function cubicPoints(p0: Point, p1: Point, p2: Point, p3: Point, count: number, includeStart: boolean, includeEnd: boolean): number[] {
 	const DENSE = 160;
 	const dense: Point[] = [];
@@ -198,9 +192,8 @@ export function composeLine(layoutId: LayoutId, state: MakingStateId): Float32Ar
 		false
 	);
 	const outLength = Math.hypot(layout.anchor.x - end.x, layout.anchor.y - end.y);
-	// leave along the shape's own end tangent so the line runs on without a kink
+	// Leave along the shape's end tangent (over the last sample step, ~13 local units) so the line runs on without a kink.
 	const n = shape.length;
-	// (over the last sample step: ~13 local units, the same distance as two steps at the former 360 points)
 	const leave = norm(shape[n - 2] - shape[n - 4] + layout.leaveDir.x, shape[n - 1] - shape[n - 3] + layout.leaveDir.y);
 	const exit = cubicPoints(
 		end,
@@ -262,8 +255,8 @@ export function lineAt(layoutId: LayoutId, s: number): string {
 }
 
 /**
- * Scroll timeline: pinned progress (0…1) where each state is held. Anchors from the round-2 motion spec
- * (docs/mockups/round-2/03-what-i-make/README.md), each with a hold window so the shape rests and the bloom can grow.
+ * Pinned progress (0…1) of each state (motion spec: docs/mockups/round-2/03-what-i-make/README.md). Each is held for a window so the
+ * shape rests and the bloom can grow.
  */
 export const STATE_STOPS = [0, 0.18, 0.38, 0.58, 0.78, 1] as const;
 const HOLD = 0.045;

@@ -1,8 +1,7 @@
 <!--
 	@component
-	The Threlte moon (lazy chunk, loaded by Hero.svelte only after hydration + idle, with WebGL, motion allowed,
-	and not on narrow or low-end devices). Fills its parent, which has exactly the size of the moon circle.
-	Rendering is driven by a RafLoop at 30 fps that stops off screen, in hidden tabs, and when unmounted.
+	Threlte moon, a lazy chunk: Hero.svelte loads it after hydration + idle, only with WebGL, motion allowed, and not on narrow or low-end
+	devices. Fills its parent (= the moon circle). Rendering: 30 fps RafLoop in MoonBody.svelte.
 -->
 <script lang="ts">
 	import { Canvas } from '@threlte/core';
