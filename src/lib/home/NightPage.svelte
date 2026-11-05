@@ -275,7 +275,14 @@
 
 	<SiteNav variant="night" bind:ref={header} tone={navOnPaper ? 'paper' : 'night'} hideWordmark={heroCovers} wordmarkHref="#hero">
 		{#snippet actions()}
-			<button type="button" class="menu-button" aria-haspopup="dialog" aria-expanded={menuOpen} aria-label={m.home_nav_menu_open()} onclick={openMenu}>
+			<button
+				type="button"
+				class={['menu-button swash-focus', menuOpen && 'is-open']}
+				aria-haspopup="dialog"
+				aria-expanded={menuOpen}
+				aria-label={m.home_nav_menu_open()}
+				onclick={openMenu}
+			>
 				<span class="menu-icon" aria-hidden="true"></span>
 			</button>
 		{/snippet}
@@ -283,7 +290,7 @@
 
 	<dialog bind:this={menu} class="menu" aria-label={m.home_nav_menu_title()} onclose={() => (menuOpen = false)}>
 		<div class="menu-inner">
-			<button type="button" class="menu-close" aria-label={m.home_nav_menu_close()} onclick={closeMenu}>
+			<button type="button" class="menu-close swash-focus" aria-label={m.home_nav_menu_close()} onclick={closeMenu}>
 				<span class="close-icon" aria-hidden="true"></span>
 			</button>
 			<nav aria-label={m.home_nav_menu_title()}>
@@ -292,7 +299,7 @@
 						<li>
 							<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
 								<span class="label-sm text-cream/60">{hour.time}</span>
-								<span class="font-display text-2xl font-black tracking-wordmark md:text-4xl">{labels[hour.id]()}</span>
+								<span class="title font-display text-2xl font-black tracking-wordmark md:text-4xl">{labels[hour.id]()}</span>
 							</a>
 						</li>
 					{/each}
@@ -302,7 +309,7 @@
 			<nav class="menu-site" aria-label={m.site_nav_label()}>
 				<ul>
 					{#each SITE_LINKS as link (link.id)}
-						<li><a class="label" href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
+						<li><a class="swash-focus label" href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
 					{/each}
 				</ul>
 			</nav>
@@ -448,6 +455,12 @@
 		color: var(--color-butter);
 	}
 
+	/* While the overlay is open its close button stands in this place: the trigger steps back (opacity, not visibility, so
+	   the dialog can hand focus back to it on close) */
+	.menu-button.is-open {
+		opacity: 0;
+	}
+
 	:global(.site-nav[data-tone='paper']) .menu-button:hover {
 		color: inherit;
 		opacity: 0.7;
@@ -508,8 +521,14 @@
 		margin: 0;
 		padding: 0;
 		border: 0;
-		background: color-mix(in oklab, var(--color-ink) 94%, transparent);
+		/* Opaque night ink with a low dusk glow; the blur keeps any light that shows through from forming shapes */
+		background:
+			radial-gradient(110% 55% at 85% -10%, color-mix(in oklab, var(--color-dusk) 70%, transparent), transparent 70%),
+			color-mix(in oklab, var(--color-ink) 97%, transparent);
+		backdrop-filter: blur(1.25rem) saturate(0.7);
 		color: var(--color-cream);
+		--focus-ring: var(--color-butter);
+		--focus-halo: color-mix(in oklab, var(--color-butter) 55%, transparent);
 	}
 
 	.menu::backdrop {
@@ -540,6 +559,43 @@
 		display: flex;
 		align-items: baseline;
 		gap: 1.25rem;
+		width: fit-content;
+	}
+
+	/* Keyboard focus: the shell's swash under the hour's name and a soft light, not a box */
+	.menu-list a:focus-visible {
+		outline: none;
+		color: var(--color-butter);
+		filter: drop-shadow(0 0 0.45rem var(--focus-halo));
+	}
+
+	.menu-list .title {
+		position: relative;
+	}
+
+	.menu-list .title::after {
+		content: '';
+		position: absolute;
+		left: -0.05em;
+		right: -0.1em;
+		bottom: -0.15em;
+		height: 0.16em;
+		min-height: 0.3rem;
+		background: var(--focus-ring);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
+	}
+
+	.menu-list a:focus-visible .title::after {
+		scale: 1 1;
+	}
+
+	.menu-site a {
+		--swash-x: 0;
+		--swash-y: 0.35rem;
+		--swash-h: 0.3rem;
 	}
 
 	.menu-list a {

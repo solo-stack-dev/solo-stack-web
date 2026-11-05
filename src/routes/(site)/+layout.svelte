@@ -2,9 +2,12 @@
 	Shell for every page but the homepage. Keep it generic (no page data) so new pages just drop into src/routes/(site)/.
 	mode-watcher (default "system", stored in localStorage) sets `dark` on <html> before first paint. `data-site-surface`
 	lets layout.css switch the html background and color-scheme to the theme while mounted.
+	Paper grain: 5% fiber over the whole page; on article pages (long reading) only ~2%, with the full grain kept around the
+	hero art at the top and the footer horizon at the bottom (two local patches that fade into the page).
 -->
 <script lang="ts">
 	import { ModeWatcher } from 'mode-watcher';
+	import { page } from '$app/state';
 	import MobileMenu from '#lib/components/site/MobileMenu.svelte';
 	import SiteFooter from '#lib/components/site/SiteFooter.svelte';
 	import SiteNav from '#lib/components/site/SiteNav.svelte';
@@ -17,6 +20,9 @@
 	let { children }: LayoutProps = $props();
 
 	useViewTransitions();
+
+	/** Long reading: a calmer surface behind the text */
+	const reading = $derived(page.route.id === '/(site)/blog/[slug]');
 </script>
 
 <ModeWatcher defaultMode="system" themeColors={{ light: '#fdf9ee', dark: '#18191b' }} synchronousModeChanges />
@@ -43,5 +49,33 @@
 	<SiteFooter />
 
 	<!-- Faint watercolor paper grain -->
-	<PaperGrain opacity={0.05} />
+	<PaperGrain opacity={reading ? 0.02 : 0.05} />
+	{#if reading}
+		<div class="grain-patch is-top" aria-hidden="true"><PaperGrain fixed={false} opacity={0.03} /></div>
+		<div class="grain-patch is-bottom" aria-hidden="true"><PaperGrain fixed={false} opacity={0.03} /></div>
+	{/if}
 </div>
+
+<style>
+	.site-surface {
+		position: relative;
+	}
+
+	.grain-patch {
+		position: absolute;
+		inset-inline: 0;
+		pointer-events: none;
+	}
+
+	.is-top {
+		top: 0;
+		height: 52rem;
+		mask: linear-gradient(#000 45%, transparent);
+	}
+
+	.is-bottom {
+		bottom: 0;
+		height: 44rem;
+		mask: linear-gradient(transparent, #000 50%);
+	}
+</style>

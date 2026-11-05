@@ -37,7 +37,7 @@
 <dialog bind:this={dialog} class="site-menu" style:--ridge="url({ridgeMask})" aria-label={m.site_nav_menu_title()} onclose={() => (open = false)}>
 	<div class="sheet">
 		<div class="head content-frame">
-			<a class="wordmark" href={localizeHref('/')} aria-label={m.site_nav_wordmark_label()} onclick={close}>
+			<a class="wordmark swash-focus" href={localizeHref('/')} aria-label={m.site_nav_wordmark_label()} onclick={close}>
 				<span class="moon" aria-hidden="true"></span>
 				<span class="font-display font-black tracking-wordmark uppercase">SOLO STACK</span>
 			</a>
@@ -114,6 +114,8 @@
 
 	/* The navbar's wordmark, in place */
 	.wordmark {
+		--swash-x: 0;
+		--swash-y: 0.2rem;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.55rem;
@@ -186,8 +188,19 @@
 		color: var(--ink-lit);
 	}
 
+	/* Keyboard focus: the swash at full strength in the focus ink, heavier than the current page's, and a soft light */
 	.pages a:focus-visible {
-		outline-offset: 0.35rem;
+		outline: none;
+		box-shadow: none;
+		animation: none;
+		color: var(--ink-lit);
+		filter: drop-shadow(0 0 0.5rem var(--focus-halo));
+	}
+
+	.pages a:focus-visible::after {
+		scale: 1 1;
+		height: 0.26em;
+		background: var(--focus-ring);
 	}
 
 	/* The footer horizon as the floor: laptop cliff in view, the owl's tree gives way */

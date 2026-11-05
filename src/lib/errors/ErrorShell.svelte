@@ -65,12 +65,12 @@
 		<p class="body text-pretty">{body}</p>
 
 		<div class="actions">
-			<a class="action is-home" href={home}>
+			<a class="action is-home swash-focus" href={home}>
 				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4l8 7.2V20a1 1 0 0 1-1 1h-4.6v-5.6H9.6V21H5a1 1 0 0 1-1-1z" /></svg>
 				<span>{m.error_home_link()}</span>
 			</a>
 			{#if retry}
-				<button type="button" class="action is-retry" onclick={() => location.reload()}>
+				<button type="button" class="action is-retry swash-focus" onclick={() => location.reload()}>
 					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.05-4.95M19 4.5V8.2h-3.7" /></svg>
 					<span>{m.error_retry()}</span>
 				</button>
@@ -78,11 +78,11 @@
 		</div>
 
 		<nav class="sections" aria-labelledby="error-sections">
-			<h2 id="error-sections" class="font-mono text-xs tracking-clock uppercase">{m.error_sections_label()}</h2>
+			<h2 id="error-sections">{m.error_sections_label()}</h2>
 			<ul>
 				{#each NIGHT_HOURS as hour (hour.id)}
 					<li>
-						<a href="{home}#{hour.id}">
+						<a class="swash-focus" href="{home}#{hour.id}">
 							<span class="font-mono text-[0.7rem] tracking-clock tabular-nums" aria-hidden="true">{hour.time}</span>
 							<span>{sectionLabels[hour.id]()}</span>
 						</a>
@@ -97,6 +97,9 @@
 
 <style>
 	.error-page {
+		/* the shell's focus swash (`swash-focus`): butter on the ink */
+		--focus-ring: var(--color-butter);
+		--focus-halo: color-mix(in oklab, var(--color-butter) 55%, transparent);
 		position: relative;
 		isolation: isolate;
 		min-height: 100svh;
@@ -216,6 +219,17 @@
 			translate 160ms ease;
 	}
 
+	/* Focus: the swash inks in under the pill, which lifts like on hover */
+	.action {
+		--swash-x: 1.25rem;
+		--swash-y: -0.75rem;
+		--swash-h: 0.4rem;
+	}
+
+	.action:focus-visible {
+		translate: 0 -2px;
+	}
+
 	.action svg {
 		width: 1.25rem;
 		height: 1.25rem;
@@ -262,8 +276,11 @@
 		margin-top: 2.25rem;
 	}
 
+	/* A quiet heading in sentence case (as written), not a tracked caps eyebrow */
 	.sections h2 {
-		color: color-mix(in oklab, var(--color-cream) 55%, transparent);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: color-mix(in oklab, var(--color-cream) 66%, transparent);
 	}
 
 	.sections ul {
@@ -273,6 +290,9 @@
 	}
 
 	.sections a {
+		--swash-x: 0;
+		--swash-y: 0.05rem;
+		--swash-h: 0.3rem;
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.75rem;
@@ -291,6 +311,10 @@
 	.sections a:hover {
 		color: var(--color-butter);
 		text-decoration-color: currentColor;
+	}
+
+	.sections a:focus-visible {
+		color: var(--color-butter);
 	}
 
 	/* Layout per scene ----------------------------------------------------------------------------------------- */

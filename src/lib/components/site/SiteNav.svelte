@@ -120,6 +120,8 @@
 	 */
 	.site-nav {
 		--nav-mark: var(--color-butter);
+		--nav-focus: var(--color-butter);
+		--nav-focus-halo: color-mix(in oklab, var(--color-butter) 55%, transparent);
 		--nav-moon: var(--color-butter);
 		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 45%, transparent);
 		inset: 0 0 auto;
@@ -257,6 +259,52 @@
 		opacity: 0.45;
 	}
 
+	/*
+	 * Keyboard focus is drawn like the current page, not as a box: the swash inks in at full strength in the focus ink, a
+	 * little heavier than the current-page mark (so focus on the current link still shows), with a soft light around the
+	 * word. Same for the wordmark, under its name.
+	 */
+	.links a:focus-visible,
+	.wordmark:focus-visible {
+		outline: none;
+		box-shadow: none;
+		animation: none;
+		color: var(--nav-focus);
+		filter: drop-shadow(0 0 0.45rem var(--nav-focus-halo));
+	}
+
+	.links a:focus-visible::after {
+		scale: 1 1;
+		opacity: 1;
+		height: 0.55rem;
+		bottom: 0.2rem;
+		background: var(--nav-focus);
+	}
+
+	.wordmark {
+		position: relative;
+	}
+
+	.wordmark::after {
+		content: '';
+		position: absolute;
+		/* under the name, after the crescent */
+		left: 1.25em;
+		right: -0.1em;
+		bottom: 0.05rem;
+		height: 0.45rem;
+		background: var(--nav-focus);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		pointer-events: none;
+		transition: scale var(--dur-state) var(--ease-settle);
+	}
+
+	.wordmark:focus-visible::after {
+		scale: 1 1;
+	}
+
 	/* Icon flush with the edge (mirroring the wordmark) while the button keeps its 44px target */
 	.actions {
 		display: flex;
@@ -287,6 +335,8 @@
 
 	.is-site {
 		--nav-mark: var(--ink-lit);
+		--nav-focus: var(--focus-ring);
+		--nav-focus-halo: var(--focus-halo);
 		--nav-moon: #b07a12;
 		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 70%, transparent);
 		--scrim: var(--background);
@@ -301,6 +351,7 @@
 
 	:global(.dark) .is-site {
 		--nav-mark: var(--color-butter);
+		--nav-focus: var(--color-butter);
 		--nav-moon: var(--color-butter);
 		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 45%, transparent);
 	}
@@ -336,6 +387,9 @@
 		pointer-events: none;
 		/* Opposite-ink halo keeps it readable on any art */
 		--nav-halo: color-mix(in oklab, var(--color-ink) 70%, transparent);
+		/* the shell's focus swash (`swash-focus`) on the passed menu button */
+		--focus-ring: var(--color-butter);
+		--focus-halo: color-mix(in oklab, var(--color-butter) 55%, transparent);
 		--scrim-h: 9rem;
 		--scrim-solid: 55%;
 	}
@@ -343,6 +397,10 @@
 	.is-night[data-tone='paper'] {
 		color: var(--color-night);
 		--nav-mark: var(--color-night);
+		--nav-focus: var(--color-night);
+		--nav-focus-halo: color-mix(in oklab, var(--color-moonlight) 90%, transparent);
+		--focus-ring: var(--color-night);
+		--focus-halo: var(--nav-focus-halo);
 		--nav-moon: var(--color-night);
 		--nav-moon-glow: transparent;
 		--nav-halo: color-mix(in oklab, var(--color-butter) 80%, transparent);
@@ -375,6 +433,12 @@
 	.is-night .bar > * {
 		pointer-events: auto;
 		filter: drop-shadow(0 0 0.35rem var(--nav-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
+	}
+
+	/* Keeps the halo under the focus light */
+	.is-night .wordmark:focus-visible,
+	.is-night .links a:focus-visible {
+		filter: drop-shadow(0 0 0.45rem var(--nav-focus-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
 	}
 
 	/* Hidden while the hero shows the giant wordmark */
