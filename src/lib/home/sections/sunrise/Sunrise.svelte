@@ -1,7 +1,7 @@
 <!--
 	@component
 	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). The night retreats upward and reveals butter paper, a misty valley with the
-	rising sun, and coffee next to a closed laptop on the cliff path. Ink-printed owner photo, legal links, and socials sit on the paper.
+	rising sun, and coffee next to a closed laptop on the cliff path. The owner's duotone print (ochre and anthracite inks multiplied into the paper), legal links, and socials sit on the paper.
 
 	`--sunrise` (0 → 1): CSS `view()` timeline from the footer's top entering to the page end; without `animation-timeline` support
 	ScrollProgress writes it. Reduced motion: the registered initial value 1 (final state, static).
@@ -127,7 +127,7 @@
 
 	<div class="bar">
 		<div class="brand">
-			<enhanced:img class="portrait" src={portrait} alt={m.home_sunrise_portrait_alt()} sizes="7rem" loading="lazy" decoding="async" />
+			<enhanced:img class="portrait" src={portrait} alt={m.home_sunrise_portrait_alt()} sizes="9rem" loading="lazy" decoding="async" />
 			<p class="wordmark font-display font-black tracking-wordmark uppercase">SOLO STACK</p>
 		</div>
 		<nav class="legal" aria-label={m.home_sunrise_footer_label()}>
@@ -162,6 +162,7 @@
 
 	.sunrise {
 		position: relative;
+		container-type: inline-size;
 		min-height: 100svh;
 		display: flex;
 		flex-direction: column;
@@ -185,6 +186,15 @@
 		--night-clock-halo:
 			0 0 2px color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)),
 			0 0 8px color-mix(in oklab, color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)) 80%, transparent);
+	}
+
+	/* Landscape: 06:00 sits in the scene, just above the far ridge on the left (30 % down the bottom-anchored 16:9 stage), not alone
+	   at the top of the sky. Lower on the paper, so its ink switches earlier. */
+	@media (min-width: 48rem) {
+		.sunrise {
+			--night-clock-top: max(var(--clock-top), calc(100% - 100cqw * 9 / 16 * 0.7));
+			--clock-switch: 0.2;
+		}
 	}
 
 	@media (max-aspect-ratio: 1/1) {
@@ -212,12 +222,12 @@
 		}
 	}
 
-	/* Butter paper behind everything; matches the sky plates' bottom band and the banner. */
+	/* Butter paper behind everything; matches the sky plates' bottom band and the banner. Opaque from the start: fading it in over the
+	   dark sky mixed a khaki fog; the retreating night above it is the only crossfade, and that one is warm (below). */
 	.paper {
 		position: absolute;
 		inset: 0;
 		background: var(--color-butter);
-		opacity: clamp(0, var(--sunrise) * 1.6, 1);
 	}
 
 	/* Top fades into the paper; sinks as the night retreats so the baked sun rises behind the valley. */
@@ -384,7 +394,12 @@
 		width: 100%;
 		height: 48svh;
 		translate: 0 var(--night-travel);
-		background: var(--ink-fade);
+		/* Ink while opaque; through the drying ramp it warms to burnt ochre, so ink over butter passes through amber, never olive */
+		background: linear-gradient(
+			var(--ink-fade) calc(100% - var(--night-ramp)),
+			color-mix(in oklab, var(--color-ochre) 38%, var(--ink-fade)) calc(100% - var(--night-ramp) * 0.55),
+			color-mix(in oklab, var(--color-ochre) 78%, var(--ink-fade))
+		);
 		pointer-events: none;
 		mask-image: linear-gradient(#000 0 0), var(--wash-dry), var(--wash-spread-down);
 		mask-repeat: no-repeat, repeat-x, repeat-x;
@@ -442,7 +457,7 @@
 		padding: 2rem var(--page-gutter) var(--bottom-gutter);
 	}
 
-	/* Owner photo ink print (anthracite, alpha = density; build-assets.mjs `portrait`), multiplied onto the paper. */
+	/* Owner photo as a duotone print (ochre + anthracite, build-assets.mjs `portrait`), multiplied into the paper. */
 	.brand {
 		--wordmark-size: clamp(2rem, 3.4vw, 3.25rem);
 
@@ -451,12 +466,14 @@
 		gap: calc(var(--wordmark-size) * 0.3);
 	}
 
+	/* Bottom-aligned, outside the baseline group: the brand's (and so the bar's) baseline is the wordmark's alone, which the legal
+	   links share. The wash-edge tail of the bust hangs below the line, so the visible ink ends on that baseline. */
 	.portrait {
 		flex: none;
+		align-self: flex-end;
 		width: auto;
-		height: calc(var(--wordmark-size) * 2.1);
-		/* drops the feathered shoulder tail below the baseline, so the visible ink ends on the wordmark's baseline */
-		margin-bottom: calc(var(--wordmark-size) * -0.3);
+		height: calc(var(--wordmark-size) * 2.75);
+		margin-bottom: calc(var(--wordmark-size) * -0.42);
 		mix-blend-mode: multiply;
 		user-select: none;
 	}

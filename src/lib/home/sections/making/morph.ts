@@ -226,25 +226,25 @@ export function morphPoints(out: Float32Array, from: ArrayLike<number>, to: Arra
 	return out;
 }
 
-/** The four pillars of the bottom row (brand tagline terms, literal) and the states they cover. */
+/**
+ * The four brand pillars of the control row (AI, code, side projects, business: the hero tagline's order) and the states they cover.
+ * Their labels are messages (`home_making_pillar_<id>`) that name what happens there, so the row does not echo the tagline.
+ */
 export const PILLARS = [
-	{ label: 'AI', target: 1, states: [0, 1] },
-	{ label: 'CODE', target: 2, states: [2] },
-	{ label: 'SIDE PROJECTS', target: 3, states: [3] },
-	{ label: 'BUSINESS', target: 4, states: [4, 5] }
+	{ id: 'ai', target: 1, states: [0, 1] },
+	{ id: 'code', target: 2, states: [2] },
+	{ id: 'projects', target: 3, states: [3] },
+	{ id: 'business', target: 4, states: [4, 5] }
 ] as const;
 
 /** Local box of the bloom masks (shape units): the bloom image covers this square around the shape's origin. */
 export const BLOOM_BOX = 700;
 
-/** CSS `mask-image` for a state's bloom: the shape region as an SVG data URL with a soft edge. */
+/** CSS `mask-image` for a state's bloom: the shape region as an SVG data URL, crisp (the ink line runs on its edge; no blur). */
 export function bloomMask(state: MakingStateId): string {
 	const { d, stroke } = SHAPE_MASKS[state];
 	const half = BLOOM_BOX / 2;
 	const paint = stroke ? `fill='none' stroke='white' stroke-width='${stroke}' stroke-linecap='round' stroke-linejoin='round'` : `fill='white'`;
-	const svg =
-		`<svg xmlns='http://www.w3.org/2000/svg' viewBox='${-half} ${-half} ${BLOOM_BOX} ${BLOOM_BOX}'>` +
-		`<filter id='s' x='-10%' y='-10%' width='120%' height='120%'><feGaussianBlur stdDeviation='5'/></filter>` +
-		`<path d='${d}' ${paint} filter='url(%23s)'/></svg>`;
+	const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${-half} ${-half} ${BLOOM_BOX} ${BLOOM_BOX}'>` + `<path d='${d}' ${paint}/></svg>`;
 	return `url("data:image/svg+xml,${svg.replaceAll('<', '%3C').replaceAll('>', '%3E').replaceAll('"', "'")}")`;
 }

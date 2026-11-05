@@ -326,7 +326,7 @@
 
 	<div class="wordmark-layer">
 		<h1 id="home-hero-title" class="wordmark is-cream settle">{@render wordmarkText()}</h1>
-		<!-- The topics in the making pillars' style: the same row reappears as the 21:00 navigation -->
+		<!-- The brand tagline (the four pillars); 21:00 names them by what happens there, so the row is not echoed one screen later -->
 		<p class="tagline settle label">{m.home_hero_tagline()}</p>
 	</div>
 
@@ -338,15 +338,17 @@
 
 	<NightClock time="20:00" />
 
-	<a class="scroll-cue label" href="#making">
-		<span class="scroll-cue-label">{m.home_hero_scroll_cue()}</span>
-		<svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true">
-			<path d="M7 1v15M1.5 10.5 7 16l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-		</svg>
-	</a>
-
 	<p class="sr-only" aria-live="polite">{announcement}</p>
 </section>
+
+<!-- Outside the hero's stacking context (it isolates): the 21:00 wipe paints its first wash over the hero's bottom, which greyed the cue
+     out. As a positioned sibling with a positive z-index it stays on top, at the hero's bottom edge (the hero is the page's first block). -->
+<a class="scroll-cue label" href="#making">
+	<span class="scroll-cue-label">{m.home_hero_scroll_cue()}</span>
+	<svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true">
+		<path d="M7 1v15M1.5 10.5 7 16l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+	</svg>
+</a>
 
 <style>
 	/* Geometry ------------------------------------------------------------------------------------------------- */
@@ -771,13 +773,14 @@
 
 	/* Scroll cue --------------------------------------------------------------------------------------------- */
 
-	/* No chip: quiet label with ink halo, butter on hover (page-wide link idiom) */
+	/* No chip: quiet label with ink halo, butter on hover (page-wide link idiom). Positioned in the page (see markup) on the hero's bottom
+	   gutter: the hero is max(100svh, 36rem) tall and starts at the top of the main column. */
 	.scroll-cue {
 		position: absolute;
-		z-index: 7;
+		z-index: 3;
 		left: 50%;
-		bottom: var(--bottom-gutter);
-		translate: -50% 0;
+		top: max(100svh, 36rem);
+		translate: -50% calc(-100% - var(--bottom-gutter));
 		display: inline-flex;
 		align-items: center;
 		gap: 0.6rem;
@@ -796,8 +799,19 @@
 		color: var(--color-butter);
 	}
 
+	/* above the wash now, so it leaves with the tagline instead of being covered */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: scroll()) {
+			.scroll-cue {
+				animation: scroll-out linear both;
+				animation-timeline: scroll(root block);
+				animation-range: 0 18svh;
+			}
+		}
+	}
+
 	.scroll-cue-label {
-		max-width: 40cqw;
+		max-width: 40vw;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
