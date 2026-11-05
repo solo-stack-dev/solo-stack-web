@@ -2,10 +2,9 @@
 	@component
 	The game frame of the 22:00 section.
 
-	Poster state (your `poster` snippet + play button) → click loads the game chunk (dynamic import via `load`) →
-	playing. The frame owns: pause (button, P/Escape, off screen, hidden tab), instant restart (remounts the game),
-	score + local high score in mono (games that restart themselves call `onRestart`), keyboard focus on the game surface, and on-screen touch buttons.
-	Games receive their default `tuning` values.
+	Poster (`poster` snippet + play button) → click imports the game chunk via `load` → playing. The frame owns pause
+	(button, P/Escape, off screen, hidden tab), restart (remounts the game), score + local high score, focus on the game
+	surface, and touch buttons. Games get their default `tuning` values.
 
 	```svelte
 	<GameFrame gameId="stack-to-moon" load={() => import('../stack-to-moon/index.ts')} label="…">
@@ -186,8 +185,7 @@
 		width: 100%;
 	}
 
-	/* An ink-ruled frame instead of a rounded card border: four hairlines in cream ink that run past the corners,
-	   like a frame ruled onto the paper. Outside the stage (which clips), so the game never covers it. */
+	/* Ink-ruled frame: four cream hairlines overshooting the corners. Outside the clipping stage so the game never covers it. */
 	.game-frame::before {
 		--gap: 0.45rem;
 		--overshoot: 0.7rem;

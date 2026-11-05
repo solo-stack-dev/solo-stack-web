@@ -2,8 +2,8 @@ import type { Component } from 'svelte';
 import type { GameButton, GameInput } from './input.svelte.ts';
 
 /**
- * One debug-tunable number of a game (gravity, speed, spawn rate, tower sway, …). The lab shows a slider per def;
- * the homepage uses `default`. `key` is a code identifier and is shown as is in the (internal) debug panel.
+ * One debug-tunable number (gravity, speed, …). The lab shows a slider per def; the homepage uses `default`.
+ * `key` is a code identifier, shown verbatim in the internal debug panel.
  */
 export interface TuningDef {
 	key: string;
@@ -27,17 +27,11 @@ export interface GameProps {
 	onScore?: (score: number) => void;
 	/** Report the end of a round. GameFrame highlights restart. Restart remounts the component (fresh state). */
 	onGameOver?: (score: number) => void;
-	/**
-	 * Report that the game started a new round by itself (e.g. jump or tap after game over), without the frame's restart
-	 * button. GameFrame clears the game-over highlight and resets the shown score. Not needed when the frame remounts you.
-	 */
+	/** The game restarted itself (e.g. jump/tap after game over), not via the frame's button. GameFrame clears the game-over highlight and shown score. */
 	onRestart?: () => void;
 }
 
-/**
- * The module contract of a game candidate: `<candidate>/index.ts` exports
- * `default` (the game component), `tuning` (debug defs), and optionally `controls` (on-screen touch buttons).
- */
+/** Module contract of `<candidate>/index.ts`: `default` (component), `tuning` (debug defs), optional `controls` (touch buttons). */
 export interface GameModule {
 	default: Component<GameProps>;
 	tuning: TuningDef[];

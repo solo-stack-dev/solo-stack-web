@@ -1,9 +1,9 @@
 <!--
 	@component
 	Candidate B: Stack to the moon. Paper blocks labeled with the owner's tools swing above the tower; Space, Enter,
-	click or tap drops one. Overhangs are sliced off, perfect drops build a combo (and regrow the block a little),
-	off-center stacks make the tower lean and sway until it topples. Reaching the moon unfolds a paper bridge,
-	then the stack goes on (endless). Simulation in `engine.ts` (fixed 240 Hz step), drawing in `render.ts`.
+	click or tap drops one. Overhangs are sliced off; perfect drops build a combo (and regrow the block a little);
+	off-center stacks lean and sway until the tower topples. The moon unfolds a paper bridge, then play goes on (endless).
+	Simulation: `engine.ts` (fixed 240 Hz). Drawing: `render.ts`.
 -->
 <script lang="ts">
 	import { untrack } from 'svelte';

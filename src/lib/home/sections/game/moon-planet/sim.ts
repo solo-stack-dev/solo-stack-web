@@ -1,7 +1,7 @@
 /**
- * Moon planet simulation. Pure data + fixed-timestep `step()`, no DOM. Everything lives in polar coordinates around
- * the moon center: `a` = angle (radians, 0 = up, clockwise, unwrapped), `h` = height above the surface.
- * Previous values (`pa`, `ph`) are kept for render interpolation.
+ * Moon planet simulation: pure data + fixed-timestep `step()`, no DOM. Polar coordinates around the moon center:
+ * `a` = angle (radians, 0 = up, clockwise, unwrapped), `h` = height above the surface. `pa`/`ph` = previous values for
+ * render interpolation.
  */
 import type { Tuning } from './tuning.ts';
 

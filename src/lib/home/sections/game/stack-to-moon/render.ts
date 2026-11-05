@@ -2,7 +2,7 @@
 import { BLOCK_H, ROPE, blockPoint, topCenter, type Game, type Paper } from './engine.ts';
 import { PAD, cloudBank, cloudPuff, hexAlpha, moonTexture, paperTexture } from './paper.ts';
 import { clamp, hash2, lerp, rng, smoothstep } from './rng.ts';
-// The painted mascot sprite lives with candidate A; one shared copy (see its header).
+// Shared mascot sprite, owned by moon-planet (see its header).
 import { drawMascotSprite, mascotSpriteReady } from '../moon-planet/mascot-sprite.ts';
 
 const CREAM = '#fbf3dd';
@@ -517,9 +517,8 @@ export class Renderer {
 	}
 
 	/**
-	 * Painted mascot (one pose, local units: feet at the origin, about 112 tall like the vector placeholder). The pose
-	 * comes from squash & stretch: a breathing idle, a stretched hop, a forward lean on the walk, and on the moon a
-	 * bouncing cheer that squashes on each landing and wiggles in the air.
+	 * Painted mascot (one pose; local units, feet at origin, ~112 tall like the vector placeholder), posed by squash &
+	 * stretch: breathing idle, stretched hop, forward-leaning walk, cheer that squashes on landing and wiggles in the air.
 	 */
 	#spriteMascot(mode: Game['mascot']['mode'], t: number, bounce: number, calm: boolean) {
 		const { context } = this;

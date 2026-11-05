@@ -1,6 +1,7 @@
 <!--
 	@component
-	On-screen buttons that feed a GameInput (pointer events, multi-touch safe). Shown on coarse pointers only. Buttons are not focusable: keyboard users use the keys on the game surface.
+	On-screen buttons feeding a GameInput (pointer events, multi-touch safe), coarse pointers only. Not focusable:
+	keyboard users use the keys on the game surface.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
