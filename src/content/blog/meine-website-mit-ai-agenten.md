@@ -59,17 +59,17 @@ Die Coding Agenten liefen in T3 Code, der Anwendung, mit der ich arbeite, und nu
 
 Auch die Bilder mussten für die Umsetzung vorbereitet werden. Ein flaches Bild einer Szene lässt sich schließlich nicht einfach in einzelne bewegliche Gegenstände zerlegen. Deshalb erzeugte ein Bildmodell separate Ebenen für Himmel, Mond, Wolken, verschiedene Posen meines Maskottchens und Requisiten. Kleine Skripte übernahmen danach das Zuschneiden und Optimieren.
 
-Die Git Historie enthält 67 Commits einschließlich der Zusammenführungen der parallelen Branches. Sie sind auf den 1. November 2026 zwischen 01:27 und 08:09 Uhr datiert.
+Die Git Historie enthält 67 Commits einschließlich der Zusammenführungen der parallelen Branches. Sie sind auf den 1.&nbsp;November&nbsp;2026 zwischen 01:27 und 08:09&nbsp;Uhr datiert.
 
 <hr data-art="horizon" />
 
 ## Vom Mond bis zu den Spielen
 
+<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
+
 Beim Scrollen vergeht auf der Startseite eine Nacht. Kleine Uhrzeitangaben markieren die Abschnitte, während sich der Himmel von der Dämmerung über die tiefe Nacht bis zum Sonnenaufgang verändert. So verbindet die Bewegung durch die Seite auch ihre unterschiedlichen Inhalte.
 
 Um 20:00 sitzt mein Maskottchen mit einem Laptop am Rand eines großen gemalten Mondes. Der Schriftzug SOLO STACK liegt teils in Creme auf dem Nachthimmel und teils in Anthrazit auf dem Mond. Du kannst den Mond anklicken und damit durch seine Phasen wechseln. Dahinter steckt eine Kugel mit gemalter Textur, umgesetzt mit Threlte, also Three.js für Svelte; bis sie geladen ist, bleibt das gemalte Bild sichtbar.
-
-<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
 
 Um 21:00 erzählt eine durchgehende Tintenlinie, was ich mache. Mit deinem Scrollen verwandelt sie sich von einer Glühbirne in einen Prompt, dann in Code, ein Telefon, ein Diagramm und schließlich einen Mond über einer Klippe. Jede Form bekommt dabei einen gelben Pigmentfleck. Mir gefällt daran, dass die Tätigkeiten sichtbar miteinander verbunden bleiben.
 
@@ -89,11 +89,11 @@ Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem 
 
 ## Musik und Kino für die späten Stunden
 
+<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
+
 Um 02:00 steht ein gemaltes altes Radio bereit. Die sozialen Plattformen sind seine Sender, ihre Logos sitzen auf den Sendertasten. Jeder Sender spielt seinen eigenen kurzen Song: etwa 30 bis 50 Sekunden auf Englisch, trauriger Rap oder Lo Fi, in Dauerschleife, solange du ihn eingestellt hast. Titel und Liedtexte stammen von gpt-6.1-sol. Die Musik habe ich mit dem offenen Musikmodell YuE2 lokal auf meiner eigenen Grafikkarte erzeugt; sie spielt erst, wenn du mit einem Klick einen Sender einstellst.
 
 Das Radio brachte ein sehr handfestes Problem mit: Das gemalte Gehäuse hatte sechs Plätze für Sendertasten, aber es gibt mehr soziale Plattformen. Deshalb wurde der Körper aus seinen eigenen gemalten Pixeln neu zusammengesetzt. So fanden alle Sendertasten Platz im Radio.
-
-<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
 
 Um 04:00 wird die Klippe zum Freiluftkino. Dort ist vorgesehen, dass der Laptop das jeweils neueste Video an den Nachthimmel projiziert. Der YouTube Player lädt erst nach einem Klick, und das Vorschaubild kommt von der eigenen Domain. Vorher wird dadurch nichts von YouTube geladen.
 

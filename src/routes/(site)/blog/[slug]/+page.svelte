@@ -478,8 +478,12 @@
 		color: transparent;
 	}
 
+	/*
+	 * Night: cream throughout, warmth only at the feet of the last line. Measured up from the bottom of the box in em, so it
+	 * stays on the last line's lower half however many lines the title breaks into (no line turns colour in one step).
+	 */
 	:global(.dark) .headline {
-		background: linear-gradient(180deg, var(--color-cream) 42%, var(--color-butter));
+		background: linear-gradient(0deg, color-mix(in oklab, var(--color-cream), var(--color-butter) 45%) 0.12em, var(--color-cream) 0.62em);
 		background-clip: text;
 	}
 
