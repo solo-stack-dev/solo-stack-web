@@ -1,8 +1,7 @@
 <!--
 	@component
-	404: the page went missing, like Ging. The scene is the World Tree (`WorldTree.svelte`). A Hunter emblem sticker
-	is slapped onto the status digits; it opens a holographic Hunter License (a native popover: light dismiss and
-	Escape for free) issued to the mascot, No. 404.
+	404: the page went missing, like Ging. Scene: `WorldTree.svelte`. A Hunter emblem sticker on the status digits opens a
+	holographic Hunter License issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

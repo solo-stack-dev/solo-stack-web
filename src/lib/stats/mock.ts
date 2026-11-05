@@ -1,7 +1,6 @@
 /**
- * MOCK DATA for the /stats page. Every number here is made up (seeded, deterministic, so builds are stable).
- * Replace `createMockStats()` in `source.server.ts` with real API calls once the platforms are connected; the shape is
- * `Stats` from `schema.ts`. The example video titles come from gpt-6.1-sol (docs/copy/stats-mock-videos-*.md).
+ * MOCK DATA for /stats: made-up numbers, seeded so builds are stable. Shape: `Stats` (`schema.ts`); replaced in `source.server.ts`
+ * once real APIs are connected. Video titles come from gpt-6.1-sol (docs/copy/stats-mock-videos-*.md).
  */
 import { HISTORY_DAYS, STAT_PLATFORM_IDS, type Stats, type StatPlatformId, type TopVideo } from './schema.ts';
 
@@ -15,7 +14,7 @@ const MOCK_VIDEO_TITLES: readonly string[] = [
 	'Zwischen Kundenarbeit und meinen eigenen Projekten'
 ];
 
-/** Fixed last day of the mock series, so the mock page looks the same on every request. */
+/** Fixed so the mock page is identical on every request. */
 export const MOCK_AS_OF = '2026-10-31';
 
 /** Followers 180 days ago → today, per platform. */
@@ -68,7 +67,7 @@ function followerSeries(start: number, end: number, next: () => number, uploads:
 	let exact = start;
 	return raw.map((value, day) => {
 		exact += value * scale;
-		// An occasional small dip (unfollows) keeps the lines honest looking; never on the first or last day.
+		// Occasional small dip (unfollows) for realism; never on the first or last day.
 		const dip = day > 0 && day < HISTORY_DAYS - 1 && next() < 0.04 ? Math.ceil(next() * 3) : 0;
 		return Math.max(0, Math.round(exact) - dip);
 	});
@@ -96,7 +95,7 @@ function postSeries(next: () => number, uploads: Set<number>): number[] {
 function topVideos(next: () => number): TopVideo[] {
 	return MOCK_VIDEO_TITLES.map((title, index) => {
 		const views90 = Math.round(2400 + next() * 9000);
-		// Newer videos (higher index) have more of their views in the short periods, so the ranking changes per period.
+		// Newer videos (higher index) weight views toward short periods, so the ranking changes per period.
 		const recency = (index + 1) / MOCK_VIDEO_TITLES.length;
 		const views30 = Math.round(views90 * (0.2 + 0.55 * recency * next() + 0.2 * recency));
 		const views7 = Math.round(views30 * (0.1 + 0.6 * recency * next()));

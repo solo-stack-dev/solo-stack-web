@@ -1,8 +1,6 @@
 /**
- * Data contract of the /stats page. The page only ever sees a validated `Stats` object, so the mock module
- * (`mock.ts`) can be swapped for real platform APIs inside `getStats()` (`stats.remote.ts`) without touching the UI.
- *
- * All daily series share one time axis: `HISTORY_DAYS` entries, oldest first, the last entry is `asOf` (UTC day).
+ * Data contract of /stats. The UI only sees a validated `Stats`, so the mock (`mock.ts`) can be swapped for real APIs behind
+ * `getStats()` (`stats.remote.ts`) without UI changes. Every daily series: `HISTORY_DAYS` entries, oldest first, last = `asOf` (UTC).
  */
 import * as v from 'valibot';
 import type { SocialId } from '#lib/home/data/socials.ts';
@@ -11,7 +9,7 @@ import type { SocialId } from '#lib/home/data/socials.ts';
 export const STAT_PLATFORM_IDS = ['youtube', 'github', 'instagram', 'tiktok', 'x', 'bluesky', 'threads', 'twitch', 'facebook'] as const satisfies readonly SocialId[];
 export type StatPlatformId = (typeof STAT_PLATFORM_IDS)[number];
 
-/** Periods offered by the page switch. The history holds two of the longest periods (current + previous). */
+/** Page switch periods. History covers two of the longest (current + previous). */
 export const PERIODS = [7, 30, 90] as const;
 export type Period = (typeof PERIODS)[number];
 export const HISTORY_DAYS = 2 * PERIODS[PERIODS.length - 1] + 1;
@@ -35,7 +33,7 @@ export const TopVideoSchema = v.object({
 });
 
 export const StatsSchema = v.object({
-	/** `mock` until the real APIs are connected. The page shows a visible notice for `mock`. */
+	/** `mock` until real APIs are connected; the page shows a notice for it. */
 	source: v.picklist(['mock', 'live']),
 	/** Last day of every daily series (YYYY-MM-DD, UTC). */
 	asOf: v.pipe(v.string(), v.isoDate()),

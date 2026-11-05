@@ -1,13 +1,12 @@
 <!--
 	@component
-	500 scene: a huge, faceless ink giant slowly rises behind a stone wall, hooks its fingers over the top and peers
-	down at a tiny lit studio, where the mascot sits outside and looks up. Layered SVGs that share one 1000 × 800
-	coordinate box (`wall.ts`), so the animated layers (head, hands) are separate composited elements over static,
-	once-rasterized painted layers. Reduced motion: the final composition, no movement.
+	500 scene: a faceless ink giant rises behind a stone wall, hooks its fingers over the coping and peers down at a tiny lit studio
+	where the mascot sits. Layered SVGs share one 1000 × 800 box (`wall.ts`), so the animated layers (head, hands) composite
+	separately over static, once-rasterized painted layers.
 
-	Interaction: the wall face is a button. Each knock shakes the wall, shakes dust off the coping and grows a crack;
-	the third knock opens the giant's single eye, which then follows the pointer, and the mascot says something. The
-	head leans a little towards the pointer. Reduced motion keeps the state changes (cracks, eye, line), not the shaking.
+	The wall face is a button: each knock shakes the wall, drops coping dust and adds a crack; the third opens the single eye, which
+	then tracks the pointer, and the mascot speaks. The head leans toward the pointer. Reduced motion: final composition, state
+	changes (cracks, eye, line) kept, no shaking or movement.
 -->
 <script lang="ts">
 	import StarField from '#lib/home/shared/StarField.svelte';
@@ -366,8 +365,8 @@
 		height: 100%;
 	}
 
-	/* One 5:4 box for the composed scene. Phones: top part, anchored right (giant, studio, mascot sit in its right
-	   two thirds). Desktop: full height, anchored right, text sits over the open sky on the left. */
+	/* 5:4 scene box, anchored right. Phones: top part (giant, studio, mascot in its right two thirds). Desktop: full height,
+	   text over the open sky on the left. */
 	.stage {
 		position: absolute;
 		right: 0;

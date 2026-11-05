@@ -1,8 +1,7 @@
 <!--
 	@component
-	Posting activity as a sky: one star per day (all platforms), weeks as columns, Monday on top. Days without a post
-	are faint specks; the more posts, the bigger and brighter the star. Total and longest streak are set big next to
-	it, no boxes. Plain HTML/CSS with one shared hover tooltip.
+	Posting activity as a sky: one star per day (all platforms), weeks as columns, Monday on top. No post = faint speck; more posts =
+	bigger, brighter star. Total and longest streak set big beside it. Plain HTML/CSS, one shared hover tooltip.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

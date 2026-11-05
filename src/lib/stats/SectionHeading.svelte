@@ -1,7 +1,7 @@
 <!--
 	@component
-	Section heading: Geist Black over a transparent wash of butter pigment (the painted bloom from the homepage),
-	slightly rotated, like a highlighter stroke on watercolor paper. One line description below.
+	Geist Black over a slightly rotated butter-pigment wash (the homepage's painted bloom), like a highlighter on watercolor paper.
+	One-line description below.
 -->
 <script lang="ts">
 	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';

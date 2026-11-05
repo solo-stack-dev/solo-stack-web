@@ -1,8 +1,7 @@
 <!--
 	@component
-	Most watched videos in the period, ranked like a chart show: big outlined rank numerals, the title, and a butter
-	pigment stroke whose length is the views relative to first place. Real videos link to YouTube; mock entries
-	(`mock-…` ids) are plain text.
+	Period's most watched videos, ranked like a chart show: big outlined rank numerals, title, and a butter stroke sized by views
+	relative to first place. Real videos link to YouTube; mock entries (`mock-…` ids) are plain text.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
