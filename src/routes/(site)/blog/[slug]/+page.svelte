@@ -6,6 +6,7 @@
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
 	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
 	import { breakArt } from '#lib/blog/section-breaks.ts';
+	import inkGround from '#lib/blog/assets/ink-ground.svg?url';
 	import inkHorizon from '#lib/blog/assets/ink-horizon.svg?url';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
 	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=webp&quality=50&enhanced';
@@ -108,6 +109,24 @@
 		return () => observer.disconnect();
 	});
 
+	// Painted section breaks load their image only once they come near the viewport (section-breaks.ts)
+	let body = $state<HTMLElement>();
+	$effect(() => {
+		if (!body || !Body || !breaks.slots) return; // re-runs for each post body
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+					entry.target.setAttribute('data-near', '');
+					observer.unobserve(entry.target);
+				}
+			},
+			{ rootMargin: '100% 0px' }
+		);
+		for (const rule of body.querySelectorAll(':scope > hr')) observer.observe(rule);
+		return () => observer.disconnect();
+	});
+
 	function seek(event: MouseEvent, seconds: number) {
 		if (!video || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return;
 		event.preventDefault();
@@ -140,6 +159,14 @@
 	<meta name="twitter:title" content={post.title} />
 	<meta name="twitter:description" content={post.description} />
 	{@html jsonLdScript(structuredData)}
+	<!-- Without scripts the painted breaks load right away -->
+	<noscript
+		><style>
+			.prose-post hr::after {
+				background-image: var(--art) !important;
+			}
+		</style></noscript
+	>
 </svelte:head>
 
 <!-- Reading progress hairline: CSS scroll timeline, no JS; absent where unsupported -->
@@ -251,18 +278,26 @@
 			{/if}
 
 			{#if post.outline.length}
-				<!-- Below lg: the same contents as a compact disclosure before the body -->
-				<details class="toc-mobile lg:hidden">
+				<!-- Below lg: the same contents as a disclosure before the body. Closed, it shows the article as a trail of
+				     fireflies on an ink thread, one per section; the section you are in glows. -->
+				<details class="toc-mobile lg:hidden" style:--ink-ground={`url("${inkGround}")`}>
 					<summary>
-						<span class="toc-fly" aria-hidden="true"></span>
-						<span id="toc-mobile-title">{m.blog_toc_title()}</span>
-						<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
+						<span class="toc-head">
+							<span class="toc-fly" aria-hidden="true"></span>
+							<span id="toc-mobile-title">{m.blog_toc_title()}</span>
+						</span>
+						<span class="trail" aria-hidden="true">
+							{#each post.outline as section (section.id)}
+								<i class:lit={current === section.id}></i>
+							{/each}
+						</span>
+						<span class="toggle" aria-hidden="true"><ChevronDownIcon class="chevron size-4" /></span>
 					</summary>
 					{@render contents('toc-mobile-title')}
 				</details>
 			{/if}
 
-			<div class="prose-post" data-break-art={breaks.slots} style={breaks.style || undefined}>
+			<div class="prose-post" bind:this={body} data-break-art={breaks.slots} style={breaks.style || undefined}>
 				<Body />
 			</div>
 
@@ -687,29 +722,133 @@
 		scale: 1;
 	}
 
-	/* Below lg: a disclosure before the body, same list, same current-section mark */
+	/*
+	 * Below lg: a disclosure before the body, same list, same current-section mark. The row stands on a brushed ink ground
+	 * (the stroke under the reading hill on /blog, heavy under the title); between title and toggle the article runs as a
+	 * trail of fireflies on a thread, one per section, and the section you are reading glows.
+	 */
 	.toc-mobile {
-		margin-block: -1rem;
+		position: relative;
+		margin-block: -0.75rem -0.25rem;
 	}
 
 	.toc-mobile summary {
-		display: flex;
+		position: relative;
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
 		align-items: center;
-		gap: 0.7rem;
-		width: fit-content;
-		min-height: 2.75rem;
-		padding-right: 0.25rem;
-		border-radius: 0.25rem;
-		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 800;
-		letter-spacing: -0.01em;
+		gap: 1rem;
+		min-height: 3.5rem;
+		padding-block: 0.375rem 0.625rem;
+		border-radius: 0.375rem;
 		cursor: pointer;
 		list-style: none;
 	}
 
 	.toc-mobile summary::-webkit-details-marker {
 		display: none;
+	}
+
+	.toc-mobile summary::after {
+		content: '';
+		position: absolute;
+		inset: auto -0.25rem -0.125rem;
+		height: 0.5rem;
+		background: var(--foreground);
+		opacity: 0.7;
+		mask: var(--ink-ground) center / 100% 100% no-repeat;
+		scale: -1 1;
+		pointer-events: none;
+	}
+
+	:global(.dark) .toc-mobile summary::after {
+		background: var(--color-cream);
+		opacity: 0.3;
+	}
+
+	.toc-head {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		font-family: var(--font-display);
+		font-size: 1.0625rem;
+		font-weight: 800;
+		letter-spacing: -0.015em;
+	}
+
+	.trail {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		height: 1rem;
+		padding-inline: 0.125rem;
+	}
+
+	/* The thread: a dotted ink line from the first firefly to the last */
+	.trail::before {
+		content: '';
+		position: absolute;
+		inset: 50% 0.25rem auto;
+		height: 1px;
+		background: repeating-linear-gradient(90deg, color-mix(in oklab, var(--foreground) 32%, transparent) 0 2px, transparent 2px 6px);
+	}
+
+	.trail i {
+		position: relative;
+		width: 0.3125rem;
+		height: 0.3125rem;
+		border-radius: 50%;
+		background: color-mix(in oklab, var(--color-ochre) 70%, var(--foreground));
+		transition:
+			scale var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
+			box-shadow var(--dur-state) ease,
+			background-color var(--dur-state) ease;
+	}
+
+	:global(.dark) .trail i {
+		background: color-mix(in oklab, var(--color-butter) 55%, var(--background));
+	}
+
+	.trail i.lit {
+		scale: 1.6;
+		background: #f1b73e;
+		box-shadow:
+			0 0 2px 1px rgb(226 169 59 / 0.9),
+			0 0 8px 2px rgb(252 215 114 / 0.75);
+	}
+
+	:global(.dark) .trail i.lit {
+		background: var(--color-moonlight);
+		box-shadow:
+			0 0 3px 1px var(--color-butter),
+			0 0 10px 3px rgb(252 215 114 / 0.55);
+	}
+
+	/* The toggle: a small ink ring, lit while open */
+	.toggle {
+		display: grid;
+		place-items: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border: 1px solid color-mix(in oklab, var(--foreground) 28%, transparent);
+		border-radius: 50%;
+		transition:
+			border-color var(--dur-hover) ease,
+			background-color var(--dur-hover) ease;
+	}
+
+	.toc-mobile summary:hover .toggle,
+	.toc-mobile[open] .toggle {
+		border-color: var(--ink-lit);
+	}
+
+	.toc-mobile[open] .toggle {
+		background: color-mix(in oklab, var(--color-butter) 22%, transparent);
+	}
+
+	:global(.dark) .toc-mobile[open] .toggle {
+		background: color-mix(in oklab, var(--color-butter) 12%, transparent);
 	}
 
 	.toc-mobile :global(.chevron),
@@ -723,13 +862,38 @@
 		rotate: 180deg;
 	}
 
+	.toc-mobile[open] :global(.chevron) {
+		color: var(--ink-lit);
+	}
+
 	.toc-mobile .toc-list {
-		margin: 0.5rem 0 0 0.2rem;
+		margin: 1rem 0 0.25rem 0.2rem;
 	}
 
 	.toc-mobile .toc-list a {
 		font-size: 0.9375rem;
 		padding-block: 0.6rem;
+	}
+
+	/* The list unfolds (where the browser can animate to `auto`) */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (interpolate-size: allow-keywords) {
+			.toc-mobile {
+				interpolate-size: allow-keywords;
+			}
+
+			.toc-mobile::details-content {
+				block-size: 0;
+				overflow: clip;
+				transition:
+					block-size var(--dur-state) ease,
+					content-visibility var(--dur-state) allow-discrete;
+			}
+
+			.toc-mobile[open]::details-content {
+				block-size: auto;
+			}
+		}
 	}
 
 	/* Transcript --------------------------------------------------------------------------------------------- */
@@ -1145,7 +1309,7 @@
 	/*
 	 * Section break (`* * *`): a painted pause between sections. Interim: the sumi horizon with the crooked tree, backlit at
 	 * night (amber horizon glow, two fireflies over the crown), ink on a butter wash on paper. Every second break mirrors.
-	 * Painted slots (data-break-art) swap in their silhouette strip.
+	 * Painted slots (data-break-art) draw their own silhouette instead (below).
 	 */
 	.prose-post :global(hr) {
 		position: relative;
@@ -1188,23 +1352,117 @@
 		scale: -1 1;
 	}
 
-	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
-	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
-	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
-		background: var(--break-art) center / cover no-repeat;
-		mask: none;
-	}
-
+	/*
+	 * Painted slots (section-breaks.ts): the slot's silhouette at its own height and place in the column, ink on paper;
+	 * at night a warm rim of light around the ink and a glow at the painting's own light source, so the black reads on the
+	 * night surface. The image loads once the break nears the viewport (`data-near`).
+	 */
 	.prose-post :global(hr:nth-of-type(3n + 1)) {
-		--break-art: var(--break-art-1);
+		--art: var(--break-art-1);
+		--ratio: var(--break-ratio-1);
+		--h: var(--break-h-1);
+		--x: var(--break-x-1);
+		--glow: var(--break-glow-1);
 	}
 
 	.prose-post :global(hr:nth-of-type(3n + 2)) {
-		--break-art: var(--break-art-2);
+		--art: var(--break-art-2);
+		--ratio: var(--break-ratio-2);
+		--h: var(--break-h-2);
+		--x: var(--break-x-2);
+		--glow: var(--break-glow-2);
 	}
 
 	.prose-post :global(hr:nth-of-type(3n)) {
-		--break-art: var(--break-art-3);
+		--art: var(--break-art-3);
+		--ratio: var(--break-ratio-3);
+		--h: var(--break-h-3);
+		--x: var(--break-x-3);
+		--glow: var(--break-glow-3);
+	}
+
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)) {
+		height: calc(var(--h) * 0.85);
+		margin-block: 2.75em 2.4em;
+		scale: none;
+	}
+
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
+		inset: 0 auto auto var(--x);
+		width: auto;
+		height: 100%;
+		aspect-ratio: var(--ratio);
+		translate: -50% 0;
+		mask: none;
+	}
+
+	/* Paper: no light behind, the ink stands on the page */
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before) {
+		background: none;
+	}
+
+	/* Night: a low warm glow around the light source, blurred past the painting's edges */
+	:global(.dark) .prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::before),
+	:global(.dark) .prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::before),
+	:global(.dark) .prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::before) {
+		background:
+			radial-gradient(38% 52% at var(--glow), rgb(252 215 114 / 0.26), transparent 75%), radial-gradient(60% 34% at 50% 88%, rgb(236 146 48 / 0.16), transparent 80%),
+			radial-gradient(50% 50% at 50% 55%, rgb(251 243 221 / 0.06), transparent 80%);
+		filter: blur(16px);
+	}
+
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
+		background: none center / contain no-repeat;
+	}
+
+	.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)[data-near]::after),
+	.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)[data-near]::after),
+	.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)[data-near]::after) {
+		background-image: var(--art);
+	}
+
+	/* Night: moonlit rim on the ink */
+	:global(.dark) .prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)::after),
+	:global(.dark) .prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)::after),
+	:global(.dark) .prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)::after) {
+		filter: drop-shadow(0 0 1px rgb(251 243 221 / 0.3)) drop-shadow(0 0 9px rgb(252 215 114 / 0.2));
+	}
+
+	@media (min-width: 40rem) {
+		.prose-post[data-break-art~='1'] :global(hr:nth-of-type(3n + 1)),
+		.prose-post[data-break-art~='2'] :global(hr:nth-of-type(3n + 2)),
+		.prose-post[data-break-art~='3'] :global(hr:nth-of-type(3n)) {
+			height: var(--h);
+		}
+	}
+
+	/* The pause settles in as it scrolls into view (CSS scroll timeline; reduced motion: simply there) */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: view()) {
+			.prose-post :global(hr) {
+				animation: settle linear both;
+				animation-timeline: view();
+				animation-range: entry 10% entry 90%;
+			}
+		}
+	}
+
+	@keyframes settle {
+		from {
+			opacity: 0;
+			translate: 0 0.75rem;
+		}
 	}
 
 	.prose-post :global(code) {
