@@ -1,0 +1,23 @@
+{
+  "master_count": 13,
+  "opaque_count": 4,
+  "native_alpha_count": 9,
+  "root_mid_top_bottom_rgba_max_difference": 0,
+  "top_to_mid_rgba_max_difference": 0,
+  "mid_to_end_rgba_max_difference": 0,
+  "root_mid_quarter_median_body_width_px": [
+    58.0,
+    58.0,
+    58.0,
+    58.0
+  ],
+  "root_mid_body_width_percentiles_5_50_95": [
+    52.0,
+    58.0,
+    66.0
+  ],
+  "root_mid_no_global_taper": true,
+  "root_end_bottom_transparent": true,
+  "exact_16_9_opaque_plates": true,
+  "cloud_top_bottom_transparent": true
+}
