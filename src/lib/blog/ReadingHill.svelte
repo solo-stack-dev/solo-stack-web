@@ -95,11 +95,9 @@
 		rotate: -4deg;
 	}
 
-	/* Night: the pigment alone turns khaki on the dark, so it stays faint and the light comes from warm amber cores below */
+	/* Night: no pigment bloom (it reads as a broad brown halo); the light is the shaped backlight below */
 	:global(.dark) .wash {
-		opacity: 0.16;
-		mix-blend-mode: screen;
-		filter: hue-rotate(-28deg) saturate(1.8);
+		display: none;
 	}
 
 	/* Laptop light and the horizon glow behind the hill crest */
@@ -111,11 +109,24 @@
 			radial-gradient(10% 14% at 73% 60%, rgb(252 215 114 / 0.6), transparent 70%), radial-gradient(26% 24% at 78% 58%, rgb(226 169 59 / 0.18), transparent 72%);
 	}
 
-	/* Night: a small moonlight core at the screen, a warm amber halo around the reader and the lower canopy, a low ember on the crest */
+	/*
+	 * Night: light from behind, shaped to the silhouette and kept local, so crown, reader and hill each read against it while
+	 * clean night stays between the art and the title: a moonlight core at the screen, a gold glow tight behind head and
+	 * shoulder, a low band behind the crest where the reader sits, a soft light behind the crown and a faint one behind its
+	 * left limbs. Quick falloffs (light, not a brown halo); the hill's foot stays in plain night.
+	 */
 	:global(.dark) .glow {
 		background:
-			radial-gradient(7% 10% at 73% 61%, rgb(255 244 214 / 0.45), transparent 70%), radial-gradient(24% 28% at 75% 54%, rgb(236 146 48 / 0.36), transparent 72%),
-			radial-gradient(34% 20% at 82% 68%, rgb(226 124 36 / 0.34), transparent 75%), radial-gradient(24% 20% at 78% 28%, rgb(236 156 56 / 0.16), transparent 75%);
+			radial-gradient(5% 8% at 73% 61%, rgb(255 244 214 / 0.42), transparent 70%),
+			radial-gradient(12% 17% at 83% 51%, rgb(255 212 130 / 0.5), rgb(240 160 64 / 0.2) 45%, transparent 72%),
+			radial-gradient(22% 8% at 79% 71%, rgb(240 150 52 / 0.42), transparent 75%),
+			radial-gradient(19% 15% at 81% 24%, rgb(255 216 140 / 0.3), rgb(236 160 70 / 0.1) 50%, transparent 72%),
+			radial-gradient(10% 10% at 67% 31%, rgb(255 216 140 / 0.14), transparent 72%);
+	}
+
+	/* Night: a thin moonlit rim around the ink, so the edges of crown, figure and hill separate from the dark */
+	:global(.dark) .hill {
+		filter: drop-shadow(0 0 0.75px rgb(251 243 221 / 0.4)) drop-shadow(0 0 5px rgb(236 160 60 / 0.22));
 	}
 
 	.hill {
