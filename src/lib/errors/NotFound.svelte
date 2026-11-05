@@ -1,7 +1,7 @@
 <!--
 	@component
-	404: the page went missing, like Ging. Scene: `WorldTree.svelte`. A Hunter emblem sticker on the status digits opens a
-	holographic Hunter License issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
+	404: the page went missing, like Ging. Scene: `WorldTree.svelte`. A license seal sticker (an original World Tree seal,
+	`HunterEmblem.svelte`) on the status digits opens a holographic license card issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -62,7 +62,7 @@
 		position: absolute;
 		right: -2.4rem;
 		top: -1.1rem;
-		width: clamp(4rem, 9vw, 5.5rem);
+		width: clamp(3.75rem, 8vw, 5rem);
 		padding: 0;
 		rotate: 14deg;
 		cursor: pointer;
@@ -76,7 +76,7 @@
 	.sticker:hover {
 		rotate: 6deg;
 		translate: 0 -0.25rem;
-		filter: drop-shadow(0 0.7rem 0.8rem rgb(14 15 16 / 0.6)) drop-shadow(0 0 0.8rem rgb(200 35 58 / 0.45));
+		filter: drop-shadow(0 0.7rem 0.8rem rgb(14 15 16 / 0.6)) drop-shadow(0 0 0.8rem rgb(252 215 114 / 0.45));
 	}
 
 	.sticker:active {
@@ -151,12 +151,9 @@
 	}
 
 	.license-head :global(.emblem) {
-		width: 3.2rem;
+		width: 3.4rem;
 		flex: none;
-		filter: drop-shadow(0 0 0.25rem rgb(251 243 221 / 0.55)) drop-shadow(0 0 0 #fbf3dd);
-		background: var(--color-cream);
-		border-radius: 0.4rem;
-		padding: 0.25rem;
+		filter: drop-shadow(0 0 0.35rem rgb(252 215 114 / 0.35));
 	}
 
 	.license-title {

@@ -137,8 +137,8 @@
 	 */
 	--surface-dusk: #fcf1d0;
 	--surface-floor: #f6ecd3;
-	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.5 0 0 0 0 0.16 0.2 0 0 0 -0.09'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 0 0.14 0 0 -0.063'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.5 0 0 0 0 0.16 0.1 0 0 0 -0.045'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 0 0.07 0 0 -0.0315'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
 	--ink-rule: color-mix(in oklab, var(--foreground) 24%, transparent);
 	--ink-rule-hover: color-mix(in oklab, var(--foreground) 45%, transparent);
 	--ink-lit: #9a4f12;
@@ -185,9 +185,9 @@
 	--focus-ring: #fcd772;
 	--focus-glow: 0 0 1rem 0.1rem color-mix(in oklab, var(--color-butter) 30%, transparent);
 	--surface-dusk: #27241f;
-	--surface-floor: #1d1d1d;
-	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.98 0 0 0 0 0.86 0 0 0 0 0.6 0.13 0 0 0 -0.058'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
-	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.03 0 0 0 0 0.03 0 0 0 0 0.04 0 0.3 0 0 -0.13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-floor: #201e1b;
+	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.98 0 0 0 0 0.86 0 0 0 0 0.6 0.065 0 0 0 -0.029'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.03 0 0 0 0 0.03 0 0 0 0 0.04 0 0.15 0 0 -0.065'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
 	--ink-rule: color-mix(in oklab, var(--foreground) 20%, transparent);
 	--ink-rule-hover: color-mix(in oklab, var(--foreground) 38%, transparent);
 	--ink-lit: #fcd772;
@@ -284,6 +284,35 @@
 	--dur-entrance: 1100ms;
 }
 
+/*
+ * The one content grid of the site pages (docs/critique/ROUND-2.md): pages use `mx-auto max-w-6xl px-4 sm:px-6 lg:px-8`
+ * (= these tokens); the site nav and footer use `content-frame`, so the wordmark sits flush with the content's left edge and
+ * the last nav control with its right edge.
+ */
+:root {
+	--content-max: 72rem;
+	--content-gutter: 1rem;
+}
+
+@media (min-width: 40rem) {
+	:root {
+		--content-gutter: 1.5rem;
+	}
+}
+
+@media (min-width: 64rem) {
+	:root {
+		--content-gutter: 2rem;
+	}
+}
+
+@utility content-frame {
+	width: 100%;
+	max-width: var(--content-max);
+	margin-inline: auto;
+	padding-inline: var(--content-gutter);
+}
+
 /* Mono labels: usage at the tokens in @theme */
 @utility label-sm {
 	font-family: var(--font-mono);
@@ -355,8 +384,7 @@
 	 * ochre there) set 3px off the element, following its radius, with a soft light behind it. It settles in from a wider
 	 * offset. Components with their own shadow keep it (their styles win over this base layer); the ring stays.
 	 */
-	[data-site-surface] :focus-visible,
-	[data-slot='sheet-content'] :focus-visible {
+	[data-site-surface] :focus-visible {
 		outline: 2px solid var(--focus-ring);
 		outline-offset: 3px;
 		box-shadow: var(--focus-glow);
@@ -381,8 +409,7 @@
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		[data-site-surface] :focus-visible,
-		[data-slot='sheet-content'] :focus-visible {
+		[data-site-surface] :focus-visible {
 			animation: focus-settle var(--dur-hover) var(--ease-settle);
 		}
 	}

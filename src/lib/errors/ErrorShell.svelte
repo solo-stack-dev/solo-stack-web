@@ -1,10 +1,12 @@
 <!--
 	@component
-	Frame for every error page: wordmark, 03:00 clock (the hour the homepage night skips), mono status, copy, home link, optional
-	retry, homepage sections as plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind.
+	Frame for every error page: the site navbar in its night look (crescent wordmark, the pages, and the 03:00 clock, the hour
+	the homepage night skips, in place of the menu), mono status, copy, home link, optional retry, the homepage sections as one
+	column of plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import SiteNav from '#lib/components/site/SiteNav.svelte';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import { NIGHT_HOURS, type SectionId } from '#lib/home/night.ts';
@@ -43,10 +45,13 @@
 <div class="error-page is-{variant}">
 	<div class="scene">{@render scene()}</div>
 
-	<header class="chrome">
-		<a class="wordmark font-display text-lg font-black tracking-wordmark uppercase md:text-xl" href={home}>SOLO STACK</a>
-		<NightClock time="03:00" placement="inline" />
-	</header>
+	<div class="chrome">
+		<SiteNav variant="night">
+			{#snippet actions()}
+				<NightClock time="03:00" placement="inline" class="error-clock" />
+			{/snippet}
+		</SiteNav>
+	</div>
 
 	<main class="panel" aria-labelledby="error-title">
 		<div class="status-row">
@@ -114,17 +119,22 @@
 
 	/* Chrome --------------------------------------------------------------------------------------------------- */
 
+	/* The navbar is fixed (as on the homepage); this row keeps its height in the grid. Same layout lines as the homepage. */
+	.error-page {
+		--page-gutter: clamp(1.25rem, 4vw, 3.5rem);
+		--nav-pad-y: clamp(1rem, 2.5vh, 1.75rem);
+	}
+
 	.chrome {
 		position: relative;
 		z-index: 3;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: clamp(1rem, 2.5vh, 1.75rem) clamp(1.25rem, 4vw, 3.5rem);
+		height: calc(2.75rem + 2 * var(--nav-pad-y));
 	}
 
-	.wordmark {
-		line-height: 1;
+	/* The clock ends on the gutter (the actions slot is offset for a 44px icon button) */
+	.chrome :global(.error-clock) {
+		margin-right: 0.75rem;
+		padding-inline: 0.25rem;
 	}
 
 	/* Panel ---------------------------------------------------------------------------------------------------- */
@@ -257,16 +267,15 @@
 	}
 
 	.sections ul {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.35rem 1.1rem;
-		margin-top: 0.7rem;
+		display: grid;
+		justify-items: start;
+		margin-top: 0.5rem;
 	}
 
 	.sections a {
 		display: inline-flex;
 		align-items: baseline;
-		gap: 0.45rem;
+		gap: 0.75rem;
 		padding-block: 0.3rem;
 		color: color-mix(in oklab, var(--color-cream) 85%, transparent);
 		text-decoration: underline;
@@ -332,6 +341,11 @@
 		.chrome {
 			animation: rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 			animation-delay: calc(var(--intro) + var(--i, 0) * 70ms);
+		}
+
+		/* fade only: a translate on the wrapper would make it the containing block of the fixed navbar */
+		.chrome {
+			animation-name: fade;
 		}
 
 		.panel::before {
