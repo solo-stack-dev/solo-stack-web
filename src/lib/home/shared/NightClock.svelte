@@ -1,7 +1,7 @@
 <!--
 	@component
-	Hour label of a section (`20:00`). Same position in every section: `--clock-top` / `--page-gutter` (layout.css),
-	a section heading sits under it at `--heading-top`. The section root must be `position: relative`.
+	Section hour label (`20:00`), same spot in every section: `--clock-top` / `--page-gutter` (layout.css); headings sit
+	under it at `--heading-top`. Section root must be `position: relative`.
 
 	```svelte
 	<NightClock time="22:00" />

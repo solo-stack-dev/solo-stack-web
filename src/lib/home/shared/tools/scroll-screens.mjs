@@ -4,11 +4,9 @@
 //
 //   node src/lib/home/shared/tools/scroll-screens.mjs <url> <outDir> [--width 1440 --height 900] [--reduced] [--step 0.5] [--prefix name] [--sheet] [--seams] [--only-seams]
 //
-// Launches Chrome on a random free debugging port, scrolls the page in `step` viewport increments, saves one WebP per
-// step, and reports console errors and uncaught exceptions (exit code 1 if there were any). `--sheet` additionally
-// writes a downscaled contact sheet (`<prefix>-sheet.webp`) for quick review. `--seams` also captures every section
-// boundary centered in the viewport (`<prefix>-seam-<id>.webp`, the section starting there); `--only-seams` skips the scroll sequence. Uses Node's built-in WebSocket and
-// `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img); no new dependency.
+// One WebP per `step` viewports; exit code 1 on console errors/warnings or uncaught exceptions. `--sheet`: contact sheet
+// (`<prefix>-sheet.webp`). `--seams`: every section boundary centered (`<prefix>-seam-<id>.webp`, id = section below);
+// `--only-seams` skips the sequence. Uses Node's WebSocket and `sharp` from pnpm's virtual store (no new dependency).
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -153,7 +151,7 @@ try {
 	if (args.includes('--seams') || args.includes('--only-seams')) {
 		const tops = await evaluate(`[...document.querySelectorAll('[data-night-hour]')].slice(1).map((el) => [el.id, el.getBoundingClientRect().top + scrollY])`);
 		for (const [id, top] of tops) {
-			// walk down to the boundary so lazy parts above it have mounted, then center it
+			// approach from above so lazy parts have mounted, then center the boundary
 			await evaluate(`scrollTo({ top: ${Math.max(0, top - height)}, behavior: 'instant' })`);
 			await sleep(400);
 			await evaluate(`scrollTo({ top: ${Math.max(0, top - height / 2)}, behavior: 'instant' })`);

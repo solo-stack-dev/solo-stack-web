@@ -1,26 +1,21 @@
 <!--
 	@component
-	The homepage frame: one fixed painted sky whose color follows the night, paper grain, stars, shooting stars,
-	the floating nav (wordmark + menu overlay), and the hour rail. Sections render as children, in NIGHT_HOURS order.
+	Homepage frame: fixed sky that follows the night, paper grain, stars, shooting stars, nav + menu overlay, hour rail.
+	Sections render as children, in NIGHT_HOURS order.
 
-	The `--night` contract (docs/HOMEPAGE-DEV.md): page scroll progress 0…1 on this wrapper, inherited by every section.
-	- Scroll-driven animation (`animation-timeline: scroll(root)`) where supported and motion is allowed.
-	- Otherwise (no support, or reduced motion): a passive, rAF-throttled scroll listener writes it inline.
-	The sky is a stack of full-viewport color layers; layer k fades in between its measured start and stop, so the
-	visible color is an exact linear blend of neighboring hours. Stops are anchored to the real section positions
-	(section center at viewport center; hours with `from: 'enter'` start blending when their section enters the
-	viewport), re-measured on resize. `--dawn` (0…1) is the progress of the last blend (butter paper).
+	`--night` (docs/HOMEPAGE-DEV.md): page scroll progress 0…1 on this wrapper, inherited by every section. Driven by
+	`animation-timeline: scroll(root)` where supported and motion is allowed, else by a rAF-throttled scroll listener.
+	Sky: one full-viewport layer per hour, each fading in between its measured start and stop (exact linear blend; curve
+	rules in night.ts), re-measured on resize. `--dawn` (0…1): progress of the last blend (butter paper).
 
-	Section transitions: the painted masks of shared/transitions.ts as `url()` custom properties (`--feather-up`,
-	`--feather-down`, `--wash-spread-up`, `--wash-dry`), and the `[data-feather]` helper that feathers a plate's top
-	and/or bottom with the painted soft edge (`--feather-top` / `--feather-bottom`: edge heights as lengths).
+	Also provides the transition masks of shared/transitions.ts as `url()` vars and the `[data-feather]` helper (below).
 
 	Chrome that follows the art underneath:
-	- The nav wordmark and the rail hide while the hero (with its giant wordmark and moon) covers the top of the viewport.
-	- Global shooting stars pause while the opaque hero covers the sky (the hero has its own); the global star field stops
-	  twinkling while the hero fills the whole viewport (its 20 fps full-screen canvas would redraw unseen).
-	- Nav and rail switch to dark ink only once the sunrise paper is really under them: the sunrise night edge
-	  (`#sunrise [data-night-edge]`, falling back to `#sunrise .night`) is tracked while the sunrise is on screen.
+	- Nav wordmark and rail hide while the hero covers the top of the viewport.
+	- Global shooting stars pause while the hero covers the sky (it has its own); the star field stops twinkling while the
+	  hero fills the viewport (its 20 fps full-screen canvas would redraw unseen).
+	- Nav and rail switch to dark ink only once sunrise paper is under them, tracked via `#sunrise [data-night-edge]`
+	  (fallback `#sunrise .night`).
 	- `html[data-night-end]` while the sunrise is on screen: bottom overscroll shows butter paper, top overscroll night.
 -->
 <script lang="ts">
@@ -60,9 +55,8 @@
 	};
 
 	const hours: readonly NightHourDef[] = NIGHT_HOURS;
-	/** Sections with their own progress dots: the rail steps aside while they are the active hour (one indicator at a time). */
+	/** Sections with their own progress dots: the rail hides while they are active (one indicator at a time). */
 	const OWN_PROGRESS = new Set<SectionId>(['making']);
-	// Painted transition masks as `url()` custom properties for the sections' edge CSS (shared/transitions.ts).
 	const maskVars = transitionMaskVars();
 	const last = NIGHT_HOURS.length - 1;
 
@@ -71,9 +65,8 @@
 	let menu: HTMLDialogElement;
 	let menuOpen = $state(false);
 	let active = $state<SectionId>('hero');
-	// The page loads at the top: the hero covers the sky until the observer says otherwise.
+	// The page loads at the top, so the hero covers the sky (and fills the viewport) until the observers say otherwise.
 	let heroCovers = $state(true);
-	// …and fills the whole viewport (reaches its bottom edge), so the global sky is completely hidden.
 	let heroFills = $state(true);
 	let navOnPaper = $state(false);
 	let railOnPaper = $state(false);
@@ -84,7 +77,7 @@
 	const sections = () => Array.from(wrapper.querySelectorAll<HTMLElement>(`[${NIGHT_HOUR_ATTR}]`));
 	const byId = (id: SectionId) => wrapper.querySelector<HTMLElement>(`#${id}[${NIGHT_HOUR_ATTR}]`);
 
-	// Anchor the sky stops to the sections: stop = scroll progress at which the section's center meets the viewport center.
+	// stop = scroll progress at which the section's center meets the viewport center.
 	function measureStops() {
 		const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
 		const elements = sections();
@@ -101,7 +94,7 @@
 			nextStarts.push(Math.min(start, previous));
 			return previous;
 		});
-		// New arrays re-render the sky layers and --sky-now, which every element inherits: only write real changes.
+		// New arrays re-render the sky layers and `--dawn-from/to`, which every element inherits: write only real changes.
 		if (!sameValues(stops, nextStops)) stops = nextStops;
 		if (!sameValues(starts, nextStarts)) starts = nextStarts;
 	}
@@ -109,7 +102,7 @@
 	const sameValues = (a: number[], b: number[]) => a.length === b.length && a.every((value, index) => value === b[index]);
 
 	$effect(() => {
-		// One measurement per frame: a window resize also resizes the wrapper, so both sources fire together.
+		// One measurement per frame: a window resize also fires the ResizeObserver.
 		let frame = 0;
 		const schedule = () => {
 			if (!frame)
@@ -121,7 +114,7 @@
 		const observer = new ResizeObserver(schedule);
 		observer.observe(wrapper);
 		const offResize = on(window, 'resize', schedule, { passive: true });
-		// untracked: measureStops reads `stops`/`starts`, which must not become dependencies of this effect
+		// untracked: `stops`/`starts` must not become dependencies
 		untrack(measureStops);
 		return () => {
 			observer.disconnect();
@@ -130,7 +123,7 @@
 		};
 	});
 
-	// Fallback driver for --night: unsupported scroll timelines, or reduced motion (the global guard would freeze the animation).
+	// Fallback --night driver: no scroll timelines, or reduced motion (the global guard would freeze the animation).
 	$effect(() => {
 		const cssDriven = CSS.supports('animation-timeline: scroll()') && !reducedMotion.current;
 		if (cssDriven) {
@@ -156,9 +149,8 @@
 		};
 	});
 
-	// The hero covers the top 40 % of the viewport: hide the nav wordmark (the hero shows the giant one) and the rail,
-	// and pause the global shooting stars (they would fly unseen behind the opaque hero, and their events would make
-	// the hero mascot look up at nothing).
+	// heroCovers = hero in the top 40 % of the viewport. Also pauses global shooting stars: unseen behind the opaque hero,
+	// their events would make the hero mascot look up at nothing.
 	$effect(() => {
 		const hero = byId('hero');
 		if (!hero) {
@@ -167,7 +159,7 @@
 			return;
 		}
 		const observer = new IntersectionObserver(([entry]) => (heroCovers = entry.isIntersecting), { rootMargin: '0px 0px -60% 0px' });
-		// The hero starts at the page top, so reaching the bottom 1 % of the viewport means it covers all of it.
+		// The hero starts at the page top, so reaching the bottom 1 % of the viewport means it fills it.
 		const fills = new IntersectionObserver(([entry]) => (heroFills = entry.isIntersecting), { rootMargin: '-99% 0px 0px 0px' });
 		observer.observe(hero);
 		fills.observe(hero);
@@ -306,7 +298,7 @@
 					{/each}
 				</ol>
 			</nav>
-			<!-- The site pages; the bar shows them inline from 48rem, on phones they live here -->
+			<!-- Site pages: inline in the bar from 48rem, here on phones -->
 			<nav class="menu-site" aria-label={m.site_nav_label()}>
 				<ul>
 					{#each SITE_LINKS as link (link.id)}
@@ -347,14 +339,13 @@
 		isolation: isolate;
 		/* Progress of the last sky blend (butter paper): 0 through the night, 1 at the page end */
 		--dawn: clamp(0, (var(--night) - var(--dawn-from, 0.9)) / max(0.0001, var(--dawn-to, 1) - var(--dawn-from, 0.9)), 1);
-		/* Ink color that stays readable on the sky: cream at night, anthracite once the paper is bright (06:00) */
+		/* Ink readable on the sky: cream at night, anthracite once the paper is bright (06:00) */
 		--night-ink: color-mix(in oklab, var(--color-cream), var(--color-night) calc(clamp(0, (var(--dawn) - 0.6) * 2.5, 1) * 100%));
 		color: var(--color-cream);
 	}
 
-	/* Feathered plate edges (docs/HOMEPAGE-DEV.md §6.5): the painted soft edge over the top `--feather-top` and/or the
-	   bottom `--feather-bottom` (lengths, default 0) of the element, solid in between (overlapping the edges by 1px,
-	   so no hairline shows). Opt in with the `data-feather` attribute; it owns the element's `mask`. */
+	/* Feathered plate edges (docs/HOMEPAGE-DEV.md §6.5): painted soft edge over the top `--feather-top` / bottom
+	   `--feather-bottom` (lengths, default 0), solid between (1px overlap avoids a hairline). Owns the element's `mask`. */
 	.night-page :global([data-feather]) {
 		mask:
 			var(--feather-up) top / 100% var(--feather-top, 0px) no-repeat,
@@ -408,8 +399,8 @@
 	.night-main {
 		position: relative;
 		z-index: 1;
-		/* The mist strips are wider than the page (they drift sideways): without this, phones zoom the page out to fit
-		   them. `clip` (not hidden) creates no scroll container, so the sticky stages keep working. */
+		/* Mist strips are wider than the page; without this, phones zoom out to fit them. `clip`, not `hidden`: no scroll
+		   container, so sticky stages keep working. */
 		overflow-x: clip;
 	}
 
@@ -608,15 +599,13 @@
 
 	/* Rail ----------------------------------------------------------------------------------------------------- */
 
-	/*
-	 * Quiet by design: small dots hugging the right edge, no labels (the time shows on hover/focus only), hidden over
-	 * the hero, and only the dots take pointer events, so the art underneath (moon, hotspots) stays clickable.
-	 */
+	/* Quiet by design: time shows on hover/focus only; only the dots take pointer events, so the art underneath (moon,
+	   hotspots) stays clickable. */
 	.rail {
 		position: fixed;
 		z-index: 4;
 		top: 50%;
-		/* hugs the edge, outside the gutter: the gutter belongs to the copy and the controls */
+		/* outside the gutter, which belongs to copy and controls */
 		right: clamp(0.25rem, 0.9vw, 0.9rem);
 		translate: 0 -50%;
 		display: none;

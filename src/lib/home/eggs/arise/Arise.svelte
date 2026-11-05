@@ -1,13 +1,10 @@
 <!--
 	@component
-	Egg: ARISE (Solo Leveling homage, mockup 01-mascot-easter-eggs/06). A pool of shadow spreads along the bottom of the
-	viewport, four painted shadow soldiers push up out of it one after another (knight, brute, assassin, and a tiny
-	shadow mascot as the punchline), their eyes ignite, smoke curls off them and sparks drift up; then each one burns
-	away from the feet up and the pool closes (~5.6 s).
+	Egg: ARISE (Solo Leveling homage, mockup 01-mascot-easter-eggs/06). Four shadow soldiers (knight, brute, assassin, tiny
+	mascot as punchline) rise from a shadow pool, eyes ignite, smoke and sparks; then they burn away feet-up (~5.6 s).
 
-	Paints over the content (every section has opaque painted art) but under the paper grain. The cutouts are decoded
-	before anything moves, so nothing pops in mid-rise. Only transform/opacity animate, except the short dissolve
-	(mask position). Reduced motion: the finished scene fades in and out in place. Escape cancels (Eggs.svelte).
+	Over the content, under the paper grain. Cutouts decode before anything moves (no pop-in mid-rise). Only
+	transform/opacity animate, except the dissolve (mask position). Reduced motion: finished scene fades in and out.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -116,7 +113,7 @@
 
 	/* Scene ----------------------------------------------------------------------------------------------------- */
 
-	/* the night darkens from the ground up, so the ink figures have something to stand in */
+	/* darkens from the ground up, so the ink figures have something to stand in */
 	.dusk {
 		position: absolute;
 		inset: 0;
@@ -125,7 +122,7 @@
 		animation: dusk var(--total) ease-in-out forwards;
 	}
 
-	/* phones: the hero text sits right where the title goes, so the night goes darker */
+	/* phones: hero text sits where the title goes, so darker */
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
 		.dusk {
 			background: linear-gradient(to top, rgb(9 10 18 / 0.9), rgb(14 15 26 / 0.5) 40%, transparent 80%), rgb(8 9 16 / 0.78);
@@ -136,7 +133,7 @@
 		}
 	}
 
-	/* the pool of shadow they rise out of: an ink ellipse with a cold rim */
+	/* ink ellipse with a cold rim */
 	.pool {
 		position: absolute;
 		left: -10vw;
@@ -196,7 +193,7 @@
 	.body {
 		position: absolute;
 		inset: 0;
-		/* burns away from the feet up: the gradient's edge sweeps from below the figure to above it */
+		/* burns away feet-up: the gradient edge sweeps from below the figure to above it */
 		mask-image: linear-gradient(to bottom, #000 0 45%, transparent 55% 100%);
 		mask-size: 100% 220%;
 		mask-position: 0 0;
@@ -454,7 +451,7 @@
 		}
 	}
 
-	/* Reduced motion: no rising, smoke or sparks; the finished scene fades in and out in place (calmFade on the roots) */
+	/* Reduced motion: static finished scene, no smoke or sparks (calmFade on the roots) */
 	.still .dusk,
 	.still .pool,
 	.still .soldier,

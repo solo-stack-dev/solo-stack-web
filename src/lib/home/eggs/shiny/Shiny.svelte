@@ -1,11 +1,9 @@
 <!--
 	@component
-	Egg: shiny mascot (1 in 4096 sessions, `?shiny=1`). Eggs.svelte sets `data-shiny` on `[data-night-page]` and
-	loads this component, which only ships global CSS:
+	Egg: shiny mascot. Global CSS only, loaded by Eggs.svelte along with `data-shiny` on `[data-night-page]`:
 
-	- Fallback golden look for every `.mascot` (warm filter + glow) until a section swaps in real golden art. Sections
-	  that render their own golden variant put `data-shiny-art` on their `.mascot` element to opt out of the filter.
-	- A tiny sparkle on every `.mascot` (`::after`, so the element must be positioned). Static under reduced motion.
+	- Fallback golden filter + glow on every `.mascot`; sections with real golden art opt out via `data-shiny-art`.
+	- A sparkle on every `.mascot` (`::after`, so it must be positioned). Static under reduced motion.
 
 	How sections swap art: docs/HOMEPAGE-DEV.md §11.
 -->

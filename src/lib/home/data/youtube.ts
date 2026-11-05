@@ -14,10 +14,7 @@ export const LatestVideoSchema = v.object({
 
 export type LatestVideo = v.InferOutput<typeof LatestVideoSchema>;
 
-/**
- * Static fallback when the feed is unreachable or empty: `null` means "no video", and the UI links to the channel
- * (YOUTUBE_CHANNEL_URL in socials.ts) instead. Never invent a video here.
- */
+/** No video: the UI links to YOUTUBE_CHANNEL_URL (socials.ts) instead. Never invent a video here. */
 export const FALLBACK_VIDEO: LatestVideo | null = null;
 
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };

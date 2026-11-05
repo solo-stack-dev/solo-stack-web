@@ -20,7 +20,7 @@ export const CommitSchema = v.object({
 
 export type Commit = v.InferOutput<typeof CommitSchema>;
 
-/** Fallback: no commits. The night shift monitor shows its empty state (`home_nightshift_monitor_empty`). */
+/** The monitor then shows its empty state (`home_nightshift_monitor_empty`). */
 export const FALLBACK_COMMITS: Commit[] = [];
 
 export const RepoListSchema = v.array(v.object({ name: v.string(), fork: v.boolean(), private: v.boolean(), archived: v.boolean() }));

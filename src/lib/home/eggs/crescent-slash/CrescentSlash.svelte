@@ -1,8 +1,8 @@
 <!--
 	@component
-	Egg: crescent slash (mockup 01-mascot-easter-eggs/04). One black ink crescent sweeps across the viewport with
-	flicked droplets (~0.6 s), holds, and fades (~1.8 s total). Pure SVG geometry revealed by an animated mask stroke;
-	only stroke-dashoffset, transform, and opacity animate. Never mounted under reduced motion (Eggs.svelte).
+	Egg: crescent slash (mockup 01-mascot-easter-eggs/04). An ink crescent sweeps across the viewport, holds, and fades.
+	SVG geometry revealed by a mask stroke; only stroke-dashoffset, transform, opacity animate. Never mounted under
+	reduced motion (Eggs.svelte).
 -->
 <script lang="ts">
 	import type { EggProps } from '../events.ts';
@@ -58,7 +58,7 @@
 		width: 100%;
 		height: 100%;
 		overflow: visible;
-		/* Moonlight catching the ink edge, so the stroke reads on the dark sky. Compositor filter on its own layer. */
+		/* Butter edge glow so the ink reads on the dark sky; own layer, so the filter is composited. */
 		filter: drop-shadow(0 0 2px color-mix(in oklab, var(--color-butter) 75%, transparent)) drop-shadow(0 0 14px color-mix(in oklab, var(--color-butter) 40%, transparent));
 		will-change: transform;
 	}

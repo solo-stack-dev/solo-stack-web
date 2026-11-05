@@ -1,7 +1,7 @@
 <!--
 	@component
-	Egg: three stars (mockup 01-mascot-easter-eggs/10). Three bright stars drift out of the sky into one line, each
-	draws a faint triangle below itself, the triangles stack, hold, and fade (~5.2 s). Reduced motion: no drift or drawing, a calm fade of the finished figure.
+	Egg: three stars (mockup 01-mascot-easter-eggs/10). Three stars drift into a line, each draws a faint triangle below
+	itself, the triangles stack, hold, and fade. Reduced motion: calm fade of the finished figure.
 -->
 <script lang="ts">
 	import type { EggProps } from '../events.ts';
@@ -16,7 +16,7 @@
 	const between = (min: number, max: number) => min + Math.random() * (max - min);
 	const narrow = window.matchMedia('(max-width: 47.99rem), (max-aspect-ratio: 4/5)').matches;
 
-	// Formation in a 1600×900 viewBox (sliced to the viewport), kept inside the visible middle on phones
+	// Units: 1600×900 viewBox, sliced to the viewport; phones keep it in the visible middle
 	const origin: Point = narrow ? [between(700, 820), between(90, 150)] : [between(380, 1100), between(90, 150)];
 	const step: Point = [between(-90, 90), between(130, 160)];
 	const sizes = [between(90, 120), between(140, 180), between(80, 105)];
@@ -158,7 +158,7 @@
 		}
 	}
 
-	/* Reduced motion: the finished figure fades in and out (calmFade), nothing travels or draws */
+	/* Reduced motion: static finished figure (calmFade on the root) */
 	.still {
 		animation: none;
 	}

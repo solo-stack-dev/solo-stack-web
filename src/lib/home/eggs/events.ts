@@ -1,8 +1,6 @@
 /**
- * Public egg contract. Tiny on purpose: this file is part of the initial bundle (imported by `Eggs.svelte`), the egg
- * effects themselves are lazy chunks.
- *
- * Other parts of the page trigger eggs with window events, e.g. a game milestone:
+ * Public egg contract. Tiny on purpose: it is in the initial bundle (via `Eggs.svelte`); the eggs are lazy chunks.
+ * Other parts of the page trigger eggs with window events:
  *
  * ```ts
  * import { THREE_STARS_EVENT } from '#lib/home/eggs/events.ts';
@@ -10,7 +8,7 @@
  * ```
  */
 
-/** Three stars align into stacked triangles. Dispatch it from a game milestone (no detail). */
+/** Three stars align into stacked triangles, e.g. on a game milestone. No detail. */
 export const THREE_STARS_EVENT = 'night:egg-three-stars';
 
 /** Ink shadows rise (same as the Konami code and `arise()` in the console). No detail. */
@@ -28,6 +26,6 @@ export interface EggProps {
 	reducedMotion: boolean;
 	/** Element the egg anchors to (moon presence: the hero moon). */
 	target?: Element | null;
-	/** Call once the effect has finished; the egg is unmounted. Escape unmounts every running egg early. */
+	/** Call when finished to unmount. Escape unmounts all eggs early. */
 	ondone: () => void;
 }

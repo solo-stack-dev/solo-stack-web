@@ -1,6 +1,6 @@
 /**
- * One shared AudioContext for the whole page (radio, game sounds, eggs). It is created lazily, and only from a user
- * gesture: browsers block audio that was not started by one, and creating it early wastes resources.
+ * One shared AudioContext for the page (radio, game, eggs), created lazily from a user gesture: browsers block audio
+ * not started by one, and creating it early wastes resources.
  *
  * ```ts
  * import { audio } from '#lib/home/shared/audio.svelte.ts';
@@ -31,9 +31,7 @@ class SharedAudio {
 		return this.#master;
 	}
 
-	/**
-	 * Create (first call) or resume the shared context. Call it synchronously inside a user gesture handler.
-	 */
+	/** Create (first call) or resume the context. Call synchronously inside a user gesture handler. */
 	unlock(): AudioContext {
 		if (!this.#context) {
 			const context = new AudioContext();

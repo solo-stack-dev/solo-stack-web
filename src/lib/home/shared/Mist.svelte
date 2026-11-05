@@ -1,12 +1,10 @@
 <!--
 	@component
-	A painted, partly transparent mist bank over the boundary between two sections, so feathered plates meet in air
-	instead of at a line. Placed by the page between two sections (src/routes/+page.svelte), never inside a section.
-	Zero height in the flow; the strip paints above both neighbors and takes no pointer events.
+	Painted mist bank over a section boundary, so feathered plates meet in air, not at a line. Placed between sections
+	in src/routes/+page.svelte, never inside one. Zero height in the flow; paints above both neighbors, no pointer events.
 
-	Parallax: the strip drifts a little against the scroll (and sideways) with a CSS scroll-driven animation on its
-	own view timeline (transform only, so it runs on the compositor). Static without support and under reduced motion.
-	The image is lazy (enhanced-img, AVIF/WebP), so only strips near the viewport load.
+	Parallax via its own view timeline, transform only (compositor). Static without support and under reduced motion.
+	Lazy image, so only strips near the viewport load.
 
 	```svelte
 	<Making />
@@ -33,13 +31,11 @@
 		above?: number;
 		/** Overall opacity, 0…1. Default 0.7. */
 		opacity?: number;
-		/** Horizontal centers (in % of the width) of two soft gaps where the bank thins out, so it never reads as one
-		 *  continuous stripe across the page. Default `[28, 74]`. */
+		/** Horizontal centers (% of width) of two soft gaps, so the bank never reads as one stripe. Default `[28, 74]`. */
 		gaps?: [number, number];
 		/** Mirror the strip horizontally, to vary a reused strip. */
 		mirror?: boolean;
-		/** Shift the (horizontally seamless) painting sideways by this share of its width, in %, wrapping around, so a
-		 *  reused strip shows a different silhouette. Default 0. */
+		/** Sideways shift of the seamless painting, % of width, wrapping (a reused strip shows a new silhouette). Default 0. */
 		offset?: number;
 		/** Vertical parallax travel each way (CSS length). Default `2.5rem`. */
 		drift?: string;
@@ -73,7 +69,7 @@
 		<div class="tiles">
 			<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
 			{#if offset}
-				<!-- the wrapped-around remainder of the shifted painting (same source, decoded once) -->
+				<!-- wrapped-around remainder (same source, decoded once) -->
 				<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
 			{/if}
 		</div>
@@ -95,7 +91,7 @@
 		width: 112%;
 		top: calc(var(--mist-height) * var(--mist-above) * -1);
 		height: var(--mist-height);
-		/* two soft gaps (intersected), so the bank breaks up into drifting banks with air between them */
+		/* two soft gaps, intersected */
 		mask-image:
 			radial-gradient(ellipse 20% 95% at var(--gap-a) 50%, transparent 15%, #000 100%), radial-gradient(ellipse 16% 95% at var(--gap-b) 55%, transparent 10%, #000 100%);
 		mask-composite: intersect;
@@ -114,7 +110,7 @@
 		flex: none;
 		width: 100%;
 		height: 100%;
-		/* the strips are horizontally seamless, so a squeezed aspect on narrow screens is fine */
+		/* horizontally seamless, so a squeezed aspect on narrow screens is fine */
 		object-fit: fill;
 		user-select: none;
 	}
@@ -133,7 +129,7 @@
 		}
 	}
 
-	/* Sinks slower than the page (it lags behind the plates) and slides a little sideways. */
+	/* Lags behind the plates and slides a little sideways. */
 	@keyframes mist-drift {
 		from {
 			transform: translate3d(-2.5%, calc(var(--mist-drift) * -1), 0);
