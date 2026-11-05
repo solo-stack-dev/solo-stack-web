@@ -1,0 +1,26 @@
+# Round 2 fix plan
+
+Both critics scored round 1 at 7.8–7.9 overall (`round-1-opus.md`, `round-1-gpt.md`). Target: ≥ 9.5 from both on every area. Their shared verdict: the painted art and the concepts are right, keep them; what costs points is the craft between the paintings (one grid, no empty bands, no template UI pieces, cleaner atmosphere around type, composed mobile layouts, finished quiet/empty states).
+
+## Rules for every fix agent
+
+- Read both critique files fully; fix every issue in your scope from BOTH lists. Where the critics disagree, pick the stronger solution and say why in your report. Do not regress what they say to keep.
+- Design only (no data/behaviour changes beyond what a fix needs, e.g. the stretched link). Accessibility visible in design: text ≥ 4.5:1, UI/focus ≥ 3:1 in both themes.
+- No visitor text written by agents (AGENTS.md). New strings: generate with gpt-6.1-sol: write the prompt to a file and run `codex exec -m gpt-6.1-sol - < prompt.md` from a directory OUTSIDE the repo; follow the voice rules in docs/PROJECT.md (German base, no hyphens/dashes in copy, no invented facts). Add keys to both `messages/de.json` and `messages/en.json`.
+- No new packages. Performance: enhanced:img, lazy below the fold, CSS-first motion, paused off screen, `prefers-reduced-motion` gets a beautiful static frame.
+- Verify: `pnpm check`, `pnpm lint`, `pnpm build`. Screenshots with `node src/lib/home/shared/tools/scroll-screens.mjs <url> <outDir> [--width --height --theme light|dark --reduced --step --prefix --seams]` (run your own `pnpm dev` on a free port) at 1440×900, 1920×1080 and 390×844, light and dark where the page has themes; look at every one critically as an art director and iterate. Save to `docs/screens/round-2/<your-area>/`.
+- Commit on your branch; message ends with a blank line and `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Report: branch, SHA, every critic issue in scope with fixed / changed approach / not fixed (why), screenshot paths, open issues.
+
+## Ownership (parallel agents, stay in your lane)
+
+| Agent | Owns | Scope |
+|---|---|---|
+| Shell | `src/lib/components/site/**` (SiteNav, MobileMenu*, SiteFooter, ThemeToggle…), `src/routes/(site)/+layout.svelte`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 1–8, GPT shell 1–5, the homepage nav scrim/heading collision (Opus home 1, the nav side), the one shared content grid token, footer redesign + spacing budget, 404 |
+| Home | `src/lib/home/sections/{hero,making,night-shift,radio,sunrise}/**` | Opus home 1 (section side: scroll-margin, keep display type out of the top ~96px), 5–10; GPT home 4–5. NOT the game, cinema or seam clouds (art pending, next wave) |
+| Blog | `src/routes/(site)/blog/**`, `src/lib/blog/**` | Opus blog + post, GPT blog + post (section-break art comes in the next wave; leave clean hooks for 2–3 painted breaks, or use existing art crops if they truly fit) |
+| Stats | `src/routes/(site)/stats/**`, `src/lib/stats/**` | Opus + GPT stats, except the painted root asset (next wave; improve the current root as far as code allows, keep it swappable) |
+| Contact | `src/routes/(site)/kontakt/**`, `src/lib/contact/**` | Opus + GPT kontakt |
+
+**Spacing budget to the footer:** the Shell agent's footer owns the gap between the last content and the first visible silhouette of the horizon (target ~96–128px desktop, ~64–96px mobile, measured to the visible art, not the image box). Page agents end their page without extra bottom padding (≤ 2rem after the last element) and remove local `pb-24`-style runways.
+
+**Grid:** pages use `mx-auto max-w-6xl px-4 sm:px-6 lg:px-8`. The Shell agent aligns the subpage nav and the footer to exactly that container (logo flush with the content's left edge, last nav control flush with its right edge). Page agents keep that container for their main column.
