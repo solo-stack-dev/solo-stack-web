@@ -30,13 +30,13 @@
 	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
-<div class="overflow-x-clip pb-24 text-foreground">
+<div class="overflow-x-clip pb-8 text-foreground">
 	<Horizon {stats} bind:period />
 
 	<!-- Below the hill: the tree's root runs down the margin past every section -->
 	<div class="relative">
 		<Roots />
-		<div class="relative mx-auto grid max-w-6xl gap-24 px-4 pt-16 sm:px-6 sm:pt-20 lg:gap-32 lg:px-8">
+		<div class="relative mx-auto grid max-w-6xl gap-24 px-4 pt-14 sm:px-6 sm:pt-16 lg:gap-32 lg:px-8">
 			<section class="grid gap-10" aria-labelledby="stats-platforms">
 				<SectionHeading id="stats-platforms" title={m.stats_platforms_title()} description={m.stats_platforms_description()} />
 				<Constellation {stats} {period} />
