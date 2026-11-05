@@ -15,8 +15,11 @@
 	import Scene from './Scene.svelte';
 	import { COMMITS_PER_PAGE, desktop, mobile, type SpotId } from './layout.ts';
 	import { Terminal } from './terminal.svelte.ts';
+	import { FALLBACK_LOG } from './fallback-log.ts';
 
-	const commits = $derived(await getRecentCommits());
+	// Live feed at build time; if it comes back empty, the baked log of this site's own recent commits (never an error in the painting)
+	const fetched = $derived(await getRecentCommits());
+	const commits = $derived(fetched.length ? fetched : FALLBACK_LOG);
 	const terminal = $derived(new Terminal(commits, m.home_nightshift_monitor_empty(), COMMITS_PER_PAGE));
 	const reduced = $derived(reducedMotion.current);
 

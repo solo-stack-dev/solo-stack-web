@@ -255,7 +255,7 @@
 
 {#snippet stripContent(variant: 'wide' | 'tall')}
 	<!-- Wide radio: one row in the long window. Tall radio: two short rows. -->
-	<div class={['strip-body', `strip-${variant}`]}>
+	<div class={['strip-body', `strip-${variant}`, !(tuned ?? selected) && 'strip-idle']}>
 		{@render stripRows()}
 	</div>
 {/snippet}
@@ -263,7 +263,7 @@
 {#snippet stripRows()}
 	{@const station = tuned ?? selected}
 	{#if !station}
-		<div class="strip-row">
+		<div class="strip-row strip-dash-row">
 			<span class="strip-dash font-mono" aria-hidden="true">— — —</span>
 		</div>
 		<div class="strip-row strip-sub">
@@ -320,6 +320,8 @@
 		--band: var(--band-wide);
 		--radio-w: min(56rem, 60cqw, calc((100svh - 22rem) / var(--aspect-wide)));
 		--stage-w: max(110cqw, calc((100svh + 4rem) / var(--plate-aspect)));
+		/* foreground rock left under the radio's feet (its dry edge included) */
+		--ground: clamp(4.5rem, 8vw, 8.5rem);
 		position: relative;
 		isolation: isolate;
 		container-type: inline-size;
@@ -351,16 +353,31 @@
 		width: var(--radio-w);
 	}
 
+	/* The foreground rock ends --ground below the radio's feet in a painted dry edge (not a long linear fade that turned it to mud).
+	   --stage-top: the stage's top relative to the scene; --cut: where the rock is gone, from the stage top (never past its bottom). */
 	.stage {
+		--stage-h: calc(var(--stage-w) * var(--plate-aspect));
+		--stage-top: calc(var(--horizon-at) * var(--radio-w) * var(--radio-aspect) - var(--horizon) * var(--stage-h));
+		--cut: min(var(--stage-h), calc(var(--radio-w) * var(--radio-aspect) + var(--ground) - var(--stage-top)));
+		--fade: calc(var(--ground) * 0.8);
 		position: absolute;
 		z-index: -1;
 		left: 50%;
 		width: var(--stage-w);
-		aspect-ratio: 1 / var(--plate-aspect);
-		top: calc(var(--horizon-at) * var(--radio-w) * var(--radio-aspect) - var(--horizon) * var(--stage-w) * var(--plate-aspect));
+		height: var(--stage-h);
+		top: var(--stage-top);
 		translate: -50% 0;
 		pointer-events: none;
-		mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%);
+		mask-image: var(--feather-up), linear-gradient(#000 0 0), var(--feather-down);
+		mask-repeat: no-repeat;
+		mask-size:
+			100% calc(var(--stage-h) * 0.16),
+			100% calc(var(--cut) - var(--fade) - var(--stage-h) * 0.16 + 2px),
+			100% var(--fade);
+		mask-position:
+			0 0,
+			0 calc(var(--stage-h) * 0.16 - 1px),
+			0 calc(var(--cut) - var(--fade));
 	}
 
 	.stage :global(.plate) {
@@ -412,6 +429,15 @@
 		max-width: 55%;
 	}
 
+	/* Wide radio: the glass right above already names the handle; the strip keeps the frequency and a follow button that fits whole */
+	.strip-wide .strip-handle {
+		display: none;
+	}
+
+	.strip-wide .strip-freq {
+		font-size: 0.85rem;
+	}
+
 	.strip-wide > .strip-sub {
 		flex: 1 1 auto;
 	}
@@ -433,12 +459,24 @@
 	.strip-sub {
 		justify-content: flex-end;
 		font-size: 0.78rem;
-		color: color-mix(in oklab, var(--color-cream) 75%, transparent);
+		line-height: 1;
+		color: color-mix(in oklab, var(--color-cream) 85%, transparent);
 	}
 
 	.strip-tall .strip-sub {
 		justify-content: flex-start;
-		font-size: 0.7rem;
+		font-size: 0.75rem;
+	}
+
+	/* Idle (nothing tuned): one centered line on both radios; the tall strip has no room for two (it clipped the hint) */
+	.strip-tall.strip-idle {
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.strip-tall.strip-idle .strip-dash-row {
+		display: none;
 	}
 
 	.strip-tall .strip-handle {
@@ -447,12 +485,12 @@
 
 	.strip-tall .strip-button {
 		padding: 0.25rem 0.55rem;
-		font-size: 0.68rem;
+		font-size: 0.75rem;
 	}
 
+	/* idle: cream, not butter (butter only once a station is tuned) */
 	.strip-dash {
-		color: var(--color-butter);
-		opacity: 0.6;
+		color: color-mix(in oklab, var(--color-cream) 55%, transparent);
 	}
 
 	.strip-hint {
@@ -460,8 +498,9 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: 0.72rem;
-		opacity: 0.7;
+		font-size: 0.75rem;
+		line-height: 1;
+		padding-block: 0.1em;
 	}
 
 	.strip-handle {
@@ -477,9 +516,8 @@
 
 	.strip-freq {
 		flex: none;
-		font-size: 0.7rem;
-		color: var(--color-butter);
-		opacity: 0.7;
+		font-size: 0.75rem;
+		color: color-mix(in oklab, var(--color-butter) 85%, transparent);
 	}
 
 	.strip-button-text {
@@ -556,8 +594,15 @@
 		accent-color: var(--color-butter);
 	}
 
-	/* Desktop: chart beside the radio */
+	/* Desktop: chart beside the radio. The section ends just under the rock's edge (no forced full screen of dark night before the
+	   cinema); its own feather is short, so it never touches the radio. */
 	@media (min-width: 80rem) {
+		.radio {
+			min-height: 0;
+			padding-bottom: calc(var(--ground) + 0.5rem);
+			--feather-bottom: calc(var(--ground) * 0.5);
+		}
+
 		.scene {
 			grid-template-columns: auto minmax(16rem, 19rem);
 			justify-content: center;

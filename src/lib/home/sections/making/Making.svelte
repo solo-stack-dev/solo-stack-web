@@ -39,6 +39,12 @@
 		chart: m.home_making_state_chart_title,
 		moon: m.home_making_state_moon_title
 	};
+	const PILLAR_LABELS: Record<(typeof PILLARS)[number]['id'], () => string> = {
+		ai: m.home_making_pillar_ai,
+		code: m.home_making_pillar_code,
+		projects: m.home_making_pillar_projects,
+		business: m.home_making_pillar_business
+	};
 	// Bloom masks (SVG data URLs) are defined once as `--mask-<id>` on the section, so the HTML carries each URL once.
 	const MASK_VARS = STATE_IDS.map((id) => `--mask-${id}: ${bloomMask(id)}`).join('; ');
 	const MASKS = Object.fromEntries(STATE_IDS.map((id) => [id, `var(--mask-${id})`])) as Record<MakingStateId, string>;
@@ -75,6 +81,9 @@
 	const playing = $derived(onStage && !userPaused && !hovered && !keyboardFocus && pageVisibility.current && !reducedMotion.current);
 
 	let line: SVGPathElement;
+	let lineIn: SVGPathElement;
+	let strandOut: SVGGElement;
+	let strandIn: SVGGElement;
 	let ink: SVGSVGElement;
 	let glow: HTMLElement;
 	const blooms: HTMLDivElement[] = [];
@@ -103,6 +112,53 @@
 	});
 
 	/**
+	 * Pigment blot: the mask that grows each bloom from the shape's center. A solid core with a wobbly edge that breaks into hard pigment
+	 * granules (no blur anywhere), generated once on the client. The bloom scales its mask-size, so the edge stays sharp while it grows;
+	 * the shape mask (crisp, morph.ts) cuts the final outline.
+	 */
+	let blot = $state('');
+	/** Smooth value noise: bilinear (smoothstep-eased) lookup in a (cells + 1)² lattice of random values, x and y in 0…1. */
+	function sample(grid: number[], cells: number, x: number, y: number) {
+		const gx = x * cells;
+		const gy = y * cells;
+		const ix = Math.min(cells - 1, Math.floor(gx));
+		const iy = Math.min(cells - 1, Math.floor(gy));
+		const fx = smooth(gx - ix);
+		const fy = smooth(gy - iy);
+		const at = (cx: number, cy: number) => grid[cy * (cells + 1) + cx];
+		const top = at(ix, iy) + (at(ix + 1, iy) - at(ix, iy)) * fx;
+		const bottom = at(ix, iy + 1) + (at(ix + 1, iy + 1) - at(ix, iy + 1)) * fx;
+		return top + (bottom - top) * fy;
+	}
+	$effect(() => {
+		const size = 320;
+		const canvas = document.createElement('canvas');
+		canvas.width = canvas.height = size;
+		const context = canvas.getContext('2d');
+		if (!context) return;
+		let seed = 2100;
+		const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+		// two octaves of smooth value noise for the edge wobble
+		const lattice = (cells: number) => Array.from({ length: (cells + 1) * (cells + 1) }, random);
+		const fine = lattice(18);
+		const coarse = lattice(6);
+		const image = context.createImageData(size, size);
+		for (let y = 0; y < size; y++) {
+			for (let x = 0; x < size; x++) {
+				const u = x / (size - 1);
+				const v = y / (size - 1);
+				const edge = Math.hypot(u * 2 - 1, v * 2 - 1) + 0.2 * (sample(coarse, 6, u, v) - 0.5) + 0.09 * (sample(fine, 18, u, v) - 0.5);
+				// solid core; a band of granules thinning out; a few loose specks beyond
+				const granule = random();
+				const solid = edge < 0.72 || (edge < 0.9 && granule < ((0.9 - edge) / 0.18) ** 0.8) || (edge < 0.98 && granule > 0.985);
+				image.data.set([255, 255, 255, solid ? 255 : 0], (y * size + x) * 4);
+			}
+		}
+		context.putImageData(image, 0, 0);
+		blot = `url(${canvas.toDataURL()})`;
+	});
+
+	/**
 	 * Visibility gate: half the stage on screen, or three quarters while it still enters from below (the hero → 21:00 wipe is then still
 	 * revealing the drawing). The hover zone lies over the hero's lower half during the wipe, so it waits for the same gate.
 	 */
@@ -122,20 +178,35 @@
 	let kind: 'morph' | 'redraw' = 'morph';
 	let dwell = 0;
 	const points = new Float32Array(LINE_POINTS * 2);
+	const pointsIn = new Float32Array(LINE_POINTS * 2);
 	const fromPoints = new Float32Array(LINE_POINTS * 2);
 	let drawnLayout = '';
 	let redrawPhase = -1;
 	let dirty = true;
 	const levels = new Float32Array(STATE_IDS.length);
 	const written = new Float32Array(STATE_IDS.length).fill(-1);
+	const grown = new Float32Array(STATE_IDS.length);
+	const sized = new Float32Array(STATE_IDS.length).fill(-1);
 	let glowWritten = -1;
 	let dashWritten = '';
+	let fadeWritten = -1;
 
 	const smooth = (x: number) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 	const target = () => composeLine(layoutId, STATE_IDS[to]);
 
+	/**
+	 * A morph is a crossfade of two strands, so the tangled middle of a point-by-point morph never shows: the old figure starts to flow
+	 * toward the new one and dissolves (OUT_FADE) while the new figure condenses out of the last stretch of the same morph (IN_FADE).
+	 * Fades are fractions of MORPH; REACH is how far along the morph each strand travels (the old one up to it, the new one from 1 - it).
+	 */
+	const REACH = 0.28;
+	const OUT_FADE = [0.26, 0.54] as const;
+	const IN_FADE = [0.44, 0.74] as const;
+	const fade = (x: number, [a, b]: readonly [number, number]) => smooth((x - a) / (b - a));
+
 	function begin(state: number, how: 'morph' | 'redraw') {
-		fromPoints.set(points);
+		// continue from whichever strand dominates right now
+		fromPoints.set(kind === 'morph' && t < 1 && t >= 0.5 ? pointsIn : points);
 		from = to;
 		to = state;
 		t = 0;
@@ -178,7 +249,12 @@
 		if (t < 1) {
 			t = Math.min(1, t + dt / (kind === 'morph' ? MORPH : REDRAW));
 			if (kind === 'morph') {
-				morphPoints(points, fromPoints, target(), t);
+				const next = target();
+				if (t >= 1) points.set(next);
+				else {
+					morphPoints(points, fromPoints, next, REACH * smooth(t / OUT_FADE[1]));
+					morphPoints(pointsIn, fromPoints, next, 1 - REACH + REACH * smooth((t - IN_FADE[0]) / (1 - IN_FADE[0])));
+				}
 				dirty = true;
 			} else {
 				// Redraw: until 0.45 the line retracts into the laptop, then it is gone, from 0.55 the new shape draws in from the left edge.
@@ -201,9 +277,18 @@
 			if (dwell >= DWELL) begin(to === LAST ? 0 : to + 1, to === LAST ? 'redraw' : 'morph');
 		}
 
+		// mid morph both strands show; otherwise (rest, redraw) only the main one
+		const crossing = kind === 'morph' && t < 1 ? t : -1;
 		if (dirty) {
 			line.setAttribute('d', toPathData(points));
+			if (crossing >= 0) lineIn.setAttribute('d', toPathData(pointsIn));
 			dirty = false;
+		}
+		const fadeKey = crossing < 0 ? -1 : Math.round(crossing * 1000);
+		if (fadeKey !== fadeWritten) {
+			strandOut.style.opacity = crossing < 0 ? '' : String(Math.round((1 - fade(crossing, OUT_FADE)) * 1000) / 1000);
+			strandIn.style.opacity = crossing < 0 ? '0' : String(Math.round(fade(crossing, IN_FADE) * 1000) / 1000);
+			fadeWritten = fadeKey;
 		}
 		if (dash !== dashWritten) {
 			ink.style.strokeDasharray = dash ? '1 2' : '';
@@ -216,12 +301,16 @@
 			const rest = t >= 1 && i === to ? 1 : 0;
 			levels[i] += (rest - levels[i]) * (1 - Math.exp(-dt * (rest ? 2.6 : 5)));
 			if (Math.abs(rest - levels[i]) < 0.002) levels[i] = rest;
-			const leaving = t < 1 && i === from ? Math.max(0, 1 - t / (kind === 'morph' ? 0.5 : 0.4)) : 1;
-			const value = Math.round(levels[i] * leaving * 1000) / 1000;
-			if (value !== written[i]) {
+			// The pigment spreads (mask growth) while the line rests; when it moves on, the bloom keeps its size and fades with the old strand.
+			if (i === to && t >= 1) grown[i] = levels[i];
+			const leaving = t < 1 && i === from ? 1 - (kind === 'morph' ? fade(t, [0.12, 0.48]) : smooth(t / 0.4)) : 1;
+			const value = Math.round(Math.min(1, levels[i] * 4) * leaving * 1000) / 1000;
+			const size = Math.round(grown[i] * 1000) / 1000;
+			if (value !== written[i] || size !== sized[i]) {
 				blooms[i].style.opacity = String(value);
-				blooms[i].style.transform = `scale(${0.82 + 0.18 * value})`;
+				blooms[i].style.setProperty('--grow', String(size));
 				written[i] = value;
+				sized[i] = size;
 			}
 		}
 
@@ -250,16 +339,20 @@
 		t = 1;
 		line.setAttribute('d', toPathData(composeLine(layoutId, STATE_IDS[active])));
 		ink.style.strokeDasharray = '';
+		strandOut.style.opacity = '';
+		strandIn.style.opacity = '0';
 		blooms.forEach((bloom, i) => {
 			bloom.style.opacity = String(Number(i === active));
-			bloom.style.transform = 'none';
+			bloom.style.setProperty('--grow', '1');
 		});
 		glow.style.opacity = String(Number(active === LAST));
 		// if motion is allowed again, the loop redraws everything from here
 		drawnLayout = '';
 		dashWritten = '';
+		fadeWritten = -1;
 		levels.fill(0);
 		written.fill(-1);
+		sized.fill(-1);
 		glowWritten = -1;
 	});
 
@@ -321,6 +414,7 @@
 			style:--screen-y={screenY}
 			style:--screen-clip={screenClip}
 			style:--dwell="{DWELL}s"
+			style:--blot={blot || undefined}
 			{@attach watchStage}
 			{@attach watchHover}
 		>
@@ -344,13 +438,22 @@
 						<defs>
 							<!-- pathLength 1: the moon → idea loop retracts and redraws the line with a dash offset in 0…1 -->
 							<path id="making-line" pathLength="1" bind:this={line} d={initialLine} />
+							<!-- the incoming strand of a morph (crossfade, see REACH) -->
+							<path id="making-line-in" pathLength="1" bind:this={lineIn} d={initialLine} />
 							<pattern id="making-grain" patternUnits="userSpaceOnUse" width="128" height="128">
 								{#if grain}<image href={grain} width="128" height="128" />{/if}
 							</pattern>
 						</defs>
-						<use href="#making-line" class="ink-glow" />
-						<use href="#making-line" class="ink-core" />
-						<use href="#making-line" class="ink-grain" />
+						<g bind:this={strandOut}>
+							<use href="#making-line" class="ink-glow" />
+							<use href="#making-line" class="ink-core" />
+							<use href="#making-line" class="ink-grain" />
+						</g>
+						<g bind:this={strandIn} opacity="0">
+							<use href="#making-line-in" class="ink-glow" />
+							<use href="#making-line-in" class="ink-core" />
+							<use href="#making-line-in" class="ink-grain" />
+						</g>
 					</svg>
 
 					<!-- the drawing and its title: hovering it pauses the rotation -->
@@ -359,73 +462,79 @@
 			</div>
 
 			<NightClock time="21:00" />
-			<!-- The pillar row below names the topics on screen (the hero tagline in the same style leads into it) -->
 			<h2 id="home-making-title" class="sr-only">{m.home_making_title()}</h2>
 
-			<!-- All six titles stay in the document as a list; no live region, so the rotation never talks over a screen reader. -->
-			<ol class="titles" aria-label={m.home_making_states_label()}>
-				{#each STATE_IDS as id, i (id)}
-					<li class={['title font-display font-black tracking-wordmark uppercase', i === active && 'is-active']}>{TITLES[id]()}</li>
-				{/each}
-			</ol>
-
-			<nav class="pillars label" aria-label={m.home_making_pillars_label()} onfocusin={onFocusIn} onfocusout={onFocusOut}>
-				<ul>
-					{#each PILLARS as pillar, p (pillar.label)}
-						{@const current = (pillar.states as readonly number[]).includes(active)}
-						<li>
-							<button
-								type="button"
-								class="pillar"
-								aria-current={current ? 'step' : undefined}
-								onclick={() => goTo(pillar.target)}
-								onkeydown={(event) => onRowKey(event, 'pillars', p)}
-								{@attach (element) => void (pillarButtons[p] = element)}
-							>
-								{pillar.label}
-								<svg class="underline" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
-									<path d="M2 5.2 C 22 2.6, 48 3.4, 70 3 S 94 3.8, 98 2.6" />
-								</svg>
-							</button>
-						</li>
-					{/each}
-				</ul>
-			</nav>
-
-			<!-- Bottom right: pause, the six states (one tab stop, arrows step), skip cue. -->
-			<div class="controls" onfocusin={onFocusIn} onfocusout={onFocusOut}>
-				<button type="button" class="toggle" aria-label={userPaused ? m.home_making_play() : m.home_making_pause()} onclick={() => (userPaused = !userPaused)}>
-					<svg viewBox="0 0 24 24" aria-hidden="true">
-						{#if userPaused}
-							<path d="M8.6 5.6 C 8.3 9.7, 8.4 14.4, 8.8 18.5 C 12.1 16.5, 15.2 14.3, 18.3 12 C 15.2 9.8, 12 7.6, 8.6 5.6 Z" />
-						{:else}
-							<path d="M8.9 5.8 C 8.6 9.8, 8.7 14.3, 9.1 18.3 M15.1 5.6 C 14.8 9.7, 14.9 14.2, 15.2 18.4" />
-						{/if}
-					</svg>
-				</button>
-				<div class="dots" role="group" aria-label={m.home_making_states_label()}>
+			<!-- Caption under the drawing: the state title, then (one group, centered) the pillar row and the transport row. Phones: the title
+			     stays under the drawing, the group sits on the rock at the bottom (display: contents). -->
+			<div class="caption">
+				<!-- All six titles stay in the document as a list; no live region, so the rotation never talks over a screen reader. -->
+				<ol class="titles" aria-label={m.home_making_states_label()}>
 					{#each STATE_IDS as id, i (id)}
-						<button
-							type="button"
-							class="dot-hit"
-							aria-label={TITLES[id]()}
-							aria-current={i === active ? 'step' : undefined}
-							tabindex={i === active ? 0 : -1}
-							onclick={() => goTo(i)}
-							onkeydown={(event) => onRowKey(event, 'dots', i)}
-							{@attach (element) => void (dots[i] = element)}
-						>
-							<span class="dot">
-								{#if i === active && resting}
-									{#key rests}<span class="ring"></span>{/key}
-								{/if}
-							</span>
-						</button>
+						<li class={['title font-display font-black tracking-wordmark uppercase', i === active && 'is-active']}>{TITLES[id]()}</li>
 					{/each}
+				</ol>
+
+				<div class="console" onfocusin={onFocusIn} onfocusout={onFocusOut}>
+					<nav class="pillars label" aria-label={m.home_making_pillars_label()}>
+						<ul>
+							{#each PILLARS as pillar, p (pillar.id)}
+								{@const current = (pillar.states as readonly number[]).includes(active)}
+								<li>
+									<button
+										type="button"
+										class="pillar"
+										aria-current={current ? 'step' : undefined}
+										onclick={() => goTo(pillar.target)}
+										onkeydown={(event) => onRowKey(event, 'pillars', p)}
+										{@attach (element) => void (pillarButtons[p] = element)}
+									>
+										{PILLAR_LABELS[pillar.id]()}
+										<svg class="underline" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+											<path d="M2 5.2 C 22 2.6, 48 3.4, 70 3 S 94 3.8, 98 2.6" />
+										</svg>
+									</button>
+								</li>
+							{/each}
+						</ul>
+					</nav>
+
+					<!-- pause, the six states (one tab stop, arrows step; the title shows on hover/focus), skip cue -->
+					<div class="transport">
+						<button type="button" class="toggle" aria-label={userPaused ? m.home_making_play() : m.home_making_pause()} onclick={() => (userPaused = !userPaused)}>
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								{#if userPaused}
+									<path d="M8.6 5.6 C 8.3 9.7, 8.4 14.4, 8.8 18.5 C 12.1 16.5, 15.2 14.3, 18.3 12 C 15.2 9.8, 12 7.6, 8.6 5.6 Z" />
+								{:else}
+									<path d="M8.9 5.8 C 8.6 9.8, 8.7 14.3, 9.1 18.3 M15.1 5.6 C 14.8 9.7, 14.9 14.2, 15.2 18.4" />
+								{/if}
+							</svg>
+						</button>
+						<div class="dots" role="group" aria-label={m.home_making_states_label()}>
+							{#each STATE_IDS as id, i (id)}
+								<button
+									type="button"
+									class="dot-hit"
+									aria-label={TITLES[id]()}
+									aria-current={i === active ? 'step' : undefined}
+									tabindex={i === active ? 0 : -1}
+									onclick={() => goTo(i)}
+									onkeydown={(event) => onRowKey(event, 'dots', i)}
+									{@attach (element) => void (dots[i] = element)}
+								>
+									<span class="dot">
+										{#if i === active && resting}
+											{#key rests}<span class="ring"></span>{/key}
+										{/if}
+									</span>
+									<span class="tip label-sm" aria-hidden="true">{TITLES[id]()}</span>
+								</button>
+							{/each}
+						</div>
+						<a class="cue" href="#game" aria-label={m.home_making_skip_label()}>
+							<svg viewBox="0 0 24 40" aria-hidden="true"><path d="M12 2 V37 M3 28 L12 37 L21 28" /></svg>
+						</a>
+					</div>
 				</div>
-				<a class="cue" href="#game" aria-label={m.home_making_skip_label()}>
-					<svg viewBox="0 0 24 40" aria-hidden="true"><path d="M12 2 V37 M3 28 L12 37 L21 28" /></svg>
-				</a>
 			</div>
 		</div>
 	</div>
@@ -541,7 +650,8 @@
 
 	/* During the wipe only the plate floods in; drawing, clock, titles and controls follow once the front passes the middle (--wipe is 1
 	   without the animation). */
-	.stage > :global(:not(.scene)),
+	.stage > :global(:not(.scene, .caption)),
+	.caption > *,
 	.bloom-mask,
 	.ink {
 		opacity: clamp(0, (var(--wipe) - 0.35) / 0.3, 1);
@@ -625,12 +735,15 @@
 		-webkit-mask-size: 100% 100%;
 	}
 
+	/* The pigment spreads from the shape's center: a sharp granular blot (generated, `--blot`) grows via mask-size (`--grow` 0…1,
+	   written by the loop); at 1 it covers the whole box and the crisp shape mask above cuts the outline. Without the blot (SSR, before
+	   hydration) the bloom is unmasked. */
 	.bloom {
 		width: 100%;
 		height: 100%;
 		opacity: 0;
-		transform: scale(0.82);
-		will-change: opacity, transform;
+		mask: var(--blot, linear-gradient(#000 0 0)) center / calc(var(--grow, 1) * 190%) calc(var(--grow, 1) * 190%) no-repeat;
+		will-change: opacity;
 	}
 
 	.bloom :global(img) {
@@ -679,15 +792,40 @@
 
 	/* ── text and controls (stage coordinates) ──────────────────────────── */
 
-	.titles {
+	/* Caption: the state title at its plate position under the drawing (plate y → stage y through the same transform as .frame), and one
+	   centered control group 3rem below it. */
+	.caption {
 		position: absolute;
+		z-index: 2;
 		left: 50%;
-		/* plate y → stage y through the same transform as .frame */
 		top: calc(50% + (var(--title-y) - var(--ph) / 2) * var(--s));
-		width: min(90vw, 44rem);
+		width: min(calc(100% - 2 * var(--page-gutter)), 44rem);
 		translate: -50% 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.titles {
+		position: relative;
 		display: grid;
+		width: 100%;
 		text-align: center;
+	}
+
+	/* No box behind the label: one soft ink ellipse (radial, wider than the words) keeps it clean on the painted sky */
+	.titles::before {
+		content: '';
+		position: absolute;
+		inset: -60% -8%;
+		z-index: -1;
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ink) 55%, transparent),
+			color-mix(in oklab, var(--color-ink) 22%, transparent) 55%,
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	.title {
@@ -702,35 +840,52 @@
 		line-clamp: 2;
 		overflow: hidden;
 		color: var(--color-cream);
-		text-shadow: var(--glow-md);
+		/* a tight ink edge for the grain, a faint warm breath: ink, not UI glow */
+		text-shadow:
+			0 0 1px var(--color-ink),
+			0 0 0.4em color-mix(in oklab, var(--color-ink) 60%, transparent),
+			0 0 1.6em color-mix(in oklab, var(--color-butter) 12%, transparent);
 		opacity: 0;
-		translate: 0 0.4em;
-		filter: blur(6px);
+		translate: 0 0.3em;
 		transition:
 			opacity var(--dur-state) ease,
-			translate var(--dur-reveal) var(--ease-settle),
-			filter var(--dur-state) ease;
+			translate var(--dur-reveal) var(--ease-settle);
 	}
 
 	.title.is-active {
 		opacity: 1;
 		translate: 0 0;
-		filter: none;
 	}
 
-	/* Bottom line of the stage; the first label's text (not its hit area) starts on the gutter */
-	.pillars {
-		position: absolute;
-		z-index: 2;
-		left: var(--page-gutter);
-		bottom: var(--bottom-gutter);
+	.console {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-top: 2.25rem;
+	}
+
+	/* Short landscape screens (phones turned sideways): title, then pillars and transport on one line, lifted so the group never
+	   leaves the stage */
+	@media (min-aspect-ratio: 1/1) and (max-height: 34rem) {
+		.caption {
+			top: min(calc(50% + (var(--title-y) - var(--ph) / 2) * var(--s)), calc(100% - 7rem));
+		}
+
+		.console {
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: center;
+			column-gap: 0.75rem;
+			margin-top: 0.5rem;
+		}
 	}
 
 	.pillars ul {
 		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
 		align-items: center;
-		gap: 0.35rem;
-		margin-left: -0.55rem;
+		gap: 0 0.35rem;
 	}
 
 	.pillars li + li::before {
@@ -743,6 +898,7 @@
 		position: relative;
 		white-space: nowrap;
 		padding: 0.6rem 0.55rem;
+		text-transform: uppercase;
 		color: var(--color-cream);
 		text-shadow: var(--halo-ink);
 		cursor: pointer;
@@ -776,13 +932,8 @@
 		scale: 1 1;
 	}
 
-	/* Bottom right, on the pillars' text line: pause, the dots, the skip cue (its arrow on the right gutter). 44px targets; the dots are
-	   24px wide each. */
-	.controls {
-		position: absolute;
-		z-index: 2;
-		right: calc(var(--page-gutter) - 0.925rem);
-		bottom: var(--bottom-gutter);
+	/* Under the pillars: pause, the dots, the skip cue. 44px targets; the dots are 32px wide each. */
+	.transport {
 		display: flex;
 		align-items: center;
 	}
@@ -828,19 +979,21 @@
 	}
 
 	.dot-hit {
+		position: relative;
 		display: grid;
 		place-items: center;
-		width: 1.5rem;
+		width: 2rem;
 		height: 2.75rem;
 		cursor: pointer;
 	}
 
 	.dot {
 		position: relative;
-		width: 0.5rem;
-		height: 0.5rem;
+		width: 0.55rem;
+		height: 0.55rem;
 		border-radius: 50%;
-		border: 1px solid color-mix(in oklab, var(--color-cream) 80%, transparent);
+		border: 1.5px solid color-mix(in oklab, var(--color-cream) 85%, transparent);
+		box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 50%, transparent);
 		transition:
 			background-color var(--dur-state),
 			border-color var(--dur-hover),
@@ -851,10 +1004,37 @@
 		border-color: var(--color-butter);
 	}
 
+	/* Active: a solid butter core with an ink rim, clearly the one lit station */
 	.dot-hit[aria-current] .dot {
 		background: var(--color-butter);
 		border-color: var(--color-butter);
-		scale: 1.25;
+		box-shadow:
+			0 0 0 1.5px var(--color-ink),
+			var(--glow-sm);
+		scale: 1.45;
+	}
+
+	/* The state's title under its dot on hover or keyboard focus (phones: above, the row sits at the bottom) */
+	.tip {
+		position: absolute;
+		left: 50%;
+		top: calc(100% - 0.15rem);
+		translate: -50% -0.25rem;
+		white-space: nowrap;
+		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+		text-transform: uppercase;
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			opacity var(--dur-hover) ease,
+			translate var(--dur-state) var(--ease-settle);
+	}
+
+	.dot-hit:hover .tip,
+	.dot-hit:focus-visible .tip {
+		opacity: 1;
+		translate: -50% 0;
 	}
 
 	/* Dwell cue: a hairline ring around the active dot fills clockwise until the next state; it runs only while the rotation plays. */
@@ -908,30 +1088,47 @@
 			padding-inline: 12vw;
 		}
 
-		/* The desktop row split in two lines, on the dark rock below the lit cliff top and laptop (plate bottom right): the pillars from the
-		   left gutter (first letter on it), and under them, as on desktop, pause, dots and cue on the right gutter. */
-		.stage {
-			--chrome-bottom: clamp(0.5rem, 2vh, 1.25rem);
+		/* The line runs down the right side to the laptop, so the title stays under the drawing and the control group sits centered on
+		   the dark rock below the lit cliff (plate bottom), one block: transport on top (its tips open upwards), pillars under it. */
+		.caption {
+			display: contents;
 		}
 
-		.pillars {
-			bottom: calc(var(--chrome-bottom) + 2.75rem);
+		.titles {
+			position: absolute;
+			left: 50%;
+			top: calc(50% + (var(--title-y) - var(--ph) / 2) * var(--s));
+			width: min(90vw, 44rem);
+			translate: -50% 0;
 		}
 
+		.console {
+			position: absolute;
+			z-index: 2;
+			left: 50%;
+			bottom: clamp(0.5rem, 2vh, 1.25rem);
+			width: calc(100% - 2 * var(--page-gutter) + 1rem);
+			translate: -50% 0;
+			flex-direction: column-reverse;
+			margin: 0;
+		}
+
+		/* two balanced pairs instead of a 3 + 1 wrap */
 		.pillars ul {
-			flex-wrap: nowrap;
-			gap: 0.15rem;
-			margin-left: -0.4rem;
+			display: grid;
+			grid-template-columns: auto auto;
+			justify-items: center;
+			gap: 0 1rem;
 		}
 
 		.pillars li + li::before {
-			margin-right: 0.15rem;
+			content: none;
 		}
 
 		.pillar {
 			min-height: 2.75rem;
 			padding-inline: 0.4rem;
-			letter-spacing: 0.12em;
+			letter-spacing: 0.14em;
 		}
 
 		.underline {
@@ -939,8 +1136,10 @@
 			width: calc(100% - 0.3rem);
 		}
 
-		.controls {
-			bottom: var(--chrome-bottom);
+		.tip {
+			top: auto;
+			bottom: calc(100% - 0.35rem);
+			translate: -50% 0.25rem;
 		}
 	}
 
@@ -950,7 +1149,6 @@
 		/* before hydration: the first state with its bloom (the component writes the active one inline from then on) */
 		.bloom-mask[data-state='idea'] .bloom {
 			opacity: 1;
-			transform: none;
 		}
 
 		/* nothing moves, so nothing to pause */

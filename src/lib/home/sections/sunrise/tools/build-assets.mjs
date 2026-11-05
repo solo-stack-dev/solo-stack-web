@@ -5,9 +5,10 @@
 // - Every layer is capped at MAX_WIDTH; transparent layers are cropped to their alpha box (+ PAD) so the browser decodes less.
 // - Sources are high quality WebP with alpha; the lossy delivery encode happens in enhanced-img.
 // - `portrait` job (opt-in; the source is the owner photo outside the repo): the footer's ink print. Crop head and shoulders,
-//   key out the butter backdrop, luminance → ink density (anthracite, alpha = density, dark mids), then print: snap to a few
-//   flat ink levels, dither with the shared paper grain, and end the bust in the shared painted wash edge, so the fade
-//   dissolves into ink specks instead of a grey gradient.
+//   key out the butter backdrop, luminance → ink density (dark mids), then print as a duotone: snap to a few flat levels, the
+//   light ones in ochre and burnt ochre, the darkest in anthracite (multiplied onto the butter paper they read as warm print, not
+//   a grey cut-out), dither with the shared paper grain, and end the bust in the shared painted wash edge, so the fade dissolves
+//   into ink specks instead of a grey gradient.
 //
 // Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs [portrait]
 // Uses `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
@@ -84,8 +85,8 @@ async function alphaBox(path) {
 const PORTRAIT = {
 	/** Head and shoulders in source px. */
 	crop: { left: 200, top: 40, width: 854, height: 1110 },
-	/** Output width: covers the largest render (~6.5rem wide) at 3×. */
-	width: 320,
+	/** Output width: covers the largest render (~8.5rem wide) at 3×. */
+	width: 420,
 	/** Backdrop key on G − B (butter ≈ 70–110, skin ≈ −10–5, hair/shirt ≈ 0): fully paper above `to`. */
 	key: { from: 22, to: 48 },
 	/** Luminance → ink: L ≤ black is full ink, L ≥ paper is no ink; `gamma` > 1 keeps the skin tones light, like a print. */
@@ -100,7 +101,13 @@ const PORTRAIT = {
 	dither: 0.2,
 	/** Bottom edge: wash tile repeated `repeat` times across at its painted aspect, offset by `shift` px; `side`: side ramps (fraction of width). */
 	feather: { repeat: 2, shift: 57, side: 0.12 },
-	ink: [24, 25, 27]
+	/** Duotone: one ink (and its alpha) per level, lightest first: ochre (--color-ochre), burnt ochre, anthracite (--color-ink). */
+	inks: [
+		[226, 169, 59],
+		[150, 88, 22],
+		[14, 15, 16]
+	],
+	alphas: [0.85, 0.92, 0.97]
 };
 
 const smoothstep = (a, b, x) => {
@@ -155,13 +162,14 @@ async function portrait() {
 			const noise = grain[(y % grainInfo.height) * grainInfo.width + (x % grainInfo.width)] - 0.5;
 			const value = dark * (1 - backdrop) * bottom * side + noise * PORTRAIT.dither;
 			// print: snap to the nearest ink level (or paper)
-			let density = 0;
-			levels.forEach((level, index) => {
-				if (value >= (level + (levels[index - 1] ?? 0)) / 2 + (index === 0 ? PORTRAIT.paper : 0)) density = level;
+			let level = -1;
+			levels.forEach((step, index) => {
+				if (value >= (step + (levels[index - 1] ?? 0)) / 2 + (index === 0 ? PORTRAIT.paper : 0)) level = index;
 			});
 			const o = (y * width + x) * 4;
-			out.set(PORTRAIT.ink, o);
-			out[o + 3] = Math.round(density * 255);
+			if (level < 0) continue;
+			out.set(PORTRAIT.inks[level], o);
+			out[o + 3] = Math.round(PORTRAIT.alphas[level] * 255);
 		}
 	}
 	// flat ink levels compress well losslessly (and must not get lossy ringing); via a buffer, since a running dev

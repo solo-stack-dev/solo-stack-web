@@ -241,13 +241,14 @@
 		/* Glass type in cqw; the tall radio is drawn ~2.3× smaller, hence larger factors */
 		--logo: 8.4cqw;
 		--name: max(0.85rem, 2.3cqw);
-		--small: max(0.68rem, 1.35cqw);
+		/* supporting glass labels never below 12px */
+		--small: max(0.75rem, 1.35cqw);
 	}
 
 	.set-tall {
 		--logo: 13cqw;
 		--name: max(0.85rem, 4.4cqw);
-		--small: max(0.62rem, 2.9cqw);
+		--small: max(0.75rem, 2.9cqw);
 	}
 
 	.layer,
@@ -290,8 +291,9 @@
 		opacity: 0.3;
 	}
 
+	/* Untuned platform marks: clearly printed cream; butter is reserved for the tuned station */
 	.mark {
-		opacity: 0.55;
+		opacity: 0.82;
 		transition: opacity 0.3s;
 	}
 
@@ -323,7 +325,8 @@
 		transition: none;
 	}
 
-	/* Above the dial slider but pointer-transparent, except for its links and controls */
+	/* Above the dial slider but pointer-transparent, except for its links and controls. A calm ink pool (no box: a soft ellipse) settles
+	   the mottled painted glass behind the live text. */
 	.glass {
 		position: absolute;
 		z-index: 1;
@@ -331,6 +334,20 @@
 		place-items: center;
 		pointer-events: none;
 		color: var(--color-cream);
+	}
+
+	.glass::before {
+		content: '';
+		position: absolute;
+		inset: 4% 2%;
+		z-index: -1;
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ink) 72%, transparent),
+			color-mix(in oklab, var(--color-ink) 45%, transparent) 65%,
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	.glass-station {
@@ -368,7 +385,6 @@
 		margin: 0;
 		font-size: var(--small);
 		color: color-mix(in oklab, var(--color-butter) 85%, white);
-		opacity: 0.9;
 	}
 
 	/* Clickable over the dial */
@@ -379,7 +395,7 @@
 		min-width: 0;
 		margin: 0.15em 0 0;
 		font-size: var(--small);
-		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+		color: color-mix(in oklab, var(--color-cream) 90%, transparent);
 		pointer-events: auto;
 	}
 
@@ -417,7 +433,7 @@
 		min-width: 0;
 		margin: 0.2em 0 0;
 		font-size: var(--small);
-		color: color-mix(in oklab, var(--color-cream) 80%, transparent);
+		color: color-mix(in oklab, var(--color-cream) 90%, transparent);
 		pointer-events: auto;
 	}
 
@@ -427,8 +443,8 @@
 		font-size: var(--small);
 		letter-spacing: 0.12em;
 		text-align: center;
-		color: var(--color-cream);
-		opacity: 0.6;
+		color: color-mix(in oklab, var(--color-cream) 88%, transparent);
+		text-shadow: 0 0 2px var(--color-ink);
 	}
 
 	@keyframes tune-in {
@@ -547,7 +563,7 @@
 
 	.key-name {
 		display: none;
-		font-size: 0.62rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.02em;
 		line-height: 1;
