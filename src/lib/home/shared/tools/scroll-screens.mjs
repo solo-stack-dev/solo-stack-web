@@ -142,6 +142,8 @@ try {
 		await evaluate(`scrollTo({ top: ${y}, behavior: 'instant' })`);
 		await sleep(settle);
 		const { data } = await send('Page.captureScreenshot', { format: 'webp', quality: 72 });
+		const actual = await evaluate('Math.round(scrollY)');
+		if (Math.abs(actual - y) > 2) errors.push(`scroll drift: asked for ${y}, page is at ${actual} (${prefix}-${String(index).padStart(2, '0')})`);
 		const file = join(outDir, `${prefix}-${String(index).padStart(2, '0')}.webp`);
 		writeFileSync(file, Buffer.from(data, 'base64'));
 		files.push(file);
