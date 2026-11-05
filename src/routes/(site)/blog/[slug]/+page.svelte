@@ -6,7 +6,7 @@
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
 	import { getPost } from '#lib/blog/posts.remote.ts';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
-	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
+	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=webp&quality=50&enhanced';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
 	import { YOUTUBE_CHANNEL_URL } from '#lib/home/data/socials.ts';
@@ -72,11 +72,8 @@
 		return graph([{ ...blogPosting, video: { '@id': videoObject['@id'] } }, videoObject]);
 	});
 
-	/** Lit part of a moon in a 16×16 box (light from the right), `lit` 0…1: crescent → half → full. */
-	function phase(lit: number) {
-		const rx = Math.abs(1 - 2 * lit) * 6.6;
-		return `M8 1.4A6.6 6.6 0 0 1 8 14.6A${rx.toFixed(2)} 6.6 0 0 ${lit < 0.5 ? 0 : 1} 8 1.4Z`;
-	}
+	/** Takeaway fireflies glow brighter down the list, 0.35…1. */
+	const glow = (index: number, count: number) => (count > 1 ? 0.35 + (0.65 * index) / (count - 1) : 1);
 
 	// TOC: current section = last heading above the upper third of the viewport.
 	let current = $state<string | null>(null);
@@ -129,41 +126,43 @@
 <!-- Reading progress hairline: CSS scroll timeline, no JS; absent where unsupported -->
 <div class="progress" aria-hidden="true"></div>
 
-<article class="post" lang={post.lang} style:--bloom="url({bloom.img.src})">
+<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
 	<div class="relative isolate">
 		<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
 		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
 			<StarField density={0.45} brightness={0.65} seed={71} />
 		</div>
 
-		<header class="mx-auto max-w-6xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8">
-			<a
-				href={localizeHref('/blog')}
-				class="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-			>
+		<header class="mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-10 lg:px-8">
+			<a href={localizeHref('/blog')} class="back">
 				<ArrowLeftIcon class="size-4" aria-hidden="true" />
 				{m.blog_post_back()}
 			</a>
 
-			<p class="meta mt-8">
-				<span class="format">{FORMAT_LABELS[post.format]()}</span>
-				<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
-				<span aria-hidden="true">·</span>
-				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-			</p>
-			<h1 class="headline mt-5 max-w-4xl font-display font-black tracking-wordmark text-balance">{post.title}</h1>
-			{#if post.tags.length}
-				<ul class="mt-6 flex flex-wrap gap-2" aria-label={m.blog_tags_label()}>
-					{#each post.tags as tag, index (index)}
-						<li class="rounded-full bg-foreground/[0.06] px-3 py-1 text-xs text-muted-foreground ring-1 ring-foreground/10 ring-inset">{tag}</li>
-					{/each}
-				</ul>
-			{/if}
+			<h1 class="headline mt-8 max-w-4xl font-display font-black tracking-wordmark text-balance sm:mt-10">{post.title}</h1>
+			<!-- Byline under the title (no eyebrow): format as an ink label, date and reading time, then the topics -->
+			<div class="byline mt-6">
+				<p class="meta">
+					<span class="format">{FORMAT_LABELS[post.format]()}</span>
+					<span class="facts">
+						<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
+						<span aria-hidden="true">·</span>
+						<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+					</span>
+				</p>
+				{#if post.tags.length}
+					<ul class="tags" aria-label={m.blog_tags_label()}>
+						{#each post.tags as tag, index (index)}
+							<li>{tag}</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
 		</header>
 
-		<div class="mx-auto mt-10 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
+		<div class="mx-auto mt-10 max-w-6xl px-4 sm:mt-14 sm:px-6 lg:px-8">
 			<div class="stage">
-				<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} />
+				<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} format={post.format} />
 			</div>
 			{#if watchUrl}
 				<p class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -182,8 +181,8 @@
 		<div class="grid min-w-0 content-start gap-14">
 			{#if post.summary}
 				<section aria-labelledby="summary-title" class="summary">
-					<h2 id="summary-title" class="stamp">{m.blog_summary_title()}</h2>
-					<p class="mt-4 text-lg leading-relaxed text-pretty sm:text-xl sm:leading-relaxed">{post.summary}</p>
+					<h2 id="summary-title" class="label-title">{m.blog_summary_title()}</h2>
+					<p class="summary-text">{post.summary}</p>
 				</section>
 			{/if}
 
@@ -211,14 +210,11 @@
 			{#if post.takeaways.length}
 				<section aria-labelledby="takeaways-title">
 					<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
-					<!-- Bullets wax from crescent to full moon (as the /stats period switch) -->
-					<ul class="takeaways mt-5">
+					<!-- Fireflies as bullets, glowing brighter down the list (as they rise from the laptop on /blog) -->
+					<ul class="takeaways mt-6">
 						{#each post.takeaways as takeaway, index (index)}
-							<li>
-								<svg viewBox="0 0 16 16" class="phase" aria-hidden="true">
-									<circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-opacity="0.45" stroke-width="1" />
-									<path d={phase(post.takeaways.length > 1 ? 0.2 + (0.8 * index) / (post.takeaways.length - 1) : 1)} fill="currentColor" />
-								</svg>
+							<li style:--glow={glow(index, post.takeaways.length)}>
+								<span class="firefly" aria-hidden="true"></span>
 								{takeaway}
 							</li>
 						{/each}
@@ -270,7 +266,7 @@
 			{/if}
 
 			<p class="generated">
-				<span class="moon" aria-hidden="true"></span>
+				<span class="firefly" aria-hidden="true"></span>
 				{m.blog_generated_note({ model: post.generatedBy })}
 			</p>
 		</div>
@@ -279,12 +275,8 @@
 			<aside class="hidden lg:block">
 				<nav class="toc" aria-labelledby="toc-title">
 					<p id="toc-title" class="toc-title">
-						<!-- Waxes while you read (same scroll timeline as the progress hairline) -->
-						<svg viewBox="0 0 16 16" class="toc-moon" aria-hidden="true">
-							<defs><clipPath id="toc-disc"><circle cx="8" cy="8" r="6.6" /></clipPath></defs>
-							<circle cx="8" cy="8" r="6.6" fill="currentColor" fill-opacity="0.16" />
-							<g clip-path="url(#toc-disc)"><circle cx="8" cy="8" r="6.6" fill="currentColor" class="toc-lit" /></g>
-						</svg>
+						<!-- A firefly that lights up while you read (same scroll timeline as the progress hairline) -->
+						<span class="toc-fly" aria-hidden="true"></span>
 						{m.blog_toc_title()}
 					</p>
 					<ol class="toc-list">
@@ -299,27 +291,457 @@
 </article>
 
 <style>
+	/* Shared marks ---------------------------------------------------------------------------------------------- */
+
+	/* A firefly: moonlight core, butter halo (ochre core on paper, where moonlight would vanish) */
+	.firefly,
+	.toc-fly {
+		display: block;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--color-moonlight);
+		box-shadow:
+			0 0 3px 1px var(--color-butter),
+			0 0 12px 3px rgb(252 215 114 / 0.55);
+	}
+
+	:global(html:not(.dark)) :is(.firefly, .toc-fly) {
+		background: #f1b73e;
+		box-shadow:
+			0 0 2px 1px rgb(226 169 59 / 0.9),
+			0 0 10px 3px rgb(252 215 114 / 0.75);
+	}
+
+	/* Header ------------------------------------------------------------------------------------------------- */
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.75rem;
+		margin-left: -0.25rem;
+		padding: 0 0.25rem;
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+		font-weight: 500;
+		transition: color var(--dur-hover) ease;
+	}
+
+	.back :global(svg) {
+		transition: translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1);
+	}
+
+	.back:hover {
+		color: var(--foreground);
+	}
+
+	.back:hover :global(svg) {
+		translate: -0.25rem 0;
+	}
+
+	.headline {
+		font-size: clamp(2.4rem, 6vw, 4.75rem);
+		line-height: 0.96;
+		padding-bottom: 0.08em;
+		/* Ink on paper; lit from behind at night (as the title on /blog) */
+		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
+		background-clip: text;
+		color: transparent;
+	}
+
+	:global(.dark) .headline {
+		background: linear-gradient(180deg, var(--color-cream) 42%, var(--color-butter));
+		background-clip: text;
+	}
+
+	.byline {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.75rem 2rem;
+	}
+
 	.meta {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.35rem 0.6rem;
+		align-items: baseline;
+		gap: 0.4rem 1rem;
 		color: var(--muted-foreground);
-		font-size: 0.875rem;
+		font-size: 0.9375rem;
 		font-variant-numeric: tabular-nums;
 	}
 
-	.format {
-		padding: 0.2rem 0.7rem;
-		border-radius: 999px;
-		background: color-mix(in oklab, var(--color-butter) 55%, transparent);
-		color: var(--color-night);
-		font-weight: 600;
+	.facts {
+		display: inline-flex;
+		gap: 0.5rem;
 	}
 
-	:global(.dark) .format {
-		background: color-mix(in oklab, var(--color-butter) 16%, transparent);
-		color: var(--color-butter);
+	/* Format as an ink label led by a brush dash (as on the index), no pill */
+	.format {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		color: var(--ink-lit);
+		font-family: var(--font-mono);
+		font-size: var(--text-label-sm);
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.format::before {
+		content: '';
+		width: 1.1rem;
+		height: 2px;
+		border-radius: 2px;
+		background: currentColor;
+		opacity: 0.8;
+	}
+
+	/* Topics as a quiet run of words, slashes between */
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0;
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+	}
+
+	/* after each word, so a wrapped line never starts with a slash */
+	.tags li:not(:last-child)::after {
+		content: '/';
+		margin: 0 0.6rem;
+		color: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+	}
+
+	/* The video sits in a pigment bloom: backlight at night, a butter wash on paper */
+	.stage {
+		position: relative;
+		isolation: isolate;
+	}
+
+	.stage::before {
+		content: '';
+		position: absolute;
+		inset: -14% -8% -10%;
+		z-index: -1;
+		background: var(--wash) center / 100% 100% no-repeat;
+		opacity: 0.5;
+		mix-blend-mode: multiply;
+		pointer-events: none;
+	}
+
+	:global(.dark) .stage::before {
+		opacity: 0.2;
+		mix-blend-mode: normal;
+	}
+
+	/* Section titles ------------------------------------------------------------------------------------------ */
+
+	/* Geist Black over a small pigment wash */
+	.section-title {
+		position: relative;
+		isolation: isolate;
+		width: fit-content;
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 3vw, 2.1rem);
+		font-weight: 900;
+		letter-spacing: -0.035em;
+		line-height: 1.1;
+	}
+
+	.section-title::before {
+		content: '';
+		position: absolute;
+		top: 30%;
+		left: -0.75rem;
+		z-index: -1;
+		width: calc(100% + 1.5rem);
+		max-width: 16rem;
+		height: 110%;
+		background: var(--wash) center / 100% 100% no-repeat;
+		opacity: 0.6;
+		mix-blend-mode: multiply;
+		rotate: -2deg;
+		pointer-events: none;
+	}
+
+	:global(.dark) .section-title::before {
+		opacity: 0.18;
+		mix-blend-mode: normal;
+	}
+
+	/* Small label heading with the brushed ink stroke under it (summary) */
+	.label-title {
+		position: relative;
+		width: fit-content;
+		color: var(--ink-lit);
+		font-family: var(--font-mono);
+		font-size: var(--text-label);
+		font-weight: 600;
+		letter-spacing: var(--tracking-label);
+		text-transform: uppercase;
+	}
+
+	.label-title::after {
+		content: '';
+		position: absolute;
+		inset: auto -0.2rem -0.55rem;
+		height: 0.5rem;
+		background: currentColor;
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		opacity: 0.7;
+	}
+
+	/* Summary: the lede of the page, set large on a pigment wash, no box */
+	.summary {
+		position: relative;
+		isolation: isolate;
+		max-width: 46rem;
+	}
+
+	.summary::before {
+		content: '';
+		position: absolute;
+		inset: -2.5rem -3rem -2rem -3.5rem;
+		z-index: -1;
+		background: var(--wash) center / 100% 100% no-repeat;
+		opacity: 0.28;
+		mix-blend-mode: multiply;
+		pointer-events: none;
+	}
+
+	:global(.dark) .summary::before {
+		opacity: 0.08;
+		mix-blend-mode: normal;
+	}
+
+	.summary-text {
+		margin-top: 1.5rem;
+		font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+		font-weight: 500;
+		letter-spacing: -0.012em;
+		line-height: 1.5;
+		text-wrap: pretty;
+	}
+
+	/* Chapters ----------------------------------------------------------------------------------------------- */
+
+	.chapters {
+		display: grid;
+	}
+
+	.chapters li {
+		position: relative;
+	}
+
+	.chapters li + li::before,
+	.links li + li::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1px;
+		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
+	}
+
+	.chapters a {
+		display: flex;
+		align-items: baseline;
+		gap: 1.25rem;
+		min-height: 3rem;
+		padding: 0.75rem 0.25rem;
+		cursor: pointer;
+		transition: color var(--dur-hover) ease;
+	}
+
+	.chapters a:hover .time {
+		color: var(--foreground);
+		text-shadow: var(--glow-sm);
+	}
+
+	.time {
+		min-width: 3.5rem;
+		color: var(--ink-lit);
+		font-family: var(--font-mono);
+		font-size: 0.875rem;
+		font-variant-numeric: tabular-nums;
+		transition:
+			color var(--dur-hover) ease,
+			text-shadow var(--dur-hover) ease;
+	}
+
+	/* Takeaways ---------------------------------------------------------------------------------------------- */
+
+	.takeaways {
+		display: grid;
+		gap: 1.1rem;
+		max-width: 46rem;
+	}
+
+	.takeaways li {
+		position: relative;
+		padding-left: 2.1rem;
+		font-size: 1.0625rem;
+		line-height: 1.6;
+		text-wrap: pretty;
+	}
+
+	.takeaways .firefly {
+		position: absolute;
+		left: 0.35rem;
+		top: 0.55em;
+		opacity: calc(0.45 + var(--glow) * 0.55);
+		scale: calc(0.75 + var(--glow) * 0.35);
+	}
+
+	/* Transcript --------------------------------------------------------------------------------------------- */
+
+	.transcript {
+		position: relative;
+	}
+
+	.transcript::before,
+	.transcript::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1px;
+		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
+	}
+
+	.transcript::after {
+		inset: auto 0 0;
+	}
+
+	.transcript summary {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-height: 3.25rem;
+		padding: 0 0.25rem;
+		font-weight: 600;
+		cursor: pointer;
+		list-style: none;
+		transition: color var(--dur-hover) ease;
+	}
+
+	.transcript summary:hover {
+		color: var(--ink-lit);
+	}
+
+	.transcript summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.transcript :global(.chevron) {
+		transition: rotate var(--dur-state) ease;
+	}
+
+	.transcript[open] :global(.chevron) {
+		rotate: 180deg;
+	}
+
+	.transcript-body {
+		display: grid;
+		gap: 0.85rem;
+		max-height: 32rem;
+		overflow-y: auto;
+		margin-bottom: 1.25rem;
+		padding: 0.25rem 1rem 0.5rem 1.25rem;
+		border-left: 2px solid color-mix(in oklab, var(--color-butter) 60%, transparent);
+		color: var(--muted-foreground);
+		line-height: 1.75;
+		scrollbar-width: thin;
+	}
+
+	.transcript-body .time {
+		display: inline-block;
+		min-width: auto;
+		margin-right: 0.6rem;
+	}
+
+	/* Links -------------------------------------------------------------------------------------------------- */
+
+	.links {
+		display: grid;
+	}
+
+	.links li {
+		position: relative;
+	}
+
+	.links a {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 0.15rem 1rem;
+		min-height: 3.75rem;
+		padding: 0.85rem 0.25rem;
+	}
+
+	.links a > span:first-child {
+		font-weight: 600;
+		text-decoration: underline;
+		text-decoration-color: transparent;
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+		transition: text-decoration-color var(--dur-state) ease;
+	}
+
+	.links a:hover > span:first-child {
+		text-decoration-color: var(--color-ochre);
+	}
+
+	:global(.dark) .links a:hover > span:first-child {
+		text-decoration-color: var(--color-butter);
+	}
+
+	.host {
+		grid-row: 2;
+		color: var(--muted-foreground);
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		overflow-wrap: anywhere;
+	}
+
+	.links :global(.arrow) {
+		grid-row: 1 / span 2;
+		grid-column: 2;
+		color: var(--muted-foreground);
+		transition:
+			translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
+			color var(--dur-state) ease;
+	}
+
+	.links a:hover :global(.arrow) {
+		translate: 0.2rem -0.2rem;
+		color: var(--ink-lit);
+	}
+
+	/* Generated note ----------------------------------------------------------------------------------------- */
+
+	.generated {
+		position: relative;
+		padding: 1.5rem 0 0 1.75rem;
+		color: var(--muted-foreground);
+		font-size: 0.875rem;
+	}
+
+	.generated::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1px;
+		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
+	}
+
+	.generated .firefly {
+		position: absolute;
+		left: 0.2rem;
+		top: calc(1.5rem + 0.45em);
+		width: 0.45rem;
+		height: 0.45rem;
 	}
 
 	/* Reading progress ---------------------------------------------------------------------------------------- */
@@ -342,9 +764,9 @@
 			animation-timeline: scroll(root);
 		}
 
-		/* Same timeline: the lit disc slides in from the right limb */
-		.toc-lit {
-			animation: wax linear both;
+		/* Same timeline: the TOC firefly lights up */
+		.toc-fly {
+			animation: kindle linear both;
 			animation-timeline: scroll(root);
 		}
 	}
@@ -355,303 +777,11 @@
 		}
 	}
 
-	@keyframes wax {
+	@keyframes kindle {
 		from {
-			translate: 13.2px 0;
+			opacity: 0.3;
+			scale: 0.6;
 		}
-	}
-
-	/* Header ------------------------------------------------------------------------------------------------- */
-
-	.headline {
-		font-size: clamp(2.4rem, 5.6vw, 4.5rem);
-		line-height: 0.98;
-		padding-bottom: 0.08em;
-		/* Ink on paper; moonlit at night (as the titles on /blog and /stats) */
-		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
-		background-clip: text;
-		color: transparent;
-	}
-
-	:global(.dark) .headline {
-		background: linear-gradient(180deg, var(--color-cream) 45%, var(--color-butter));
-		background-clip: text;
-	}
-
-	/* Moon glow behind the video so it sits in the night, not on it */
-	.stage {
-		position: relative;
-		isolation: isolate;
-	}
-
-	.stage::before {
-		content: '';
-		position: absolute;
-		inset: 8% 6% -6%;
-		z-index: -1;
-		border-radius: 50%;
-		background: radial-gradient(closest-side, rgb(252 215 114 / 0.22), transparent);
-		filter: blur(40px);
-		pointer-events: none;
-	}
-
-	:global(html:not(.dark)) .stage::before {
-		background: radial-gradient(closest-side, rgb(226 169 59 / 0.22), transparent);
-	}
-
-	/* Section titles: Geist Black over a butter wash (as on /stats) */
-	.section-title {
-		position: relative;
-		isolation: isolate;
-		width: fit-content;
-		font-family: var(--font-display);
-		font-size: clamp(1.6rem, 3vw, 2rem);
-		font-weight: 900;
-		letter-spacing: -0.035em;
-		line-height: 1.1;
-	}
-
-	.section-title::before {
-		content: '';
-		position: absolute;
-		top: 40%;
-		left: -0.6rem;
-		z-index: -1;
-		width: min(78%, 14rem);
-		height: 100%;
-		background: var(--bloom) center / 100% 100% no-repeat;
-		opacity: 0.55;
-		mix-blend-mode: multiply;
-		rotate: -2deg;
-		pointer-events: none;
-	}
-
-	:global(.dark) .section-title::before {
-		opacity: 0.25;
-		mix-blend-mode: normal;
-	}
-
-	/* "Summary" as a rubber stamp (as the mock data stamp on /stats) */
-	.stamp {
-		display: inline-block;
-		padding: 0.3rem 0.7rem;
-		border: 2px solid currentColor;
-		border-radius: 0.5rem;
-		color: #7d560a;
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		font-weight: 700;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
-		transform: rotate(-3deg);
-		mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.8) 85%);
-		opacity: 0.9;
-	}
-
-	:global(.dark) .stamp {
-		color: rgb(252 215 114 / 0.85);
-	}
-
-	/* Butter paper with a pigment left edge */
-	.summary {
-		position: relative;
-		padding: 1.75rem 2rem 1.9rem 2.25rem;
-		border-radius: calc(var(--radius) + 0.25rem);
-		background: color-mix(in oklab, var(--color-butter) 22%, var(--card));
-		overflow: hidden;
-	}
-
-	.summary::before {
-		content: '';
-		position: absolute;
-		inset: 0 auto 0 0;
-		width: 0.3rem;
-		background: linear-gradient(var(--color-butter), var(--color-ochre));
-	}
-
-	:global(.dark) .summary {
-		background: color-mix(in oklab, var(--color-butter) 7%, var(--card));
-	}
-
-	/* Chapters ----------------------------------------------------------------------------------------------- */
-
-	.chapters {
-		display: grid;
-		border-top: 1px solid var(--border);
-	}
-
-	.chapters li {
-		border-bottom: 1px solid var(--border);
-	}
-
-	.chapters a {
-		display: flex;
-		align-items: baseline;
-		gap: 1rem;
-		min-height: 2.75rem;
-		padding: 0.6rem 0.5rem;
-		border-radius: 0.5rem;
-		cursor: pointer;
-		transition: background-color 150ms ease;
-	}
-
-	.chapters a:hover {
-		background: var(--muted);
-	}
-
-	.time {
-		min-width: 3.5rem;
-		color: var(--focus-ring);
-		font-family: var(--font-mono);
-		font-size: 0.875rem;
-		font-variant-numeric: tabular-nums;
-	}
-
-	/* Takeaways ---------------------------------------------------------------------------------------------- */
-
-	.takeaways {
-		display: grid;
-		gap: 0.85rem;
-	}
-
-	.takeaways li {
-		position: relative;
-		padding-left: 2.1rem;
-		font-size: 1.0625rem;
-		line-height: 1.6;
-	}
-
-	.phase {
-		position: absolute;
-		left: 0.1rem;
-		top: 0.3em;
-		width: 1.1rem;
-		height: 1.1rem;
-		color: var(--color-ochre);
-	}
-
-	:global(.dark) .phase {
-		color: var(--color-butter);
-		filter: drop-shadow(0 0 0.35rem rgb(252 215 114 / 0.45));
-	}
-
-	/* A small butter moon */
-	.generated .moon {
-		content: '';
-		position: absolute;
-		left: 0.2rem;
-		top: 0.45em;
-		width: 0.85rem;
-		height: 0.85rem;
-		border-radius: 999px;
-		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--color-butter) 48%);
-		box-shadow: 0 0 0.6rem color-mix(in oklab, var(--color-butter) 40%, transparent);
-		rotate: -20deg;
-	}
-
-	:global(html:not(.dark)) .generated .moon {
-		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--color-ochre) 48%);
-	}
-
-	/* Transcript --------------------------------------------------------------------------------------------- */
-
-	.transcript {
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		background: var(--card);
-	}
-
-	.transcript summary {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		min-height: 3rem;
-		padding: 0 1rem;
-		font-weight: 600;
-		cursor: pointer;
-		list-style: none;
-	}
-
-	.transcript summary::-webkit-details-marker {
-		display: none;
-	}
-
-	.transcript :global(.chevron) {
-		transition: rotate 200ms ease;
-	}
-
-	.transcript[open] :global(.chevron) {
-		rotate: 180deg;
-	}
-
-	.transcript-body {
-		display: grid;
-		gap: 0.75rem;
-		max-height: 32rem;
-		overflow-y: auto;
-		padding: 0.5rem 1rem 1.25rem;
-		color: var(--muted-foreground);
-		line-height: 1.7;
-	}
-
-	.transcript-body .time {
-		display: inline-block;
-		min-width: auto;
-		margin-right: 0.5rem;
-	}
-
-	/* Links -------------------------------------------------------------------------------------------------- */
-
-	.links {
-		display: grid;
-		gap: 0.5rem;
-	}
-
-	.links a {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-		gap: 0 1rem;
-		min-height: 3.5rem;
-		padding: 0.6rem 1rem;
-		border: 1px solid var(--border);
-		border-radius: var(--radius);
-		background: var(--card);
-		transition: border-color 150ms ease;
-	}
-
-	.links a:hover {
-		border-color: color-mix(in oklab, var(--color-ochre) 60%, var(--border));
-	}
-
-	.links a > span:first-child {
-		font-weight: 600;
-	}
-
-	.host {
-		grid-row: 2;
-		color: var(--muted-foreground);
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-		overflow-wrap: anywhere;
-	}
-
-	.links :global(.arrow) {
-		grid-row: 1 / span 2;
-		grid-column: 2;
-		color: var(--muted-foreground);
-	}
-
-	.generated {
-		position: relative;
-		padding: 1.25rem 0 0 2rem;
-		border-top: 1px solid var(--border);
-		color: var(--muted-foreground);
-		font-size: 0.875rem;
-	}
-
-	.generated .moon {
-		top: calc(1.25rem + 0.3em);
 	}
 
 	/* Table of contents ------------------------------------------------------------------------------------- */
@@ -669,22 +799,11 @@
 	.toc-title {
 		display: flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.7rem;
 		font-family: var(--font-display);
 		font-size: 0.95rem;
 		font-weight: 800;
 		letter-spacing: -0.01em;
-	}
-
-	.toc-moon {
-		width: 1.1rem;
-		height: 1.1rem;
-		color: var(--color-ochre);
-	}
-
-	:global(.dark) .toc-moon {
-		color: var(--color-butter);
-		filter: drop-shadow(0 0 0.35rem rgb(252 215 114 / 0.45));
 	}
 
 	.toc-list {
@@ -707,7 +826,7 @@
 		color: var(--foreground);
 	}
 
-	/* The current section: a butter mark on the rail */
+	/* The current section: a lit mark on the rail */
 	.toc-list a::before {
 		content: '';
 		position: absolute;
@@ -740,7 +859,9 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.toc-list a::before {
+		.toc-list a::before,
+		.back :global(svg),
+		.links :global(.arrow) {
 			transition: none;
 		}
 	}
@@ -748,7 +869,7 @@
 	/* Article body (mdsvex) ----------------------------------------------------------------------------------- */
 
 	.prose-post {
-		max-width: 70ch;
+		max-width: 68ch;
 		font-size: 1.125rem;
 		line-height: 1.8;
 		text-wrap: pretty;
@@ -756,29 +877,30 @@
 	}
 
 	.prose-post :global(> * + *) {
-		margin-top: 1.25em;
+		margin-top: 1.3em;
 	}
 
 	.prose-post :global(h2) {
 		scroll-margin-top: 6rem;
-		margin-top: 2.4em;
+		margin-top: 2.6em;
 		font-family: var(--font-display);
-		font-size: 1.7rem;
+		font-size: clamp(1.55rem, 2.6vw, 1.85rem);
 		font-weight: 900;
 		letter-spacing: -0.035em;
-		line-height: 1.25;
+		line-height: 1.2;
 		text-wrap: balance;
 		hyphens: manual;
 	}
 
+	/* A short brushed ink stroke over each section */
 	.prose-post :global(h2::before) {
 		content: '';
 		display: block;
-		width: 2.5rem;
-		height: 3px;
-		margin-bottom: 0.9rem;
-		border-radius: 3px;
-		background: var(--color-butter);
+		width: 3rem;
+		height: 0.55rem;
+		margin-bottom: 0.85rem;
+		background: var(--ink-lit);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
 	}
 
 	.prose-post :global(h3) {
@@ -799,8 +921,12 @@
 
 	/* Lede: the first paragraph a little larger */
 	.prose-post :global(> p:first-child) {
-		font-size: 1.2rem;
+		font-size: 1.22rem;
 		color: var(--foreground);
+	}
+
+	.prose-post :global(p) {
+		color: color-mix(in oklab, var(--foreground) 88%, var(--muted-foreground));
 	}
 
 	.prose-post :global(a) {
@@ -808,16 +934,22 @@
 		text-decoration-color: var(--color-ochre);
 		text-decoration-thickness: 2px;
 		text-underline-offset: 0.2em;
+		transition: text-decoration-color var(--dur-hover) ease;
+	}
+
+	.prose-post :global(a:hover) {
+		text-decoration-color: currentColor;
 	}
 
 	.prose-post :global(strong) {
+		color: var(--foreground);
 		font-weight: 700;
 	}
 
 	.prose-post :global(ul),
 	.prose-post :global(ol) {
 		display: grid;
-		gap: 0.4em;
+		gap: 0.45em;
 		padding-left: 1.4em;
 	}
 
@@ -834,10 +966,20 @@
 	}
 
 	.prose-post :global(blockquote) {
-		padding-left: 1.2em;
-		border-left: 3px solid var(--color-butter);
+		position: relative;
+		padding-left: 1.4em;
 		color: var(--muted-foreground);
+		font-size: 1.2rem;
 		font-style: italic;
+	}
+
+	.prose-post :global(blockquote::before) {
+		content: '';
+		position: absolute;
+		inset: 0.2em auto 0.2em 0;
+		width: 3px;
+		border-radius: 3px;
+		background: linear-gradient(var(--color-butter), var(--color-ochre));
 	}
 
 	.prose-post :global(code) {
@@ -851,8 +993,8 @@
 	.prose-post :global(pre) {
 		overflow-x: auto;
 		padding: 1rem 1.25rem;
-		border-radius: var(--radius);
-		background: var(--color-night);
+		border-radius: 0.5rem;
+		background: var(--color-ink);
 		color: var(--color-cream);
 		font-size: 0.9rem;
 		line-height: 1.6;
@@ -864,7 +1006,10 @@
 	}
 
 	.prose-post :global(hr) {
+		height: 0.6rem;
+		margin-block: 2.5em;
 		border: 0;
-		border-top: 1px solid var(--border);
+		background: var(--border);
+		mask: var(--ink-underline) center / 6rem 100% no-repeat;
 	}
 </style>
