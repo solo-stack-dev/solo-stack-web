@@ -4,7 +4,8 @@
 	mottling); its foot is a painted feather (stats-hill-feather.webp, docs/art/site/round-3/ink-feather.png) whose brush runs
 	out into the page unevenly, so in the light theme the hill dissolves into the paper instead of ending in a band. The curve is the glowing path along its crest, and it climbs to the tree of light, whose
 	trunk stands exactly on today's value. God rays fan out behind the canopy, a few golden motes drift down, the mascot sits
-	small at the tree's foot looking up. Light theme: ink on warm paper with a butter wash behind the tree; dark: backlit night.
+	small at the tree's foot looking up. Light theme: ink wash on warm paper (~86 % at the crest, thinning toward the foot) with a butter wash behind the tree;
+	dark: solid ink, backlit night.
 
 	Geometry (hill.ts) lives in fixed virtual canvases (one per layout, switched at 640 px) and the art is placed in percent, so
 	the prerendered page is exact at every width. Hover or drag to read a day. The first and last date sit in the ink under the
@@ -140,6 +141,15 @@
 					<stop offset="0" stop-color="var(--color-butter)" stop-opacity="var(--halo-alpha)" />
 					<stop offset="1" stop-color="var(--color-butter)" stop-opacity="0" />
 				</radialGradient>
+				<!-- Paper: the ink is ~86 % along the land's top edge and thins with depth to ~58 % toward the foot (a soft band
+					 along the surface over a base wash). Night: no wash, solid ink (see .washed). -->
+				<filter id="soften-{name}" filterUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
+					<feGaussianBlur stdDeviation={g.spec.h * 0.05} />
+				</filter>
+				<mask id="wash-{name}" maskUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
+					<rect x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400} fill="#fff" fill-opacity="0.58" />
+					<path d={g.surface} fill="none" stroke="#fff" stroke-opacity="0.72" stroke-width={g.spec.h * 0.2} stroke-linejoin="round" filter="url(#soften-{name})" />
+				</mask>
 				<!-- Solid above the attach line, the painted feather (white pigment, its own alpha) below it -->
 				<mask id="dissolve-{name}" maskUnits="userSpaceOnUse" x="-420" y="-400" width={g.spec.w + 840} height={g.spec.h * 1.8 + 400}>
 					<path d={g.foot.solid} fill="#fff" />
@@ -150,7 +160,7 @@
 			<rect x="-400" y="-200" width={g.spec.w + 800} height={g.spec.h + 200} fill="url(#halo-{name})" />
 			<path d={g.far} class="far" filter="url(#far-{name})" mask="url(#dissolve-{name})" />
 			<g mask="url(#dissolve-{name})">
-				<path d={g.body} class="ink" filter="url(#ink-{name})" />
+				<g class="washed" mask="url(#wash-{name})"><path d={g.body} class="ink" filter="url(#ink-{name})" /></g>
 			</g>
 		</svg>
 	{/each}
@@ -404,6 +414,12 @@
 		fill: var(--ink);
 	}
 
+	/* Paper: the wash mask (dense along the top edge, thinning with depth) keeps the silhouette without a black mass. Night:
+	   solid ink. */
+	:global(.dark) .washed {
+		mask: none;
+	}
+
 	.halo {
 		fill: none;
 		stroke-width: 9;
@@ -463,6 +479,11 @@
 		letter-spacing: 0.04em;
 		color: color-mix(in oklab, var(--color-cream) 78%, transparent);
 		white-space: nowrap;
+	}
+
+	/* Paper: the thinner ink needs the full cream for contrast */
+	:global(:root:not(.dark)) .date {
+		color: var(--color-cream);
 	}
 
 	/* Hung under the path from its own anchor, turned with the slope */

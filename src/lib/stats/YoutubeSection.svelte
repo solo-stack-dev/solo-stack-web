@@ -2,8 +2,8 @@
 	@component
 	YouTube detail. The four channel numbers stand like waymarks on one path: a single line with a node under every number, and
 	below it a painted ink ground (stats-kpi-ground.webp, docs/art/site/round-3/ink-ground-a.png) holding label and change. At
-	night the ground is solid ink and the path butter; on paper the same brush stroke is a pale sumi wash under an ochre line,
-	so the strip never reads as a black band. The ground is one painting per row: every figure shows its slice of it (container
+	night the ground is solid ink and the path butter; on paper the same brush stroke is a warm butter wash with granulating
+	ochre under an ochre line, so the strip never reads as a black band or a grey smudge. The ground is one painting per row: every figure shows its slice of it (container
 	units of the list), so the brush runs on unbroken across the figures. Subgrid rows give every number one shared baseline,
 	however the labels wrap. Below: daily views (columns of light) beside the top videos, the chart as tall as the list.
 -->
@@ -208,10 +208,15 @@
 		--wash: #0b0b0c;
 	}
 
-	/* Paper: the same stroke as a pale warm sumi wash, multiplied into the grain */
+	/* Paper: the same stroke as a warm butter wash (~18 %) with ochre pigment granulating in its tooth and pooling in a few
+	   places, multiplied into the paper: warm, never grey */
 	:global(:root:not(.dark)) .ground::before {
-		--wash: color-mix(in oklab, var(--color-ink) 65%, #8a5a12);
-		opacity: 0.09;
+		--wash:
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.66 0 0 0 0 0.44 0 0 0 0 0.09 2.1 0 0 0 -1.16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E")
+				0 0 / 220px 220px,
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='160'%3E%3Cfilter id='p' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.05' numOctaves='2' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.89 0 0 0 0 0.66 0 0 0 0 0.23 0.9 0 0 0 -0.38'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E")
+				0 0 / 640px 100%,
+			color-mix(in oklab, var(--color-butter) 18%, transparent);
 		mix-blend-mode: multiply;
 	}
 
