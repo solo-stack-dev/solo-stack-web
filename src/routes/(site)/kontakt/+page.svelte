@@ -34,6 +34,8 @@
 	let token = $state('');
 	let turnstile = $state<ReturnType<typeof TurnstileWidget>>();
 	let successHeading = $state<HTMLElement>();
+	/** Where the owl's flight ends once the letter is sent (tablets and up) */
+	let landing = $state<HTMLElement>();
 	/** Someone is at the letter (pointer over it or focus in it): the owl watches. */
 	let hovering = $state(false);
 	let focused = $state(false);
@@ -138,10 +140,14 @@
 		<OwlMessenger
 			class="perch"
 			flown={sent}
+			{landing}
 			watching={hovering || focused}
 			sizes="(min-width: 80rem) clamp(24rem, 67vw - 29.5rem, 42rem), (min-width: 48rem) calc(34.7vw - 6rem), 14rem"
 		/>
 	</div>
+
+	<!-- The owl's landing spot: the bird with the letter glides down to here and stays, a small silhouette over the horizon -->
+	<span class="landing" bind:this={landing} aria-hidden="true"></span>
 
 	<div class="mx-auto max-w-6xl px-4 pt-10 pb-8 sm:px-6 sm:pt-16 lg:px-8">
 		<!-- One headline group: the invitation, or once the owl has the letter, the thanks in its place -->
@@ -348,6 +354,19 @@
 		min-height: calc(var(--owl-top) + var(--owl) * 0.86);
 	}
 
+	/*
+	 * Sent: the page fills the space down to the footer (on screens taller than the thanks, main stretches), so its end, and
+	 * with it the owl's landing spot, sits just above the horizon.
+	 */
+	:global(main:has(> .contact[data-sent])) {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.contact[data-sent] {
+		flex: 1 0 auto;
+	}
+
 	.rail {
 		position: absolute;
 		top: var(--owl-top);
@@ -363,8 +382,39 @@
 		max-width: 48rem;
 	}
 
+	/*
+	 * Where the flight ends (OwlMessenger measures it): in the sky between the thanks and the footer horizon, right of the text
+	 * and left of the branch, a little way into the footer's empty gap above the wordmark (4.5rem, 6.5rem from 64rem). Its width
+	 * is the small bird's wingspan.
+	 * Phones: none (the owl perches above the title there and flies off into the sky).
+	 */
+	.landing {
+		position: absolute;
+		display: none;
+		pointer-events: none;
+	}
+
+	@media (min-width: 48rem) {
+		.landing {
+			display: block;
+			left: 66%;
+			bottom: -1.25rem;
+			width: 3.25rem;
+			height: 1px;
+			translate: -50% 0;
+		}
+	}
+
 	@media (min-width: 64rem) {
-		.contact :global(.perch) {
+		.landing {
+			left: 58%;
+			bottom: -2.5rem;
+			width: 3.5rem;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.contact:not([data-sent]) :global(.perch) {
 			position: sticky;
 			/* The head (15 % into the canvas) rests 5.5rem below the top of the viewport */
 			top: calc(5.5rem - var(--owl) * 0.15);
