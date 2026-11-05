@@ -1,7 +1,7 @@
 <!--
 	@component
-	One explorable object in the night shift room: a real button over the art, positioned in canvas percentages.
-	The tooltip is the button's content, so its text is also the accessible name. Hover, focus and tap show it.
+	One explorable object: a button over the art, in canvas percentages. The tooltip is the button's content, so it is
+	also the accessible name. Hover, focus and tap show it.
 -->
 <script lang="ts">
 	import type { Spot } from './layout.ts';
@@ -101,7 +101,7 @@
 			0 0 18px 4px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
-	/* Bonsai and handheld light up through their own layers (golden tree, contour); keep only a faint glow. */
+	/* Bonsai and handheld light up via their own layers (golden tree, contour); faint glow only. */
 	.spot[data-spot='bonsai'] .glow,
 	.spot[data-spot='handheld'] .glow {
 		background: radial-gradient(closest-side, color-mix(in oklab, var(--color-butter) 12%, transparent), transparent);

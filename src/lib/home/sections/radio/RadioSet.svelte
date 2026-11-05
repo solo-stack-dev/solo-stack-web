@@ -1,12 +1,10 @@
 <!--
 	@component
-	The painted radio itself, one layout variant (`wide` or `tall`, geometry in layout.ts). Radio.svelte renders both
-	variants and CSS shows the matching one (no layout shift at hydration); the hidden one is `display: none`, so it is
-	out of the tab order and the accessibility tree, and its lazy images are never fetched.
+	The painted radio, one variant (`wide` | `tall`, geometry in layout.ts). Radio.svelte renders both and CSS shows one
+	(no hydration shift); the hidden one is `display: none`: out of tab order and a11y tree, lazy images never fetched.
 
-	Layers, back to front: body (painted glass, strip window, key recess) → printed slide-rule scale + mini logos (SVG
-	in body pixels) → needle (slides along the scale) → big station logo, name, handle and live content on the glass →
-	dial slider (transparent range input over the glass) → display strip (snippet) → preset keys → knobs.
+	Layers, back to front: body → slide-rule scale + mini logos (SVG, body px) → needle → station on the glass →
+	dial (transparent range input) → display strip (snippet) → preset keys → knobs.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -42,7 +40,7 @@
 		ondialcommit: () => void;
 		ondialkey: (event: KeyboardEvent) => void;
 		strip: Snippet<['wide' | 'tall']>;
-		/** Song controls for a station with a song, shown next to its title on the glass. */
+		/** Song controls, shown next to the song title on the glass. */
 		song: Snippet<[Station]>;
 	}
 
@@ -85,7 +83,7 @@
 </script>
 
 <div class={['set', `set-${variant}`]} style:aspect-ratio="{layout.size.w} / {layout.size.h}">
-	<!-- Static sources so enhanced-img emits width candidates (sizes = 2× of the largest CSS width) -->
+	<!-- Static sources so enhanced-img emits width candidates (largest = 2× max CSS width) -->
 	{#if variant === 'wide'}
 		<enhanced:img src="./assets/radio-body.webp?w=1800;1200;900" alt="" class="layer body" sizes="(min-width: 40rem) min(56rem, 88vw), 1px" loading="lazy" />
 	{:else}
@@ -240,7 +238,7 @@
 		/* Ink and light used on the art */
 		--ink: var(--color-ink);
 		--glow: var(--color-butter);
-		/* Type on the glass, in radio widths (cqw): the tall radio is drawn ~2.3× smaller, so it gets larger factors */
+		/* Glass type in cqw; the tall radio is drawn ~2.3× smaller, hence larger factors */
 		--logo: 8.4cqw;
 		--name: max(0.85rem, 2.3cqw);
 		--small: max(0.68rem, 1.35cqw);
@@ -325,8 +323,7 @@
 		transition: none;
 	}
 
-	/* Station on the glass: logo left, name / handle / live content right */
-	/* Above the dial slider, but transparent to the pointer except for its links and controls */
+	/* Above the dial slider but pointer-transparent, except for its links and controls */
 	.glass {
 		position: absolute;
 		z-index: 1;
@@ -374,7 +371,7 @@
 		opacity: 0.9;
 	}
 
-	/* Song of the tuned station: controls (snippet) and title; the note glows while it plays. Clickable over the dial. */
+	/* Clickable over the dial */
 	.glass-song {
 		display: flex;
 		align-items: center;
@@ -386,7 +383,7 @@
 		pointer-events: auto;
 	}
 
-	/* Tall radio: the strip right below already shows the handle; drop it here so name, song and live content fit */
+	/* Tall radio: the strip below already shows the handle; hide it so name, song and live content fit */
 	.set-tall .glass-text:has(.glass-song) .glass-handle {
 		display: none;
 	}
@@ -412,7 +409,7 @@
 		text-shadow: 0 0 0.8cqw color-mix(in oklab, var(--color-butter) 90%, transparent);
 	}
 
-	/* Live content (StationContent: label + line). Links inside stay clickable over the dial. */
+	/* StationContent; links stay clickable over the dial */
 	.glass-content {
 		display: flex;
 		align-items: baseline;
@@ -449,7 +446,7 @@
 		}
 	}
 
-	/* The slider covers the glass; it is invisible but focusable. */
+	/* Invisible but focusable */
 	.dial {
 		position: absolute;
 		margin: 0;
@@ -540,7 +537,7 @@
 		translate: 0 13%;
 	}
 
-	/* Printed ink logo: unmodified shape, one ink color, a touch of print texture through multiply */
+	/* Printed ink logo: unmodified shape, one ink color, multiply for print texture */
 	.key :global(.key-logo) {
 		width: min(50cqw, 3.4rem);
 		height: min(50cqw, 3.4rem);

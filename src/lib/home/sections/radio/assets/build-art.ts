@@ -1,24 +1,18 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote and the rects for layout.ts */
 /**
- * Builds the optimized night radio layers in this folder from the painted masters in `docs/art/radio/`.
- * Run from the repo root (Node ≥ 24 strips the types):
+ * Builds the radio layers in this folder from the masters in `docs/art/radio/`. From the repo root (Node ≥ 24):
  *
  *     node src/lib/home/sections/radio/assets/build-art.ts
  *
- * The painted body has six preset slots, the section has one key per station (9 now, 10 with Discord). The script
- * re-assembles the body from its own painted pixels (no new paint):
+ * The painted body has six preset slots but the section needs one key per station (9, 10 with Discord), so the body
+ * is re-assembled from its own pixels (no new paint):
+ * - The six-slot plate between the knobs becomes one long dark window (display strip, 9-slice of the slot rims).
+ * - A band with one long key recess is inserted under the knob row: side walls from the straight sides (gentle bulge
+ *   keeps the outline round), cream tiled from clean face patches, rims tiled from the six slot rims.
+ * - Phones: speaker grille cut out (seams cross-faded on cream), two key rows.
  *
- * - The six-slot plate between the knobs becomes one long dark window: the display strip (9-slice of the slot rims).
- * - A band is inserted under the knob row with one long key recess across the radio. The band is cloned from the
- *   body: side walls copied from the straight part of the sides (with a gentle bulge so the outline stays round),
- *   cream wash tiled from clean patches of the face, recess rims tiled from the six painted slot rims.
- * - Phones get a narrower radio: the speaker grille is cut out (seams cross-faded on plain cream) and the key recess
- *   holds two rows.
- *
- * Outputs (WebP; `@sveltejs/enhanced-img` derives AVIF/WebP sizes at build time):
- * landscapes (≤ 1920 / 1080 wide, the paintings' native size is smaller), bodies cropped to content and sized for
- * 2× of their largest CSS width, needle/key/knob as delivered. The script prints the measured rects for layout.ts.
- *
+ * Outputs WebP (enhanced-img derives sizes at build): landscapes ≤ 1920 / 1080 wide (paintings are smaller natively),
+ * bodies cropped and sized for 2× their largest CSS width, needle/key/knob as delivered. Prints the rects for layout.ts.
  * Uses the `sharp` that `@sveltejs/enhanced-img` already installs (no new dependency).
  */
 import { readdirSync } from 'node:fs';
@@ -35,7 +29,7 @@ const pnpmDir = join(root, 'node_modules/.pnpm');
 const sharpDir = readdirSync(pnpmDir).find((name) => name.startsWith('sharp@'));
 if (!sharpDir) throw new Error('sharp not found in node_modules/.pnpm (run pnpm install)');
 const require = createRequire(import.meta.url);
-// sharp is not a direct dependency, so there are no types to import; this script only needs a loose shape.
+// sharp is not a direct dependency, so no types; a loose shape is enough.
 // oxlint-disable-next-line typescript/no-explicit-any
 const sharp = require(join(pnpmDir, sharpDir, 'node_modules/sharp')) as (input?: unknown, options?: unknown) => any;
 
@@ -183,7 +177,7 @@ const PLATE = { x: 822, y: 780, w: 778, h: 130 };
 /** 9-slice of one slot with its plate: corner size, edge pieces. */
 const RIM = 30;
 const CORNERS = { tl: [822, 780], tr: [1570, 780], bl: [822, 880], br: [1570, 880] } as const;
-/** Straight top/bottom rim segments, one per painted slot (tiled in turn, so the rim never repeats visibly). */
+/** Straight top/bottom rim segments, one per slot (tiled in turn so the rim never visibly repeats). */
 const RIM_SEGMENTS = [860, 982, 1108, 1236, 1364, 1494];
 const RIM_SEGMENT_W = 60;
 /** Straight left/right rim pieces (rows 815…875). */
@@ -205,10 +199,7 @@ const WALL_FROM = 800;
 /** Source rows of the straight side walls (sampled back and forth). */
 const WALL_ROWS = [420, 780] as const;
 
-/**
- * Redraws a side wall over rows `from…to` of `dst`: columns of the master's straight wall, each row shifted so its
- * outline lands on `target(row)`. Soft towards the face and at both ends.
- */
+/** Redraws a side wall over rows `from…to` from the master's straight wall, each row shifted so its outline lands on `target(row)`. Soft edges. */
 function drawWall(dst: Img, master: Img, side: 'left' | 'right', from: number, to: number, target: (row: number) => number, dx: number) {
 	const { x: sx, w } = SIDE_WALL[side];
 	const span = WALL_ROWS[1] - WALL_ROWS[0];
@@ -218,7 +209,7 @@ function drawWall(dst: Img, master: Img, side: 'left' | 'right', from: number, t
 		const phase = i % (2 * span);
 		return WALL_ROWS[0] + (phase < span ? phase : 2 * span - phase);
 	};
-	// Per-row shift, low-passed so the painted bevel inside the wall does not jitter with the noisy alpha outline
+	// Low-passed so the painted bevel does not jitter with the noisy alpha outline
 	const raw = Array.from({ length: to - from }, (_, i) => {
 		const [l, r] = outline(master, source(i));
 		return target(from + i) - (side === 'left' ? l : r - dx) - dx;
@@ -255,11 +246,10 @@ const PLATE_CROP_TOP = { wide: 480, tall: 585 } as const;
 const GRILLE_CUT = { inner: 152, outer: 700, width: 446, top: 280, bottom: 948 };
 
 async function longSlot(body: Img, w: number, h: number, s: number): Promise<Img> {
-	// Pieces at scale s; the target box w × h includes the plate outline.
+	// Pieces at scale s; w × h includes the plate outline.
 	const c = Math.round(RIM * s);
 	const res = blank(w, h);
-	// Dark interior: tiled slot interiors
-	// Dark interior: the painted dial glass wash, scaled to the recess (one piece, so nothing repeats)
+	// Dark interior: the dial glass wash, scaled as one piece so nothing repeats
 	const g = GLASS_WASH;
 	const crop = sub(body, g.x, g.y, Math.min(g.w, Math.round(((w - 2 * c + 40) / (h - 2 * c + 40)) * g.h)), g.h);
 	draw(res, await scale(crop, w - 2 * c + 40, h - 2 * c + 40), c - 20, c - 20, 10);
@@ -301,9 +291,8 @@ async function insertBand(body: Img, master: Img, band: number, recess: { x: num
 	opaque(fill);
 	draw(res, fill, left + 20, INSERT_ROW - 12, { t: 12, b: 12 });
 
-	// Side walls, from WALL_FROM down through the band: the outline keeps the width it has at WALL_FROM (the body's
-	// widest rows) and only rounds in again over the last rows of the band, following the painted bottom curve.
-	// `dx`: the narrow body lost the grille columns, so its right wall sits further left than in the master.
+	// Side walls from WALL_FROM through the band keep the widest width and round in only over the band's last rows,
+	// following the painted bottom curve. `dx`: the narrow body lost the grille, so its right wall sits further left.
 	const dx = master.w - body.w;
 	const curve = INSERT_ROW - WALL_FROM;
 	for (const side of ['left', 'right'] as const) {
@@ -335,7 +324,7 @@ function cutGrille(body: Img): Img {
 		const t = Math.max(smooth((top - y) / fade + 0.5), smooth((y - bottom) / fade + 0.5));
 		for (let x = 0; x < res.w; x++) {
 			const a = x < inner ? x : x + width;
-			// Above/below the grille: cross-fade the cut over 120 px so the painted wash has no visible step
+			// Above/below the grille: cross-fade over 120 px so the wash has no visible step
 			const u = smooth((x - outer + 60) / 120);
 			const d = (y * res.w + x) * 4;
 			const da = (y * body.w + a) * 4;
@@ -416,9 +405,8 @@ async function main() {
 	report('wide', wideSave, 0, PLATE, wideRecess);
 	report('tall', tallSave, GRILLE_CUT.width, tallPlate, tallRecess);
 
-	// Plates (masters are upscaled from ~1670 / ~850 px paintings; 1920 / 1080 keep all painted detail). The sky with
-	// the moon is cut off at `cropTop` master rows: the section shows only mountains, mist, sea and forest, the page's
-	// own night sky shows above (LANDSCAPE.*.cropTop in layout.ts places the cut plate at its original offset).
+	// Plates: masters are upscaled from ~1670 / ~850 px paintings, so 1920 / 1080 keep all detail. The moon sky is cut at
+	// `cropTop` master rows so the page's night sky shows above; LANDSCAPE.*.cropTop (layout.ts) restores the offset.
 	for (const [name, width, cropTop] of [
 		['radio-landscape', 1920, PLATE_CROP_TOP.wide],
 		['radio-landscape-mobile', 1080, PLATE_CROP_TOP.tall]
@@ -433,7 +421,7 @@ async function main() {
 		console.log(`${name}.webp: ${info.width}×${info.height}, ${(info.size / 1024).toFixed(0)} kB`);
 	}
 
-	// Small cutouts as delivered (cropped to content already), lossless
+	// Small cutouts as delivered (already cropped), lossless
 	for (const name of ['radio-needle', 'radio-key', 'radio-key-pressed', 'radio-knob']) {
 		const info = await sharp(join(masters, `${name}.png`))
 			.webp({ lossless: true, effort: 6 })

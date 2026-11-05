@@ -1,8 +1,7 @@
 <!--
 	@component
-	The radio's printed frequency chart: a paper card with every social link (logo, platform, handle, frequency).
-	This is the plain, accessible fallback required by the brief: real links, visible without any interaction or
-	JavaScript, in reduced motion too. The active station is marked with a pencil highlight.
+	Printed frequency chart: a paper card with every social link. The brief's accessible fallback: real links, visible
+	without interaction or JS, also under reduced motion. The active station gets a pencil highlight.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';

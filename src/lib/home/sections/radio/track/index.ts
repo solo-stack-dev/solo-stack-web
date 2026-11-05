@@ -1,14 +1,11 @@
 /**
- * Station songs: every station plays its own short looping song while it is tuned. A song is a file in this folder
- * named after the station id (`SocialId` in `socials.ts`), e.g. `youtube.m4a`. A station without a file still works,
- * it just plays no music: to give Discord a song later, drop `discord.m4a` here (and its title into `TITLES`).
+ * Station songs (looping while tuned): files named after the station id (`SocialId`), e.g. `youtube.m4a`. No file = no
+ * music; to add Discord, drop `discord.m4a` here and its title into `TITLES`.
  *
- * The songs were generated locally with YuE2 (m-a-p/YuE2-3B) from lyrics and titles written by gpt-6.1-sol; prompts,
- * lyrics, styles, seeds and the chosen takes are in docs/art/radio/SONGS.md. AAC 77 to 80 kbps, 33 to 50 s, under
- * 500 kB each, about -16 LUFS, faded at both ends so the loop restarts gently.
+ * Generated locally with YuE2 (m-a-p/YuE2-3B) from gpt-6.1-sol lyrics/titles; prompts, seeds and takes in
+ * docs/art/radio/SONGS.md. AAC 77–80 kbps, 33–50 s, < 500 kB, ≈ -16 LUFS, faded at both ends for a gentle loop.
  *
- * Only the file URLs are bundled (Vite fingerprints them); the audio itself loads when its station is tuned and the
- * song starts (`preload="none"`).
+ * Only the fingerprinted URLs are bundled; audio loads when tuned (`preload="none"`).
  */
 import type { SocialId } from '#lib/home/data/socials.ts';
 
@@ -17,7 +14,7 @@ export interface Track {
 	src: string;
 	/** MIME type for the `<audio>` source. */
 	type: string;
-	/** Song title (the owner's own data, generated with gpt-6.1-sol), shown while the station is tuned. */
+	/** Song title (generated with gpt-6.1-sol), shown while tuned. */
 	title: string | null;
 }
 
@@ -45,5 +42,5 @@ const TRACKS = new Map<string, Track>(
 	})
 );
 
-/** The song of a station, or `null` if it has none (the station then plays no music). */
+/** A station's song, or `null` (no music). */
 export const trackFor = (id: SocialId): Track | null => TRACKS.get(id) ?? null;

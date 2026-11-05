@@ -1,8 +1,7 @@
 <!--
 	@component
-	One hidden `<svg>` with a `<symbol>` per station logo (24×24 paths from icons.ts). BrandIcon and the dial marks
-	reference them with `<use>`. Rendered once per page by Radio.svelte. Not `display: none`, so every browser resolves
-	the symbols.
+	Hidden `<svg>` with one `<symbol>` per logo, used via `<use>` by BrandIcon and the dial marks. Rendered once by
+	Radio.svelte. Not `display: none`, so every browser resolves the symbols.
 -->
 <script lang="ts">
 	import { ICON_VIEWBOX, SOCIAL_ICONS, iconId } from './icons.ts';

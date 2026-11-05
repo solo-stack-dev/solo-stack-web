@@ -1,14 +1,12 @@
 /**
- * Geometry of the night radio art, in one place so the painted layers can be re-tuned without touching components.
+ * Radio art geometry, so the painted layers can be re-tuned without touching components.
  *
- * Every rect is in **pixels of the body image** (`size` = the WebP's size, written by `assets/build-art.ts`, which
- * also prints the measured rects). The component converts everything to percentages of the rendered body.
+ * Units: **body image px** (`size` = the WebP written by `assets/build-art.ts`, which prints the measured rects).
+ * Components convert to percentages of the rendered body.
  *
- * Two radio variants: `wide` (≥ 40rem, `radio-body.webp`: grille, glass, knobs, one row of keys) and `tall` (phones,
- * `radio-body-mobile.webp`: same radio without the grille, two rows of keys).
- *
- * The dial is a slide rule: the needle slides horizontally along the top of the glass (`needle.x0…x1` is the travel of
- * its center), the printed scale and the mini station logos sit in the same band, the tuned station shows below it.
+ * Variants: `wide` (≥ 40rem, `radio-body.webp`, one key row) and `tall` (phones, `radio-body-mobile.webp`, no grille,
+ * two key rows). The dial is a slide rule: needle, scale and mini logos share a band at the top of the glass; the tuned
+ * station shows below it.
  */
 
 export interface Rect {
@@ -40,7 +38,7 @@ export interface RadioLayout {
 	};
 	/** Printed scale: a rule at `rule`, minor ticks `minorTick` long, station ticks from `markTop`, logos centered on `logoY`. */
 	scale: { rule: number; minorTick: number; markTop: number; logoY: number; logoSize: number };
-	/** Area inside the glass for the big glowing station logo, name, handle, and live content. */
+	/** Area in the glass for the station logo, name, handle and live content. */
 	glassContent: Rect;
 	/** Dark display window between the knobs: @handle, follow link, music controls. */
 	displayStrip: Rect;
@@ -52,7 +50,7 @@ export interface RadioLayout {
 	keyGap: number;
 	/** Painted knob seats (`radio-knob.webp` overlays): volume on the left, tuning on the right. */
 	knobs: { volume: Knob; tuning: Knob };
-	/** Where the landscape horizon crosses the radio, as a fraction of the radio height from its top (may be < 0). */
+	/** Where the horizon crosses the radio, as a fraction of radio height from its top (may be < 0). */
 	horizonAt: number;
 }
 
@@ -89,22 +87,22 @@ export const RADIO_LAYOUT: { wide: RadioLayout; tall: RadioLayout } = {
 };
 
 /**
- * Landscape plates, measured on the full painted master (`w` × `h` = its aspect). `horizonY`: the painted mist band
- * (waveform baseline) as a fraction of the master height. `cropTop`: fraction of the master cut off at the top by
- * `assets/build-art.ts` (sky and moon); the WebP holds only the rest and is drawn at that offset inside the stage.
+ * Landscape plates, measured on the full master (`w` × `h`). `horizonY`: painted mist band (waveform baseline) as a
+ * fraction of master height. `cropTop`: fraction cut off the top by `assets/build-art.ts` (PLATE_CROP_TOP, keep in
+ * sync); the WebP is drawn at that offset inside the stage.
  */
 export const LANDSCAPE = {
 	wide: { w: 2560, h: 1440, horizonY: 748 / 1440, cropTop: 480 / 1440 },
 	tall: { w: 1080, h: 2340, horizonY: 950 / 2340, cropTop: 585 / 2340 }
 } as const;
 
-/** Height of the waveform band around the horizon, as a fraction of the plate height. */
+/** Waveform band height around the horizon, as a fraction of plate height. */
 export const WAVEFORM_BAND = { wide: 0.16, tall: 0.09 } as const;
 
-/** Breakpoint between the tall (phone) and the wide radio. Keep in sync with the media queries in Radio.svelte. */
+/** Tall/wide radio breakpoint. Keep in sync with Radio.svelte's media queries. */
 export const WIDE_MEDIA = '(min-width: 40rem)';
 
-/** Key slots inside the key bank, row by row, left to right, keeping the key art's aspect; a shorter last row is centered. */
+/** Key slots in the bank, row-major, keeping the key art's aspect; a shorter last row is centered. */
 export function keySlots(layout: RadioLayout, count: number): Rect[] {
 	const { keyBank: bank, keyRows: rows, keyGap: gap } = layout;
 	const columns = Math.max(1, Math.ceil(count / rows));

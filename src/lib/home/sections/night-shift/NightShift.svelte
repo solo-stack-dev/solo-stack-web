@@ -1,13 +1,10 @@
 <!--
 	@component
-	01:00 Night shift (docs/HANDOFF-HOMEPAGE.md §5.4): one fixed view of the studio at night. The painted room is
-	cover-cropped into the viewport (Scene), the monitor types the real latest commits as `git log --oneline`, and six
-	objects are explorable hotspots (the bonsai is the golden tree egg). Geometry lives in `layout.ts`.
+	01:00 Night shift (docs/HANDOFF-HOMEPAGE.md §5.4): one fixed, cover-cropped view of the studio (Scene). The monitor
+	types the latest commits as `git log --oneline`; six objects are hotspots (bonsai = golden tree egg). Geometry: layout.ts.
 
-	Motion: typing loop, hand frame swap on the painted mascot, steam, lamp flicker, dust, pointer parallax (the scene
-	plate with everything on it, the foreground leaf and dust). Everything pauses
-	off screen and in hidden tabs; under reduced motion the scene is static with the first page of commits fully typed,
-	and the hotspots still work.
+	Motion (typing, hand frames, steam, lamp flicker, dust, pointer parallax) pauses off screen and in hidden tabs.
+	Reduced motion: static scene, first page of commits fully typed, hotspots still work.
 -->
 <script lang="ts">
 	import { MediaQuery } from 'svelte/reactivity';
@@ -49,7 +46,7 @@
 		typing.paused = false;
 	});
 
-	// ── Pointer parallax: eased --px/--py in -1…1, written as CSS variables; idle once settled ─────────────
+	// ── Pointer parallax: eased --px/--py in -1…1; idle once settled ───────────────────────────────────────
 	let root: HTMLElement | undefined = $state();
 	const target = { x: 0, y: 0 };
 	const current = { x: 0, y: 0 };
@@ -87,7 +84,7 @@
 		root.style.removeProperty('--py');
 	});
 
-	// ── The "live" flag that pauses CSS loops off screen ──────────────────
+	// ── `live` pauses CSS loops off screen ──────────────────
 	const seen = new InView({ rootMargin: '10% 0px' });
 	const live = $derived(seen.current && pageVisibility.current);
 
@@ -151,7 +148,7 @@
 </section>
 
 <style>
-	/* Fixed view: the box has the art's aspect ratio and is capped at one screen; only wider screens crop (cover). */
+	/* Art's aspect ratio, capped at one screen; only wider screens crop (cover). */
 	.night-shift {
 		position: relative;
 		width: 100%;
@@ -225,7 +222,7 @@
 		}
 	}
 
-	/* All CSS loops (steam, flicker, dust, cursor, rings) stop while the section is off screen or the tab is hidden. */
+	/* CSS loops (steam, flicker, dust, cursor, rings) stop off screen or in hidden tabs. */
 	.night-shift:not([data-live]) :global(*) {
 		animation-play-state: paused !important;
 	}

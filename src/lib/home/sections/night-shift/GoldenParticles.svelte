@@ -1,7 +1,7 @@
 <!--
 	@component
-	Golden tree egg: gold motes rising from the bonsai while it is lit. Lazy chunk (LazyMount), one small canvas,
-	30 fps, runs only while particles are alive and the canvas is on screen.
+	Golden tree egg: gold motes rising from the lit bonsai. Lazy chunk (LazyMount), one small canvas at 30 fps, running
+	only while motes are alive and on screen.
 -->
 <script lang="ts">
 	import { RafLoop } from '#lib/home/shared/motion.svelte.ts';

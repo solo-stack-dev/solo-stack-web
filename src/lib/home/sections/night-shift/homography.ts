@@ -3,9 +3,8 @@ import type { Point, Quad } from './layout.ts';
 const n = (value: number) => +value.toFixed(8);
 
 /**
- * CSS `matrix3d()` that maps a `width`×`height` box (with `transform-origin: 0 0`) onto an arbitrary quad, so live
- * HTML sits on a painted screen in perspective. Projective square-to-quad mapping (Heckbert), scaled to the box.
- * `quad` is in the same px space as the box's offset parent: top left, top right, bottom right, bottom left.
+ * CSS `matrix3d()` mapping a `width`×`height` box (`transform-origin: 0 0`) onto `quad`: Heckbert square-to-quad
+ * projection, scaled to the box. `quad` is in the offset parent's px, clockwise from top left.
  */
 export function quadToMatrix3d(width: number, height: number, quad: Quad): string {
 	const [p0, p1, p2, p3] = quad;

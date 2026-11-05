@@ -1,10 +1,9 @@
 /**
- * Night shift scene geometry, the single place to re-tune the composition.
+ * Night shift scene geometry: the one place to re-tune the composition.
  *
- * Source of truth: the measurements of the over-the-shoulder repaint in docs/art/night-shift/repaint/ (desktop scene
- * 2560×1440, mobile scene 1080×2340, all in art px) and the crop rects that tools/optimize-art.mjs wrote to ./art.ts. Everything here is
- * authored in art px and exported as percentages (0…100) of each variant's canvas, so the layers, the live monitor
- * and the hotspots stay pixel-registered at every size.
+ * Sources: measurements of the repaint in docs/art/night-shift/repaint/ (desktop 2560×1440, mobile 1080×2340) and the
+ * crop rects tools/optimize-art.mjs writes to ./art.ts. Authored in art px, exported as percentages (0…100) of each
+ * variant's canvas, so layers, monitor and hotspots stay pixel-registered at every size.
  */
 import { PROPS, SCENES, type ArtRect } from './art.ts';
 
@@ -20,7 +19,7 @@ export interface Rect {
 	h: number;
 }
 
-/** Corners of a quad, clockwise from top left: top left, top right, bottom right, bottom left. */
+/** Quad corners, clockwise from top left. */
 export type Quad = [Point, Point, Point, Point];
 
 export type SpotId = 'window' | 'coffee' | 'handheld' | 'manga' | 'bonsai' | 'dumbbells';
@@ -31,38 +30,38 @@ export interface Spot {
 	rect: Rect;
 	/** Area that lights up on hover/focus (defaults to `rect`). */
 	glow?: Rect;
-	/** Tooltip anchor in percent of `rect` (the tooltip sits above it). Default: top center. */
+	/** Tooltip anchor in % of `rect`; the tooltip sits above it. Default: top center. */
 	tip?: Point;
-	/** Which part of the tooltip sits on the anchor: `end` for spots at the right edge so it opens leftwards. */
+	/** Part of the tooltip on the anchor; `end` for right-edge spots so it opens leftwards. */
 	tipAlign?: 'start' | 'center' | 'end';
-	/** Tap marker position in percent of `rect` (mobile "tap to explore" rings). Default: center. */
+	/** Tap marker ("tap to explore" ring) in % of `rect`. Default: center. */
 	dot?: Point;
 }
 
 export interface SceneLayout {
 	/** Art canvas size in px (aspect ratio of every layer of this variant). */
 	canvas: { width: number; height: number };
-	/** Cover-crop focal point, 0…1: which part of the art stays visible when the viewport's aspect differs. */
+	/** Cover-crop focal point, 0…1. */
 	focal: Point;
-	/** Painted monitor screen. The live terminal is a `box`-sized HTML block mapped onto `quad` with a matrix3d. */
+	/** Painted screen. The terminal is a `box`-sized HTML block mapped onto `quad` with a matrix3d. */
 	monitor: { quad: Quad; box: { width: number; height: number }; fontSize: number; padding: number };
-	/** Box around the painted mascot: the shiny egg's golden glow is a radial gradient inside it, its sparkle sits top right. */
+	/** Box around the painted mascot: holds the shiny egg's radial glow; its sparkle sits top right. */
 	mascot: Rect;
 	/** Upper window glass (both panes). */
 	window: Rect;
-	/** Desk lamp bulb (flicker glow) and its light radius in percent of the canvas width. */
+	/** Lamp bulb (flicker glow); radius in % of canvas width. */
 	lamp: Point & { radius: number };
-	/** Steam over the mug: box the wisps rise in (they start at the bottom center). */
+	/** Box the steam wisps rise in, from its bottom center. */
 	steam: Rect;
-	/** Bonsai pot (center of its baseline): transform origin for the golden canopy and particle source. */
+	/** Bonsai pot baseline center: golden canopy transform origin and particle source. */
 	bonsai: Point;
 	/** Cropped transparent props, placed on this canvas. */
 	props: { bonsai: Rect; golden: Rect; handheld: Rect; foreground?: Rect };
-	/** Plate image height in percent of the canvas: the file carries the hands band below the scene. */
+	/** Plate image height in % of canvas (the file carries the hands band below the scene). */
 	sheet: number;
 	/**
-	 * Typing hands: a window at `rect` (canvas percent) onto the same plate image, which is `image` (percent of the
-	 * window) large and translated by `cells[frame - 1]` (percent of the image) to show that frame's cell.
+	 * Typing hands: a window at `rect` (canvas %) onto the plate image, sized `image` (% of the window) and translated
+	 * by `cells[frame - 1]` (% of the image).
 	 */
 	hands: { rect: Rect; image: { w: number; h: number }; cells: Point[] };
 	/** Hotspots in tab order. */
@@ -112,16 +111,16 @@ const hands = ({ canvas, sheet, hands: rect, cells }: Plate): SceneLayout['hands
 
 const sheetPct = ({ canvas, sheet }: Plate) => r4((sheet / canvas.height) * 100);
 
-/** Moves every corner `inset` px toward the quad's center, so the live text keeps clear of the painted bezel. */
+/** Moves each corner `inset` px toward the center so the text clears the painted bezel. */
 function screen(canvas: Canvas, corners: [number, number][], inset: number): Quad {
 	const cx = corners.reduce((sum, [x]) => sum + x, 0) / 4;
 	const cy = corners.reduce((sum, [, y]) => sum + y, 0) / 4;
 	return corners.map(([x, y]) => pointPct(canvas, [x + Math.sign(cx - x) * inset, y + Math.sign(cy - y) * inset])) as Quad;
 }
 
-/** Bonsai pot: center of its baseline on the desktop prop canvas (both tree states share the pot). */
+/** Bonsai pot baseline center on the prop canvas (both trees share the pot). */
 const POT: [number, number] = [2303, 1090];
-/** Handheld: the cropped prop's center on the desktop prop canvas. */
+/** Handheld prop center on the prop canvas. */
 const CONSOLE: [number, number] = [313, 1175];
 
 /** Maps a prop canvas point `from` to `to` on a scene canvas at `scale`. */
@@ -129,7 +128,7 @@ const anchor = (from: [number, number], to: [number, number], scale: number): Tr
 
 // ── Desktop 2560×1440: over-the-shoulder repaint (docs/art/night-shift/repaint/NOTES.md, measurements.json) ──────────
 const D: Canvas = { width: 2560, height: 1440 };
-/** The props were painted for the old, closer room: 0.8 matches the repaint's scale (mug rim 134 vs 171 px). */
+/** Props were painted for a closer room; 0.8 matches the repaint (mug rim 134 vs 171 px). */
 const BONSAI_ON_DESKTOP = anchor(POT, [2420, 850], 0.8);
 const HANDHELD_ON_DESKTOP = anchor(CONSOLE, [370, 1180], 0.8);
 
@@ -137,7 +136,7 @@ export const desktop: SceneLayout = {
 	canvas: D,
 	focal: { x: 0.55, y: 0.6 },
 	monitor: {
-		// left edge is nearer the camera (the screen turns slightly toward the typist)
+		// left edge is nearer the camera (screen turns toward the typist)
 		quad: screen(
 			D,
 			[
@@ -148,17 +147,17 @@ export const desktop: SceneLayout = {
 			],
 			10
 		),
-		// the screen's mid lines measure ≈ 601×307 art px; the box keeps that aspect and fits a page plus the prompt
+		// screen mid lines ≈ 601×307 art px; same aspect, fits a page plus the prompt
 		box: { width: 540, height: 276 },
 		fontSize: 18,
 		padding: 24
 	},
-	// head, headphones, back and both arms down to the hands on the keys (the chair excluded)
+	// head, headphones, back, arms down to the hands; no chair
 	mascot: rectPct(D, 1018, 230, 1160, 1082),
 	window: rectPct(D, 420, 0, 1080, 480),
 	// center of the shade's lit opening
 	lamp: { ...pointPct(D, [358, 622]), radius: 14 },
-	// mug rim [501, 860, 134, 30], steam origin (568, 873): the wisps rise from the bottom center of this box
+	// mug rim [501, 860, 134, 30], steam origin (568, 873)
 	steam: rectPct(D, 503, 609, 130, 264),
 	bonsai: at(D, POT, BONSAI_ON_DESKTOP),
 	props: {
@@ -180,7 +179,7 @@ export const desktop: SceneLayout = {
 	]
 };
 
-// ── Mobile 1080×2340: dedicated portrait repaint; the desktop props are reused, anchored on its own measurements ───
+// ── Mobile 1080×2340: portrait repaint; desktop props reused, anchored on its own measurements ──────────────────────
 const M: Canvas = { width: 1080, height: 2340 };
 const BONSAI_TO_MOBILE = anchor(POT, [995, 1141], 0.4);
 const HANDHELD_TO_MOBILE = anchor(CONSOLE, [190, 1400], 0.4);
@@ -199,7 +198,7 @@ export const mobile: SceneLayout = {
 			],
 			6
 		),
-		// the screen's mid lines measure ≈ 448×226 art px; 174 px tall fits a full page plus the prompt
+		// screen mid lines ≈ 448×226 art px; 174 px tall fits a page plus the prompt
 		box: { width: 344, height: 174 },
 		fontSize: 13,
 		padding: 10
@@ -223,5 +222,5 @@ export const mobile: SceneLayout = {
 	]
 };
 
-/** How many commits one terminal "page" types before it clears and continues with the next ones. */
+/** Commits per terminal "page" before it clears and continues. */
 export const COMMITS_PER_PAGE = 6;

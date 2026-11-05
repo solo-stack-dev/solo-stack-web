@@ -10,9 +10,9 @@ export interface TerminalLine {
 
 /** The command typed on the monitor. A shell command, not copy. */
 export const COMMAND = 'git log --oneline';
-/** Longest line typed (the monitor box is ~40 columns; the rest would be clipped anyway). */
+/** Longest line typed; the monitor box is ~40 columns. */
 const MAX_COLUMNS = 40;
-/** How long a finished page stays on screen before it clears. */
+/** How long a finished page stays before it clears. */
 const HOLD_MS = 4200;
 
 function seeded(seed: number) {
@@ -24,9 +24,8 @@ function clip(text: string): string {
 }
 
 /**
- * Typing state of the night shift monitor: `git log --oneline` over the real commits, page by page, char by char, in
- * a loop. Drive it with `tick(dt)` from a RafLoop; read `typed` (chars revealed on the current page) and `frame`
- * (mascot hand frame 1…3: 1 rests, 2 and 3 alternate while characters appear).
+ * Monitor typing state: `git log --oneline` over the real commits, page by page, looping. Drive with `tick(dt)` from a
+ * RafLoop; read `typed` (chars shown on this page) and `frame` (hands 1…3: 1 rests, 2/3 alternate while typing).
  */
 export class Terminal {
 	readonly pages: TerminalLine[][];
@@ -128,7 +127,7 @@ export class Terminal {
 		}
 	}
 
-	/** Visible part of each line on the current page: `null` for lines not started yet (the command line always shows). */
+	/** Visible part of each line; `null` for lines not started (the command line always shows). */
 	visible(): (string | null)[] {
 		let left = this.typed;
 		return this.lines.map((line, index) => {

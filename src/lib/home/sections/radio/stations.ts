@@ -1,7 +1,6 @@
 /**
- * Stations of the night radio: one per linkable platform in `socials.ts` (same order, YouTube first). Each plays its
- * own short song while tuned (`track/`; a station without a song file plays no music). Positions are spread evenly
- * over the dial (0…1) and get an FM-style frequency label (88.0–108.0), which is decoration, not copy.
+ * One station per linkable platform in `socials.ts` (same order), each with an optional song (`track/`). Positions are
+ * spread evenly over the dial (0…1); the FM label (88.0–108.0) is decoration, not copy.
  */
 import { linkedSocials, type SocialId } from '#lib/home/data/socials.ts';
 import { trackFor, type Track } from './track/index.ts';
@@ -23,7 +22,7 @@ export interface Station {
 	frequency: string;
 }
 
-/** Margin at both ends of the dial, so the first and last station are not glued to the glass edge. */
+/** Keeps the end stations off the glass edge. */
 const DIAL_MARGIN = 0.06;
 
 const frequencyAt = (position: number) => (88 + position * 20).toFixed(1);
@@ -48,10 +47,10 @@ export const STATIONS: readonly Station[] = build();
 /** Dial resolution: the slider runs 0…DIAL_MAX. */
 export const DIAL_MAX = 1000;
 
-/** Idle dial value before anything is tuned: left of the first station, between stations (static). */
+/** Dial before anything is tuned: left of the first station (static). */
 export const DIAL_IDLE = 0;
 
-/** Half the distance between two neighbors: inside it the dial "locks" onto a station while dragging. */
+/** Distance within which the dragged dial locks onto a station (0.32 of the station spacing). */
 const SNAP_WINDOW = STATIONS.length > 1 ? (STATIONS[1].position - STATIONS[0].position) * 0.32 : 0.1;
 
 export const dialValue = (station: Station) => Math.round(station.position * DIAL_MAX);

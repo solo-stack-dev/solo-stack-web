@@ -1,23 +1,17 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Turns the painted night shift masters (docs/art/night-shift/) into the optimized sources in ../assets/ that
-// `@sveltejs/enhanced-img` encodes to AVIF/WebP at build time, and writes ../art.ts with the crop rects, so layout.ts
-// can place every cropped layer on its scene canvas.
+// Turns the night shift masters (docs/art/night-shift/) into the sources in ../assets/ (enhanced-img encodes them at
+// build) and writes ../art.ts with the crop rects layout.ts uses to place each layer.
 //
-// - Scene plates (room with the mascot painted in): desktop downscaled to 1920 wide (the painting's native raster is
-//   1672×941, more pixels add nothing), mobile 1080×2340. High quality WebP sources (the build
-//   re-encodes them).
-// - Typing hands live IN the plate file: a band below the scene holds the three hand frames side by side. Each frame
-//   is composited onto the full master scene, put through the same resize as the plate, and cut out around the pixels
-//   that frames 2 and 3 change (plus a margin of unchanged plate pixels), with a bleed of the surrounding scene so
-//   resampling at the cell edge sees the same neighbours as in the scene. The section shows the scene part as the
-//   plate and one cell through a window at the hands rect, both from the SAME image: same file, same decode, same
-//   srcset choice and scaling, so the cell registers exactly (a separately encoded patch drifted by ~0.5 CSS px in
-//   Chrome on phones).
-// - Transparent full-canvas props: cropped to their visible alpha bounding box; the offset goes to art.ts.
+// - Scene plates (mascot painted in): desktop 1920 wide (native raster is 1672×941, more adds nothing), mobile
+//   1080×2340. High-quality WebP; the build re-encodes.
+// - Typing hands live IN the plate file: a band below the scene holds frames 1…3 side by side. Each frame is
+//   composited onto the master, resized like the plate, and cut around the pixels frames change (+ MARGIN), with a
+//   BLEED of scene so edge resampling sees the same neighbours. Plate and cell come from the SAME image (file, decode,
+//   srcset, scaling), so the cell registers exactly; a separate patch drifted ~0.5 CSS px in Chrome on phones.
+// - Transparent full-canvas props: cropped to their alpha bounding box; offsets go to art.ts.
 //
 // Run: node src/lib/home/sections/night-shift/tools/optimize-art.mjs && pnpm exec oxfmt src/lib/home/sections/night-shift/art.ts
-// (stop `pnpm dev` first on Windows, it keeps the asset files open). Uses `sharp` from pnpm's virtual store (it ships
-// with @sveltejs/enhanced-img; no new dependency).
+// (on Windows stop `pnpm dev` first; it keeps the assets open). Uses `sharp` from pnpm's store (ships with enhanced-img).
 import { createRequire } from 'node:module';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -29,13 +23,13 @@ const out = (name) => fileURLToPath(new URL(`../assets/${name}`, import.meta.url
 
 /** Alpha at or below this counts as empty when cropping (invisible residue). */
 const ALPHA_EMPTY = 6;
-/** WebP quality of the sources (the build re-encodes; keep them close to lossless). */
+/** Near-lossless; the build re-encodes. */
 const SOURCE_QUALITY = 92;
-/** Unchanged plate pixels kept inside each hands cell around the changed pixels. */
+/** Unchanged plate pixels kept around the changed pixels inside each hands cell. */
 const MARGIN = 8;
-/** Scene pixels kept around each cell in the band, so downscaling (Lanczos) and bilinear drawing see real neighbours. */
+/** Scene pixels around each cell in the band, so Lanczos downscaling and bilinear drawing see real neighbours. */
 const BLEED = 8;
-/** A plate pixel counts as changed by a hand frame above this summed RGB difference (resampling noise stays below). */
+/** Summed RGB difference above which a pixel counts as changed by a hand frame (resampling noise stays below). */
 const CHANGED = 3;
 
 const webp = (image) => image.webp({ quality: SOURCE_QUALITY, effort: 6, smartSubsample: true });
@@ -77,15 +71,15 @@ async function prop(source, name) {
 }
 
 /**
- * Scene plate `width` wide with the hands band appended. `frames` are the hands masters 1…3 with their position on the
- * master canvas. Returns the plate canvas, the hands rect on it, the sheet height and each cell's position in the sheet.
+ * Scene plate `width` wide plus hands band. `frames`: hands masters 1…3 with their master-canvas position.
+ * Returns plate canvas, hands rect, sheet height and each cell's position in the sheet.
  */
 async function plate(source, width, frames, name) {
 	const base = await render(source, width);
 	const { width: w, height: h } = base.info;
 	const rendered = await Promise.all(frames.map((frame) => render(source, width, frame)));
 
-	// Bounding box of every plate pixel a frame changes, grown by the margin and snapped to even px (4:2:0 chroma)
+	// Box of all changed pixels + MARGIN, snapped to even px (4:2:0 chroma)
 	let [x0, y0, x1, y1] = [w, h, -1, -1];
 	for (const { data } of rendered) {
 		for (let y = 0; y < h; y++) {
@@ -106,7 +100,7 @@ async function plate(source, width, frames, name) {
 	if (outer.x < 0 || outer.y < 0 || outer.x + outer.width > w || outer.y + outer.height > h || outer.width * frames.length > w)
 		throw new Error('hands band does not fit');
 
-	// Band below the scene: the scene's last row repeated (a seam guard for downscaling), then the cells side by side
+	// Band: the scene's last row repeated (seam guard for downscaling), then the cells side by side
 	const band = Buffer.alloc(w * (outer.height + BLEED) * 3);
 	for (let y = 0; y < outer.height + BLEED; y++) base.data.copy(band, y * w * 3, (h - 1) * w * 3, h * w * 3);
 	rendered.forEach(({ data }, index) => {
