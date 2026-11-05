@@ -1,21 +1,16 @@
 /* oxlint-disable no-console -- CLI tool that reports what it wrote */
-// Builds the optimized sunrise sources in ../assets/ from the painted masters in docs/art/ and writes ../art.ts
-// (intrinsic sizes + crop boxes, read by ../layout.ts). `<enhanced:img>` then emits responsive AVIF/WebP from these.
+// Builds the sunrise sources in ../assets/ from the masters in docs/art/ and writes ../art.ts (canvas sizes + crop boxes for
+// ../layout.ts). `<enhanced:img>` encodes the responsive AVIF/WebP from these.
 //
-// - Opaque plates (sky, sky-mobile) and wide layers are resized to at most MAX_WIDTH.
-// - Transparent layers are cropped to their alpha bounding box (plus a small pad), so the browser decodes less;
-//   art.ts records where the crop sits on the master canvas, layout.ts places everything in master coordinates.
-// - Sources are high quality WebP (alpha kept); the lossy delivery encode happens in enhanced-img.
-//
-// - `portrait` job (not part of the default run; its source is the owner photo outside the repo): the footer's
-//   ink print. Crop to head and shoulders, key out the butter backdrop, turn luminance into ink density (anthracite
-//   with alpha = density, mids pushed dark), then print it: the density is compressed to a few flat ink levels,
-//   dithered with the shared paper grain, and the bust ends in the shared painted soft edge (feather-down) instead
-//   of a grey gradient, so the fade dissolves into ink specks like a print. Sunrise.svelte multiplies it onto the
-//   butter paper.
+// - Every layer is capped at MAX_WIDTH; transparent layers are cropped to their alpha box (+ PAD) so the browser decodes less.
+// - Sources are high quality WebP with alpha; the lossy delivery encode happens in enhanced-img.
+// - `portrait` job (opt-in; the source is the owner photo outside the repo): the footer's ink print. Crop head and shoulders,
+//   key out the butter backdrop, luminance → ink density (anthracite, alpha = density, dark mids), then print: snap to a few
+//   flat ink levels, dither with the shared paper grain, and end the bust in the shared painted wash edge, so the fade
+//   dissolves into ink specks instead of a grey gradient.
 //
 // Run: node src/lib/home/sections/sunrise/tools/build-assets.mjs [portrait]
-// Uses `sharp` from pnpm's virtual store (it ships with @sveltejs/enhanced-img; no new dependency).
+// Uses `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
 import { existsSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -35,10 +30,7 @@ const WEBP = { quality: 92, alphaQuality: 100, effort: 6, smartSubsample: true }
 /** The owner's photo (outside the repo, 1254²); `portrait` job only. */
 const PORTRAIT_SOURCE = 'D:/repos/Solo Stack/branding/final-branding-assets/profil-buttergelb.png';
 
-/**
- * Layers: `scale` shrinks the cropped content (the masters are upsampled from smaller native renders, so a smaller
- * source loses nothing visible at the largest rendered size).
- */
+/** Optional `scale` shrinks the cropped content (masters are upsampled from smaller renders, so nothing visible is lost). */
 const LAYERS = [
 	{ key: 'sky', src: 'sunrise/sunrise-sky.png', out: 'sunrise-sky.webp', crop: false },
 	{ key: 'skyMobile', src: 'sunrise/sunrise-sky-mobile.png', out: 'sunrise-sky-mobile.webp', crop: false },
@@ -106,8 +98,7 @@ const PORTRAIT = {
 	paper: 0.08,
 	/** Grain dither amplitude (in density units): how far the paper grain moves a pixel across a level boundary. */
 	dither: 0.2,
-	/** Feather into the paper: the painted bottom edge repeats `repeat` times across (its height follows its painted
-	 *  aspect), shifted by `shift` px; side ramps as fractions of the width. */
+	/** Bottom edge: wash tile repeated `repeat` times across at its painted aspect, offset by `shift` px; `side`: side ramps (fraction of width). */
 	feather: { repeat: 2, shift: 57, side: 0.12 },
 	ink: [24, 25, 27]
 };
@@ -138,8 +129,8 @@ async function portrait() {
 	const grain = new Float32Array(grainRaw.length);
 	order.forEach((index, rank) => (grain[index] = rank / (order.length - 1)));
 
-	// The shared painted wash edge (opaque above, transparent below; the sunrise night's drying wash): its ramp rows at
-	// their painted aspect, tiled twice across the bust, so the blooms and tide lines keep their shape.
+	// Bottom edge: the ramp rows of the shared drying wash (opaque above, transparent below; also the sunrise night's front),
+	// tiled across the bust at their painted aspect so the blooms and tide lines keep their shape.
 	const featherFile = shared('transitions/wash-dry.webp');
 	const featherInfo = await sharp(featherFile).metadata();
 	const ramp = { top: Math.round(featherInfo.height * 0.18), bottom: Math.round(featherInfo.height * 0.82) };

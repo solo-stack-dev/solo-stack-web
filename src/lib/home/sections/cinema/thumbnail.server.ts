@@ -9,10 +9,7 @@ const EMPTY_JPEG = Uint8Array.from(
 	(char) => char.charCodeAt(0)
 );
 
-/**
- * Fetch the best available thumbnail of a video from YouTube's image CDN (server side, at build time only).
- * Returns the JPEG bytes, or a dark placeholder JPEG if none is available.
- */
+/** Best available thumbnail JPEG from YouTube's image CDN (build time only), or EMPTY_JPEG. */
 export async function fetchVideoThumbnail(id: string): Promise<Uint8Array<ArrayBuffer>> {
 	if (!VIDEO_ID_PATTERN.test(id)) return EMPTY_JPEG;
 	for (const name of THUMBNAIL_CANDIDATES) {

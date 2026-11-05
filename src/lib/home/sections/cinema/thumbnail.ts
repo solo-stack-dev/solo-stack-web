@@ -1,10 +1,8 @@
 /**
- * Self-hosted video thumbnail. The facade must not contact YouTube before the visitor clicks play (no `i.ytimg.com`
- * request either: in the EU that already transfers the visitor's IP to Google). So the thumbnail is fetched once at
- * build time by the prerendered route `src/routes/media/video-thumbnail/[id]/[width].[format]/+server.ts`, which
- * crops it to 16:9 and encodes it in every width × format below, and served from our own origin. The prerender
- * crawler finds the variants through `<VideoThumbnail>`'s `srcset`s and `<img src>` (and the post's `og:image`), so
- * every build ships the thumbnails of the videos it rendered.
+ * Self-hosted video thumbnails. The facade must not contact YouTube (incl. `i.ytimg.com`) before play: in the EU that already
+ * transfers the visitor's IP to Google. The prerendered route `src/routes/media/video-thumbnail/[id]/[width].[format]/+server.ts`
+ * fetches each thumbnail once at build time, crops it to 16:9, and encodes every width × format below. The crawler finds the
+ * variants via `<VideoThumbnail>`'s `srcset`/`src` and the post's `og:image`, so each build ships the thumbnails it rendered.
  */
 export const VIDEO_ID_PATTERN = /^[\w-]{11}$/;
 

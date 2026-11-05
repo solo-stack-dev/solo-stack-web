@@ -1,14 +1,11 @@
 <!--
 	@component
-	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). The night retreats upward as a ragged watercolor edge and
-	reveals butter paper, a misty valley with the rising sun, and a steaming coffee next to a closed laptop on the cliff
-	path (the shift is over). The owner's photo is ink-printed onto the paper next to the wordmark; legal links and
-	social icons sit on the paper at the very end of the page.
+	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). The night retreats upward and reveals butter paper, a misty valley with the
+	rising sun, and coffee next to a closed laptop on the cliff path. Ink-printed owner photo, legal links, and socials sit on the paper.
 
-	Scroll: `--sunrise` (0 → 1) is driven by a CSS scroll-driven animation (`view()` timeline of this footer, from its
-	top entering the viewport to the page end). Fallback without `animation-timeline` support: ScrollProgress writes it.
-	Reduced motion (or neither): the registered initial value 1 = the final sunrise, static.
-	All rects live in ./layout.ts; optimized assets come from tools/build-assets.mjs.
+	`--sunrise` (0 → 1): CSS `view()` timeline from the footer's top entering to the page end; without `animation-timeline` support
+	ScrollProgress writes it. Reduced motion: the registered initial value 1 (final state, static).
+	Rects: ./layout.ts. Assets: tools/build-assets.mjs.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -42,8 +39,8 @@
 	let root: HTMLElement;
 	const near = new InView();
 
-	// JS fallback for browsers without scroll-driven animations. `through` is 0 when the top enters and reaches
-	// (vh + H) / H … at the page end, where the bottom of this last section meets the viewport bottom.
+	// JS fallback without scroll-driven animations. As the last section it can't scroll out: at the page end `through`
+	// only reaches H / (vh + H), hence the rescale to 1.
 	const through = new ScrollProgress();
 	let fallback = $state(false);
 	$effect(() => {
@@ -121,7 +118,7 @@
 		<div class="placed laptop-glint" style={place.laptopGlint}></div>
 	</div>
 
-	<!-- The night dries and pulls back (ink-wash wipe, CSS below). NightPage tracks the cleared line for the nav ink. -->
+	<!-- Retreating night (ink-wash wipe, CSS below). NightPage tracks the cleared line for the nav ink. -->
 	<div class="night" aria-hidden="true">
 		<span class="night-clear" data-night-edge data-edge-clear="1"></span>
 	</div>
@@ -171,10 +168,9 @@
 		justify-content: flex-end;
 		overflow: clip;
 		color: var(--color-night);
-		/* the bottom of the 04:00 cinema (its --ink-fade), continued by the retreating night */
+		/* continues the cinema's --ink-fade */
 		--ink-fade: var(--color-night);
-		/* The clock sits on the retreating night until its ink clears the clock (--sunrise ≈ 0.88 → 0.95, see .night),
-		   then on the paper: cream ink first, anthracite after, like the nav. */
+		/* cream on the night, anthracite once its ink clears the clock (--sunrise ≈ 0.88 → 0.95, see .night), like the nav */
 		--night-clock-color: color-mix(
 			in oklab,
 			color-mix(in oklab, var(--color-cream) 85%, transparent),
@@ -201,7 +197,7 @@
 		}
 	}
 
-	/* Butter paper behind everything: matches the bottom band of the sky plates (butter) and the banner. */
+	/* Butter paper behind everything; matches the sky plates' bottom band and the banner. */
 	.paper {
 		position: absolute;
 		inset: 0;
@@ -209,8 +205,7 @@
 		opacity: clamp(0, var(--sunrise) * 1.6, 1);
 	}
 
-	/* The painted sky plate. Its top fades into the paper; it sinks a little as the night retreats, so the baked sun
-	   rises behind the valley. */
+	/* Top fades into the paper; sinks as the night retreats so the baked sun rises behind the valley. */
 	.sky {
 		opacity: clamp(0, var(--sunrise) * 1.6, 1);
 		translate: 0 calc((1 - var(--sunrise)) * 6%);
@@ -266,7 +261,7 @@
 		position: absolute;
 	}
 
-	/* The valley's misty lower edge and the lowest rocks dissolve into the paper above the footer bar. */
+	/* Valley mist and the lowest rocks dissolve into the paper above the bar. */
 	.valley {
 		mask-image: linear-gradient(to bottom, black 62%, transparent 96%);
 	}
@@ -323,7 +318,7 @@
 		}
 	}
 
-	/* A faint warm glint where the low sun catches the closed lid; it grows with the sunrise and breathes slowly. */
+	/* Warm glint where the low sun catches the lid; grows with --sunrise. */
 	.laptop-glint {
 		border-radius: 50%;
 		background: radial-gradient(
@@ -355,18 +350,14 @@
 	}
 
 	/*
-	 * The night retreats upward (the 04:00 → 06:00 ink-wash wipe): solid ink in the color of the cinema's bottom, ending
-	 * in the product (intersect) of the painted drying wash and the wet bloom wash at another size and offset
-	 * (shared/transitions.ts): the front has crisp lobes and tide lines, changes shape as it moves and never repeats
-	 * visibly, and the washes' soft even haze squares away instead of reading as fog. Both tile sideways near their
-	 * painted (square) aspect.
+	 * 04:00 → 06:00 ink-wash wipe: solid --ink-fade ending in the intersect of the drying wash and the wet bloom wash at another
+	 * size and offset (shared/transitions.ts). The intersect gives crisp lobes and tide lines that change as the front moves and
+	 * never visibly repeat, and squares away the washes' even haze (would read as fog). Both tile near their painted square aspect.
 	 *
-	 * As --sunrise runs 0 → 1 the night pulls back by --night-travel (a translate, no layout; it speeds up over the
-	 * last fifth) and dries: the ramp tightens from 55svh to 16svh. At the start the wash begins right under the
-	 * cinema's painted bottom (no flat ink block). The ramp's opaque top always covers the section's top line while
-	 * that line is more than ~5svh below the viewport top, so the cinema's ink bottom never meets the paper at a
-	 * straight edge; at the page end the ink is gone below ~6svh, clear of the 06:00 clock. Reduced motion / no JS:
-	 * the final state, static.
+	 * Over --sunrise 0 → 1 it translates up by --night-travel (no layout; faster in the last fifth) and the ramp tightens
+	 * 55svh → 16svh. Tuned so that: the wash starts right under the cinema's painted bottom (no flat ink block); the opaque top
+	 * covers the section's top line while that line is > ~5svh below the viewport top (no straight seam on the paper); at the
+	 * page end the ink is gone below ~6svh, clear of the 06:00 clock.
 	 */
 	.night {
 		--night-ramp: calc(55svh - 39svh * var(--sunrise));
@@ -393,8 +384,7 @@
 		mask-composite: add, intersect, add;
 	}
 
-	/* The part of .night that still carries ink (down to where the ramp is about half transparent): NightPage's
-	   nav/rail ink switch reads this box (data-night-edge, data-edge-clear="1"). */
+	/* The still-inked part of .night (down to ~50 % ramp alpha); NightPage's nav/rail ink switch reads this box (data-night-edge). */
 	.night-clear {
 		position: absolute;
 		inset: 0 0 auto;
@@ -411,8 +401,7 @@
 		padding: 2rem var(--page-gutter) var(--bottom-gutter);
 	}
 
-	/* The owner photo, ink-printed onto the paper: anthracite ink with alpha = density (tools/build-assets.mjs portrait),
-	   multiplied onto the butter so the paper shows through the light tones. The ink ends on the wordmark's baseline. */
+	/* Owner photo ink print (anthracite, alpha = density; build-assets.mjs `portrait`), multiplied onto the paper. */
 	.brand {
 		--wordmark-size: clamp(2rem, 3.4vw, 3.25rem);
 
@@ -425,7 +414,7 @@
 		flex: none;
 		width: auto;
 		height: calc(var(--wordmark-size) * 2.1);
-		/* the shoulders are feathered into the paper: drop the faded tail below the baseline so the ink ends on it */
+		/* drops the feathered shoulder tail below the baseline, so the visible ink ends on the wordmark's baseline */
 		margin-bottom: calc(var(--wordmark-size) * -0.3);
 		mix-blend-mode: multiply;
 		user-select: none;
