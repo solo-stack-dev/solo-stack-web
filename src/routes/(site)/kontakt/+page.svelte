@@ -4,7 +4,7 @@
 	plus the same schema on the server, Turnstile against spam. Issue codes map to `contact_error_*` messages.
 -->
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { page } from '$app/state';
 	import { sendContact } from '#lib/contact/contact.remote.ts';
 	import { CONTACT_LIMITS, CONTACT_TOPICS, ContactSchema, type ContactTopic } from '#lib/contact/schema.ts';
@@ -12,6 +12,8 @@
 	import TurnstileWidget from '#lib/contact/TurnstileWidget.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
+	import seal from '#lib/contact/assets/wax-seal.webp?w=288;216;144&enhanced';
+	import sealPressed from '#lib/contact/assets/wax-seal-pressed.webp?w=288;216;144&enhanced';
 	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
@@ -76,6 +78,21 @@
 			if (!(control instanceof HTMLInputElement && control.type === 'hidden')) control.focus({ preventScroll: true });
 		});
 	}
+
+	/**
+	 * After the first send attempt the letter checks itself again as you correct it: a field that is right now clears its red
+	 * ink and message at once (while typing in it), one you leave wrong shows it again on change. Preflight only, no request.
+	 */
+	function recheck(event: Event) {
+		if (!contact.submitted) return;
+		if (event.type === 'input' && (event.target as Element).getAttribute('aria-invalid') !== 'true') return;
+		void contact.validate({ preflightOnly: true });
+	}
+
+	// A solved challenge clears its message too (its token arrives without an input event)
+	$effect(() => {
+		if (token && untrack(() => contact.submitted)) void contact.validate({ preflightOnly: true });
+	});
 
 	const invalid = {
 		topic: () => !!fields.topic.issues(),
@@ -162,10 +179,12 @@
 		{#if !sent}
 			<form
 				{...enhanced}
-				class="letter relative mt-14 grid gap-12 sm:mt-20"
+				class="letter relative mt-10 grid gap-12 sm:mt-20"
 				data-sending={contact.pending > 0 || undefined}
 				novalidate
 				onsubmit={revealFirstIssue}
+				oninput={recheck}
+				onchange={recheck}
 				onpointerenter={() => (hovering = true)}
 				onpointerleave={() => (hovering = false)}
 				onfocusin={() => (focused = true)}
@@ -173,7 +192,7 @@
 			>
 				<!-- The topic: four lines of the letter to tick, each with an ink circle that fills with butter -->
 				<fieldset class="topics grid min-w-0 gap-3" aria-describedby="contact-topic-error" data-issue-anchor>
-					<legend class="mb-3 label">{m.contact_topic_legend()}</legend>
+					<legend class="caption mb-1">{m.contact_topic_legend()}</legend>
 					<div class="choices">
 						{#each CONTACT_TOPICS as topic (topic)}
 							<label class="choice">
@@ -188,7 +207,7 @@
 
 				<div class="grid gap-10 sm:grid-cols-2 sm:gap-8">
 					<div class="field" data-issue-anchor>
-						<label class="label" for="contact-name">{m.contact_name_label()}</label>
+						<label class="caption" for="contact-name">{m.contact_name_label()}</label>
 						<div class="write">
 							<input
 								id="contact-name"
@@ -205,7 +224,7 @@
 					</div>
 
 					<div class="field" data-issue-anchor>
-						<label class="label" for="contact-email">{m.contact_email_label()}</label>
+						<label class="caption" for="contact-email">{m.contact_email_label()}</label>
 						<div class="write">
 							<input
 								id="contact-email"
@@ -224,7 +243,7 @@
 				</div>
 
 				<div class="field" data-issue-anchor>
-					<label class="label" for="contact-message">{m.contact_message_label()}</label>
+					<label class="caption" for="contact-message">{m.contact_message_label()}</label>
 					<!-- On focus a margin line runs down the left of the pad and the first writing line inks in, where the caret is -->
 					<div class="write write-pad">
 						<textarea
@@ -256,9 +275,13 @@
 					</div>
 
 					<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+						<!-- Sealed with butter wax: the seal lifts on hover, is pressed in on click and stays pressed while the owl takes the letter -->
 						<button type="submit" class="send" disabled={contact.pending > 0}>
-							<span class="dot" aria-hidden="true"></span>
-							{contact.pending > 0 ? m.contact_sending() : m.contact_submit()}
+							<span class="seal" aria-hidden="true">
+								<enhanced:img class="wax" src={seal} alt="" sizes="4.5rem" loading="lazy" decoding="async" />
+								<enhanced:img class="wax pressed" src={sealPressed} alt="" sizes="4.5rem" loading="lazy" decoding="async" />
+							</span>
+							<span class="send-label">{contact.pending > 0 ? m.contact_sending() : m.contact_submit()}</span>
 						</button>
 						<p class="max-w-sm text-sm text-pretty text-muted-foreground">
 							{m.contact_privacy_note()}
@@ -362,13 +385,13 @@
 	/* Phones: the owl perches above the title; its twigs fade out (OwlMessenger) a clear 1.5rem above the title's ink */
 	@media (max-width: 47.99rem) {
 		.contact {
-			--owl: min(14rem, 58vw);
-			--owl-top: calc(2.5rem - var(--owl) * 0.1);
+			--owl: min(13.5rem, 56vw);
+			--owl-top: calc(0.5rem - var(--owl) * 0.1);
 			min-height: 0;
 		}
 
 		.hero {
-			padding-top: calc(var(--owl) * 0.86);
+			padding-top: calc(var(--owl) * 0.86 - 2.5rem);
 		}
 	}
 
@@ -398,19 +421,20 @@
 		scroll-margin-top: 7rem;
 	}
 
-	/* Mono captions, quieter than the writing */
-	.label {
+	/* Captions in the hand of the page (sentence case, quieter than the writing), close above the line they name */
+	.caption {
 		position: relative;
 		width: fit-content;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: color-mix(in oklab, var(--foreground) 74%, transparent);
+		font-size: 0.875rem;
+		font-weight: 500;
+		line-height: 1.25;
+		color: color-mix(in oklab, var(--foreground) 78%, transparent);
 		transition: color var(--dur-state) ease;
 	}
 
 	/* A drop of ink hangs in front of the label of the field being written */
-	.field > .label::before,
-	.topics > .label::before {
+	.field > .caption::before,
+	.topics > .caption::before {
 		content: '';
 		position: absolute;
 		top: 50%;
@@ -427,26 +451,26 @@
 
 	/* Phones: no gutter to hang it in, so it follows the label */
 	@media (max-width: 39.99rem) {
-		.field > .label::before,
-		.topics > .label::before {
+		.field > .caption::before,
+		.topics > .caption::before {
 			left: calc(100% + 0.35rem);
 		}
 	}
 
-	.field:focus-within > .label,
-	.topics:focus-within > .label {
+	.field:focus-within > .caption,
+	.topics:focus-within > .caption {
 		color: var(--ink-lit);
 	}
 
-	.field:focus-within > .label::before,
-	.topics:focus-within > .label::before {
+	.field:focus-within > .caption::before,
+	.topics:focus-within > .caption::before {
 		scale: 1;
 	}
 
-	/* Label 6px above the writing, the rule 2.75rem below it */
+	/* The caption ≈ 7px above the written letters, the rule right under them: no empty box between caption and line */
 	.field {
 		display: grid;
-		gap: 0.375rem;
+		gap: 0.125rem;
 		align-content: start;
 	}
 
@@ -480,8 +504,8 @@
 	}
 
 	.line {
-		min-height: 2.75rem;
-		padding: 0.25rem 0 0.4rem;
+		padding: 0 0 0.4rem;
+		line-height: 1.5;
 	}
 
 	/* Lined letter pad: the rules scroll with the text; the last one is the ruled baseline below */
@@ -859,100 +883,156 @@
 		outline-offset: 3px;
 	}
 
-	.topics {
+	.letter {
 		--ink-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.6 2.9C18.4 3.4 21.4 7.4 21 12.2c-.4 4.7-4.4 8.2-9.3 7.9C7 19.8 3.1 16 3.2 11.6 3.3 6.7 7.4 2.8 12.4 3.1c1.6.1 2.9.6 4 1.3' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3C/svg%3E");
+		/* The same brush ring, finer, drawn around the wax seal on focus */
+		--seal-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.6 2.9C18.4 3.4 21.4 7.4 21 12.2c-.4 4.7-4.4 8.2-9.3 7.9C7 19.8 3.1 16 3.2 11.6 3.3 6.7 7.4 2.8 12.4 3.1c1.6.1 2.9.6 4 1.3' fill='none' stroke='%23000' stroke-width='0.7' stroke-linecap='round'/%3E%3C/svg%3E");
 	}
 
-	/* Butter pill, lit from above; its moon rises on hover, it presses in, and a sheen runs while sending */
+	/*
+	 * Send: the letter's butter wax seal (round-3 art) with the words beside it in ink, no pill. Hover lifts the seal off the
+	 * paper (its shadow grows), a press swaps in the pressed wax, and while the owl takes the letter the seal stays pressed and
+	 * a line of ink runs under the words. Keyboard focus is drawn in the material: an ink ring around the seal and the swash
+	 * under the words (`--focus-ring`, ≥ 3:1). The wax fills ≈ 80 % of its canvas, so the 4.5rem seal shows ≈ 58px of wax.
+	 */
 	.send {
-		position: relative;
-		isolation: isolate;
-		overflow: hidden;
+		--seal: 4.5rem;
+		--seal-shadow: rgb(14 15 16 / 0.3);
 		display: inline-flex;
 		align-items: center;
-		gap: 0.75rem;
-		min-height: 3.25rem;
-		padding: 0 1.75rem 0 1.3rem;
-		border-radius: 999px;
-		background: linear-gradient(
-			180deg,
-			color-mix(in oklab, var(--color-moonlight) 60%, var(--color-butter)),
-			var(--color-butter) 55%,
-			color-mix(in oklab, var(--color-butter) 84%, var(--color-ochre))
-		);
-		color: var(--color-night);
-		font-weight: 700;
-		--send-edge: inset 0 1px 0 rgb(255 255 255 / 0.55), inset 0 -1px 0 color-mix(in oklab, var(--color-ochre) 55%, transparent);
-		box-shadow:
-			var(--send-edge),
-			0 6px 24px -6px color-mix(in oklab, var(--color-ochre) 75%, transparent);
+		gap: 0.375rem;
+		min-height: var(--seal);
+		/* the canvas's empty rim: the wax lines up with the letter's left edge */
+		margin-left: calc(var(--seal) * -0.1);
+		padding-right: 0.25rem;
+		color: var(--foreground);
+		font-size: 1.0625rem;
+		font-weight: 600;
 		-webkit-tap-highlight-color: transparent;
+	}
+
+	:global(.dark) .send {
+		--seal-shadow: rgb(0 0 0 / 0.6);
+	}
+
+	/* No box: the ring and the swash below draw the focus */
+	.send:focus-visible {
+		outline: none;
+		box-shadow: none;
+	}
+
+	.seal {
+		position: relative;
+		flex: none;
+		width: var(--seal);
+		height: var(--seal);
+		filter: drop-shadow(0 1px 1px var(--seal-shadow)) drop-shadow(0 2px 3px color-mix(in oklab, var(--seal-shadow) 50%, transparent));
 		transition:
 			translate var(--dur-hover) var(--ease-settle),
-			scale var(--dur-hover) var(--ease-settle),
-			box-shadow var(--dur-state) ease;
+			filter var(--dur-hover) ease;
 	}
 
-	.send:hover:not(:disabled) {
-		translate: 0 -2px;
-		box-shadow:
-			var(--send-edge),
-			0 12px 34px -8px color-mix(in oklab, var(--color-ochre) 85%, transparent);
+	.seal :global(img) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
 	}
 
-	.send:active:not(:disabled) {
+	.seal :global(.pressed) {
+		opacity: 0;
+	}
+
+	/* Hand-drawn ink ring around the wax (focus) */
+	.seal::after {
+		content: '';
+		position: absolute;
+		inset: -0.5rem;
+		background: var(--focus-ring);
+		mask: var(--seal-ring) center / 100% 100% no-repeat;
+		opacity: 0;
+		scale: 0.94;
+		transition:
+			opacity var(--dur-hover) ease,
+			scale var(--dur-state) var(--ease-settle);
+	}
+
+	.send-label {
+		position: relative;
+		padding-block: 0.5rem;
+		transition: color var(--dur-state) ease;
+	}
+
+	/* The swash under the words: faint on hover, the focus mark on keyboard focus, running ink while sending */
+	.send-label::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0.1rem;
+		height: 0.4rem;
+		background: var(--ink-lit);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		opacity: 0;
+		transition:
+			opacity var(--dur-hover) ease,
+			translate var(--dur-hover) var(--ease-settle);
+	}
+
+	.send:hover:not(:disabled) .seal {
+		translate: 0 -3px;
+		filter: drop-shadow(0 3px 2px color-mix(in oklab, var(--seal-shadow) 75%, transparent))
+			drop-shadow(0 8px 10px color-mix(in oklab, var(--seal-shadow) 45%, transparent));
+	}
+
+	.send:hover:not(:disabled) .send-label::after {
+		opacity: 0.55;
+	}
+
+	.send:focus-visible .seal::after {
+		opacity: 1;
+		scale: 1;
+	}
+
+	.send:focus-visible .send-label::after {
+		background: var(--focus-ring);
+		opacity: 1;
+	}
+
+	/* Pressed into the paper: the pressed wax, flat to the page */
+	.send:active:not(:disabled) .seal,
+	.send:disabled .seal {
 		translate: 0 1px;
-		scale: 0.985;
-		box-shadow:
-			var(--send-edge),
-			0 2px 10px -4px color-mix(in oklab, var(--color-ochre) 80%, transparent);
+		filter: drop-shadow(0 0.5px 0.5px var(--seal-shadow));
 		transition-duration: 60ms;
 	}
 
-	.send:focus-visible {
-		outline-offset: 4px;
+	.send:active:not(:disabled) .seal :global(.pressed),
+	.send:disabled .seal :global(.pressed) {
+		opacity: 1;
 	}
 
+	/* Sending: the seal stays pressed, the words rest in quieter ink and a line of ink runs under them */
 	.send:disabled {
 		cursor: progress;
 	}
 
-	.send:disabled::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		background: linear-gradient(100deg, transparent 30%, color-mix(in oklab, var(--color-moonlight) 85%, transparent) 50%, transparent 70%);
-		translate: -100% 0;
-		animation: sheen 1.5s ease-in-out infinite;
+	.send:disabled .send-label {
+		color: color-mix(in oklab, var(--foreground) 80%, transparent);
 	}
 
-	@keyframes sheen {
-		to {
-			translate: 100% 0;
+	.send:disabled .send-label::after {
+		opacity: 0.8;
+		clip-path: inset(0 100% 0 0);
+		animation: ink-run 1.6s var(--ease-settle) infinite;
+	}
+
+	@keyframes ink-run {
+		45% {
+			clip-path: inset(0);
 		}
-	}
-
-	.dot {
-		width: 0.85rem;
-		height: 0.85rem;
-		border-radius: 50%;
-		/* a crescent: night shadow over a cream disc */
-		background: radial-gradient(circle at 70% 35%, var(--color-butter) 45%, transparent 47%), var(--color-night);
-		transition: translate 300ms cubic-bezier(0.3, 1.35, 0.5, 1);
-	}
-
-	.send:hover:not(:disabled) .dot {
-		translate: 0 -2px;
-	}
-
-	.send:disabled .dot {
-		animation: pulse 1s ease-in-out infinite alternate;
-	}
-
-	@keyframes pulse {
-		to {
-			opacity: 0.35;
+		100% {
+			clip-path: inset(0 0 0 100%);
 		}
 	}
 
@@ -1047,8 +1127,9 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.send:disabled::after {
-			display: none;
+		.send:disabled .send-label::after {
+			clip-path: none;
+			animation: none;
 		}
 
 		.sent-title::after {
@@ -1056,12 +1137,9 @@
 			animation: none;
 		}
 
-		.send:disabled .dot {
-			animation: none;
-		}
-
-		.send,
-		.dot,
+		.seal,
+		.seal::after,
+		.send-label::after,
 		.mark,
 		.mark::after,
 		.choice::after,
