@@ -1,176 +1,205 @@
 <!--
 	@component
-	Blog index entry. Thumbnail: self-hosted, or the painted night with a stamp while the video is not public. No card box.
-	The title link covers the whole entry (one tab stop, one link name). `featured`: image beside a big title from `md`.
+	Blog index entry, no card box. Art: the self-hosted video thumbnail, or the format's silhouette vignette with the
+	"video follows" sign lit in its sky while the video is not public; both on a torn paper edge. The title link covers the
+	whole entry (one tab stop, one link name).
+
+	`featured` (the newest post): art beside a big title from `md`. Otherwise an index row: meta column, title and teaser,
+	art on the right (stacked on phones).
 -->
 <script lang="ts">
-	import ArrowRightIcon from '@lucide/svelte/icons/arrow-right';
 	import VideoThumbnail from '#lib/home/sections/cinema/VideoThumbnail.svelte';
 	import { m } from '#lib/paraglide/messages.js';
 	import { FORMAT_LABELS, formatDate, postHref } from './content.ts';
-	import NightScene from './NightScene.svelte';
+	import FormatVignette from './FormatVignette.svelte';
+	import { DECKLE_MASK } from './materials.ts';
 	import type { PostSummary } from './schema.ts';
 
 	interface Props {
 		post: PostSummary;
 		featured?: boolean;
-		/** Load the image eagerly (the first card above the fold). */
+		/** Load the image eagerly (the first entry above the fold). */
 		eager?: boolean;
 	}
 
 	let { post, featured = false, eager = false }: Props = $props();
 
-	// Rendered width. Index: max-w-6xl (72rem), px-4/sm:6/lg:8, gap 2rem, 1/2/3 columns (md/lg). Featured from md: 1.15fr + 1fr, gap 3rem.
+	// Rendered width. Index: max-w-6xl (72rem), px-4/sm:6/lg:8. Featured from md: 1.2fr + 1fr, gap up to 4rem. Rows from md: 17rem art.
 	const SIZES_SINGLE = '(min-width: 40rem) calc(100vw - 3rem), calc(100vw - 2rem)';
 	const sizes = $derived(
 		featured
-			? `(min-width: 64rem) min(calc((100vw - 7rem) * 0.535), 36.6rem), (min-width: 48rem) calc((100vw - 6rem) * 0.535), ${SIZES_SINGLE}`
-			: `(min-width: 64rem) min(calc((100vw - 8rem) / 3), 21.33rem), (min-width: 48rem) calc(50vw - 2.5rem), ${SIZES_SINGLE}`
+			? `(min-width: 72rem) 36rem, (min-width: 48rem) calc((100vw - 7rem) * 0.55), ${SIZES_SINGLE}`
+			: `(min-width: 64rem) 19rem, (min-width: 48rem) 15rem, ${SIZES_SINGLE}`
 	);
 </script>
 
 <!-- `lang` marks only the post's own text; format, date and reading time are page UI -->
-<article class={['post-card group', featured && 'is-featured']}>
-	<div class="thumb">
+<article class={['entry', featured ? 'is-featured' : 'is-row']}>
+	<div class="art">
 		{#if post.youtubeId}
-			<VideoThumbnail id={post.youtubeId} {sizes} loading={eager ? 'eager' : 'lazy'} />
+			<div class="thumb" style:--deckle={DECKLE_MASK}>
+				<VideoThumbnail id={post.youtubeId} {sizes} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} />
+			</div>
 		{:else}
-			<NightScene class="scene" variant="moonrise">
-				<span class="stamp">{m.blog_card_no_video()}</span>
-			</NightScene>
+			<FormatVignette class="thumb" format={post.format} {sizes} {eager}>
+				<span class="sign"><span class="spark" aria-hidden="true"></span>{m.blog_card_no_video()}</span>
+			</FormatVignette>
 		{/if}
 	</div>
 
 	<div class="body">
-		<p class="meta">
-			<span class="format">{FORMAT_LABELS[post.format]()}</span>
-			<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
-			<span aria-hidden="true">·</span>
-			<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-		</p>
 		<h2 class="title" lang={post.lang}>
 			<a href={postHref(post)} hreflang={post.lang}>{post.title}</a>
 		</h2>
 		<p class="teaser" lang={post.lang}>{post.description}</p>
-		{#if featured}
-			<span class="go" aria-hidden="true"><ArrowRightIcon class="size-5" /></span>
-		{/if}
+		<p class="meta">
+			<span class="format">{FORMAT_LABELS[post.format]()}</span>
+			<span class="facts">
+				<time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+				<span aria-hidden="true">·</span>
+				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+			</span>
+		</p>
+		<!-- A brushed arrow that walks on hover -->
+		<svg class="go" viewBox="0 0 64 16" aria-hidden="true">
+			<path d="M2 8.6C14 7.6 30 8.4 44 7.9s12 .4 16-.2" />
+			<path d="M51.5 2.4c3 2.2 6 4.3 9 5.6-3.2 1.5-6.1 3.4-8.8 5.6" />
+		</svg>
 	</div>
 </article>
 
 <style>
-	.post-card {
+	.entry {
 		position: relative;
 		display: grid;
 		align-content: start;
 		gap: 1.25rem;
 	}
 
-	.post-card:has(a:focus-visible) {
+	/* One focus ring around the whole entry (the title link is the target) */
+	.entry:has(a:focus-visible) {
 		outline: 2px solid var(--focus-ring);
-		outline-offset: 6px;
-		border-radius: 1.5rem;
+		outline-offset: 0.75rem;
+		border-radius: 0.75rem;
 	}
 
-	.thumb {
+	/* Art ------------------------------------------------------------------------------------------------------- */
+
+	.art {
+		position: relative;
+		transition: translate var(--dur-state) var(--ease-settle);
+	}
+
+	.art :global(.thumb) {
 		position: relative;
 		aspect-ratio: 16 / 9;
 		overflow: hidden;
-		border-radius: 1.25rem;
-		background: var(--color-night);
-		box-shadow:
-			0 0 0 1px color-mix(in oklab, var(--foreground) 8%, transparent),
-			0 1.25rem 2.5rem -1.75rem rgb(24 25 27 / 0.45);
-		transition:
-			translate 300ms cubic-bezier(0.3, 1.35, 0.5, 1),
-			box-shadow 300ms ease;
+		background: var(--color-ink);
+		mask: var(--deckle) center / 100% 100% no-repeat;
 	}
 
-	/* Hover: lifts and catches the moonlight */
-	.post-card:hover .thumb {
-		translate: 0 -4px;
-		box-shadow:
-			0 0 0 1px color-mix(in oklab, var(--color-butter) 55%, transparent),
-			0 1.5rem 3rem -1.5rem rgb(24 25 27 / 0.5),
-			0 0 3.5rem -0.5rem rgb(252 215 114 / 0.28);
-	}
-
-	.thumb :global(img),
-	.thumb :global(.scene) {
+	.art :global(.thumb img) {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		transition: scale 600ms ease;
+		transition:
+			scale 900ms var(--ease-settle),
+			filter 600ms ease;
 	}
 
-	.post-card:hover .thumb :global(img),
-	.post-card:hover .thumb :global(.scene) {
-		scale: 1.04;
+	/* Hover: the art drifts up and the night brightens a little, as if the landmark lit up */
+	.entry:hover .art {
+		translate: 0 -3px;
 	}
 
-	/* "Video follows" stamp (as the mock data stamp on /stats) */
-	.stamp {
+	.entry:hover .art :global(.thumb img) {
+		scale: 1.035;
+		filter: brightness(1.08) saturate(1.06);
+	}
+
+	/* Paper shadow under the torn sheet (the mask would clip a box-shadow) */
+	.art::after {
+		content: '';
 		position: absolute;
-		top: 1rem;
-		left: 1rem;
-		padding: 0.3rem 0.7rem;
-		border: 2px solid currentColor;
-		border-radius: 0.5rem;
-		color: rgb(252 215 114 / 0.9);
-		font-family: var(--font-mono);
-		font-size: 0.7rem;
-		font-weight: 700;
-		letter-spacing: 0.2em;
-		text-transform: uppercase;
-		transform: rotate(-4deg);
-		mask-image: radial-gradient(circle at 30% 40%, #000 60%, rgb(0 0 0 / 0.75) 85%);
+		inset: auto 6% -0.9rem;
+		z-index: -1;
+		height: 1.6rem;
+		border-radius: 50%;
+		background: radial-gradient(closest-side, rgb(24 25 27 / 0.22), transparent);
+		transition: opacity var(--dur-state) ease;
 	}
+
+	:global(.dark) .art::after {
+		background: radial-gradient(closest-side, rgb(252 215 114 / 0.1), transparent);
+	}
+
+	/* "Video follows", lit in the dark sky of the vignette like a sign over the hills */
+	.sign {
+		position: absolute;
+		top: clamp(0.8rem, 6cqi, 1.75rem);
+		left: clamp(0.9rem, 6cqi, 2rem);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		color: var(--color-moonlight);
+		font-family: var(--font-mono);
+		font-size: clamp(0.625rem, 2.4cqi, 0.8125rem);
+		font-weight: 500;
+		letter-spacing: var(--tracking-label-sm);
+		text-transform: uppercase;
+		text-shadow:
+			0 0 8px rgb(252 215 114 / 0.55),
+			0 1px 2px rgb(14 15 16 / 0.8);
+	}
+
+	/* A firefly as the sign's pilot light */
+	.spark {
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		background: var(--color-moonlight);
+		box-shadow:
+			0 0 3px 1px var(--color-butter),
+			0 0 12px 3px rgb(252 215 114 / 0.6);
+		animation: blink 3.6s ease-in-out infinite;
+	}
+
+	@keyframes blink {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
+	}
+
+	/* Text ------------------------------------------------------------------------------------------------------ */
 
 	.body {
 		position: relative;
 		display: grid;
-		gap: 0.7rem;
-	}
-
-	.meta {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 0.35rem 0.6rem;
-		color: var(--muted-foreground);
-		font-size: 0.8125rem;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.format {
-		padding: 0.15rem 0.6rem;
-		border-radius: 999px;
-		background: color-mix(in oklab, var(--color-butter) 55%, transparent);
-		color: var(--color-night);
-		font-weight: 600;
-	}
-
-	:global(.dark) .format {
-		background: color-mix(in oklab, var(--color-butter) 16%, transparent);
-		color: var(--color-butter);
+		align-content: start;
+		gap: 0.75rem;
 	}
 
 	.title {
 		font-family: var(--font-display);
-		font-size: 1.45rem;
+		font-size: clamp(1.4rem, 2.1vw, 1.75rem);
 		font-weight: 900;
-		letter-spacing: -0.03em;
-		line-height: 1.12;
+		letter-spacing: -0.035em;
+		line-height: 1.08;
 		text-wrap: balance;
 	}
 
 	.title a {
 		outline: none;
+		box-shadow: none;
 		text-decoration: underline;
 		text-decoration-color: transparent;
-		text-decoration-thickness: 0.08em;
-		text-underline-offset: 0.18em;
-		transition: text-decoration-color 200ms ease;
+		text-decoration-thickness: 0.075em;
+		text-underline-offset: 0.16em;
+		transition: text-decoration-color var(--dur-state) ease;
 	}
 
 	/* The whole entry is the link target */
@@ -180,70 +209,152 @@
 		inset: 0;
 	}
 
-	.post-card:hover .title a {
+	.entry:hover .title a {
 		text-decoration-color: var(--color-ochre);
 	}
 
-	:global(.dark) .post-card:hover .title a {
+	:global(.dark) .entry:hover .title a {
 		text-decoration-color: var(--color-butter);
 	}
 
 	.teaser {
-		max-width: 60ch;
+		max-width: 58ch;
 		color: var(--muted-foreground);
 		line-height: 1.6;
 		text-wrap: pretty;
 	}
 
-	.go {
-		display: grid;
-		place-items: center;
-		width: 3rem;
-		height: 3rem;
-		margin-top: 0.75rem;
-		border-radius: 999px;
-		background: var(--color-butter);
-		color: var(--color-night);
-		box-shadow: 0 2px 16px -2px rgb(252 215 114 / 0.6);
-		transition: translate 300ms cubic-bezier(0.3, 1.35, 0.5, 1);
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 0.4rem 1rem;
+		margin-top: 0.25rem;
+		color: var(--muted-foreground);
+		font-size: 0.8125rem;
+		font-variant-numeric: tabular-nums;
 	}
 
-	.post-card:hover .go {
-		translate: 0.35rem 0;
+	.facts {
+		display: inline-flex;
+		gap: 0.5rem;
+	}
+
+	/* Format as an ink label, no pill: a short brush dash leads it */
+	.format {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		color: var(--ink-lit);
+		font-family: var(--font-mono);
+		font-size: var(--text-label-sm);
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+	}
+
+	.format::before {
+		content: '';
+		width: 1.1rem;
+		height: 2px;
+		border-radius: 2px;
+		background: currentColor;
+		opacity: 0.8;
+	}
+
+	.go {
+		width: 3.5rem;
+		height: 0.9rem;
+		margin-top: 0.4rem;
+		overflow: visible;
+		color: var(--foreground);
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2.2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		opacity: 0.55;
+		transition:
+			translate var(--dur-state) cubic-bezier(0.3, 1.35, 0.5, 1),
+			opacity var(--dur-state) ease,
+			color var(--dur-state) ease;
+	}
+
+	.entry:hover .go {
+		translate: 0.6rem 0;
+		opacity: 1;
+		color: var(--ink-lit);
+	}
+
+	/* Featured ------------------------------------------------------------------------------------------------- */
+
+	.is-featured .title {
+		font-size: clamp(1.9rem, 6.4vw, 2.4rem);
+		line-height: 1.02;
+		letter-spacing: var(--tracking-wordmark);
 	}
 
 	@media (min-width: 48rem) {
 		.is-featured {
-			grid-template-columns: 1.15fr 1fr;
+			grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
 			align-items: center;
-			gap: 3rem;
-		}
-
-		.is-featured .thumb {
-			border-radius: 1.5rem;
-		}
-
-		.is-featured .stamp {
-			top: 1.5rem;
-			left: 1.5rem;
-			font-size: 0.8rem;
+			gap: clamp(2rem, 4.5vw, 4rem);
 		}
 
 		.is-featured .title {
 			font-size: clamp(1.9rem, 3vw, 2.75rem);
 			line-height: 1;
-			letter-spacing: var(--tracking-wordmark);
 		}
 
 		.is-featured .teaser {
 			font-size: 1.0625rem;
 		}
+
+		.is-featured .go {
+			width: 4.5rem;
+			height: 1.1rem;
+		}
+	}
+
+	/* Rows ------------------------------------------------------------------------------------------------------ */
+
+	@media (min-width: 48rem) {
+		.is-row {
+			grid-template-columns: minmax(0, 1fr) 15rem;
+			align-items: start;
+			gap: 2.5rem;
+		}
+
+		.is-row .art {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		.is-row .body {
+			grid-column: 1;
+			grid-row: 1;
+		}
+	}
+
+	@media (min-width: 64rem) {
+		.is-row {
+			grid-template-columns: minmax(0, 1fr) 19rem;
+			gap: 4rem;
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.post-card:hover .thumb,
-		.post-card:hover .go {
+		.spark {
+			animation: none;
+		}
+
+		.entry:hover .art,
+		.entry:hover .go {
 			translate: none;
+		}
+
+		.entry:hover .art :global(.thumb img) {
+			scale: none;
 		}
 	}
 </style>
