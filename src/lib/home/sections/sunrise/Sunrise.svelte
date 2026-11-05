@@ -176,6 +176,11 @@
 			color-mix(in oklab, var(--color-cream) 85%, transparent),
 			color-mix(in oklab, var(--color-night) 85%, transparent) calc(clamp(0, (var(--sunrise) - 0.88) / 0.07, 1) * 100%)
 		);
+		/* its halo follows: ink on the night, butter on the paper */
+		--clock-paper: calc(clamp(0, (var(--sunrise) - 0.88) / 0.07, 1) * 100%);
+		--night-clock-halo:
+			0 0 2px color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)),
+			0 0 8px color-mix(in oklab, color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)) 80%, transparent);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {

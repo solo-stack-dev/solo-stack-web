@@ -5,7 +5,6 @@
 //   node src/lib/home/shared/tools/optimize-materials.mjs
 //
 // - paper-grain.webp: grayscale tile → two-tone alpha (cream above the mean, ink below), so `normal` blending suffices.
-// - edge-{1,2,3}.webp (opaque above) and -up (flipped), 1280×200 (CSS stretches them anyway).
 // - star-{1..4}.webp: 48 px StarField sprites. shooting-star.webp: 480×48, head on the right.
 //
 // Uses `sharp` from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
@@ -46,21 +45,6 @@ const report = (name) => console.log(`${name.padEnd(22)} ${(statSync(target(name
 		.toBuffer();
 	await sharp(palette).webp({ lossless: true }).toFile(target('paper-grain.webp'));
 	report('paper-grain.webp');
-}
-
-for (const edge of [1, 2, 3]) {
-	const base = sharp(source(`edge-${edge}.png`)).resize(1280, 200, { fit: 'fill', kernel: 'lanczos3' });
-	await base
-		.clone()
-		.webp({ quality: 80, alphaQuality: 70, effort: 6 })
-		.toFile(target(`edge-${edge}.webp`));
-	await base
-		.clone()
-		.flip()
-		.webp({ quality: 80, alphaQuality: 70, effort: 6 })
-		.toFile(target(`edge-${edge}-up.webp`));
-	report(`edge-${edge}.webp`);
-	report(`edge-${edge}-up.webp`);
 }
 
 for (const star of [1, 2, 3, 4]) {

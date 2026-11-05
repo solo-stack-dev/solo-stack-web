@@ -12,8 +12,6 @@ import type { SocialId } from '#lib/home/data/socials.ts';
 export interface Track {
 	/** URL of the audio file. */
 	src: string;
-	/** MIME type for the `<audio>` source. */
-	type: string;
 	/** Song title (generated with gpt-6.1-sol), shown while tuned. */
 	title: string | null;
 }
@@ -31,14 +29,12 @@ const TITLES: Partial<Record<SocialId, string>> = {
 	facebook: 'The Fold'
 };
 
-const MIME: Record<string, string> = { m4a: 'audio/mp4', mp3: 'audio/mpeg', opus: 'audio/ogg; codecs=opus', webm: 'audio/webm' };
-
 const files = import.meta.glob<string>('./*.{m4a,mp3,opus,webm}', { query: '?url', import: 'default', eager: true });
 
 const TRACKS = new Map<string, Track>(
 	Object.entries(files).map(([path, src]) => {
-		const [, id, extension] = /^\.\/(.+)\.(\w+)$/.exec(path)!;
-		return [id, { src, type: MIME[extension], title: TITLES[id as SocialId] ?? null }];
+		const [, id] = /^\.\/(.+)\.\w+$/.exec(path)!;
+		return [id, { src, title: TITLES[id as SocialId] ?? null }];
 	})
 );
 

@@ -242,7 +242,6 @@ The following records compare decoded RGB pixels against the pre-edit files. SHA
 
 Blank screen interior was additionally checked independently: zero changed pixels in both plates. Saved final PNGs were read back and matched the recorded final SHA-256 values.
 
-
 ## Registered local cliff-light repair - 2026-11-03
 
 Tool: built-in `image_gen.imagegen`, underlying model not exposed; highest quality requested, no selectable model/quality/native-mask option. `transparent_background: false`. Four generation calls: two per plate. Grayscale mask supplied as image 2 is a visual guide; exact pixel confinement comes from final compositing.
@@ -261,6 +260,7 @@ Originals were copied before edits to `C:/Users/peter/AppData/Local/Temp/making-
 
 - desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-becffc26-c799-4870-aa13-6bfeb4649189.png`.
 - mobile: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-03a762ce-4a3c-45f8-b279-94fc25ac4430.png`.
+
 ### Selected second pair outputs
 
 - desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-e96f9cb7-4c8c-426c-8a98-285e5fcbf5f1.png`.
@@ -298,82 +298,56 @@ Audits compare decoded RGB against the pre-edit copies. Outside-mask SHA-256 val
 
 ```json
 {
-  "desktop": {
-    "file": "making-plate.png",
-    "dimensions": [
-      2560,
-      1440
-    ],
-    "mode": "RGB",
-    "opaque": true,
-    "chunks": [
-      "IHDR",
-      "sRGB",
-      "IDAT",
-      "IEND"
-    ],
-    "maskBBoxXYXYExclusive": [
-      1851,
-      916,
-      2560,
-      1175
-    ],
-    "maskPixels": 67131,
-    "changedPixels": 63093,
-    "unchangedOutsideMask": 3619269,
-    "changedOutsideMask": 0,
-    "laptopProtectedPixels": 13254,
-    "changedLaptop": 0,
-    "screenProtectedPixels": 4989,
-    "changedScreen": 0,
-    "silhouetteProtectedPixels": 4982,
-    "changedSilhouette": 0,
-    "pureBlack": 0,
-    "pureWhite": 0,
-    "originalSHA256": "c950d5f9040e2d2eb2ded4bcf7698f8451a7a51ca866a3de439757fa85418b07",
-    "finalSHA256": "1d54c5239c5d08de783f3ec474688ca300584c6ec7a7b11a7e36f6e51a03586b",
-    "outsideOriginalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
-    "outsideFinalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
-    "bytes": 4115376
-  },
-  "mobile": {
-    "file": "making-plate-mobile.png",
-    "dimensions": [
-      1080,
-      2340
-    ],
-    "mode": "RGB",
-    "opaque": true,
-    "chunks": [
-      "IHDR",
-      "sRGB",
-      "IDAT",
-      "IEND"
-    ],
-    "maskBBoxXYXYExclusive": [
-      601,
-      1703,
-      1080,
-      1931
-    ],
-    "maskPixels": 49761,
-    "changedPixels": 46533,
-    "unchangedOutsideMask": 2477439,
-    "changedOutsideMask": 0,
-    "laptopProtectedPixels": 11690,
-    "changedLaptop": 0,
-    "screenProtectedPixels": 4062,
-    "changedScreen": 0,
-    "silhouetteProtectedPixels": 3005,
-    "changedSilhouette": 0,
-    "pureBlack": 0,
-    "pureWhite": 0,
-    "originalSHA256": "92ddf1145d5f01f072367f8be7b20d6ec342b324c62c6fd21811b873280510cb",
-    "finalSHA256": "d6809d47c674415d2766033acbc2393435359c3adf3feb4c4e41bf042a90e788",
-    "outsideOriginalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
-    "outsideFinalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
-    "bytes": 3076536
-  }
+	"desktop": {
+		"file": "making-plate.png",
+		"dimensions": [2560, 1440],
+		"mode": "RGB",
+		"opaque": true,
+		"chunks": ["IHDR", "sRGB", "IDAT", "IEND"],
+		"maskBBoxXYXYExclusive": [1851, 916, 2560, 1175],
+		"maskPixels": 67131,
+		"changedPixels": 63093,
+		"unchangedOutsideMask": 3619269,
+		"changedOutsideMask": 0,
+		"laptopProtectedPixels": 13254,
+		"changedLaptop": 0,
+		"screenProtectedPixels": 4989,
+		"changedScreen": 0,
+		"silhouetteProtectedPixels": 4982,
+		"changedSilhouette": 0,
+		"pureBlack": 0,
+		"pureWhite": 0,
+		"originalSHA256": "c950d5f9040e2d2eb2ded4bcf7698f8451a7a51ca866a3de439757fa85418b07",
+		"finalSHA256": "1d54c5239c5d08de783f3ec474688ca300584c6ec7a7b11a7e36f6e51a03586b",
+		"outsideOriginalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
+		"outsideFinalSHA256": "a9e7bbc7cab5e206b7ab8896f3f6f91934dd7565ec8c303fedf1b32bcc2a4089",
+		"bytes": 4115376
+	},
+	"mobile": {
+		"file": "making-plate-mobile.png",
+		"dimensions": [1080, 2340],
+		"mode": "RGB",
+		"opaque": true,
+		"chunks": ["IHDR", "sRGB", "IDAT", "IEND"],
+		"maskBBoxXYXYExclusive": [601, 1703, 1080, 1931],
+		"maskPixels": 49761,
+		"changedPixels": 46533,
+		"unchangedOutsideMask": 2477439,
+		"changedOutsideMask": 0,
+		"laptopProtectedPixels": 11690,
+		"changedLaptop": 0,
+		"screenProtectedPixels": 4062,
+		"changedScreen": 0,
+		"silhouetteProtectedPixels": 3005,
+		"changedSilhouette": 0,
+		"pureBlack": 0,
+		"pureWhite": 0,
+		"originalSHA256": "92ddf1145d5f01f072367f8be7b20d6ec342b324c62c6fd21811b873280510cb",
+		"finalSHA256": "d6809d47c674415d2766033acbc2393435359c3adf3feb4c4e41bf042a90e788",
+		"outsideOriginalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
+		"outsideFinalSHA256": "60eabb670eaed91c44f79b82455fe598358e33a0eb27f350b788efbe9936c7fe",
+		"bytes": 3076536
+	}
 }
 ```
 

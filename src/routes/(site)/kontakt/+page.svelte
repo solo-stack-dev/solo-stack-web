@@ -120,7 +120,7 @@
 			{:else}
 				<form {...enhanced} class="relative grid gap-12" novalidate>
 					<fieldset class="grid gap-4" aria-describedby="contact-topic-error">
-						<legend class="label mb-4">{m.contact_topic_legend()}</legend>
+						<legend class="mb-4 label">{m.contact_topic_legend()}</legend>
 						<div class="-mx-4 [scrollbar-width:none] overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
 							<div class="track flex w-max gap-0.5 rounded-full bg-foreground/[0.06] p-1 ring-1 ring-foreground/10 ring-inset">
 								{#each CONTACT_TOPICS as topic (topic)}

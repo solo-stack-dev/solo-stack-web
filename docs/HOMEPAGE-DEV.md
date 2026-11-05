@@ -87,7 +87,7 @@ Defined in `src/routes/layout.css`. Use them instead of local values so every se
 | `--halo-ink`, `--halo-butter`                                                                    | Text halo for cream on pigment / anthracite on paper                                                                     |
 | `--glow-sm/md/lg`                                                                                | Butter light (works as `text-shadow` and `box-shadow`)                                                                   |
 | `--ink-underline`                                                                                | The selection/link mark: a hand-drawn stroke as a mask on an `::after` (`mask: var(--ink-underline) center / 100% 100%`) |
-| `--ease-settle`, `--ease-ambient`, `--dur-hover/state/reveal/entrance`                           | Motion (160 / 300 / 600 / 1100 ms)                                                                                       |
+| `--ease-settle`, `--dur-hover/state/reveal/entrance`                                             | Motion (160 / 300 / 600 / 1100 ms)                                                                                       |
 | utilities `label-sm` (clock, rail, hints), `label` (controls, tabs, links), `night-heading` (h2) | Mono label scale (Geist Mono, self-hosted) and the one section heading style                                             |
 
 Interaction idioms, two only: the hand-drawn underline for every selection or navigation state (nav current page, making pillars, game tabs, links), and the solid butter disc/button for primary actions (play, follow). No pills or glass chips.
@@ -196,7 +196,7 @@ The night shift frames its room with a night-ink vignette inside the feathered a
 
 ### 6.5b `materials.ts` (lead)
 
-`materials.ts` exports the optimized shared materials: `PAPER_GRAIN`, `EDGE_MASKS[1|2|3].down|up` (ragged painted edges, currently unused by the page), `STAR_SPRITES`, `SHOOTING_STAR_SPRITE`. Regenerate the files after the masters change: `node src/lib/home/shared/tools/optimize-materials.mjs` (uses `sharp` from pnpm's store, no new dependency).
+`materials.ts` exports the optimized shared materials: `PAPER_GRAIN`, `STAR_SPRITES`, `SHOOTING_STAR_SPRITE`. Regenerate the files after the masters change: `node src/lib/home/shared/tools/optimize-materials.mjs` (uses `sharp` from pnpm's store, no new dependency).
 
 QA screenshots: `node src/lib/home/shared/tools/scroll-screens.mjs <dev url> docs/screens/integration --prefix desktop-1440 [--width 390 --height 844] [--reduced] [--sheet] [--seams]` (headless Chrome on a random free port, one WebP per half viewport, reports console errors; `--seams` centers every section boundary).
 

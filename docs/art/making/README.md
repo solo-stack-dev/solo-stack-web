@@ -41,7 +41,6 @@ Keep these large masters outside the shipped bundle. Generate optimized responsi
 
 Exact generation prompts and ordered input references: [PROMPTS.md](PROMPTS.md).
 
-
 ## Local cliff illumination repair - 2026-11-03
 
 Repaired both plate masters in place. The broad ochre surface stripe on the main laptop ledge is now dark anthracite away from a localized warm pool beneath the laptop, with sparse separated catch-lights. Detached warm background fringe on the exterior of the bezel was replaced with dark generated night pigment. The laptop body, blank screen and protected cliff silhouette retain their original RGB pixels. The mandatory two-pixel silhouette guard retains its original color, including a thin warm hairline; the lower stepped ledges and existing background washes were outside this repair.
