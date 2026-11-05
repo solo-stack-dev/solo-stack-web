@@ -1,10 +1,18 @@
 <!--
 	@component
-	Footer of the non-home pages (the homepage has the sunrise): the floor of every subpage. A silhouette horizon (the owl's
-	tree on the left, the cliff with the glowing laptop on the right, `assets/footer-horizon.webp`) rises out of the page, and
-	the footer content sits on its ink ground, light on black in both themes. On narrow screens the strip keeps a minimum
-	height and crops from the left, so the laptop cliff stays in view. The screen glow and three fireflies run only while the
-	horizon is on screen; reduced motion gets them still. Social icons use the same Simple Icons paths as the sunrise.
+	Footer of the non-home pages (the homepage has the sunrise): the floor of every subpage. Two silhouette ridges rise out
+	of the page: a far one in diluted ink (the same art mirrored, as a mask) and the near horizon (`assets/footer-horizon.webp`:
+	the owl's tree on the left, the cliff with the glowing laptop on the right). On narrow screens the strip keeps a minimum
+	width and crops from the left, so the laptop cliff stays in view.
+
+	The near ridge runs into its ink ground. The tagline and the platforms (small glyphs, 44px targets, a balanced 5 + 4
+	block on phones) are set into that ground. Below it the giant wordmark stands on the bottom edge of the page with the
+	fine print above it: cream on the ink at night; on paper the ground is one sumi stroke that runs dry after the glyphs,
+	and the wordmark is ink on the paper, so the light theme never ends in a black slab.
+
+	Spacing budget (docs/critique/ROUND-2.md): pages end without a bottom runway; the footer pulls its art up so the first
+	visible silhouette sits ~112px under the page's last content on desktop and ~80px on phones (`--gap`). The screen glow
+	and three fireflies run only while the horizon is on screen; reduced motion gets them still.
 -->
 <script lang="ts">
 	import { inView } from '#lib/home/shared/motion.svelte.ts';
@@ -14,6 +22,7 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import horizon from './assets/footer-horizon.webp?w=2172;1600;1080&enhanced';
+	import ridgeMask from './assets/footer-horizon.webp?url';
 
 	const socials = linkedSocials();
 	// TODO(owner): imprint and privacy pages do not exist yet (/kontakt does; same in the sunrise footer).
@@ -24,8 +33,9 @@
 	let awake = $state(false);
 </script>
 
-<footer class="site-footer">
+<footer class="site-footer" style:--ridge="url({ridgeMask})">
 	<div class="horizon" data-awake={awake || undefined} aria-hidden="true" {@attach inView((visible) => (awake = visible), { rootMargin: '10% 0px' })}>
+		<div class="far"></div>
 		<div class="land">
 			<enhanced:img src={horizon} alt="" sizes="(min-width: 64rem) 110vw, 76rem" loading="lazy" decoding="async" />
 			<span class="screen"></span>
@@ -37,110 +47,127 @@
 	</div>
 
 	<div class="ground">
-		<div class="mx-auto grid max-w-6xl gap-8 px-4 pt-6 pb-10 sm:px-8 md:grid-cols-2 md:items-end md:pt-4">
-			<div class="grid justify-items-start gap-2">
-				<a
-					href={localizeHref('/')}
-					class="inline-flex min-h-11 items-center font-display text-lg font-black tracking-wordmark text-cream uppercase"
-					aria-label={m.site_nav_wordmark_label()}>SOLO STACK</a
-				>
-				<p class="text-quiet text-sm">{m.site_footer_tagline()}</p>
-				<p class="text-quiet font-mono text-xs tracking-clock tabular-nums">© {year} SOLO STACK</p>
-			</div>
-
-			<div class="grid gap-4 md:justify-items-end">
-				<nav aria-label={m.site_footer_socials_label()}>
-					<ul class="-mx-2 flex flex-wrap gap-0.5 md:justify-end">
+		<div class="band">
+			<div class="band-row content-frame">
+				<p class="tagline">{m.site_footer_tagline()}</p>
+				<nav class="socials" aria-label={m.site_footer_socials_label()}>
+					<ul>
 						{#each socials as social (social.id)}
 							<li>
-								<a
-									href={social.url}
-									target="_blank"
-									rel="me noopener"
-									title={social.name}
-									aria-label={m.site_footer_social_link({ name: social.name })}
-									class="social text-quiet grid size-11 place-items-center rounded-full"
-								>
-									<svg viewBox="0 0 24 24" class="size-4.5 fill-current" aria-hidden="true" focusable="false"><path d={SOCIAL_ICON_PATHS[social.icon]} /></svg>
+								<a href={social.url} target="_blank" rel="me noopener" title={social.name} aria-label={m.site_footer_social_link({ name: social.name })}>
+									<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={SOCIAL_ICON_PATHS[social.icon]} /></svg>
 								</a>
-							</li>
-						{/each}
-					</ul>
-				</nav>
-				<nav aria-label={m.site_footer_legal_label()}>
-					<ul class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-						{#each LEGAL_LINKS as link (link.id)}
-							<li>
-								<a href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'} class="legal text-quiet inline-flex min-h-11 items-center"
-									>{legalLabels[link.id]()}</a
-								>
 							</li>
 						{/each}
 					</ul>
 				</nav>
 			</div>
 		</div>
+
+		<div class="base content-frame">
+			<div class="fine">
+				<p class="copy label-sm">© {year} SOLO STACK</p>
+				<nav aria-label={m.site_footer_legal_label()}>
+					<ul class="legal">
+						{#each LEGAL_LINKS as link (link.id)}
+							<li>
+								<a class="label" href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'}>{legalLabels[link.id]()}</a>
+							</li>
+						{/each}
+					</ul>
+				</nav>
+			</div>
+
+			<a class="giant font-display" href={localizeHref('/')} aria-label={m.site_nav_wordmark_label()}><span aria-hidden="true">SOLO STACK</span></a>
+		</div>
 	</div>
 </footer>
 
 <style>
 	/*
-	 * The ground is the ink of the painting (its bottom row, #131415), black in both themes; text on it is cream (≥ 15:1) or
-	 * the quiet warm grey (#b3ab98, 7.9:1). Focus is the night ring in both themes.
+	 * Ink ground: the painting's bottom row (#131415). On it: cream (≥ 15:1), quiet warm grey (#b3ab98, 7.9:1), butter focus.
+	 * On paper (light theme, below the dry stroke): ink, `--muted-foreground` (5.3:1), the deep `--focus-ring`.
 	 */
 	.site-footer {
 		--ground: #131415;
 		--quiet: #b3ab98;
-		--focus-ring: var(--color-butter);
-		--focus-glow: 0 0 1rem 0.1rem color-mix(in oklab, var(--color-butter) 30%, transparent);
+		/* the near strip: never narrower than 76rem (phones crop from the left), a little wider than the screen on desktop */
+		--land-w: max(100cqw, 76rem);
+		--anchor: 0.96;
+		/* top of the first visible silhouette inside the strip (laptop cliff on phones, the owl's tree on desktop) */
+		--art-top: 0.63;
+		--gap: 3.5rem;
 		position: relative;
 		isolation: isolate;
-		margin-top: 2rem;
+		container-type: inline-size;
 	}
 
-	.text-quiet {
-		color: var(--quiet);
+	@media (min-width: 64rem) {
+		.site-footer {
+			--land-w: 110cqw;
+			--anchor: 0.45;
+			--art-top: 0.56;
+			--gap: 5.5rem;
+		}
 	}
+
+	/* Sky ---------------------------------------------------------------------------------------------------- */
 
 	.horizon {
 		position: relative;
 		overflow: hidden;
 		pointer-events: none;
-		/* the sky glow above the line: butter wash on paper, a low dusk light at night */
+		/* the transparent sky of the strip reaches up over the page's tail: pull it up so only `--gap` stays empty */
+		margin-top: calc(var(--gap) - var(--land-w) * 299 / 2172 * var(--art-top) - var(--far-rise));
+		padding-top: var(--far-rise);
+		--far-rise: clamp(1.25rem, 3cqw, 3rem);
+		/* the glow above the line: butter wash on paper */
 		background:
-			radial-gradient(38% 78% at 86% 100%, color-mix(in oklab, var(--color-butter) 30%, transparent), transparent 72%),
-			radial-gradient(22% 70% at 10% 100%, color-mix(in oklab, var(--color-butter) 16%, transparent), transparent 70%),
-			linear-gradient(to top, color-mix(in oklab, var(--color-butter) 14%, transparent), transparent 55%);
+			radial-gradient(38% 70% at 86% 100%, color-mix(in oklab, var(--color-butter) 34%, transparent), transparent 72%),
+			radial-gradient(24% 60% at 10% 100%, color-mix(in oklab, var(--color-butter) 18%, transparent), transparent 70%),
+			linear-gradient(to top, color-mix(in oklab, var(--color-butter) 18%, transparent), transparent 60%);
 	}
 
 	/* At night the horizon is the lit part (the silhouette technique): a low ochre afterglow along the whole line */
 	:global(.dark) .horizon {
 		background:
-			radial-gradient(34% 85% at 87% 100%, rgb(252 215 114 / 0.3), rgb(226 169 59 / 0.1) 55%, transparent 80%),
-			radial-gradient(20% 75% at 10% 100%, rgb(252 215 114 / 0.2), transparent 75%),
-			linear-gradient(to top, rgb(226 169 59 / 0.26), rgb(226 169 59 / 0.1) 35%, rgb(42 39 35 / 0.1) 60%, transparent 85%);
+			radial-gradient(34% 80% at 87% 100%, rgb(252 215 114 / 0.3), rgb(226 169 59 / 0.1) 55%, transparent 80%),
+			radial-gradient(22% 70% at 10% 100%, rgb(252 215 114 / 0.18), transparent 75%),
+			linear-gradient(to top, rgb(226 169 59 / 0.3), rgb(226 169 59 / 0.12) 35%, rgb(42 39 35 / 0.1) 62%, transparent 88%);
 	}
 
 	/*
-	 * The strip at its own aspect (2172 × 299), never narrower than 76rem: on narrow screens it overflows to the left (anchored
-	 * at 96 %), so the laptop cliff stays and the owl's tree gives way. Overlays are placed in the art's own percentages.
+	 * The far ridge: the strip's own silhouette, mirrored and larger, as a mask over a flat diluted ink (lighter than the near
+	 * ridge: atmospheric depth). Lifted by `--far-rise`, its ground hides behind the near strip.
 	 */
-	.land {
-		--land-w: max(100%, 76rem);
-		--anchor: 0.96;
-		position: relative;
-		width: var(--land-w);
-		margin-left: calc((100% - var(--land-w)) * var(--anchor));
-		aspect-ratio: 2172 / 299;
-		margin-bottom: -1px;
+	.far {
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		--far-w: calc(var(--land-w) * 1.35);
+		--far-lift: calc(var(--far-rise) + var(--land-w) * 0.012);
+		width: var(--far-w);
+		height: calc(var(--far-w) * 299 / 2172 + var(--far-lift));
+		margin-left: calc((100cqw - var(--far-w)) * 0.5);
+		scale: -1 1;
+		/* a sumi wash: inkiest at the ridge line, thinning out into the paper below it */
+		background: linear-gradient(to bottom, color-mix(in oklab, #3b3226 30%, transparent) 64%, color-mix(in oklab, #3b3226 8%, transparent) 78%, transparent 92%);
+		mask:
+			var(--ridge) top / 100% calc(100% - var(--far-lift)) no-repeat,
+			linear-gradient(#000 0 0) bottom / 100% calc(var(--far-lift) + 2px) no-repeat;
 	}
 
-	/* Wide screens: a little closer, so the tree and the laptop keep their presence (both stay in frame) */
-	@media (min-width: 64rem) {
-		.land {
-			--land-w: 110%;
-			--anchor: 0.45;
-		}
+	:global(.dark) .far {
+		background: #2b2620;
+	}
+
+	/* The near strip at its own aspect (2172 × 299); overlays are placed in the art's own percentages. */
+	.land {
+		position: relative;
+		width: var(--land-w);
+		margin-left: calc((100cqw - var(--land-w)) * var(--anchor));
+		aspect-ratio: 2172 / 299;
+		margin-bottom: -1px;
 	}
 
 	.land :global(picture) {
@@ -277,26 +304,217 @@
 		animation-play-state: paused;
 	}
 
+	/* Ground ------------------------------------------------------------------------------------------------- */
+
 	.ground {
+		position: relative;
+		color: var(--foreground);
+	}
+
+	:global(.dark) .ground {
+		background: var(--ground);
+	}
+
+	/* The ink right under the ridge: always ink. On paper its lower edge is a dry brush running out (horizontal streaks). */
+	.band {
+		--focus-ring: var(--color-butter);
+		--focus-glow: 0 0 1rem 0.1rem color-mix(in oklab, var(--color-butter) 30%, transparent);
 		position: relative;
 		background: var(--ground);
 		color: var(--color-cream);
 	}
 
-	.social,
+	.band::after {
+		content: '';
+		position: absolute;
+		inset: 100% 0 auto;
+		height: clamp(4rem, 8cqw, 7rem);
+		margin-top: -1px;
+		background: var(--ground);
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 120' width='1400' height='120' preserveAspectRatio='none'%3E%3ClinearGradient id='g' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23000'/%3E%3C/linearGradient%3E%3Cfilter id='d' x='0' y='0' width='1' height='1' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0028 0.07' numOctaves='4' seed='7' result='n'/%3E%3CfeComposite in='SourceGraphic' in2='n' operator='arithmetic' k2='1.1' k3='1.2' k4='-0.72'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 7 0 0 0 -3.3'/%3E%3C/filter%3E%3Crect width='1400' height='120' fill='url(%23g)' filter='url(%23d)'/%3E%3C/svg%3E")
+			0 0 / 100% 100% no-repeat;
+		pointer-events: none;
+	}
+
+	:global(.dark) .band::after {
+		display: none;
+	}
+
+	.band-row {
+		display: grid;
+		gap: 1rem;
+		justify-items: center;
+		padding-block: 0.75rem 0.5rem;
+		text-align: center;
+	}
+
+	.tagline {
+		max-width: 34ch;
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 600;
+		line-height: 1.4;
+		color: color-mix(in oklab, var(--color-cream) 88%, var(--ground));
+		text-wrap: balance;
+	}
+
+	/* 44px targets; a balanced 5 / 4 block on phones (9 in a row would not fit 390px) */
+	.socials ul {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		max-width: calc(5 * 2.75rem + 4 * 0.75rem);
+		gap: 0.25rem 0.75rem;
+	}
+
+	.socials a {
+		display: grid;
+		place-items: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 50%;
+		color: var(--quiet);
+		transition: color var(--dur-hover) ease;
+	}
+
+	.socials a:hover {
+		color: var(--color-butter);
+	}
+
+	.socials svg {
+		width: 1.125rem;
+		height: 1.125rem;
+		fill: currentColor;
+	}
+
+	@media (min-width: 48rem) {
+		.band-row {
+			grid-template-columns: 1fr auto;
+			align-items: center;
+			justify-items: start;
+			text-align: left;
+			padding-block: 0.25rem 0;
+		}
+
+		.tagline {
+			max-width: none;
+		}
+
+		/* the last glyph (not its hit area) ends on the content edge */
+		.socials ul {
+			max-width: none;
+			flex-wrap: nowrap;
+			gap: 0.125rem;
+			margin-right: -0.8125rem;
+		}
+	}
+
+	/* The base: fine print, then the wordmark standing on the bottom edge */
+	.base {
+		position: relative;
+		display: grid;
+		padding-top: clamp(3.75rem, 7cqw, 6rem);
+	}
+
+	:global(.dark) .base {
+		padding-top: clamp(2.5rem, 5cqw, 4.5rem);
+		--focus-ring: var(--color-butter);
+	}
+
+	.fine {
+		display: grid;
+		justify-items: center;
+		gap: 0.25rem;
+		color: var(--muted-foreground);
+	}
+
+	:global(.dark) .fine {
+		color: var(--quiet);
+	}
+
+	.copy {
+		padding-block: 0.75rem;
+	}
+
 	.legal {
-		transition:
-			color var(--dur-hover) ease,
-			background-color var(--dur-hover) ease;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		column-gap: 1.5rem;
 	}
 
-	.social:hover {
-		color: var(--color-cream);
-		background-color: rgb(251 243 221 / 0.08);
+	.legal a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.75rem;
+		transition: color var(--dur-hover) ease;
 	}
 
-	.legal:hover {
-		color: var(--color-cream);
+	.legal a:hover {
+		color: var(--ink-lit);
+	}
+
+	@media (min-width: 48rem) {
+		.fine {
+			grid-template-columns: 1fr auto;
+			align-items: center;
+		}
+
+		.fine .copy {
+			justify-self: start;
+		}
+
+		.legal {
+			margin-right: 0;
+		}
+	}
+
+	/*
+	 * The giant wordmark spans the content column exactly (container units), standing on the page's bottom edge: cap height
+	 * only, no descenders, so it can sit on the edge. Ink on paper; cream at night, sinking into the ground towards its foot.
+	 */
+	.giant {
+		display: block;
+		overflow: clip;
+		margin-top: clamp(0.5rem, 1.5cqw, 1.5rem);
+		container-type: inline-size;
+		line-height: 0;
+		border-radius: 0.1em;
+	}
+
+	.giant span {
+		display: block;
+		/* "SOLO STACK" at 900 / -0.045em inks 6.0 em wide: this fills the column to the pixel */
+		font-size: 16.6cqi;
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: var(--tracking-wordmark);
+		white-space: nowrap;
+		/* cap height to baseline only (plus the round letters' overshoot), so it can stand on the edge */
+		text-box: trim-both cap alphabetic;
+		padding-block: 0.04em 0.03em;
+		margin-bottom: -0.03em;
+		/* trims the S's side bearing so it starts on the content edge */
+		margin-left: -0.04em;
+		background: linear-gradient(to bottom, var(--color-ink) 55%, color-mix(in oklab, var(--color-ink) 82%, var(--background)));
+		background-clip: text;
+		color: transparent;
+		transition: opacity var(--dur-hover) ease;
+	}
+
+	:global(.dark) .giant span {
+		background: linear-gradient(
+			to bottom,
+			var(--color-moonlight),
+			var(--color-cream) 28%,
+			color-mix(in oklab, var(--color-cream) 55%, var(--ground)) 82%,
+			color-mix(in oklab, var(--color-cream) 40%, var(--ground))
+		);
+		background-clip: text;
+	}
+
+	.giant:hover span {
+		opacity: 0.86;
 	}
 
 	@media (prefers-reduced-motion: reduce) {

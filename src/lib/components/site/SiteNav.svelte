@@ -1,14 +1,21 @@
 <!--
 	@component
-	The site navbar: wordmark (home), top level links, `actions` snippet on the right.
-	- `variant="site"`: sticky blurred bar. The (site) layout passes theme toggle and phone menu as `actions`; links move into it below `sm`.
-	- `variant="night"` (homepage): fixed, no bar; cream ink with an opposite-ink halo to read over any art; current page gets
-	  `--ink-underline`, and a soft scrim in the ink under it (off while the hero shows the giant wordmark). Sits on `--page-gutter` / `--nav-pad-y`. NightPage passes its menu button as `actions` and lists the site
-	  links in that overlay on phones, so the homepage has one header. `tone="paper"` = anthracite ink over the sunrise.
-	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown/sheet here: the homepage must not ship them.
+	The site navbar, one language on every page: crescent wordmark (home), uppercase tracked display links with the hand-drawn
+	`--ink-underline` swash under the current page, `actions` snippet on the right. No bar: a painted scrim of the ground under
+	it (night ink, sunrise butter, or the subpage paper) dissolves into the page, eased so it has no edge.
+	It slides away while you scroll down and comes back on the first scroll up (never while it holds keyboard focus), so
+	headings and art below the fold are never covered.
+	- `variant="site"`: sticky, aligned to the pages' content grid (`content-frame`). The scrim is the page's own paper or
+	  night (`--background`) and appears once the page is scrolled. The (site) layout passes theme toggle and phone menu as
+	  `actions`; the links move into the menu below `sm`.
+	- `variant="night"` (homepage): fixed on `--page-gutter` / `--nav-pad-y`, cream ink with an opposite-ink halo to read over
+	  any art; scrim off while the hero shows the giant wordmark. NightPage passes its menu button as `actions` and lists the
+	  site links in that overlay on phones. `tone="paper"` = anthracite ink over the sunrise.
+	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown here: the homepage must not ship it.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { on } from 'svelte/events';
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
@@ -33,17 +40,63 @@
 
 	const pathname = $derived(page.url.pathname);
 
+	/** Scrolled past the top: the site scrim fades in. */
+	let scrolled = $state(false);
+	/** Scrolling down: the bar steps out of the way. */
+	let away = $state(false);
+
+	/** Below this the bar always shows; a direction must hold for `TRAVEL` px before it switches (no flicker on trackpads). */
+	const TOP = 96;
+	const TRAVEL = 18;
+
+	$effect(() => {
+		let lastY = window.scrollY;
+		let travel = 0;
+		let frame = 0;
+		const update = () => {
+			frame = 0;
+			const y = Math.max(0, window.scrollY);
+			const delta = y - lastY;
+			lastY = y;
+			scrolled = y > 4;
+			if (y < TOP) {
+				away = false;
+				travel = 0;
+				return;
+			}
+			if (delta === 0) return;
+			if (Math.sign(delta) !== Math.sign(travel)) travel = 0;
+			travel += delta;
+			if (travel > TRAVEL) away = true;
+			else if (travel < -TRAVEL) away = false;
+		};
+		const schedule = () => {
+			if (!frame) frame = requestAnimationFrame(update);
+		};
+		const off = on(window, 'scroll', schedule, { passive: true });
+		update();
+		return () => {
+			off();
+			cancelAnimationFrame(frame);
+		};
+	});
+
 	$effect(restoreEclipseMoon);
 </script>
 
-<header bind:this={ref} class={['site-nav', `is-${variant}`, hideWordmark && 'is-bare']} data-tone={variant === 'night' ? tone : undefined}>
-	<div class="bar">
+<header
+	bind:this={ref}
+	class={['site-nav', `is-${variant}`, hideWordmark && 'is-bare']}
+	data-tone={variant === 'night' ? tone : undefined}
+	data-scrolled={scrolled || undefined}
+	data-away={away || undefined}
+>
+	<div class={['bar', variant === 'site' && 'content-frame']}>
 		<a class={['wordmark', hideWordmark && 'is-hidden']} href={wordmarkHref ?? localizeHref('/')} aria-label={m.site_nav_wordmark_label()}>
 			<span class="moon" aria-hidden="true"></span>
 			<span class="font-display font-black tracking-wordmark uppercase">SOLO STACK</span>
 		</a>
 
-		<!-- Site look: `display: contents`. Night look: a row of the links and the menu button. -->
 		<div class="dock">
 			<nav class="links" aria-label={m.site_nav_label()}>
 				<ul>
@@ -61,12 +114,35 @@
 </header>
 
 <style>
+	/*
+	 * Tokens per ground. `--nav-mark`: current-page swash and hover ink. On light paper the butter would be 1.3:1, so it is the
+	 * deep `--ink-lit` (5.7:1) there; the crescent is ochre ink (3.5:1). `--nav-scrim`: the ground the scrim is painted from.
+	 */
 	.site-nav {
+		--nav-mark: var(--color-butter);
+		--nav-moon: var(--color-butter);
+		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 45%, transparent);
 		inset: 0 0 auto;
 		z-index: 40;
+		transition:
+			translate var(--dur-state) var(--ease-settle),
+			opacity var(--dur-state) ease,
+			color var(--dur-state) ease;
+	}
+
+	/* Scroll down: out of the way. Keyboard focus inside always brings it back. */
+	.site-nav[data-away]:not(:focus-within) {
+		translate: 0 -120%;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.site-nav[data-away]:not(:focus-within) * {
+		pointer-events: none;
 	}
 
 	.bar {
+		position: relative;
 		display: flex;
 		align-items: center;
 		gap: clamp(0.75rem, 2vw, 2rem);
@@ -78,18 +154,28 @@
 		gap: 0.55rem;
 		min-height: 2.75rem;
 		margin-right: auto;
-		font-size: 1.0625rem;
+		font-size: 1.125rem;
 		line-height: 1;
+		transition:
+			opacity var(--dur-state) ease,
+			translate var(--dur-state) var(--ease-settle),
+			visibility 0s;
 	}
 
-	/* The banner's butter crescent, CSS only */
+	@media (min-width: 48rem) {
+		.wordmark {
+			font-size: 1.25rem;
+		}
+	}
+
+	/* The banner's crescent, CSS only */
 	.moon {
 		width: 0.85em;
 		height: 0.85em;
 		flex: none;
 		border-radius: 999px;
-		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--color-butter) 48%);
-		box-shadow: 0 0 0.9em color-mix(in oklab, var(--color-butter) 45%, transparent);
+		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--nav-moon) 48%);
+		box-shadow: 0 0 0.9em var(--nav-moon-glow);
 		rotate: -20deg;
 	}
 
@@ -111,10 +197,19 @@
 			radial-gradient(circle, var(--color-night) 0 64%, transparent 66%);
 	}
 
+	.dock {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.links {
+		display: none;
+	}
+
 	.links ul {
 		display: flex;
 		align-items: center;
-		gap: 0.25rem;
 	}
 
 	.links a {
@@ -122,86 +217,115 @@
 		display: inline-flex;
 		align-items: center;
 		min-height: 2.75rem;
-		padding: 0 0.8rem;
-		border-radius: 999px;
-		transition:
-			color var(--dur-hover) ease,
-			background-color var(--dur-hover) ease;
+		padding: 0 0.85rem;
+		font-family: var(--font-display);
+		font-size: 0.875rem;
+		font-weight: 800;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		transition: color var(--dur-hover) ease;
 	}
 
-	/* Current page underline (--ink-underline), drawn in from the left on hover */
+	/* Current page swash (--ink-underline), drawn in from the left */
 	.links a::after {
 		content: '';
 		position: absolute;
-		left: 0.8rem;
-		right: 0.8rem;
-		bottom: 0.4rem;
+		left: 0.6rem;
+		right: 0.6rem;
+		bottom: 0.3rem;
 		height: 0.45rem;
-		background: var(--color-butter);
+		background: var(--nav-mark);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
 		scale: 0 1;
 		transform-origin: left;
-		transition: scale var(--dur-state) var(--ease-settle);
+		transition:
+			scale var(--dur-state) var(--ease-settle),
+			opacity var(--dur-hover) ease;
 	}
 
 	.links a[aria-current]::after {
 		scale: 1 1;
 	}
 
-	/* Site look ---------------------------------------------------------------------------------------------- */
-
-	.is-site .dock {
-		display: contents;
+	.links a:hover {
+		color: var(--nav-mark);
 	}
 
+	/* Hover previews the mark, faint */
+	.links a:not([aria-current]):hover::after {
+		scale: 1 1;
+		opacity: 0.45;
+	}
+
+	/* Icon flush with the edge (mirroring the wordmark) while the button keeps its 44px target */
+	.actions {
+		display: flex;
+		align-items: center;
+		margin-right: -0.75rem;
+	}
+
+	/* The scrim: the ground under the bar, opaque through the bar's row, then dissolving with an eased tail. */
+	.site-nav::before,
+	.site-nav::after {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		z-index: -1;
+		height: var(--scrim-h);
+		pointer-events: none;
+		background: linear-gradient(
+			var(--scrim) 0% var(--scrim-solid),
+			color-mix(in oklab, var(--scrim) 78%, transparent) calc(var(--scrim-solid) + (100% - var(--scrim-solid)) * 0.3),
+			color-mix(in oklab, var(--scrim) 42%, transparent) calc(var(--scrim-solid) + (100% - var(--scrim-solid)) * 0.58),
+			color-mix(in oklab, var(--scrim) 14%, transparent) calc(var(--scrim-solid) + (100% - var(--scrim-solid)) * 0.82),
+			transparent
+		);
+		transition: opacity var(--dur-state) ease;
+	}
+
+	/* Site look ---------------------------------------------------------------------------------------------- */
+
 	.is-site {
+		--nav-mark: var(--ink-lit);
+		--nav-moon: #b07a12;
+		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 70%, transparent);
+		--scrim: var(--background);
+		--scrim-h: 7.5rem;
+		--scrim-solid: 52%;
 		position: sticky;
 		top: 0;
-		border-bottom: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
-		background: color-mix(in oklab, var(--background) 82%, transparent);
 		color: var(--foreground);
-		backdrop-filter: blur(12px) saturate(1.2);
-		-webkit-backdrop-filter: blur(12px) saturate(1.2);
 		/* Holds still during view transitions */
 		view-transition-name: site-nav;
 	}
 
-	.is-site .bar {
-		max-width: 76rem;
-		height: 3.75rem;
-		margin: 0 auto;
-		padding: 0 clamp(1rem, 4vw, 2rem);
+	:global(.dark) .is-site {
+		--nav-mark: var(--color-butter);
+		--nav-moon: var(--color-butter);
+		--nav-moon-glow: color-mix(in oklab, var(--color-butter) 45%, transparent);
 	}
 
-	.is-site .links {
+	/* Only one scrim layer here, and only once the page moves: at the top the hero's own painted sky shows through */
+	.is-site::before {
+		opacity: 0;
+	}
+
+	.is-site::after {
 		display: none;
+	}
+
+	.is-site[data-scrolled]::before {
+		opacity: 1;
+	}
+
+	.is-site .bar {
+		height: 4.5rem;
 	}
 
 	@media (min-width: 40rem) {
 		.is-site .links {
 			display: block;
 		}
-	}
-
-	.is-site .links a {
-		color: var(--muted-foreground);
-		font-size: 0.9375rem;
-		font-weight: 500;
-	}
-
-	.is-site .links a:hover {
-		color: var(--foreground);
-		background: var(--muted);
-	}
-
-	.is-site .links a[aria-current] {
-		color: var(--foreground);
-	}
-
-	.is-site .actions {
-		display: flex;
-		align-items: center;
-		gap: 0.25rem;
 	}
 
 	/* Night look (homepage) ---------------------------------------------------------------------------------- */
@@ -212,53 +336,36 @@
 		pointer-events: none;
 		/* Opposite-ink halo keeps it readable on any art */
 		--nav-halo: color-mix(in oklab, var(--color-ink) 70%, transparent);
-		transition: color var(--dur-state) ease;
+		--scrim-h: 9rem;
+		--scrim-solid: 55%;
 	}
 
 	.is-night[data-tone='paper'] {
 		color: var(--color-night);
+		--nav-mark: var(--color-night);
+		--nav-moon: var(--color-night);
+		--nav-moon-glow: transparent;
 		--nav-halo: color-mix(in oklab, var(--color-butter) 80%, transparent);
 	}
 
-	/* Scrim: content scrolling under the bar dissolves into the sky (night ink) or the sunrise paper (butter), eased so it has no edge.
-	   Two layers crossfade with the tone. */
-	.is-night::before,
-	.is-night::after {
-		content: '';
-		position: absolute;
-		inset: 0 0 auto;
-		z-index: -1;
-		height: 7rem;
-		pointer-events: none;
-		background: linear-gradient(
-			var(--scrim) 0% 40%,
-			color-mix(in oklab, var(--scrim) 58%, transparent) 64%,
-			color-mix(in oklab, var(--scrim) 20%, transparent) 84%,
-			transparent
-		);
-		transition: opacity var(--dur-state) ease;
-	}
-
+	/* Two scrim layers crossfade with the tone: night ink, sunrise butter */
 	.is-night::before {
-		--scrim: color-mix(in oklab, var(--color-night) 85%, transparent);
+		--scrim: color-mix(in oklab, var(--color-night) 90%, transparent);
 	}
 
 	.is-night::after {
-		--scrim: color-mix(in oklab, var(--color-butter) 85%, transparent);
+		--scrim: color-mix(in oklab, var(--color-butter) 88%, transparent);
 		opacity: 0;
 	}
 
 	.is-night[data-tone='paper']::before,
-	.is-night.is-bare::after {
-		opacity: 0;
-	}
-
-	.is-night[data-tone='paper']::after {
-		opacity: 1;
-	}
-
+	.is-night.is-bare::after,
 	.is-night.is-bare::before {
 		opacity: 0;
+	}
+
+	.is-night[data-tone='paper']:not(.is-bare)::after {
+		opacity: 1;
 	}
 
 	.is-night .bar {
@@ -268,25 +375,6 @@
 	.is-night .bar > * {
 		pointer-events: auto;
 		filter: drop-shadow(0 0 0.35rem var(--nav-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
-	}
-
-	.is-night .wordmark {
-		font-size: 1.125rem;
-		transition:
-			opacity var(--dur-state) ease,
-			translate var(--dur-state) var(--ease-settle),
-			visibility 0s;
-	}
-
-	@media (min-width: 48rem) {
-		.is-night .wordmark {
-			font-size: 1.25rem;
-		}
-	}
-
-	.is-night[data-tone='paper'] .moon {
-		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--color-night) 48%);
-		box-shadow: none;
 	}
 
 	/* Hidden while the hero shows the giant wordmark */
@@ -300,65 +388,14 @@
 			visibility 0s var(--dur-state);
 	}
 
-	.is-night .dock {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
 	/* On phones the dock holds only the menu button; the overlay lists the site links */
-	.is-night .links {
-		display: none;
-	}
-
 	@media (min-width: 48rem) {
 		.is-night .links {
 			display: block;
 		}
 	}
 
-	.is-night .links ul {
-		gap: 0;
-	}
-
-	.is-night .links a {
-		padding: 0 0.85rem;
-		border-radius: 0;
-		font-family: var(--font-display);
-		font-size: 0.875rem;
-		font-weight: 800;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-	}
-
-	.is-night .links a::after {
-		left: 0.6rem;
-		right: 0.6rem;
-		bottom: 0.3rem;
-	}
-
-	.is-night .links a:hover {
-		color: var(--color-butter);
-	}
-
 	.is-night[data-tone='paper'] .links a:hover {
 		color: inherit;
-	}
-
-	.is-night[data-tone='paper'] .links a::after {
-		background: var(--color-night);
-	}
-
-	/* Hover previews the mark, faint */
-	.is-night .links a:not([aria-current]):hover::after {
-		scale: 1 1;
-		opacity: 0.45;
-	}
-
-	/* Icon flush with the gutter (mirroring the wordmark) while the button keeps its 44px target */
-	.is-night .actions {
-		display: flex;
-		align-items: center;
-		margin-right: -0.65rem;
 	}
 </style>

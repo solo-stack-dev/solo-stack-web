@@ -1,7 +1,9 @@
 <!--
 	@component
-	The Hunter emblem as a drawn SVG: a thick Λ crossed by a thin V, with the red diamond where they overlap, and serifs on
-	every end. `sticker` adds the fat cream die-cut outline. Purely decorative (aria-hidden); the caller labels it.
+	The 404 license seal, an original mark of this site: an ink disc with an ochre ring and twelve hour dots (the clock the
+	night runs on), and the World Tree of the 404 scene drawn small inside it (three domed canopies on one trunk, a ground
+	line), with a four point guiding star above its crown. `sticker` adds the fat cream die-cut outline. Purely decorative
+	(aria-hidden); the caller labels it.
 -->
 <script lang="ts">
 	interface Props {
@@ -11,28 +13,32 @@
 
 	let { sticker = false, class: className = '' }: Props = $props();
 
-	// 120 × 84 box. Λ legs from the apex (60, 8) to (24, 76) / (96, 76); V legs from (24, 8) / (96, 8) to (60, 76).
-	const thick = 'M60 8 L24 76 M60 8 L96 76';
-	const thin = 'M24 8 L60 76 M96 8 L60 76';
-	const serifs = 'M12 8 H36 M48 8 H72 M84 8 H108 M12 76 H36 M48 76 H72 M84 76 H108';
-	// Inside both: bounded by the Λ above y 42 and by the V below it (the legs cross at (42, 42) and (78, 42)).
-	const diamond = 'M60 8 L42 42 L60 76 L78 42 Z';
+	// 100 × 100 box, center (50, 50). Hour dots on r = 38.5, every 30°.
+	const dots = Array.from({ length: 12 }, (_, hour) => {
+		const angle = (hour / 12) * Math.PI * 2;
+		return { x: 50 + Math.sin(angle) * 38.5, y: 50 - Math.cos(angle) * 38.5, major: hour % 3 === 0 };
+	});
+	// Domed canopy tiers (flat underside, like the scene's platforms), widest at the bottom.
+	const tiers = ['M27 66 C31 55.5 69 55.5 73 66 Z', 'M32.5 52 C36 43 64 43 67.5 52 Z', 'M38 38.5 C41 31 59 31 62 38.5 Z'];
+	const star = 'M50 18 L51.4 22.6 L56 24 L51.4 25.4 L50 30 L48.6 25.4 L44 24 L48.6 22.6 Z';
 </script>
 
-<svg class="hunter-emblem {className}" viewBox="-6 -6 132 96" aria-hidden="true">
+<svg class="hunter-emblem {className}" viewBox="0 0 100 100" aria-hidden="true">
 	{#if sticker}
-		<g stroke="#fbf3dd" stroke-linecap="round" stroke-linejoin="round" fill="#fbf3dd">
-			<path d={thick} stroke-width="24" />
-			<path d={thin} stroke-width="18" />
-			<path d={serifs} stroke-width="16" />
-		</g>
+		<circle cx="50" cy="50" r="48.5" fill="#fbf3dd" />
 	{/if}
-	<path d={diamond} fill="#c8233a" />
-	<g fill="none" stroke="#0e0f10" stroke-linecap="butt">
-		<path d={thick} stroke-width="11" />
-		<path d={thin} stroke-width="3.2" />
-		<path d={serifs} stroke-width="3.6" />
-	</g>
+	<circle cx="50" cy="50" r="42" fill="#0e0f10" />
+	<circle cx="50" cy="50" r="34.5" fill="none" stroke="#e2a93b" stroke-width="1.4" />
+	{#each dots as dot, index (index)}
+		<circle cx={dot.x} cy={dot.y} r={dot.major ? 1.5 : 0.9} fill={dot.major ? '#fcd772' : '#fbf3dd'} opacity={dot.major ? 1 : 0.55} />
+	{/each}
+	<!-- trunk, ground, canopies, star -->
+	<path d="M48.2 76 L48.9 36 H51.1 L51.8 76 Z" fill="#e2a93b" />
+	<path d="M33 76.5 Q50 72.5 67 76.5" fill="none" stroke="#e2a93b" stroke-width="1.6" stroke-linecap="round" />
+	{#each tiers as tier, index (index)}
+		<path d={tier} fill="#fcd772" />
+	{/each}
+	<path d={star} fill="#fff4d6" />
 </svg>
 
 <style>
