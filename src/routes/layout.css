@@ -129,6 +129,23 @@
 	--sidebar-ring: #e2a93b;
 	/* Not a shadcn token: keyboard focus outline on the site pages (≥ 3:1 on the paper) */
 	--focus-ring: #9a4f12;
+	/* Soft light around the focus ring (decoration only, the outline carries the contrast) */
+	--focus-glow: 0 0 0.9rem 0.15rem color-mix(in oklab, var(--color-butter) 55%, transparent);
+	/*
+	 * Painted paper of the site pages (see `.site-surface`): butter wash at the very top, a warmer floor, two pigment tiles.
+	 * Writing ink: ruled lines that ink in on focus (contact form), `--ink-lit` ≥ 3:1 on the paper, `--ink-error` ≥ 4.5:1.
+	 */
+	--surface-dusk: #fcf1d0;
+	--surface-floor: #f6ecd3;
+	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.5 0 0 0 0 0.16 0.2 0 0 0 -0.09'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.42 0 0 0 0 0.33 0 0 0 0 0.2 0 0.14 0 0 -0.063'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--ink-rule: color-mix(in oklab, var(--foreground) 24%, transparent);
+	--ink-rule-hover: color-mix(in oklab, var(--foreground) 45%, transparent);
+	--ink-lit: #9a4f12;
+	--ink-wet: #c98a16;
+	--ink-glow: color-mix(in oklab, var(--color-ochre) 45%, transparent);
+	--ink-error: #b3321c;
+	--ink-caret: #9a4f12;
 }
 
 .dark {
@@ -166,6 +183,18 @@
 	--sidebar-border: rgb(251 243 221 / 0.1);
 	--sidebar-ring: #fcd772;
 	--focus-ring: #fcd772;
+	--focus-glow: 0 0 1rem 0.1rem color-mix(in oklab, var(--color-butter) 30%, transparent);
+	--surface-dusk: #27241f;
+	--surface-floor: #1d1d1d;
+	--surface-mottle-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='704' height='704'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0057' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.98 0 0 0 0 0.86 0 0 0 0 0.6 0.13 0 0 0 -0.058'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--surface-mottle-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1088' height='1088'%3E%3Cfilter id='m' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0037' numOctaves='2' seed='29' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.03 0 0 0 0 0.03 0 0 0 0 0.04 0 0.3 0 0 -0.13'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+	--ink-rule: color-mix(in oklab, var(--foreground) 20%, transparent);
+	--ink-rule-hover: color-mix(in oklab, var(--foreground) 38%, transparent);
+	--ink-lit: #fcd772;
+	--ink-wet: #fff4d6;
+	--ink-glow: color-mix(in oklab, var(--color-butter) 55%, transparent);
+	--ink-error: #ff8a6e;
+	--ink-caret: #fcd772;
 }
 
 @theme inline {
@@ -321,10 +350,41 @@
 		color-scheme: dark !important;
 	}
 
-	/* Butter is too pale on light paper, so `--focus-ring` is deep ochre there */
+	/*
+	 * Site keyboard focus: a 2px ring (`--focus-ring`, ≥ 3:1 in both themes; butter is too pale on light paper, so it is deep
+	 * ochre there) set 3px off the element, following its radius, with a soft light behind it. It settles in from a wider
+	 * offset. Components with their own shadow keep it (their styles win over this base layer); the ring stays.
+	 */
 	[data-site-surface] :focus-visible,
 	[data-slot='sheet-content'] :focus-visible {
-		outline-color: var(--focus-ring);
+		outline: 2px solid var(--focus-ring);
+		outline-offset: 3px;
+		box-shadow: var(--focus-glow);
+	}
+
+	/* Bare links get a soft corner for the ring (rounded components keep their own radius) */
+	[data-site-surface] a:focus-visible {
+		border-radius: 0.3em;
+	}
+
+	/* Programmatic focus targets (main via the skip link, headings) get no glow */
+	[data-site-surface] [tabindex='-1']:focus-visible {
+		box-shadow: none;
+		animation: none;
+	}
+
+	/* Links inside running text: a closer ring, so it does not cut into the lines above and below */
+	[data-site-surface] :is(p, li, dd, figcaption) > a:focus-visible,
+	[data-site-surface] .prose-post a:focus-visible {
+		outline-offset: 0.12em;
+		border-radius: 0.25em;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		[data-site-surface] :focus-visible,
+		[data-slot='sheet-content'] :focus-visible {
+			animation: focus-settle var(--dur-hover) var(--ease-settle);
+		}
 	}
 
 	::selection {
@@ -386,6 +446,30 @@ html[data-vt-dir='back']::view-transition-new(root) {
 		opacity: 0;
 		transform: translateY(6px);
 	}
+}
+
+@keyframes focus-settle {
+	from {
+		outline-offset: 7px;
+		outline-color: transparent;
+	}
+}
+
+/*
+ * Painted night paper behind every site page, all on one element that scrolls with the page (no fixed background, no JS,
+ * no image requests): a warmer, lighter dusk at the very top (a butter wash on light paper) that settles into the plain
+ * `--background` mid page, a faint lift towards the footer horizon, and two low-frequency pigment tiles of different sizes
+ * (704/1088 px, so the repeat never lines up) as watercolor mottling. The tiles are tiny SVG turbulence, rasterized once.
+ * The fine fiber is the fixed `PaperGrain` in the (site) layout.
+ */
+.site-surface {
+	background:
+		var(--surface-mottle-a) 0 0 / 704px 704px,
+		var(--surface-mottle-b) 37% 0 / 1088px 1088px,
+		radial-gradient(120% 34rem at 62% -6rem in oklab, var(--surface-dusk), transparent) top / 100% 46rem no-repeat,
+		linear-gradient(in oklab to bottom, var(--surface-dusk), color-mix(in oklab, var(--surface-dusk) 40%, transparent) 38%, transparent) top / 100% 64rem no-repeat,
+		linear-gradient(in oklab to top, var(--surface-floor), transparent) bottom / 100% 40rem no-repeat,
+		var(--background);
 }
 
 @keyframes vt-content-in-back {

@@ -21,7 +21,7 @@
 
 <ModeWatcher defaultMode="system" themeColors={{ light: '#fdf9ee', dark: '#18191b' }} synchronousModeChanges />
 
-<div class="site-surface flex min-h-svh flex-col bg-background text-foreground" data-site-surface>
+<div class="site-surface flex min-h-svh flex-col text-foreground" data-site-surface>
 	<a
 		href="#main"
 		class="fixed top-3 left-1/2 z-50 -translate-x-1/2 -translate-y-24 rounded-full bg-butter px-4 py-2 font-semibold text-night focus-visible:translate-y-0"
