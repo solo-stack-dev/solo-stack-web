@@ -42,12 +42,7 @@
 	};
 
 	// Seam geometry (shared/dawn.ts) and the cup the 06:00 clock stands beside (stage %).
-	const cupVars = [
-		dawnVars(),
-		`--cup-y: ${(d.coffee.y + d.coffee.h * 0.05) / 100}`,
-		`--cup-y-m: ${(mo.coffee.y + mo.coffee.h * 0.02) / 100}`,
-		`--cup-right-m: ${(mo.coffee.x + mo.coffee.w) / 100}`
-	].join('; ');
+	const cupVars = [dawnVars(), `--cup-y: ${(d.coffee.y + d.coffee.h * 0.05) / 100}`, `--cup-y-m: ${(mo.coffee.y + mo.coffee.h * 0.02) / 100}`].join('; ');
 
 	let root: HTMLElement;
 	const near = new InView();
@@ -501,9 +496,8 @@
 			--clear: var(--dawn-clear-m);
 			min-height: 0;
 			--stage-margin: 20cqw;
-			/* 06:00 right of the cup, above the laptop */
-			--night-clock-top: calc(var(--stage-margin) + 100cqw * var(--cup-y-m));
-			--night-clock-left: calc(100cqw * var(--cup-right-m) + 0.25rem);
+			/* 06:00 on the column like every other hour label (page gutter), in the dawn sky just above the cup and the hill line */
+			--night-clock-top: calc(var(--stage-margin) + 100cqw * var(--cup-y-m) - 2rem);
 		}
 
 		/* In the flow: a short band of dawn sky under the cloud bank, then the square scene, then the footer bar. The far ridge

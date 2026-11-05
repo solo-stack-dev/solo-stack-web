@@ -6,8 +6,8 @@
 	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
 	- No video (empty feed or offline build): the painted projection fills the screen (docs/art/site/round-2/cinema-projection.png);
 	  the message and the channel link sit centered on a soft ink scrim over its calm sky.
-	- The frame's outer bloom is cut another third with a tighter falloff, except where the beam arrives
-	  (left edge on desktop, bottom edge on mobile); the aperture keeps a thin bright inner edge: the screen, not the fire, leads.
+	- The frame's outer band is halved and broken on the three sides away from the beam and keeps its light where the beam
+	  arrives (left edge on desktop, bottom edge on mobile); the aperture edge is uneven projected light, not a drawn line.
 	- Heading: left of the screen, level with its top, above the mascot (desktop); above the frame (mobile).
 	- The 06:00 dawn cloud bank (shared/DawnBank.svelte) rolls over the landscape's bottom: the cliff dissolves into it; cliff,
 	  mascot, beam, frame, screen and heading paint in front of it (z-index 3), the plate behind.
@@ -429,8 +429,14 @@
 		}
 	}
 
-	/* The video window: thumbnail facade, iframe, or the empty screen. Always exactly 16:9. */
+	/* The video window: thumbnail facade, iframe, or the empty screen. Always exactly 16:9. The frame art's hole is a few px
+	   larger than its recorded 16:9 aperture (x 114…1800, y 133…1091 vs 117…1797, 139…1084), which left a dark ruled gap
+	   around the picture: the screen grows 1.7 % about its center, under the frame's inner edge, so the hole is always filled. */
 	.screen {
+		--grow: 0.017;
+		left: calc(var(--dx) - var(--dw) * var(--grow) / 2);
+		top: calc(var(--dy) - var(--dh) * var(--grow) / 2);
+		width: calc(var(--dw) * (1 + var(--grow)));
 		height: auto;
 		aspect-ratio: 16 / 9;
 		background: var(--color-ink);
@@ -585,23 +591,116 @@
 		text-shadow: var(--halo-ink);
 	}
 
-	/* A thin bright inner edge on the aperture (over the screen's content): the strongest light is where picture meets screen */
+	/*
+	 * The aperture edge is projected light, not a drawn rectangle: per side a 1px core and a 3px soft stroke whose brightness
+	 * runs unevenly along the edge (so its width seems to vary) and drops out in a few short breaks, softened by a slight
+	 * blur. The side where the beam arrives (left on desktop, bottom on mobile) is the brightest and gets an inner spill.
+	 */
 	.screen::after {
+		--hi: color-mix(in oklab, var(--color-moonlight) 78%, transparent);
+		--mid: color-mix(in oklab, var(--color-moonlight) 42%, transparent);
+		--lo: color-mix(in oklab, var(--color-moonlight) 14%, transparent);
+		--soft-hi: color-mix(in oklab, var(--color-butter) 38%, transparent);
+		--soft-lo: color-mix(in oklab, var(--color-butter) 10%, transparent);
+		--spill: color-mix(in oklab, var(--color-butter) 24%, transparent);
+		--no: transparent;
+		/* the beam side, full strength along its whole length */
+		--beam-core: linear-gradient(var(--beam-dir), var(--mid), var(--hi) 12%, var(--hi) 46%, var(--mid) 58%, var(--hi) 70%, var(--hi) 92%, var(--mid));
+		--beam-soft: linear-gradient(var(--beam-dir), var(--soft-lo), var(--soft-hi) 18%, var(--soft-hi) 64%, var(--soft-lo) 76%, var(--soft-hi) 88%, var(--soft-lo));
+		/* the three sides away from the beam: dimmer, uneven, broken */
+		--edge-a: linear-gradient(
+			90deg,
+			var(--lo),
+			var(--mid) 7%,
+			var(--lo) 15%,
+			var(--no) 18%,
+			var(--no) 21%,
+			var(--mid) 27%,
+			var(--lo) 38%,
+			var(--mid) 51%,
+			var(--mid) 57%,
+			var(--lo) 63%,
+			var(--no) 66%,
+			var(--lo) 70%,
+			var(--mid) 82%,
+			var(--lo) 91%,
+			var(--mid)
+		);
+		--soft-a: linear-gradient(
+			90deg,
+			var(--no),
+			var(--soft-lo) 9%,
+			var(--no) 16%,
+			var(--no) 30%,
+			var(--soft-lo) 44%,
+			var(--soft-lo) 55%,
+			var(--no) 62%,
+			var(--no) 76%,
+			var(--soft-lo) 86%,
+			var(--no)
+		);
+		--edge-b: linear-gradient(
+			180deg,
+			var(--mid),
+			var(--lo) 9%,
+			var(--mid) 22%,
+			var(--lo) 31%,
+			var(--no) 35%,
+			var(--no) 39%,
+			var(--lo) 44%,
+			var(--mid) 58%,
+			var(--lo) 72%,
+			var(--mid) 84%,
+			var(--no) 92%,
+			var(--lo)
+		);
+		--soft-b: linear-gradient(180deg, var(--soft-lo), var(--no) 12%, var(--no) 47%, var(--soft-lo) 58%, var(--no) 69%, var(--soft-lo) 82%, var(--no));
+		--edge-c: linear-gradient(
+			90deg,
+			var(--mid),
+			var(--lo) 11%,
+			var(--no) 14%,
+			var(--lo) 18%,
+			var(--mid) 33%,
+			var(--lo) 47%,
+			var(--mid) 61%,
+			var(--lo) 68%,
+			var(--no) 74%,
+			var(--no) 77%,
+			var(--mid) 86%,
+			var(--lo)
+		);
+		--soft-c: linear-gradient(90deg, var(--no), var(--soft-lo) 26%, var(--no) 40%, var(--soft-lo) 58%, var(--no) 70%, var(--soft-lo) 92%, var(--no));
+		--beam-dir: 180deg;
 		content: '';
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		box-shadow:
-			inset 0 0 0 1px color-mix(in oklab, var(--color-moonlight) 80%, transparent),
-			inset 0 0 0 2px color-mix(in oklab, var(--color-butter) 35%, transparent),
-			inset 0 0 1.1rem color-mix(in oklab, var(--color-butter) 26%, transparent);
+		filter: blur(0.35px);
+		background:
+			/* left: the beam side */
+			var(--beam-core) left / 1px 100% no-repeat,
+			var(--beam-soft) left / 3px 100% no-repeat,
+			linear-gradient(to right, var(--spill), transparent) left / 1.4rem 100% no-repeat,
+			/* top, right, bottom */ var(--edge-a) top / 100% 1px no-repeat,
+			var(--soft-a) top / 100% 3px no-repeat,
+			var(--edge-b) right / 1px 100% no-repeat,
+			var(--soft-b) right / 2px 100% no-repeat,
+			var(--edge-c) bottom / 100% 1px no-repeat,
+			var(--soft-c) bottom / 100% 3px no-repeat;
 	}
 
-	/* The frame's outer bloom another third down (round 3: 12 % / 45 % → 8 % / 22 %) with a tighter falloff: the halo stays faint
-	   and the band only darkens close to the rim; full light stays at the aperture. Where the beam arrives
-	   (--spill-at: left edge on desktop, bottom edge on mobile) a soft spot adds the spill back, so the light reads as coming from
-	   the projector, not as an applied perimeter. Layers: spill ∪ (horizontal ∩ vertical). */
+	/*
+	 * The frame's outer band: its bloom stays where the beam arrives (--band-l/r/t/b = 1 there: left on desktop, bottom on
+	 * mobile) and is halved on the three sides away from it; two irregular washes (J, across x and y) break its continuity, so
+	 * it never reads as a lit perimeter. A soft spot at --spill-at adds the projector's spill back. Layers: spill ∪ (H ∩ V ∩ Jx ∩ Jy).
+	 * The aperture is x 6.08…93.35 %, y 11.26…87.84 % of the frame art (art.ts), so H and V are 1 across it.
+	 */
 	.frame {
+		--band-l: 1;
+		--band-r: 0.5;
+		--band-t: 0.5;
+		--band-b: 0.5;
 		--spill-at: 0% 64%;
 		--spill-size: 16% 48%;
 		mask:
@@ -613,27 +712,33 @@
 			),
 			linear-gradient(
 				to right,
-				color-mix(in oklab, #000 8%, transparent),
-				color-mix(in oklab, #000 22%, transparent) 2.5%,
-				color-mix(in oklab, #000 62%, transparent) 4.6%,
-				#000 6%,
-				#000 94%,
-				color-mix(in oklab, #000 62%, transparent) 95.4%,
-				color-mix(in oklab, #000 22%, transparent) 97.5%,
-				color-mix(in oklab, #000 8%, transparent)
+				color-mix(in oklab, #000 calc(8% * var(--band-l)), transparent),
+				color-mix(in oklab, #000 calc(22% * var(--band-l)), transparent) 2.5%,
+				color-mix(in oklab, #000 calc(62% * var(--band-l)), transparent) 4.6%,
+				color-mix(in oklab, #000 calc(100% * var(--band-l)), transparent) 6%,
+				#000 6.6%,
+				#000 92.8%,
+				color-mix(in oklab, #000 calc(100% * var(--band-r)), transparent) 93.4%,
+				color-mix(in oklab, #000 calc(62% * var(--band-r)), transparent) 95.4%,
+				color-mix(in oklab, #000 calc(22% * var(--band-r)), transparent) 97.5%,
+				color-mix(in oklab, #000 calc(8% * var(--band-r)), transparent)
 			),
 			linear-gradient(
 				to bottom,
-				color-mix(in oklab, #000 8%, transparent),
-				color-mix(in oklab, #000 22%, transparent) 4%,
-				color-mix(in oklab, #000 62%, transparent) 7.8%,
-				#000 10%,
-				#000 89%,
-				color-mix(in oklab, #000 62%, transparent) 91.6%,
-				color-mix(in oklab, #000 22%, transparent) 95.5%,
-				color-mix(in oklab, #000 8%, transparent)
-			);
-		mask-composite: add, intersect;
+				color-mix(in oklab, #000 calc(8% * var(--band-t)), transparent),
+				color-mix(in oklab, #000 calc(22% * var(--band-t)), transparent) 4%,
+				color-mix(in oklab, #000 calc(62% * var(--band-t)), transparent) 7.8%,
+				color-mix(in oklab, #000 calc(100% * var(--band-t)), transparent) 10.6%,
+				#000 11.6%,
+				#000 87.4%,
+				color-mix(in oklab, #000 calc(100% * var(--band-b)), transparent) 88.2%,
+				color-mix(in oklab, #000 calc(62% * var(--band-b)), transparent) 91.6%,
+				color-mix(in oklab, #000 calc(22% * var(--band-b)), transparent) 95.5%,
+				color-mix(in oklab, #000 calc(8% * var(--band-b)), transparent)
+			),
+			linear-gradient(90deg, #000 0 7%, #0009 14%, #000 22%, #0006 31%, #000e 38%, #000 47%, #0007 55%, #000 63%, #000b 71%, #0005 79%, #000 86%, #000 93% 100%),
+			linear-gradient(180deg, #000 0 12%, #000a 20%, #0006 29%, #000 37%, #000 45%, #0008 54%, #000d 62%, #0005 71%, #000 79%, #000 87% 100%);
+		mask-composite: add, intersect, intersect, intersect;
 		filter: saturate(0.88) brightness(0.8);
 	}
 
@@ -718,10 +823,27 @@
 			right: var(--page-gutter);
 		}
 
-		/* the beam rises from the laptop below */
+		/* the beam rises from the laptop below: the bottom edge keeps the light */
 		.frame {
+			--band-l: 0.5;
+			--band-b: 1;
 			--spill-at: 50% 100%;
 			--spill-size: 46% 22%;
+		}
+
+		.screen::after {
+			--beam-dir: 90deg;
+			background:
+				/* bottom: the beam side */
+				var(--beam-core) bottom / 100% 1px no-repeat,
+				var(--beam-soft) bottom / 100% 3px no-repeat,
+				linear-gradient(to top, var(--spill), transparent) bottom / 100% 1.1rem no-repeat,
+				/* top, right, left */ var(--edge-a) top / 100% 1px no-repeat,
+				var(--soft-a) top / 100% 3px no-repeat,
+				var(--edge-b) right / 1px 100% no-repeat,
+				var(--soft-b) right / 2px 100% no-repeat,
+				var(--edge-b) left / 1px 100% no-repeat,
+				var(--soft-b) left / 2px 100% no-repeat;
 		}
 
 		.stage {
@@ -748,6 +870,12 @@
 		.screen,
 		.caption {
 			height: auto;
+		}
+
+		.screen {
+			left: calc(var(--mx) - var(--mw) * var(--grow) / 2);
+			top: calc(var(--my) - var(--mh) * var(--grow) / 2);
+			width: calc(var(--mw) * (1 + var(--grow)));
 		}
 
 		.beam-art {

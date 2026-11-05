@@ -220,7 +220,8 @@ export const mobile: SceneLayout = {
 		{ id: 'coffee', rect: rectPct(M, 40, 1190, 140, 150), tipAlign: 'start' },
 		{ id: 'handheld', rect: rectPct(M, 90, 1340, 200, 120), tipAlign: 'start' },
 		{ id: 'bonsai', rect: rectPct(M, 900, 950, 180, 220), tip: { x: 45, y: 0 }, tipAlign: 'end' },
-		{ id: 'dumbbells', rect: rectPct(M, 670, 2006, 370, 285), tipAlign: 'end' }
+		// the room's bottom dissolves into the 02:00 cloud seam: the ring sits on the back dumbbell's lit top, not on the seam
+		{ id: 'dumbbells', rect: rectPct(M, 670, 2006, 370, 285), tipAlign: 'end', dot: { x: 50, y: 14 } }
 	]
 };
 

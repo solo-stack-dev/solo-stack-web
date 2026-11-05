@@ -1,7 +1,7 @@
 <!--
 	@component
 	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): painted radio with one preset key per platform (real logos), a
-	dial that snaps to stations, a display strip (tuned station name + handle, follow disc), a song per station (`track/`),
+	dial that snaps to stations, a display strip (tuned station's handle, follow disc), a song per station (`track/`),
 	and a visually hidden list of every link (StationList: accessible, no-JS fallback; no printed card).
 
 	- Audio never autoplays. Tuning (key, dial release, keyboard step) is the gesture that calls `audio.unlock()` and
@@ -270,11 +270,10 @@
 			<span class="strip-hint font-mono">{m.home_radio_strip_idle()}</span>
 		</div>
 	{:else}
-		<!-- The tuned station on the lower display: name · handle, and the follow disc (primary action idiom) -->
+		<!-- The lower display says the handle only (the glass above shows the station's glyph); a station without a handle shows
+		     its name instead. The follow disc is the primary action idiom. -->
 		<p class="strip-station">
-			<span class="strip-name">{station.name}</span>
-			{#if station.handle}<span class="strip-dot" aria-hidden="true">·</span>
-				<span class="strip-handle font-mono">{station.handle}</span>{/if}
+			{#if station.handle}<span class="strip-handle font-mono">{station.handle}</span>{:else}<span class="strip-name">{station.name}</span>{/if}
 		</p>
 		<a class="strip-follow" href={station.url} rel="me noopener" target="_blank">
 			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h10v10M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" /></svg>
@@ -411,19 +410,42 @@
 		filter: brightness(calc(1 + var(--radio-pulse) * 0.8));
 	}
 
+	/* The idle waveform crosses the plate almost flat and read as a ruled line through the mist: it is broken into uneven
+	   dry-brush segments and dimmed (−60 % on the wide plate) on every width; the music brings it back up. */
 	.horizon {
+		--horizon-dim: 0.4;
 		position: absolute;
 		left: 0;
 		right: 0;
 		top: calc((var(--horizon) - var(--band) / 2) * 100%);
 		height: calc(var(--band) * 100%);
+		opacity: calc(var(--horizon-dim) + var(--radio-pulse) * (1 - var(--horizon-dim)));
+		mask-image: linear-gradient(
+			90deg,
+			transparent 3%,
+			#0007 9%,
+			#000c 15%,
+			#0003 21%,
+			#0009 27%,
+			#000 34%,
+			#0004 40%,
+			#000a 45%,
+			#0001 52%,
+			#0008 58%,
+			#000 64%,
+			#0005 70%,
+			#000b 76%,
+			#0002 83%,
+			#0008 89%,
+			transparent 96%
+		);
 	}
 
 	.variant-tall {
 		display: none;
 	}
 
-	/* Station strip: idle = dashes + hint; tuned = "Name · handle" (truncates) and the follow disc at the right, one row on both radios */
+	/* Station strip: idle = dashes + hint; tuned = the handle (truncates) and the follow disc at the right, one row on both radios */
 	.strip-body {
 		display: flex;
 		align-items: center;
@@ -483,7 +505,7 @@
 	.strip-station {
 		display: flex;
 		align-items: baseline;
-		gap: 0.35em;
+		flex: 1 1 auto;
 		min-width: 0;
 		margin: 0;
 		line-height: 1.2;
@@ -492,44 +514,31 @@
 	}
 
 	.strip-name {
-		flex: none;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		font-weight: 700;
 		font-size: 0.9rem;
 		color: var(--color-butter);
 		text-shadow: var(--glow-sm);
 	}
 
-	.strip-dot {
-		flex: none;
-		color: color-mix(in oklab, var(--color-butter) 70%, transparent);
-	}
-
 	.strip-handle {
 		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font-size: 0.75rem;
-		color: color-mix(in oklab, var(--color-cream) 92%, transparent);
-	}
-
-	/* Tall radio: the short strip stacks name over handle so the longest handle (Bluesky) keeps most of its text */
-	.strip-tall .strip-station {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.1rem;
-		line-height: 1.1;
-	}
-
-	.strip-tall .strip-dot {
-		display: none;
-	}
-
-	.strip-tall .strip-name {
 		font-size: 0.8rem;
+		color: var(--color-cream);
+		text-shadow: 0 0 0.6rem color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
+	/* the tall radio's short window: the handle takes the whole row up to the disc, at the 12px floor */
 	.strip-tall .strip-handle {
-		max-width: 100%;
+		font-size: 0.75rem;
+	}
+
+	.strip-tall:not(.strip-idle) {
+		gap: 0.375rem;
 	}
 
 	/* Follow: the butter disc (same idiom as play), 1.75rem = 28px target */
@@ -631,26 +640,8 @@
 			--radio-overlap: 7rem;
 		}
 
-		/* The idle waveform crosses the narrow plate almost flat: break it into uneven dry-brush segments and dim it, so the
-		   horizon glow is painted, not ruled */
 		.horizon {
-			opacity: 0.7;
-			mask-image: linear-gradient(
-				90deg,
-				transparent 4%,
-				#0008 11%,
-				#000 19%,
-				#0005 26%,
-				#000d 33%,
-				#0002 41%,
-				#0009 47%,
-				#000 57%,
-				#0004 64%,
-				#000a 71%,
-				#0003 80%,
-				#0008 87%,
-				transparent 95%
-			);
+			--horizon-dim: 0.7;
 		}
 
 		.head {
