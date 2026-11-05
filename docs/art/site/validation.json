@@ -1,0 +1,10 @@
+{
+  "blink_changed_pixels": 12969,
+  "blink_changed_pixels_outside_eye_patches": 0,
+  "blink_alpha_identical": true,
+  "reading_hill_left_45_percent_empty": true,
+  "footer_top_45_percent_empty": true,
+  "footer_bottom_fully_opaque": true,
+  "transparent_master_count": 9,
+  "opaque_master_count": 4
+}
