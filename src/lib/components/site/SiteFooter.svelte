@@ -76,12 +76,12 @@
 					{/each}
 				</ul>
 			</nav>
-			<p class="copy label-sm">© {year} SOLO STACK</p>
+			<p class="copy">© {year} Solo Stack</p>
 			<nav class="legal-nav" aria-label={m.site_footer_legal_label()}>
 				<ul class="legal">
 					{#each LEGAL_LINKS as link (link.id)}
 						<li>
-							<a class="swash-focus label" href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'}>{legalLabels[link.id]()}</a>
+							<a class="swash-focus" href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'}>{legalLabels[link.id]()}</a>
 						</li>
 					{/each}
 				</ul>
@@ -122,6 +122,16 @@
 		}
 	}
 
+	/*
+	 * Wide screens: the strip keeps growing with the screen while the wordmark stays on the content column, so the ground's
+	 * small rises grow against the letters. Shifting the strip left puts the L on the lowest stretch of the ridge.
+	 */
+	@media (min-width: 110rem) {
+		.site-footer {
+			--anchor: 0.1;
+		}
+	}
+
 	/* Sky ---------------------------------------------------------------------------------------------------- */
 
 	/*
@@ -132,14 +142,21 @@
 		--far-rise: clamp(1.25rem, 3cqw, 3rem);
 		--land-h: calc(var(--land-w) * 299 / 2172);
 		--column: calc(min(100cqw, var(--content-max)) - 2 * var(--content-gutter));
-		/* the wordmark's baseline, as a fraction of the strip's height from its bottom: just under the ridge line (~0.13-0.16) */
-		--foot: 0.065;
 		/* "SOLO STACK" at 900 / -0.045em inks 6.0 em wide: 16.6% of the column fills it; Geist caps are 0.71 em */
 		--mark-size: calc(var(--column) * 0.166);
-		--mark-h: calc(var(--mark-size) * 0.71);
+		--cap-h: calc(var(--mark-size) * 0.71);
+		--mark-h: var(--cap-h);
+		/*
+		 * The baseline comes from the mark, not from the strip alone: the ridge's ground line under the wordmark sits at ~16% of
+		 * the strip's height (measured from the art's alpha), and the letters stand 7% of their cap height deep in its grass.
+		 * The ridge then covers the same sliver of every foot at any width (the L's foot stays an L).
+		 */
+		--ground: 0.16;
+		--sink: 0.07;
+		--base: calc(var(--land-h) * var(--ground) - var(--cap-h) * var(--sink));
 		/* room above the strip for the capitals, and their top: the first visible shape of the footer */
-		--sky: max(var(--far-rise), var(--mark-h) - var(--land-h) * (1 - var(--foot)) + 1rem);
-		--mark-top: calc(var(--sky) + var(--land-h) * (1 - var(--foot)) - var(--mark-h));
+		--sky: max(var(--far-rise), var(--mark-h) - var(--land-h) + var(--base) + 1rem);
+		--mark-top: calc(var(--sky) + var(--land-h) - var(--base) - var(--mark-h));
 		position: relative;
 		overflow: hidden;
 		pointer-events: none;
@@ -188,19 +205,25 @@
 	/*
 	 * The wordmark as a landmark of the same night, set on the content column (never wider, so never clipped) and standing
 	 * between the far and the near ridge: the near ridge, the owl's tree and the laptop cliff stand in front of its feet.
-	 * Cap height to baseline only, so `bottom` places the baseline. Paper: a diluted sumi wash, mottled like the paper, that
-	 * thins into the butter glow at the horizon (lighter than the black ridge in front of it, darker than the far one: depth).
+	 * Cap height to baseline only, so `bottom` places the baseline.
+	 *
+	 * Filled with pigment, not a picture: one tile per theme (5 cap heights wide, stretched to the cap height) with the body
+	 * colour, a slow bloom and granules that settle more densely towards the feet. Paper: granulated sumi ink at ~85% on the
+	 * paper. Night: cream (#efe5cc) granulating to butter at the feet, where the afterglow is.
 	 */
 	.mark {
-		/* pigment pooling: horizontal dry-brush streaks of ink, a little denser in places (one small turbulence tile) */
-		--mark-pigment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='416' height='416'%3E%3Cfilter id='w' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011 0.045' numOctaves='4' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 1.1 -0.42'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+		--mark-pigment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='128'%3E%3Cdefs%3E%3ClinearGradient id='p' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23373530'/%3E%3Cstop offset='.5' stop-color='%23373530'/%3E%3Cstop offset='1' stop-color='%233a342b'/%3E%3C/linearGradient%3E%3ClinearGradient id='d' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.3'/%3E%3Cstop offset='.6' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='640' height='128' fill='url(%23d)'/%3E%3C/mask%3E%3Cfilter id='w' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .035' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.055 0 0 0 0 0.051 0 0 0 0 0.043 1.4 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.071 0 0 0 0 0.067 0 0 0 0 0.063 6 0 0 0 -3.2'/%3E%3C/filter%3E%3Cfilter id='l' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.42' numOctaves='2' seed='19' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.992 0 0 0 0 0.976 0 0 0 0 0.933 4 0 0 0 -2.95'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='640' height='128' fill='url(%23p)'/%3E%3Crect width='640' height='128' filter='url(%23w)'/%3E%3Crect width='640' height='128' filter='url(%23g)' mask='url(%23m)'/%3E%3Crect width='640' height='128' filter='url(%23l)'/%3E%3C/svg%3E");
 		position: absolute;
-		inset: auto 0 calc(var(--land-h) * var(--foot));
+		inset: auto 0 var(--base);
 		width: 100%;
 		max-width: var(--content-max);
 		margin-inline: auto;
 		padding-inline: var(--content-gutter);
 		line-height: 0;
+	}
+
+	:global(.dark) .mark {
+		--mark-pigment: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='128'%3E%3Cdefs%3E%3ClinearGradient id='p' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23efe5cc'/%3E%3Cstop offset='.5' stop-color='%23efe5cc'/%3E%3Cstop offset='1' stop-color='%23fcd772'/%3E%3C/linearGradient%3E%3ClinearGradient id='d' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='.3'/%3E%3Cstop offset='.6' stop-color='%23fff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23fff'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='640' height='128' fill='url(%23d)'/%3E%3C/mask%3E%3Cfilter id='w' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .035' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.886 0 0 0 0 0.663 0 0 0 0 0.231 1.4 0 0 0 -.62'/%3E%3C/filter%3E%3Cfilter id='g' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.725 0 0 0 0 0.541 0 0 0 0 0.208 6 0 0 0 -3.3'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='640' height='128' fill='url(%23p)'/%3E%3Crect width='640' height='128' filter='url(%23w)'/%3E%3Crect width='640' height='128' filter='url(%23g)' mask='url(%23m)'/%3E%3C/svg%3E");
 	}
 
 	.mark > span {
@@ -213,38 +236,10 @@
 		text-box: trim-both cap alphabetic;
 		/* trims the S's side bearing so it starts on the content edge */
 		margin-left: -0.04em;
-		background:
-			var(--mark-pigment) 0 0 / 26rem 26rem,
-			linear-gradient(
-				to bottom,
-				color-mix(in oklab, #2e271d 66%, var(--background)),
-				color-mix(in oklab, #3b3226 54%, var(--background)) 60%,
-				color-mix(in oklab, #3b3226 40%, var(--color-butter))
-			);
+		background: var(--mark-pigment) 0 0 / auto 100% repeat-x;
 		background-clip: text;
 		color: transparent;
 		filter: url(#footer-brush);
-	}
-
-	/* Phones: SOLO stacked on STACK, "STACK" (3.2 em inked) across the column, so it stays large without leaving it */
-	@media (max-width: 39.99rem) {
-		.horizon {
-			--mark-size: calc(var(--column) / 3.2);
-			--mark-h: calc(var(--mark-size) * (0.71 + 0.84));
-		}
-
-		/* one line every 0.84em: the wash repeats per line, so STACK gets the same shading as SOLO */
-		.mark > span,
-		:global(.dark) .mark > span {
-			line-height: 0.84;
-			background-size:
-				26rem 26rem,
-				100% 0.84em;
-		}
-
-		.mark span span {
-			display: block;
-		}
 	}
 
 	/* Without text-box trimming the line box keeps the descender space: drop it, so the baseline stays under the ridge */
@@ -253,20 +248,6 @@
 			line-height: 0.71;
 			translate: 0 0.12em;
 		}
-	}
-
-	/* Night: moonlit, not lamp-lit; the far ridge shows faintly through the lower letters, the afterglow warms their feet */
-	:global(.dark) .mark > span {
-		background:
-			var(--mark-pigment) 0 0 / 26rem 26rem,
-			linear-gradient(
-				to bottom,
-				color-mix(in oklab, var(--color-moonlight) 72%, transparent),
-				color-mix(in oklab, var(--color-cream) 58%, transparent) 34%,
-				color-mix(in oklab, #d9b878 36%, transparent) 78%,
-				color-mix(in oklab, var(--color-ochre) 30%, transparent)
-			);
-		background-clip: text;
 	}
 
 	.brush {
@@ -471,6 +452,16 @@
 		width: 1.125rem;
 		height: 1.125rem;
 		fill: currentColor;
+	}
+
+	/* Fine print: 13px Geist in sentence case, as written (no tracked mono caps) */
+	.copy,
+	.legal {
+		font-family: var(--font-body);
+		font-size: 0.8125rem;
+		font-weight: 500;
+		line-height: 1.4;
+		letter-spacing: 0;
 	}
 
 	.copy {

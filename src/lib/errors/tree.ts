@@ -32,7 +32,7 @@ export function trunkX(y: number) {
  */
 export const CLIMB_STOPS = (
 	[
-		[0.5, 0.34],
+		[0.5, 0.32],
 		[0.31, 0.27],
 		[0.12, 0.12]
 	] as const

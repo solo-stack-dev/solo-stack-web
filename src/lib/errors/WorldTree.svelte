@@ -104,7 +104,7 @@
 			<linearGradient id="wt-cloud-fill" x1="0" y1="0" x2="0" y2="1">
 				<stop offset="0" stop-color="#fcd772" stop-opacity="0.55" />
 				<stop offset="0.45" stop-color="#8f8a7a" stop-opacity="0.7" />
-				<stop offset="1" stop-color="#2a3150" />
+				<stop offset="1" stop-color="#1f1d1a" />
 			</linearGradient>
 		</defs>
 		<g class="veil-drift" filter="url(#wt-cloud)" fill="url(#wt-cloud-fill)">
@@ -124,7 +124,7 @@
 		position: absolute;
 		inset: 0;
 		overflow: hidden;
-		background: #141a33;
+		background: #141414;
 		/* sun and horizon on the sky plate: object-position keeps this point at the same viewport spot */
 		--sun-x: 62%;
 		--horizon: 62%;
@@ -214,7 +214,8 @@
 
 	/* Tree stage ------------------------------------------------------------------------------------------------- */
 
-	/* The tree's own box. Desktop: right of the text, top platform at 20svh. Phones: centered-left, platform near the top. */
+	/* The tree's own box. Desktop: right of the text, top platform at 20svh. Phones: centered-left, platform near the top, the
+	 * crown and all climb stops above the text (which starts at 42svh). */
 	.stage {
 		--h: 130svh;
 		--platform: 18svh;
@@ -228,7 +229,7 @@
 
 	@media (max-width: 63.99rem) {
 		.stage {
-			--h: 110svh;
+			--h: 58svh;
 			--platform: 15svh;
 			right: auto;
 			left: 38%;
