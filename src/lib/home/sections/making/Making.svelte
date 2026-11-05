@@ -830,6 +830,8 @@
 
 	.title {
 		grid-area: 1 / 1;
+		/* one-line titles sit on the cell's bottom, so the gap to the controls stays the same for every state */
+		align-self: end;
 		font-size: clamp(1.75rem, 3.4vw, 3.25rem);
 		line-height: 1;
 		text-wrap: balance;
@@ -847,14 +849,19 @@
 			0 0 1.6em color-mix(in oklab, var(--color-butter) 12%, transparent);
 		opacity: 0;
 		translate: 0 0.3em;
+		/* Crossfade in sequence, never two titles at once: the outgoing one is gone in --title-out, the incoming one starts after it */
+		--title-out: 120ms;
 		transition:
-			opacity var(--dur-state) ease,
-			translate var(--dur-reveal) var(--ease-settle);
+			opacity var(--title-out) ease-in,
+			translate var(--title-out) ease-in;
 	}
 
 	.title.is-active {
 		opacity: 1;
 		translate: 0 0;
+		transition:
+			opacity var(--dur-state) ease-out var(--title-out),
+			translate var(--dur-reveal) var(--ease-settle) var(--title-out);
 	}
 
 	.console {
@@ -1088,29 +1095,15 @@
 			padding-inline: 12vw;
 		}
 
-		/* The line runs down the right side to the laptop, so the title stays under the drawing and the control group sits centered on
-		   the dark rock below the lit cliff (plate bottom), one block: transport on top (its tips open upwards), pillars under it. */
+		/* Title, transport and pillars are one group under the drawing (transport first, its tips open upwards), the control row 32–48px
+		   under the title. The line runs down the right margin around the group into the laptop (morph.ts `via`), so the cliff stays free. */
 		.caption {
-			display: contents;
-		}
-
-		.titles {
-			position: absolute;
-			left: 50%;
-			top: calc(50% + (var(--title-y) - var(--ph) / 2) * var(--s));
-			width: min(90vw, 44rem);
-			translate: -50% 0;
+			width: calc(100% - 2 * var(--page-gutter) + 1rem);
 		}
 
 		.console {
-			position: absolute;
-			z-index: 2;
-			left: 50%;
-			bottom: clamp(0.5rem, 2vh, 1.25rem);
-			width: calc(100% - 2 * var(--page-gutter) + 1rem);
-			translate: -50% 0;
 			flex-direction: column-reverse;
-			margin: 0;
+			margin-top: 1.5rem;
 		}
 
 		/* two balanced pairs instead of a 3 + 1 wrap */

@@ -32,10 +32,12 @@
 		poster?: Snippet;
 		/** Game title shown on the poster beside the play button (a message). */
 		title?: string;
+		/** A new local high score was stored (the section shows it beside the frame). */
+		onrecord?: (value: number) => void;
 		class?: string;
 	}
 
-	let { gameId, load, label, poster, title, class: className = '' }: Props = $props();
+	let { gameId, load, label, poster, title, onrecord, class: className = '' }: Props = $props();
 
 	type Status = 'poster' | 'loading' | 'playing' | 'error';
 
@@ -83,7 +85,10 @@
 
 	function onScore(value: number) {
 		score = value;
-		if (value > highScore) highScore = saveHighScore(gameId, value);
+		if (value > highScore) {
+			highScore = saveHighScore(gameId, value);
+			onrecord?.(highScore);
+		}
 	}
 
 	function onGameOver(value: number) {
@@ -192,19 +197,14 @@
 		width: 100%;
 	}
 
-	/* Ink-ruled frame: four cream hairlines overshooting the corners. Outside the clipping stage so the game never covers it. */
+	/* Ink-ruled mat: one closed cream hairline a little outside the stage, corners meeting (no crop marks sticking out). Outside the
+	   clipping stage so the game never covers it. */
 	.game-frame::before {
-		--gap: 0.45rem;
-		--overshoot: 0.7rem;
-		--rule: color-mix(in oklab, var(--color-cream) 30%, transparent);
 		content: '';
 		position: absolute;
-		inset: calc((var(--gap) + var(--overshoot)) * -1);
-		background:
-			linear-gradient(var(--rule) 0 0) 0 var(--overshoot) / 100% 1px no-repeat,
-			linear-gradient(var(--rule) 0 0) 0 calc(100% - var(--overshoot)) / 100% 1px no-repeat,
-			linear-gradient(var(--rule) 0 0) var(--overshoot) 0 / 1px 100% no-repeat,
-			linear-gradient(var(--rule) 0 0) calc(100% - var(--overshoot)) 0 / 1px 100% no-repeat;
+		inset: -0.45rem;
+		border: 1px solid color-mix(in oklab, var(--color-cream) 26%, transparent);
+		border-radius: 3px;
 		pointer-events: none;
 	}
 

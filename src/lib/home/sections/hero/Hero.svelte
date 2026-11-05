@@ -722,8 +722,27 @@
 		margin: 0;
 		line-height: 1.6;
 		color: var(--color-cream);
-		/* the line crosses the butter clouds, where cream alone has too little contrast */
-		text-shadow: var(--halo-ink);
+		/* The line crosses the butter clouds, where cream alone has too little contrast: a tight 1px ink edge, a soft ink shadow, and a
+		   wide ink pool (::before) under the whole line, so every letter reads on bright cloud without a box. */
+		text-shadow:
+			var(--halo-ink),
+			0 0 0.5em color-mix(in oklab, var(--color-ink) 75%, transparent),
+			0 0 1.4em color-mix(in oklab, var(--color-ink) 50%, transparent);
+		isolation: isolate;
+	}
+
+	.tagline::before {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		inset: -0.9em -1.4em;
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ink) 62%, transparent),
+			color-mix(in oklab, var(--color-ink) 34%, transparent) 60%,
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {

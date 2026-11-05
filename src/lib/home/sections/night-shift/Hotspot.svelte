@@ -24,7 +24,7 @@
 	const rect = $derived(spot.rect);
 	const glow = $derived(spot.glow ?? spot.rect);
 	const tip = $derived(spot.tip ?? { x: 50, y: 0 });
-	const dot = $derived(spot.dot ?? { x: 50, y: 50 });
+	const dot = $derived(spot.dot === undefined ? { x: 50, y: 50 } : spot.dot);
 	const pct = (value: number) => `${value}%`;
 </script>
 
@@ -51,7 +51,7 @@
 		style:width={pct((glow.w / rect.w) * 100)}
 		style:height={pct((glow.h / rect.h) * 100)}
 	></span>
-	{#if marker}
+	{#if marker && dot}
 		<span class="marker" aria-hidden="true" style:left={pct(dot.x)} style:top={pct(dot.y)}></span>
 	{/if}
 	<span class="tip font-mono" data-align={spot.tipAlign ?? 'center'} style:left={pct(tip.x)} style:top={pct(tip.y)}>{label}</span>
