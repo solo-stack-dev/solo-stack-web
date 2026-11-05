@@ -9,8 +9,11 @@
 
 /** Art anchors, measured on the alpha channel of the production WebPs (see docs/art/site/README.md). */
 export const ART = {
-	/** Trunk axis x; groundY: where the roots meet the painted flat mound strip; rootLeft/Right: ends of that strip. */
-	tree: { width: 1190, height: 1322, trunkX: 573, groundY: 1300, rootLeft: 66, rootRight: 1124, canopyX: 600, canopyY: 470, topY: 117 },
+	/**
+	 * Trunk axis x; groundY: where the roots meet the painted flat mound strip; rootLeft/Right: ends of that strip; rootTipX:
+	 * where the rightmost painted root visibly runs out on it (the long root, Roots.svelte, continues from there).
+	 */
+	tree: { width: 1190, height: 1322, trunkX: 573, groundY: 1300, rootLeft: 66, rootRight: 1124, rootTipX: 1050, canopyX: 600, canopyY: 470, topY: 117 },
 	rays: { width: 1586, height: 992, originX: 816, originY: 221 },
 	mascot: { width: 700, height: 700, centerX: 330, groundY: 663 }
 } as const;
@@ -168,6 +171,8 @@ export interface HillGeometry {
 	/** Date labels set into the ink just under the path, turned with it (angle in degrees). */
 	startLabel: { left: number; top: number; angle: number };
 	endLabel: { left: number; top: number; angle: number };
+	/** Where the long root (Roots.svelte) leaves the tree: the tip of its rightmost painted root, on the knoll. */
+	rootTip: { left: number; top: number };
 }
 
 export function hill(values: readonly number[], name: LayoutName): HillGeometry {
@@ -302,6 +307,7 @@ export function hill(values: readonly number[], name: LayoutName): HillGeometry 
 		foot,
 		glow: { left: pct(canopyX, w), top: pct(canopyY, h) },
 		startLabel,
-		endLabel
+		endLabel,
+		rootTip: { left: pct(ex + (ART.tree.rootTipX - ART.tree.trunkX) * scale, w), top: pct(mound, h) }
 	};
 }

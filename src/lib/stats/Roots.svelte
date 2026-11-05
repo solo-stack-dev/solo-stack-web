@@ -1,262 +1,231 @@
 <!--
 	@component
-	The growth tree's root, continuing below the hill: it leaves the ink under the trunk, bends into the right margin and runs
-	down past every section toward the footer's ground. An irregular ink body (swelling, knotted, a wobbling frayed edge), a
-	narrow, dim gold vein inside (like the veins in the painted trunk) and, at each section, a rootlet that branches off into
-	the margin and runs out in a hair with the faintest light at its tip. Nothing of it ever enters the content column.
+	The growth tree's long root, a painting (docs/art/site/round-2/root-*.png, derivatives by `tools/root-tiles.mjs`): it
+	continues the tree's rightmost painted root, sinks through the knoll's ink, comes out under the hill's painted foot and runs
+	down the right margin past every section into the footer horizon, where its rootlets sink into the cliff beside the laptop.
 
-	Self-contained on purpose: it only needs a positioned parent whose `section`s it measures, so it can later be swapped for a
-	painted root image without touching the page. Decorative and client only (absolutely positioned, no layout shift). From
-	1280 px only, where the margin is wide enough to hold it clear of the content. Grows with the scroll through a CSS scroll-driven animation where supported; complete otherwise and for
-	reduced motion.
+	Built as top + N middle tiles + end at one rendered width. The page decides the length: N is the nearest whole number of
+	tiles, and the tile height absorbs the rest (a few percent at most, never a visibly stretched tile), so both the start at
+	the tree (`data-root-tip` in GrowthHill) and the end in the horizon stay exact. A dead straight root would read as a page
+	border, so it sways slowly: every half tile is its own segment, sheared (skewX) from one point of a smooth curve to the
+	next, so the painting stays continuous across every join and only bends by a degree or two there.
+
+	Decorative and client only: absolutely positioned (no layout shift), static (identical for reduced motion), and only from
+	1400 px, where the margin right of the content column is ≥ 150 px and the root sits in its middle, well clear of both the
+	content and the viewport edge. Its images are only requested there. Needs a positioned parent spanning the hero and the
+	sections.
 -->
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { LAYOUTS } from './hill.ts';
+	import { MediaQuery } from 'svelte/reactivity';
+	import endTile from './assets/stats-root-end.webp';
+	import midTile from './assets/stats-root-mid.webp';
+	import topTile from './assets/stats-root-top.webp';
+
+	/** Rendered canvas width (the bark body is ~8 px of it); piece heights follow the masters' proportions. */
+	const WIDTH = 36;
+	const TOP = WIDTH * 7;
+	const MID = WIDTH * 7;
+	const END = WIDTH * 7.9;
+	/** Where the painted rootlets run out, from the end piece's top. */
+	const END_TIP = WIDTH * 7;
+	/** Clearance of the root's axis to the content column's right edge and to the viewport edge. */
+	const CLEAR = 56;
+	/**
+	 * The footer horizon (SiteFooter, `footer-horizon.webp`), in fractions of its strip, measured on the art's alpha: the laptop
+	 * spans x 0.868–0.904; the ridge lies at 0.765 of the height on the cliff (x ≥ 0.815), at 0.86 on the low land left of it.
+	 * The rootlets run out just below the ridge, so the root sinks into the ground, never onto the laptop.
+	 */
+	const LAPTOP = [0.868, 0.904];
+	const ridgeAt = (fraction: number) => (fraction >= 0.815 ? 0.765 : 0.86);
+	const INTO_GROUND = 18;
+	/** Distance kept to the laptop's edge, and how long the drift toward the landing point takes (px, ending at the tip). */
+	const LAPTOP_CLEAR = 26;
+	const DRIFT = 900;
+	/** Closest the landing point may come to the viewport edge. */
+	const LANDING_EDGE = 40;
+	/** From the tree's root tip the axis eases this far right into the margin, over this many px of the descent. */
+	const ENTRY_SHIFT = 32;
+	const ENTRY = 340;
+	/** Sway: amplitude and the two slow wavelengths, in px. */
+	const SWAY = 13;
+	const WAVES = [1500, 610];
+
+	const wide = new MediaQuery('(min-width: 87.5rem)', false);
+
+	interface Segment {
+		src: string;
+		top: number;
+		height: number;
+		left: number;
+		skew: number;
+		/** Background offset and height: the segment's slice of its piece. */
+		offset: number;
+		size: number;
+		/** Still inside the hill's ink: no moonlit rim at night (the light would sit under the ground). */
+		buried: boolean;
+	}
 
 	let host: HTMLDivElement;
-	let size = $state<{ w: number; h: number; tops: number[] } | null>(null);
+	let segments = $state<Segment[]>([]);
+	const layers = $derived([segments.filter((segment) => segment.buried), segments.filter((segment) => !segment.buried)]);
 
-	onMount(() => {
+	$effect(() => {
+		if (!wide.current) return void (segments = []);
 		const parent = host.parentElement!;
+		const tip = parent.querySelector<HTMLElement>('[data-root-tip]');
+		const land = document.querySelector<HTMLElement>('main ~ footer img');
+		if (!tip) return;
+
 		const measure = () => {
 			const box = parent.getBoundingClientRect();
-			const tops = [...parent.querySelectorAll('section')].map((section) => section.getBoundingClientRect().top - box.top);
-			size = { w: box.width, h: box.height, tops };
+			const at = tip.getBoundingClientRect();
+			const w = box.width;
+			const column = Math.min(w, 1152);
+			const contentRight = (w - column) / 2 + column - 32;
+			const clamp = (x: number) => Math.max(contentRight + CLEAR, Math.min(w - CLEAR, x));
+			// It leaves the tree's root on the knoll and eases into its line in the margin while still in the ink.
+			const tipX = at.left - box.left;
+			const base = clamp(tipX + ENTRY_SHIFT);
+			const start = at.top - box.top;
+			// The hill's painted foot (GrowthHill: ~0.93 of its height; a little higher, where the brush still covers it)
+			const hill = tip.parentElement!.getBoundingClientRect();
+			const foot = hill.top - box.top + hill.height * 0.86;
+
+			// Landing: into the horizon's ridge right under the root, or beside the laptop if the root would hang onto it.
+			let landing = base;
+			let end = box.height;
+			if (land) {
+				const strip = land.getBoundingClientRect();
+				const fraction = (x: number) => (x - (strip.left - box.left)) / strip.width;
+				const laptop = LAPTOP.map((f) => strip.left - box.left + f * strip.width);
+				if (base > laptop[0] - LAPTOP_CLEAR && base < laptop[1] + LAPTOP_CLEAR) {
+					// Preferably right of it, into the cliff (it may come closer to the edge there, it is going underground)
+					const right = laptop[1] + LAPTOP_CLEAR;
+					landing = right <= w - LANDING_EDGE ? right : Math.min(laptop[0] - LAPTOP_CLEAR, w - CLEAR);
+				}
+				end = strip.top - box.top + strip.height * ridgeAt(fraction(landing)) + INTO_GROUND;
+			}
+			const length = end - start - TOP - END_TIP;
+			const count = Math.max(1, Math.round(length / MID));
+			const tile = length / count;
+
+			// The axis: a slow sway, rising from nothing at the tree so the root leaves it exactly at the anchor.
+			const axis = (y: number) => {
+				const t = y - start;
+				const envelope = Math.min(1, t / 420);
+				const entry = Math.min(1, t / ENTRY);
+				const enter = (tipX - base) * (1 - entry * entry * (3 - 2 * entry));
+				const sway =
+					0.72 * Math.sin((t / WAVES[0]) * Math.PI * 2 + 0.4) + 0.28 * Math.sin((t / WAVES[1]) * Math.PI * 2 + 2.1) - 0.72 * Math.sin(0.4) - 0.28 * Math.sin(2.1);
+				// Toward the end the sway gives way to a drift onto the landing point.
+				const linear = Math.min(1, Math.max(0, (y - (end - DRIFT)) / DRIFT));
+				const drift = linear * linear * (3 - 2 * linear);
+				return base + enter + SWAY * envelope * (1 - drift) * sway + (landing - base) * drift;
+			};
+			const dpr = window.devicePixelRatio || 1;
+			const snap = (value: number) => Math.round(value * dpr) / dpr;
+
+			const pieces: [string, number][] = [[topTile, TOP], ...Array.from({ length: count }, () => [midTile, tile] as [string, number]), [endTile, END]];
+			const next: Segment[] = [];
+			let y = start;
+			for (const [src, height] of pieces) {
+				for (let half = 0; half < 2; half++) {
+					const from = snap(y + (height * half) / 2);
+					const to = snap(y + (height * (half + 1)) / 2);
+					const x0 = axis(from);
+					const x1 = axis(to);
+					next.push({
+						src,
+						top: from,
+						height: to - from,
+						left: x0 - WIDTH / 2,
+						skew: Math.atan2(x1 - x0, to - from),
+						offset: from - y,
+						size: height,
+						buried: to <= foot
+					});
+				}
+				y += height;
+			}
+			segments = next;
 		};
+		measure();
 		const observer = new ResizeObserver(measure);
 		observer.observe(parent);
 		return () => observer.disconnect();
 	});
-
-	type Point = [number, number];
-	const fmt = ([x, y]: Point) => `${x.toFixed(1)} ${y.toFixed(1)}`;
-	const toLine = (points: Point[]) => `M${points.map(fmt).join('L')}`;
-	const fract = (value: number) => value - Math.floor(value);
-	const jitter = (index: number) => fract(Math.sin(index * 78.233) * 43758.5453) - 0.5;
-	/** Smooth 1D value noise in -0.5…0.5. */
-	const noise = (t: number, seed: number) => {
-		const i = Math.floor(t);
-		const f = t - i;
-		const k = f * f * (3 - 2 * f);
-		return jitter(i + seed * 101) * (1 - k) + jitter(i + 1 + seed * 101) * k;
-	};
-
-	/** Filled outline around a centerline, `width(t)` wide (t = 0…1 along the line): a tapering root, not a stroke. */
-	function taper(line: Point[], width: (t: number) => number) {
-		const left: string[] = [];
-		const right: string[] = [];
-		line.forEach(([x, y], index) => {
-			const [px, py] = line[Math.max(0, index - 1)];
-			const [nx, ny] = line[Math.min(line.length - 1, index + 1)];
-			const length = Math.hypot(nx - px, ny - py) || 1;
-			const half = width(index / (line.length - 1)) / 2;
-			const ox = (-(ny - py) / length) * half;
-			const oy = ((nx - px) / length) * half;
-			left.push(fmt([x + ox, y + oy]));
-			right.unshift(fmt([x - ox, y - oy]));
-		});
-		return `M${left.join('L')}L${right.join('L')}Z`;
-	}
-
-	/** Catmull-Rom through the points, sampled into a dense polyline. */
-	const smooth = (points: Point[], steps = 12) => {
-		const out: Point[] = [];
-		for (let index = 0; index < points.length - 1; index++) {
-			const p0 = points[Math.max(0, index - 1)];
-			const p1 = points[index];
-			const p2 = points[index + 1];
-			const p3 = points[Math.min(points.length - 1, index + 2)];
-			for (let step = 0; step < steps; step++) {
-				const t = step / steps;
-				const t2 = t * t;
-				const t3 = t2 * t;
-				const f = (a: number, b: number, c: number, d: number) => 0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3);
-				out.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1])]);
-			}
-		}
-		out.push(points[points.length - 1]);
-		return out;
-	};
-
-	/** How far the root runs past the bottom of the page content, toward the footer's ground. */
-	const RUN_OUT = 130;
-
-	const root = $derived.by(() => {
-		if (!size) return null;
-		const { w, h, tops } = size;
-		const canvas = Math.min(w, 1600);
-		const spec = LAYOUTS.wide;
-		const trunk = (w - canvas) / 2 + canvas * (1 - spec.tree * spec.trunkFromRight);
-		const column = Math.min(w, 1152);
-		// The content's right edge (max-w-6xl minus lg:px-8) plus a little air: the root and its rootlets stay right of it.
-		const clear = (w - column) / 2 + column - 32 + 14;
-		const margin = Math.max(0, w - 6 - clear);
-		const gutter = clear + Math.max(4, margin * 0.4);
-		const end = h + RUN_OUT;
-
-		const spine: Point[] = [
-			[trunk, -170],
-			[trunk + (gutter - trunk) * 0.42, 20],
-			[gutter - 4, 170]
-		];
-		for (let y = 320, index = 0; y < end - 120; y += 150 + jitter(index + 9) * 60, index++) {
-			const sway = Math.min(margin * 0.3, 22);
-			spine.push([Math.max(clear + 2, Math.min(w - 6, gutter + jitter(index) * sway * 2)), y]);
-		}
-		spine.push([gutter + 3, end]);
-		const line = smooth(spine);
-
-		// Body: thick under the trunk, then an uneven taper with swellings and two or three knots, a hair at the end.
-		const knots = [0.31, 0.58, 0.83];
-		const body = taper(line, (t) => {
-			const base = t < 0.08 ? 16 - t * 75 : 10 * (1 - t) ** 0.85 + 0.6;
-			const swell = 1 + noise(t * 8, 1) * 0.6 + noise(t * 27, 2) * 0.3;
-			const knot = knots.reduce((sum, at) => sum + Math.max(0, 1 - Math.abs(t - at) * 45) * 0.55, 0);
-			return Math.max(0.5, base * (swell + knot));
-		});
-
-		// Rootlets: branch off at each section into the margin (never left of `clear`), arc down and run out in a hair.
-		const room = w - 6 - clear;
-		const rootlets =
-			room < 28
-				? []
-				: tops.slice(1).map((top, index) => {
-						const y = top + 60;
-						const startIndex = Math.max(
-							0,
-							line.findIndex(([, ly]) => ly >= y)
-						);
-						const [sx, sy] = line[startIndex];
-						const out = index % 2 === 0 ? 1 : -1;
-						const reach = Math.min(70 + (index % 2) * 30, out > 0 ? w - 8 - sx : sx - clear);
-						const twig = smooth([
-							[sx, sy],
-							[sx + out * reach * 0.35, sy + 14],
-							[sx + out * reach * 0.75, sy + 34 + jitter(index + 3) * 12],
-							[sx + out * reach, sy + 64]
-						]);
-						return { path: taper(twig, (t) => 3.4 * (1 - t) ** 1.3 + 0.35), tip: twig[twig.length - 1] };
-					});
-
-		// Fine hairs along the root, alternating sides, shorter further down.
-		const hairs: string[] = [];
-		for (let index = 40, n = 0; index < line.length - 10; index += 14 + Math.round((jitter(n + 40) + 0.5) * 16), n++) {
-			const [x, y] = line[index];
-			const side = n % 2 ? 1 : -1;
-			const length = Math.min((8 + (jitter(n + 70) + 0.5) * 16) * (1 - index / line.length / 1.4), side < 0 ? Math.max(0, x - clear) : 40);
-			if (length < 4) continue;
-			hairs.push(`M${fmt([x, y])}q${(side * length * 0.6).toFixed(1)} ${(length * 0.2).toFixed(1)} ${(side * length).toFixed(1)} ${(length * 0.8).toFixed(1)}`);
-		}
-
-		return {
-			w,
-			h,
-			end,
-			body,
-			hairs: hairs.join(''),
-			// The vein shows in the upper root only, as it thins it sinks into the ink
-			vein: toLine(line.slice(4, Math.floor(line.length * 0.62))),
-			rootlets
-		};
-	});
 </script>
 
-<div bind:this={host} class="roots pointer-events-none absolute inset-0 hidden xl:block" aria-hidden="true">
-	{#if root}
-		<svg viewBox="0 0 {root.w} {root.h}" width={root.w} height={root.h} class="absolute inset-0 overflow-visible">
-			<defs>
-				<!-- Ink: a slow wobble in the outline (never a ruled line) and a finely frayed, slightly bled edge -->
-				<filter id="root-ink" x="-20%" y="-2%" width="140%" height="104%">
-					<feTurbulence type="fractalNoise" baseFrequency="0.035 0.012" numOctaves="2" seed="5" result="wobble" />
-					<feDisplacementMap in="SourceGraphic" in2="wobble" scale="5" xChannelSelector="R" yChannelSelector="G" result="shape" />
-					<feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="1" seed="11" result="fray" />
-					<feDisplacementMap in="shape" in2="fray" scale="1.6" xChannelSelector="R" yChannelSelector="G" />
-				</filter>
-				<linearGradient id="root-fade" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={root.end}>
-					<stop offset="0" stop-color="var(--root)" />
-					<stop offset="0.86" stop-color="var(--root)" />
-					<stop offset="1" stop-color="var(--root)" stop-opacity="0" />
-				</linearGradient>
-				<linearGradient id="root-vein" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={root.end * 0.62}>
-					<stop offset="0" stop-color="var(--vein)" />
-					<stop offset="0.55" stop-color="var(--vein)" />
-					<stop offset="1" stop-color="var(--vein)" stop-opacity="0" />
-				</linearGradient>
-				<radialGradient id="root-tip">
-					<stop offset="0" stop-color="var(--color-butter)" stop-opacity="0.5" />
-					<stop offset="1" stop-color="var(--color-butter)" stop-opacity="0" />
-				</radialGradient>
-			</defs>
-			<g filter="url(#root-ink)" fill="url(#root-fade)">
-				<path d={root.body} />
-				{#each root.rootlets as rootlet, index (index)}<path d={rootlet.path} />{/each}
-			</g>
-			<path d={root.hairs} class="hairs" />
-			<path d={root.vein} class="vein" />
-			{#each root.rootlets as rootlet, index (index)}
-				<circle cx={rootlet.tip[0]} cy={rootlet.tip[1]} r="5" fill="url(#root-tip)" class="tip" />
+<div bind:this={host} class="roots pointer-events-none absolute inset-0 hidden" aria-hidden="true">
+	{#each layers as layer, buried (buried)}
+		<div class="root" class:buried={buried === 0} style:--w="{WIDTH}px">
+			{#each layer as segment (segment.top)}
+				<div
+					class:entrance={segment.top === segments[0].top}
+					style:top="{segment.top}px"
+					style:left="{segment.left}px"
+					style:height="{segment.height}px"
+					style:transform="skewX({segment.skew}rad)"
+					style:background-image="url({segment.src})"
+					style:background-position="0 {-segment.offset}px"
+					style:background-size="100% {segment.size}px"
+				></div>
 			{/each}
-		</svg>
-	{/if}
+		</div>
+	{/each}
 </div>
 
 <style>
-	.roots {
-		--root: color-mix(in oklab, var(--color-ink) 90%, transparent);
-		--vein: #b07a12;
-		--vein-alpha: 0.55;
-	}
-
-	:global(.dark) .roots {
-		--root: #070708;
-		--vein: var(--color-butter);
-		--vein-alpha: 0.42;
-	}
-
-	.hairs {
-		fill: none;
-		stroke: var(--root);
-		stroke-width: 0.6;
-		stroke-linecap: round;
-		opacity: 0.5;
-	}
-
-	/* Narrow and dim, like the gold veins in the painted trunk; it fades as the root thins */
-	.vein {
-		fill: none;
-		stroke: url(#root-vein);
-		stroke-width: 0.7;
-		stroke-linecap: round;
-		opacity: var(--vein-alpha);
-		filter: drop-shadow(0 0 1.5px rgb(252 215 114 / 0.35));
-	}
-
-	.tip {
-		opacity: 0.35;
-	}
-
-	:global(:root:not(.dark)) .tip {
-		display: none;
-	}
-
-	/* The root grows down with the scroll */
-	@supports (animation-timeline: view()) {
-		@media (prefers-reduced-motion: no-preference) {
-			.roots svg {
-				animation: grow linear both;
-				animation-timeline: view();
-				animation-range: cover 0% cover 55%;
-			}
+	/* Above the footer: the rootlets land on its near ridge (behind its far ridge, opaque at night, they would be cut off) */
+	@media (min-width: 87.5rem) {
+		.roots {
+			display: block;
+			z-index: 1;
 		}
 	}
 
-	@keyframes grow {
+	.root {
+		position: absolute;
+		inset: 0;
+		animation: appear 0.8s ease-out both;
+	}
+
+	.root > div {
+		position: absolute;
+		width: var(--w);
+		background-repeat: no-repeat;
+		transform-origin: 0 0;
+	}
+
+	/* The thick entrance starts inside the knoll's ink and fades in there, so no cut edge ever shows */
+	.entrance {
+		mask-image: linear-gradient(transparent, #000 80%);
+	}
+
+	/* Ink on paper: the painted bark as it is, a touch quieter so it never outweighs the type */
+	:global(:root:not(.dark)) .root {
+		opacity: 0.9;
+	}
+
+	/* At night the root is ink like the hill it comes out of: a silhouette a shade darker than the sky, set off by a thin
+	   moonlit rim and a faint halo (the horizon's silhouette technique); the gold vein sinks to a dim ochre thread inside */
+	:global(.dark) .root {
+		filter: brightness(0.7) contrast(1.35) drop-shadow(0 0 1px rgb(246 231 184 / 0.3)) drop-shadow(0 0 9px rgb(246 231 184 / 0.06));
+	}
+
+	:global(.dark) .root.buried {
+		filter: brightness(0.7) contrast(1.35);
+	}
+
+	@keyframes appear {
 		from {
-			clip-path: inset(-220px -60px 100% -60px);
+			opacity: 0;
 		}
-		to {
-			clip-path: inset(-220px -60px -160px -60px);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.root {
+			animation: none;
 		}
 	}
 </style>

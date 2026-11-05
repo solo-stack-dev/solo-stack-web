@@ -216,6 +216,9 @@
 		{/key}
 	{/each}
 
+	<!-- Anchor for the long root below the hill (Roots.svelte measures it; wide layout only) -->
+	<span class="root-tip" data-root-tip style:left="{geometries.wide.rootTip.left}%" style:top="{geometries.wide.rootTip.top}%"></span>
+
 	<span class="start date" aria-hidden="true">{formatDay(dates[0])}</span>
 	<span class="end date" aria-hidden="true">{formatDay(dates[dates.length - 1])}</span>
 
@@ -315,6 +318,12 @@
 		.land-wide {
 			display: block;
 		}
+	}
+
+	.root-tip {
+		position: absolute;
+		width: 0;
+		height: 0;
 	}
 
 	.art {
