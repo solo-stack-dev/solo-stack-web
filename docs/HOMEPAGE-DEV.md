@@ -190,7 +190,7 @@ All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use
 **Wipes.**
 
 - 20→21, making: `#making` overlaps the hero by `--wipe-overlap` (45svh, negative margin; only its own `a`/`button` take pointer events there) and its `.track` is masked by two layers of `--wash-spread-up` plus a solid layer. A registered `--wipe` (0…1) runs on the named view timeline `--making-wipe` (`animation-range: entry 45% entry 100%`: from the page top until the section top reaches the viewport top). The front starts at the viewport bottom and floods up over the moon ~1.4× faster than the page; the plate's straight top is always transparent while the hero is on screen. Static fallback (no support, reduced motion): the overlap is one soft wash from hero to plate. If you change the overlap, change the `entry 45%` start with it.
-- 04→06, sunrise: `.night` is solid ink (`--ink-fade`, the cinema's bottom color) ending in `--wash-dry` plus a layer of `--wash-spread-down`; with `--sunrise` it translates up (`--night-travel`) and its ramp tightens from 42svh to 20svh (the wash dries). It always covers the section's top line. Reduced motion / no JS: the final state.
+- 04→06, sunrise: `.night` is solid ink (`--ink-fade`, the cinema's bottom color) ending in `--wash-dry` plus a layer of `--wash-spread-down`; with `--sunrise` it translates up (`--night-travel`) and its ramp tightens from 55svh to 16svh (the wash dries). It always covers the section's top line. Reduced motion / no JS: the final state.
 
 The night shift frames its room with a night-ink vignette inside the feathered art (`Scene.svelte` `.art::after`), so the interior sinks into the dark before it meets the sky.
 

@@ -4,6 +4,8 @@ For each take: start at the bar of the first vocal note (one bar earlier if it e
 -16 LUFS, limit peaks at -4 dBFS (ffmpeg alimiter, keeps the AAC true peak under 0), fade in 0.4 s and out 2.5 s so the loop restarts
 gently, encode AAC <= 80 kbps 44.1 kHz stereo (.m4a, faststart). Also prints metrics used to pick the best take.
 
+Run it as `edit.py` from inside the YuE checkout (D:/repos/YuE/output/solo-stack-radio/), next to its `takes/` folder.
+
 Usage: python edit.py metrics            -> metrics.json for all takes
        python edit.py encode <take> <out.m4a>
 """

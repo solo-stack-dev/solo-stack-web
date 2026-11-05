@@ -1,3 +1,5 @@
+> **Superseded (2026-11-05):** the homepage no longer has the Solo Stack FM station; every social station now plays its own song (docs/art/radio/SONGS.md). Kept as a record of the original generation run. Update the radio parts before re-running this prompt.
+
 You are the writer for the blog on solo-stack.dev, the website of the German YouTube channel "Solo Stack". Write one complete blog article in German, in the owner's voice (first person "ich"), addressing the reader with "du".
 
 ## Do not use tools

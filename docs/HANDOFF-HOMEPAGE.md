@@ -2,6 +2,8 @@
 
 This document is the complete brief for building the solo-stack.dev homepage. It was written at the end of the design phase (2026-11-01) for the next lead agent. Read it fully before starting, then read [PROJECT.md](PROJECT.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [AGENTS.md](../AGENTS.md).
 
+> **Historical plan.** The built homepage differs in places: `SectionEdge`/`Seam` were replaced by painted mist and ink-wash wipes, Solo Stack FM by one song per social station, the hero portrait moved to the footer, and the sunrise walk mascot was removed. [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md) describes the current state.
+
 **You are the lead.** You do not build all of this yourself. Build the foundation, then run several subagents in parallel (art production and one implementation agent per section), and integrate their work. A single agent doing everything sequentially takes too long, and the owner explicitly wants parallel subagents.
 
 ---

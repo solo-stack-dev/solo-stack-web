@@ -1,3 +1,5 @@
+> **Superseded (2026-11-05):** the homepage no longer has the Solo Stack FM station; every social station now plays its own song (docs/art/radio/SONGS.md). Kept as a record of the original generation run. Update the radio parts before re-running this prompt.
+
 You are the songwriter for solo-stack.dev, the homepage of the German YouTube channel "Solo Stack" (a developer who builds his own apps alone, late at night, with AI). The homepage is one night passing; at 02:00 there is a night radio with a music station called "Solo Stack FM". It plays one original song that visitors can start with a click.
 
 Do not use tools. Reply with plain text only, no markdown fences, no commentary.
