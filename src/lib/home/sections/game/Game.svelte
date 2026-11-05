@@ -30,7 +30,7 @@
 	<NightClock time="22:00" />
 	<h2 id="home-game-title" class="night-heading">{m.home_game_title()}</h2>
 	<div class="content">
-		<!-- Tabs in the page-wide selection idiom (label + hand-drawn underline), attached to the frame's top left -->
+		<!-- Tabs in the page-wide selection idiom (label + hand-drawn underline), on the gutter under the heading -->
 		<div class="tabs label" role="tablist" aria-label={m.home_game_tabs_label()}>
 			{#each CANDIDATE_IDS as id (id)}
 				<button
@@ -47,7 +47,7 @@
 				</button>
 			{/each}
 		</div>
-		<div role="tabpanel" id="game-panel" aria-labelledby="game-tab-{selected}">
+		<div role="tabpanel" id="game-panel" class="panel" aria-labelledby="game-tab-{selected}">
 			{#key selected}
 				<GameFrame gameId={selected} load={candidate.load} label={candidate.title()}>
 					{#snippet poster()}
@@ -80,18 +80,22 @@
 		max-width: 60rem;
 	}
 
-	/* Tabs (2.75rem) + gap above the 16:9 stage: the whole frame fits under the heading on a laptop screen */
+	/* Tabs on the gutter lines like the heading; the frame is the centered art object. Tabs (2.75rem) + gap above the 16:9 stage: the
+	   whole frame fits under the heading on a laptop screen. */
 	.content {
 		position: relative;
 		z-index: 1;
 		display: grid;
 		gap: 0.75rem;
+	}
+
+	.panel {
+		justify-self: center;
 		width: min(100%, 72rem, calc((100svh - var(--heading-top) - 3.5rem - clamp(1.5rem, 4vh, 2.5rem) - 3.5rem - var(--bottom-gutter)) * 16 / 9));
-		margin-inline: auto;
 	}
 
 	@media (max-width: 40rem) {
-		.content {
+		.panel {
 			width: 100%;
 		}
 	}

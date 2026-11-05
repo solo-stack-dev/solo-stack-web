@@ -49,7 +49,8 @@
 	const screenX = $derived(layout.screen.reduce((sum, p) => sum + p.x, 0) / 4);
 	const screenY = $derived(layout.screen.reduce((sum, p) => sum + p.y, 0) / 4);
 
-	const progress = new ScrollProgress({ mode: 'pinned' });
+	// Also written to the track as --making-pin: the bottom chrome fades out before the stage unpins (CSS below).
+	const progress = new ScrollProgress({ mode: 'pinned', cssVar: '--making-pin' });
 	/** The 21:00 sky color backs the plate in the wipe overlap (night.ts). */
 	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'making')!.sky;
 
@@ -298,20 +299,27 @@
 		mask-composite: add, intersect, add;
 	}
 
-	/* The wipe runs from page top (the overlap's share of the entry range) until the section top hits the viewport top. The plate is solid
-	   at --wipe-front, which starts at the hero's bottom edge (it must never show through the translucent ramp) and rises ~1.8× faster than
-	   the page. The ramp above is ≥ 28svh, tightening only near the viewport top for the track's own top edge. At scroll 0 only its faint
-	   first blooms touch the hero's bottom; drawing and controls fade in later (.stage). */
+	/* The wipe runs from page top (the overlap's share of the entry range) until the section top is --wipe-tail above the viewport top.
+	   The plate is solid at --wipe-front, which starts at the hero's bottom edge (it must never show through the translucent ramp) and
+	   crosses the viewport linearly, reaching its top as the wipe ends. As the track's straight top edge is off screen by then, the ramp
+	   keeps room for deep lobes through the wordmark: up to 1.6 × 48svh tall (tiles at 1.6 × the painted aspect's height), tightening
+	   only to 1.1 × the front's distance from that edge. At scroll 0 only its faint first blooms touch the hero's bottom; drawing and
+	   controls fade in later (.stage). */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: view()) {
 			.track {
-				--wipe-front: calc(var(--wipe-overlap) * (1 - var(--wipe)));
-				--wipe-w: min(calc(28svh + var(--wipe) * 20svh), calc(var(--wipe-front) * 1.1));
+				--wipe-tail: 25svh;
+				--wipe-front: calc(var(--wipe-overlap) * (1 - var(--wipe)) + var(--wipe-tail) * var(--wipe));
+				--wipe-w: min(calc((28svh + var(--wipe) * 20svh) * 1.6), calc(var(--wipe-front) * 1.1));
 				--wipe-b: calc(var(--wipe-front) + var(--wipe-w) * 0.1);
 				--wipe-x: calc(10% + var(--wipe) * 45%);
+				mask-size:
+					100% 100%,
+					calc(var(--wipe-w) * 1.125) var(--wipe-w),
+					calc(var(--wipe-w) * 0.8125) var(--wipe-w);
 				animation: making-wipe linear both;
 				animation-timeline: --making-wipe;
-				animation-range: entry 45% entry 100%;
+				animation-range: entry 45% contain 25svh;
 			}
 		}
 	}
@@ -342,6 +350,17 @@
 	.bloom-mask,
 	.ink {
 		opacity: clamp(0, (var(--wipe) - 0.35) / 0.3, 1);
+	}
+
+	/* The bottom chrome leaves over the last 8 % of the pin, so it never rides up under the nav with the unpinning stage. */
+	@media (prefers-reduced-motion: no-preference) {
+		.stage > :is(.pillars, .progress, .cue) {
+			opacity: calc(clamp(0, (var(--wipe) - 0.35) / 0.3, 1) * clamp(0, (1 - var(--making-pin, 0)) / 0.08, 1));
+		}
+
+		.stage > :is(.pillars, .progress, .cue):focus-within {
+			opacity: 1;
+		}
 	}
 
 	/* ── scene ───────────────────────────────────────────────────────────── */
@@ -647,42 +666,43 @@
 			padding-inline: 12vw;
 		}
 
-		/* One row right above the cue, on the dark rock below the lit cliff top and laptop (plate bottom right), never on the ledge or screen. */
+		/* The desktop row split in two lines, on the dark rock below the lit cliff top and laptop (plate bottom right): the pillars from the
+		   left gutter (first letter on it), and under them, as on desktop, the dots left of the cue on the right gutter. */
+		.stage {
+			--chrome-bottom: clamp(0.5rem, 2vh, 1.25rem);
+		}
+
 		.pillars {
-			left: 50%;
-			bottom: calc(clamp(0.5rem, 2vh, 1.25rem) + 2.75rem);
-			translate: -50% 0;
+			bottom: calc(var(--chrome-bottom) + 2.75rem);
 		}
 
 		.pillars ul {
 			flex-wrap: nowrap;
-			justify-content: center;
-			gap: 0;
+			gap: 0.15rem;
+			margin-left: -0.4rem;
 		}
 
 		.pillars li + li::before {
-			content: none;
+			margin-right: 0.15rem;
 		}
 
 		.pillar {
 			min-height: 2.75rem;
-			min-width: 2.75rem;
-			padding-inline: 0.45rem;
-			letter-spacing: 0.14em;
+			padding-inline: 0.4rem;
+			letter-spacing: 0.12em;
 		}
 
-		/* the dots share the cue's line, at the left gutter */
+		.underline {
+			left: 0.15rem;
+			width: calc(100% - 0.3rem);
+		}
+
 		.progress {
-			right: auto;
-			left: var(--page-gutter);
-			bottom: calc(clamp(0.5rem, 2vh, 1.25rem) + 1.125rem);
+			bottom: calc(var(--chrome-bottom) + 1.125rem);
 		}
 
 		.cue {
-			right: auto;
-			left: 50%;
-			translate: -50% 0;
-			bottom: clamp(0.5rem, 2vh, 1.25rem);
+			bottom: var(--chrome-bottom);
 		}
 	}
 

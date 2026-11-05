@@ -170,17 +170,27 @@
 		color: var(--color-night);
 		/* continues the cinema's --ink-fade */
 		--ink-fade: var(--color-night);
-		/* cream on the night, anthracite once its ink clears the clock (--sunrise ≈ 0.88 → 0.95, see .night), like the nav */
+		/*
+		 * Clock: cream with an ink halo on the night, anthracite with a butter halo once the paper dominates behind it. The night's
+		 * opaque part never reaches the clock line: the clock meets only its translucent ramp, darker than mid-tone (measured) only
+		 * until --sunrise ≈ 0.4 on landscape screens, and never on portrait ones (taller section, clock deeper in the paper).
+		 */
+		--clock-switch: 0.36;
+		--clock-paper: calc(clamp(0, (var(--sunrise) - var(--clock-switch)) / 0.08, 1) * 100%);
 		--night-clock-color: color-mix(
 			in oklab,
 			color-mix(in oklab, var(--color-cream) 85%, transparent),
-			color-mix(in oklab, var(--color-night) 85%, transparent) calc(clamp(0, (var(--sunrise) - 0.88) / 0.07, 1) * 100%)
+			color-mix(in oklab, var(--color-night) 85%, transparent) var(--clock-paper)
 		);
-		/* its halo follows: ink on the night, butter on the paper */
-		--clock-paper: calc(clamp(0, (var(--sunrise) - 0.88) / 0.07, 1) * 100%);
 		--night-clock-halo:
 			0 0 2px color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)),
 			0 0 8px color-mix(in oklab, color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)) 80%, transparent);
+	}
+
+	@media (max-aspect-ratio: 1/1) {
+		.sunrise {
+			--clock-switch: 0.04;
+		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -389,6 +399,31 @@
 		mask-composite: add, intersect, add;
 	}
 
+	/* Reduced motion: the dried final state at rest, above the clock line. The ink stays opaque on the section's top line (continuing the
+	   cinema's ink, so no seam) and dissolves through a soft ramp unioned with two bloom-wash copies at unrelated widths. Both are lifted
+	   so their flat opaque bands sit above the box: only the lobed parts show, and the intersect never shows a repeat. */
+	@media (prefers-reduced-motion: reduce) {
+		.night {
+			--night-travel: 0px;
+			height: calc(var(--clock-top) * 1.4);
+			mask-image: linear-gradient(#000 20%, transparent 60%), var(--wash-spread-down), var(--wash-spread-down);
+			mask-repeat: no-repeat, repeat-x, repeat-x;
+			mask-size:
+				100% 100%,
+				38% 140%,
+				57% 130%;
+			mask-position:
+				0 0,
+				11% 100%,
+				63% 100%;
+			mask-composite: add, intersect;
+		}
+
+		.night-clear {
+			height: 40%;
+		}
+	}
+
 	/* The still-inked part of .night (down to ~50 % ramp alpha); NightPage's nav/rail ink switch reads this box (data-night-edge). */
 	.night-clear {
 		position: absolute;
@@ -401,7 +436,8 @@
 		z-index: 1;
 		display: grid;
 		grid-template-columns: auto 1fr auto;
-		align-items: center;
+		/* links and icons sit on the wordmark's baseline, not centered on the taller portrait */
+		align-items: last baseline;
 		gap: 1.5rem clamp(2rem, 5vw, 5rem);
 		padding: 2rem var(--page-gutter) var(--bottom-gutter);
 	}
@@ -552,9 +588,13 @@
 			font-size: 1.05rem;
 		}
 
+		/* 44px targets in a balanced 5 / 4 block (9 in one row would not fit) */
 		.socials ul {
 			justify-content: center;
+			max-width: calc(5 * 2.75rem + 4 * 0.75rem);
 			margin-right: 0;
+			margin-inline: auto;
+			gap: 0.25rem 0.75rem;
 		}
 	}
 </style>

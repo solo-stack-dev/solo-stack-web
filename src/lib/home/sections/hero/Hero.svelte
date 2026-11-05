@@ -741,7 +741,7 @@
 		@supports (animation-timeline: scroll()) {
 			.tagline {
 				animation:
-					tagline-out linear both,
+					scroll-out linear both,
 					settle var(--dur-reveal) 550ms var(--ease-settle) backwards;
 				animation-timeline: scroll(root block), auto;
 				animation-range:
@@ -751,9 +751,21 @@
 		}
 	}
 
-	@keyframes tagline-out {
+	@keyframes scroll-out {
 		to {
 			opacity: 0;
+		}
+	}
+
+	/* The mascot is gone before the making wipe's ramp reaches it (phones: it sits low on the rim, the wash front would cut it). Desktop:
+	   it is already leaving the viewport top by then. Static under reduced motion. */
+	@media (prefers-reduced-motion: no-preference) {
+		@supports (animation-timeline: scroll()) {
+			.mascot {
+				animation: scroll-out linear both;
+				animation-timeline: scroll(root block);
+				animation-range: 18svh 42svh;
+			}
 		}
 	}
 
