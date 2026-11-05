@@ -1,0 +1,197 @@
+[
+  {
+    "file": "break-fireflies.png",
+    "width": 1200,
+    "height": 400,
+    "bytes": 99684,
+    "mode": "RGBA",
+    "sha256": "e3ce0dbf78e02513939b85f325b89c89766024e8b23910d6e1034ddaeed86435",
+    "alpha": {
+      "zero": 450179,
+      "partial": 23604,
+      "opaque": 6217,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "break-laptop.png",
+    "width": 1200,
+    "height": 400,
+    "bytes": 93413,
+    "mode": "RGBA",
+    "sha256": "a6da79ed29a31967e7b6ea4a0c7913de663cd4126bdbe29f18aa13f88fdb4e23",
+    "alpha": {
+      "zero": 441659,
+      "partial": 4992,
+      "opaque": 33349,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "break-owl.png",
+    "width": 1200,
+    "height": 400,
+    "bytes": 81310,
+    "mode": "RGBA",
+    "sha256": "a2daa92f58886190e06a60727cbe69d3dbee665ec31fa5bbc28ddd0e62ea01ce",
+    "alpha": {
+      "zero": 444040,
+      "partial": 4168,
+      "opaque": 31792,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "cinema-projection.png",
+    "width": 1664,
+    "height": 936,
+    "bytes": 2048988,
+    "mode": "RGB",
+    "sha256": "f9be5d48169afe9cba15943443ca3f7fc20e67b7517adbf37a9c74f96fb750fd",
+    "alpha": {
+      "zero": 0,
+      "partial": 0,
+      "opaque": 1557504,
+      "minimum": 255,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "poster-constellations.png",
+    "width": 1664,
+    "height": 936,
+    "bytes": 2102765,
+    "mode": "RGB",
+    "sha256": "123ec7d169d7712ccb30abd17fde6f36851213997ac0cb90bd06ae795b343f47",
+    "alpha": {
+      "zero": 0,
+      "partial": 0,
+      "opaque": 1557504,
+      "minimum": 255,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "poster-moon-planet.png",
+    "width": 1664,
+    "height": 936,
+    "bytes": 2211007,
+    "mode": "RGB",
+    "sha256": "0dd05e8fa2c70d3fdd808c3eb53ca3c5c8baeffd192e2660d110688d48f1105e",
+    "alpha": {
+      "zero": 0,
+      "partial": 0,
+      "opaque": 1557504,
+      "minimum": 255,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "poster-stack-to-moon.png",
+    "width": 1664,
+    "height": 936,
+    "bytes": 2005412,
+    "mode": "RGB",
+    "sha256": "4a408cd11b59aaed19b31593a76a18eed9ae65001b9acbcb9e95889960d39e68",
+    "alpha": {
+      "zero": 0,
+      "partial": 0,
+      "opaque": 1557504,
+      "minimum": 255,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "root-end.png",
+    "width": 700,
+    "height": 1983,
+    "bytes": 216418,
+    "mode": "RGBA",
+    "sha256": "c14f997ec4071d05e05b999efaef5b1ac8d17b69b6f82c9746c76601ca106dc6",
+    "alpha": {
+      "zero": 1307992,
+      "partial": 26243,
+      "opaque": 53865,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "root-mid.png",
+    "width": 700,
+    "height": 1750,
+    "bytes": 299601,
+    "mode": "RGBA",
+    "sha256": "df2383f7f0afd53487e3ce62325a81f4d81b74abf0eeb72bf8fc7d5dffeaf22f",
+    "alpha": {
+      "zero": 1108010,
+      "partial": 20566,
+      "opaque": 96424,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "root-top.png",
+    "width": 700,
+    "height": 1750,
+    "bytes": 304306,
+    "mode": "RGBA",
+    "sha256": "a4a1c60f60acb003f57e8722373f5eba6d7c58d5c523e5cd552cd79eff33058e",
+    "alpha": {
+      "zero": 1105554,
+      "partial": 15784,
+      "opaque": 103662,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "seam-cloud-a.png",
+    "width": 2560,
+    "height": 600,
+    "bytes": 538523,
+    "mode": "RGBA",
+    "sha256": "98ef5b7af80c789d06421685b107246fbb3c267eda67fc5b6c6c834443d80b50",
+    "alpha": {
+      "zero": 1061589,
+      "partial": 142168,
+      "opaque": 332243,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "seam-cloud-b.png",
+    "width": 2560,
+    "height": 600,
+    "bytes": 499390,
+    "mode": "RGBA",
+    "sha256": "db997bb0692eb63acbeb8cea8b2e5d38e211d4c8ef4f0471673133289db5da38",
+    "alpha": {
+      "zero": 1108497,
+      "partial": 139253,
+      "opaque": 288250,
+      "minimum": 0,
+      "maximum": 255
+    }
+  },
+  {
+    "file": "seam-cloud-c.png",
+    "width": 2560,
+    "height": 600,
+    "bytes": 336984,
+    "mode": "RGBA",
+    "sha256": "24559567df07c459e8285f651373afcf9634a3b08222655ba4536e2aee0a05a2",
+    "alpha": {
+      "zero": 1235703,
+      "partial": 130080,
+      "opaque": 170217,
+      "minimum": 0,
+      "maximum": 255
+    }
+  }
+]
