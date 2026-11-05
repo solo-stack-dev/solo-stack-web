@@ -1,0 +1,21 @@
+# Round 3 fix plan
+
+Round 2 scores: Opus 8.6, gpt-6.1-sol 8.8 overall (`round-2-opus.md`, `round-2-gpt.md`). Target ≥ 9.5 from both on every area. All rules from `ROUND-2.md` still apply (no agent-written copy, no packages, verify, screenshots, commit trailer, report format); screens go to `docs/screens/round-3/<area>/`.
+
+## Lead decisions where the critics disagree
+
+- **Footer wordmark** (Opus: remove, template trope, clipped; GPT: keep the oversized closing wordmark): keep a large wordmark but make it part of the painting, never clipped by the page edge: letters stand in/behind the ink ground so the ridge or ground covers their feet, set in the material (cream at night, ink-on-paper treatment that does not create the band sandwich in light). If that cannot look non-template, shrink it into the ground (Opus option).
+- **Light-theme footer** (Opus: sandwich): one continuous ink ground from the ridge to the page bottom in both themes, holding tagline, icons and fine print in cream. No paper gap between ink layers.
+- **Stats root** (both: fails twice): remove the page-long root. If anything stays, only a short, broad, branching root entrance from the tree's root flare under the hill that tapers out within the first section, never a strand down the margin.
+- **Blog section breaks** (GPT: ornaments, owl unrelated; Opus: fine): make each break relevant to the section it sits at and give the two breaks different scale/alignment (e.g. a wide shallow homepage scene crop for the night journey, the radio/desk detail by the music/cinema section). The painted break assets stay available for future posts.
+
+## Ownership (parallel agents)
+
+| Agent | Owns | Scope |
+|---|---|---|
+| Shell | `src/lib/components/site/**`, `src/routes/(site)/+layout.svelte`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte`, `src/lib/home/NightPage.svelte` (menu only) | Opus shell 1–6, GPT shell 1–2 (footer wordmark/ground per the decisions above; focus drawn as the swash, not a box; homepage mobile menu opaque + trigger hidden while open; theme chooser in the site's material; reading-surface grain lower on article pages; 404 label sentence case) |
+| Home A | `src/lib/home/sections/{hero,making,game,night-shift}/**` | Opus home 3 (21→22 band, desk bottom edge 01→02 on the night-shift side), 4, 5, 6, 7; GPT home 2 |
+| Home B | `src/lib/home/sections/{radio,cinema,sunrise}/**`, `src/lib/home/shared/**` seams/mist, `src/routes/+page.svelte` seam config | Opus home 1, 2, 3 (radio side: pull 02:00 up); GPT home 1, 3; uses round-3 dawn art |
+| Blog | `src/routes/(site)/blog/**`, `src/lib/blog/**`, `src/content/blog/**` (structure only) | all Opus + GPT blog and post issues |
+| Stats | `src/routes/(site)/stats/**`, `src/lib/stats/**` | all Opus + GPT stats issues; uses round-3 painted masks |
+| Contact | `src/routes/(site)/kontakt/**`, `src/lib/contact/**` | all Opus + GPT kontakt issues incl. verifying the sent state (force it temporarily, revert) and the wax-seal send button (round-3 art) |
