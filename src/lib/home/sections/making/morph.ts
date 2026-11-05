@@ -1,6 +1,7 @@
 /**
- * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates), scroll timeline, and the one continuous line (entry → shape →
- * exit to the laptop screen) interpolated between the six shapes in paths.ts. Pure functions plus small caches; no DOM. HANDOFF-HOMEPAGE §5.2.
+ * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates) and the one continuous line (entry → shape → exit to the laptop
+ * screen) for each of the six shapes in paths.ts, plus the morph between any two of them. Pure functions plus small caches; no DOM.
+ * HANDOFF-HOMEPAGE §5.2.
  */
 import { SHAPES, SHAPE_MASKS, SHAPE_POINTS, STATE_IDS, type MakingStateId } from './paths.ts';
 
@@ -11,7 +12,7 @@ export interface Point {
 	y: number;
 }
 
-export type LayoutId = 'desktop' | 'mobile' | 'figure';
+export type LayoutId = 'desktop' | 'mobile';
 
 export interface MakingLayout {
 	/** Plate size in plate pixels; also the SVG viewBox. */
@@ -55,7 +56,7 @@ export const LAPTOP_SCREEN = {
 		{ x: 952, y: 1800 },
 		{ x: 875, y: 1792 }
 	]
-} as const satisfies Record<'desktop' | 'mobile', readonly [Point, Point, Point, Point]>;
+} as const satisfies Record<LayoutId, readonly [Point, Point, Point, Point]>;
 
 /**
  * Line end: left edge of the laptop screen, slightly above its middle, so the line plugs into the screen instead of crossing it.
@@ -64,7 +65,7 @@ export const LAPTOP_SCREEN = {
 export const SCREEN_ANCHOR = {
 	desktop: { x: 2247, y: 972 },
 	mobile: { x: 885, y: 1758 }
-} as const satisfies Record<'desktop' | 'mobile', Point>;
+} as const satisfies Record<LayoutId, Point>;
 
 const norm = (x: number, y: number): Point => {
 	const length = Math.hypot(x, y) || 1;
@@ -106,29 +107,6 @@ export const LAYOUTS: Record<LayoutId, MakingLayout> = {
 		stroke: 8.5,
 		titleY: 1240,
 		screen: LAPTOP_SCREEN.mobile
-	},
-	// reduced motion: one static figure per state, short line in from the left and out to the right
-	figure: {
-		width: 900,
-		height: 700,
-		center: { x: 450, y: 340 },
-		scale: 0.9,
-		entry: { x: -10, y: 420 },
-		entryDir: norm(1, 0),
-		arriveDir: norm(1, -0.2),
-		entryHandles: [0.5, 0.45],
-		leaveDir: { x: 0, y: 0 },
-		exitHandles: [0.45, 0.4],
-		anchor: { x: 910, y: 430 },
-		anchorDir: norm(1, 0),
-		stroke: 6,
-		titleY: 0,
-		screen: [
-			{ x: 0, y: 0 },
-			{ x: 0, y: 0 },
-			{ x: 0, y: 0 },
-			{ x: 0, y: 0 }
-		]
 	}
 };
 
@@ -233,51 +211,19 @@ export function toPathData(points: ArrayLike<number>): string {
 
 /** How much the morph sweeps along the line: the left end changes first, the right end last (0 = all at once). */
 const SWEEP = 0.55;
-const scratch = new Float32Array(LINE_POINTS * 2);
 
-/** The line at a fractional state position `s` (0…5) as SVG path data. Deterministic in `s`, so it reverses exactly. */
-export function lineAt(layoutId: LayoutId, s: number): string {
-	const last = STATE_IDS.length - 1;
-	const clamped = Math.min(last, Math.max(0, s));
-	const from = Math.min(last - 1, Math.floor(clamped));
-	const t = clamped - from;
-	const a = composeLine(layoutId, STATE_IDS[from]);
-	if (t <= 0) return toPathData(a);
-	const b = composeLine(layoutId, STATE_IDS[from + 1]);
-	if (t >= 1) return toPathData(b);
+/**
+ * Morph `from` → `to` (flat point arrays of LINE_POINTS) at `t` (0…1) into `out`: each point eases (smoothstep) over its own window,
+ * staggered along the line. `from` may be a snapshot of a morph in progress, so an interrupted morph continues without a jump.
+ */
+export function morphPoints(out: Float32Array, from: ArrayLike<number>, to: ArrayLike<number>, t: number): Float32Array {
 	for (let i = 0; i < LINE_POINTS; i++) {
 		let k = t * (1 + SWEEP) - (SWEEP * i) / (LINE_POINTS - 1);
 		k = k <= 0 ? 0 : k >= 1 ? 1 : k * k * (3 - 2 * k);
-		scratch[i * 2] = a[i * 2] + (b[i * 2] - a[i * 2]) * k;
-		scratch[i * 2 + 1] = a[i * 2 + 1] + (b[i * 2 + 1] - a[i * 2 + 1]) * k;
+		out[i * 2] = from[i * 2] + (to[i * 2] - from[i * 2]) * k;
+		out[i * 2 + 1] = from[i * 2 + 1] + (to[i * 2 + 1] - from[i * 2 + 1]) * k;
 	}
-	return toPathData(scratch);
-}
-
-/**
- * Pinned progress (0…1) of each state (motion spec: docs/mockups/round-2/03-what-i-make/README.md). Each is held for a window so the
- * shape rests and the bloom can grow.
- */
-export const STATE_STOPS = [0, 0.18, 0.38, 0.58, 0.78, 1] as const;
-const HOLD = 0.045;
-const holdStart = (i: number) => (i === 0 ? 0 : STATE_STOPS[i] - HOLD);
-const holdEnd = (i: number) => (i === STATE_STOPS.length - 1 ? 1 : i === 0 ? 0.06 : STATE_STOPS[i] + HOLD);
-
-/** Progress (0…1) → state position (0…5, fractional while morphing, integer while held). */
-export function stateAt(progress: number): number {
-	for (let i = 0; i < STATE_STOPS.length; i++) {
-		if (progress <= holdEnd(i)) {
-			if (progress >= holdStart(i) || i === 0) return i;
-			const span = holdStart(i) - holdEnd(i - 1);
-			return i - 1 + (progress - holdEnd(i - 1)) / span;
-		}
-	}
-	return STATE_STOPS.length - 1;
-}
-
-/** Progress to scroll to for a state: the middle of its hold window. */
-export function progressFor(state: number): number {
-	return (holdStart(state) + holdEnd(state)) / 2;
+	return out;
 }
 
 /** The four pillars of the bottom row (brand tagline terms, literal) and the states they cover. */

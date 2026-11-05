@@ -186,7 +186,7 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 **Composition:** a dark painted sky with yellow pigment clouds bleeding in from the top left; **one continuous hand drawn ink line** (cream/butter stroke) that enters from the left edge, forms the current shape in the center, and leaves to the right, ending at the moon above the cliff with the laptop (the banner's motif); the shape's interior blooms with yellow watercolor; the current pillar title below the shape; a row `AI · CODE · SIDE PROJECTS · BUSINESS` at the bottom with the active one underlined; dots and a scroll cue at the bottom right.
 
-**Behavior:** the section is pinned (`position: sticky`) for roughly 5–6 viewport heights. Scroll progress morphs the line through six states: lightbulb (idea) → chat bubble/prompt (AI) → `</>` (code) → phone with an app (side projects) → rising chart (business) → the moon over the cliff (leads into the next hour). Each state: the line morphs, then the watercolor fill blooms inside and the title changes. Clicking a pillar in the bottom row scrolls to that state.
+**Behavior** (revised 2026-11-05, docs/SITE-REDESIGN.md fix 1: the pinned scroll scrub felt like blocked scrolling): the section is one viewport and scrolls like any other. While it is on screen the line rotates on its own through six states: lightbulb (idea) → chat bubble/prompt (AI) → `</>` (code) → phone with an app (side projects) → rising chart (business) → the moon over the cliff, where the laptop lights up. Each state: the line morphs (1.4 s), the title changes, then it rests 4 s while the watercolor fill blooms and the active dot's ring fills. From the moon the line pours back into the laptop and the lightbulb draws in anew. It pauses on hover over the drawing or the controls, keyboard focus in the controls, a hidden tab, off screen, and a small pause button (WCAG 2.2.2). Pillars and dots jump to a state and restart the rest; arrow keys move along the focused row. No live region: all six titles stay in the document as a list.
 
 **Build:**
 
@@ -198,9 +198,9 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 **Mobile:** `03-ink-morph-mobile.png`: the line runs vertically, the shape is centered, the pillar row becomes a compact indicator.
 
-**Reduced motion:** no pinning; show the four pillars (plus the start and end states) as a static vertical sequence of drawn shapes with fills.
+**Reduced motion:** no autoplay and no morph; the stage shows one state with its fill, and the pillars and dots switch it instantly (one still frame keeps the line running into the laptop, which a vertical list of figures lost).
 
-**Acceptance:** smooth at 60 fps on a mid range laptop; scrolling back reverses cleanly; no scroll jacking; pillar row is real buttons and links.
+**Acceptance:** smooth at 60 fps on a mid range laptop; no scroll jacking or pinning; the rAF loop stops off screen; pillar row and dots are real buttons.
 
 ### 5.3 22:00 Game (open: build three prototypes, the owner playtests and picks)
 

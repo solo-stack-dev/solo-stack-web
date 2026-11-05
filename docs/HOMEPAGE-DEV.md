@@ -48,7 +48,7 @@ Every section component renders one root element with:
 | a heading with `aria-labelledby` on the root | Landmark and outline. Hero owns the only `<h1>` (the wordmark); others use `<h2>`                    |
 | transparent background                       | The global sky shows through; paint your art on top of it                                            |
 
-Placeholder heights from Phase 0 (`min-height: 100svh`; making is `550svh` with a sticky stage) are starting points. Change your own height freely: the sky stops re-measure on resize.
+Placeholder heights from Phase 0 (`min-height: 100svh`) are starting points; no section pins or scrubs by scroll (making rotates on its own inside one viewport). Change your own height freely: the sky stops re-measure on resize.
 
 `MockupRef` (the low-opacity round-2 mockup behind each section) is temporary. Keep it while you build, delete its usage and your `assets/*-mockup-ref.webp` once real art is in place. In dev, `?ref=0` hides all references and `?ref=1` shows them at 0.9 opacity for comparison.
 
@@ -189,7 +189,7 @@ All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use
 
 **Wipes.**
 
-- 20→21, making: `#making` overlaps the hero by `--wipe-overlap` (45svh, negative margin; only its own `a`/`button` take pointer events there) and its `.track` is masked by two layers of `--wash-spread-up` plus a solid layer. A registered `--wipe` (0…1) runs on the named view timeline `--making-wipe` (`animation-range: entry 45% entry 100%`: from the page top until the section top reaches the viewport top). The front starts at the viewport bottom and floods up over the moon ~1.4× faster than the page; the plate's straight top is always transparent while the hero is on screen. Static fallback (no support, reduced motion): the overlap is one soft wash from hero to plate. If you change the overlap, change the `entry 45%` start with it.
+- 20→21, making: `#making` overlaps the hero by `--wipe-overlap` (45svh, negative margin; only its own `a`/`button` take pointer events there) and its `.track` is masked by two layers of `--wash-spread-up` plus a solid layer. The one-viewport stage starts `--stage-offset` below the section top (25svh with the wipe, the whole 45svh in the static fallback; `scroll-margin-top` makes `#making` links land on it). A registered `--wipe` (0…1) runs on the named view timeline `--making-wipe` (`animation-range: entry 45% contain 25svh`: from the page top until the section top is 25svh above the viewport top, i.e. the stage fills the viewport). The front starts at the viewport bottom and floods up over the moon ~1.25× faster than the page; the track's straight top is always transparent while the hero is on screen, and the ramp keeps room for its lobes because the stage sits below the track top. Static fallback (no support, reduced motion): the overlap is one soft wash from hero to plate. If you change the overlap, change the `entry 45%` start with it; if you change the stage offset, change the `contain 25svh` end with it.
 - 04→06, sunrise: `.night` is solid ink (`--ink-fade`, the cinema's bottom color) ending in `--wash-dry` plus a layer of `--wash-spread-down`; with `--sunrise` it translates up (`--night-travel`) and its ramp tightens from 55svh to 16svh (the wash dries). It always covers the section's top line. Reduced motion / no JS: the final state.
 
 The night shift frames its room with a night-ink vignette inside the feathered art (`Scene.svelte` `.art::after`), so the interior sinks into the dark before it meets the sky.
@@ -227,7 +227,7 @@ import { reducedMotion, pageVisibility, inView, InView, ScrollProgress, RafLoop 
 - `pageVisibility.current`: reactive tab visibility.
 - `inView(callback, { rootMargin, threshold, once })`: attachment, `callback(visible, entry)`. Usage: `<div {@attach inView((v) => (near = v))}>`.
 - `new InView(options)`: reactive `.current`, attach with `{@attach seen.attach}`.
-- `new ScrollProgress({ mode, cssVar })`: reactive `.current` 0…1, attach to the element. Modes: `through` (enter bottom → leave top), `pinned` (tall wrapper with a sticky child: 0 at wrapper top = viewport top, 1 at wrapper bottom = viewport bottom), `enter` (top at viewport bottom → top at viewport top). `cssVar: '--progress'` also writes the value to the element, which is cheaper than reactive markup for per-frame styling. Only measures while near the viewport.
+- `new ScrollProgress({ mode, cssVar })`: reactive `.current` 0…1, attach to the element. Modes: `through` (enter bottom → leave top), `enter` (top at viewport bottom → top at viewport top). `cssVar: '--progress'` also writes the value to the element, which is cheaper than reactive markup for per-frame styling. Only measures while near the viewport.
 - `new RafLoop(tick, { fps, paused })`: `tick(dtSeconds, time)`; runs only while attached element is on screen, tab visible, and `!paused`. `.paused` (get/set), `.running` (reactive). dt is clamped to 0.1 s.
 
 ```svelte

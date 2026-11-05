@@ -65,13 +65,11 @@ export class InView {
 		}, this.#options)(element);
 }
 
-export type ScrollProgressMode = 'through' | 'pinned' | 'enter';
+export type ScrollProgressMode = 'through' | 'enter';
 
 export interface ScrollProgressOptions {
 	/**
 	 * - `through` (default): 0 when the element's top reaches the viewport bottom, 1 when its bottom leaves the top.
-	 * - `pinned`: for a tall wrapper with a `position: sticky` child. 0 when the wrapper's top hits the viewport top,
-	 *   1 when its bottom hits the viewport bottom (the time the child is stuck).
 	 * - `enter`: 0 when the top reaches the viewport bottom, 1 when the top reaches the viewport top.
 	 */
 	mode?: ScrollProgressMode;
@@ -84,8 +82,8 @@ const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
 /**
  * Scroll progress of an element through the viewport, 0…1. rAF-throttled; listens only while the element is near the viewport.
  * ```svelte
- * <script>const progress = new ScrollProgress({ mode: 'pinned', cssVar: '--progress' });</script>
- * <div class="h-[600svh]" {@attach progress.attach}><div class="sticky top-0 h-svh">{progress.current}</div></div>
+ * <script>const progress = new ScrollProgress({ cssVar: '--progress' });</script>
+ * <div {@attach progress.attach}>{progress.current}</div>
  * ```
  */
 export class ScrollProgress {
@@ -107,8 +105,7 @@ export class ScrollProgress {
 			const rect = element.getBoundingClientRect();
 			const viewport = window.innerHeight;
 			let value: number;
-			if (this.#mode === 'pinned') value = -rect.top / Math.max(1, rect.height - viewport);
-			else if (this.#mode === 'enter') value = (viewport - rect.top) / Math.max(1, viewport);
+			if (this.#mode === 'enter') value = (viewport - rect.top) / Math.max(1, viewport);
 			else value = (viewport - rect.top) / Math.max(1, viewport + rect.height);
 			value = clamp01(value);
 			if (value === this.current) return;
