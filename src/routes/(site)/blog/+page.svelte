@@ -170,11 +170,9 @@
 		/* sits in the sky left of the tree, its foot level with the hill's toe (which the dry brush dissolves) */
 		margin-bottom: calc(var(--art-h) * 0.12);
 		font-size: clamp(4.25rem, 20vw, 5.25rem);
-		/* Ink on paper, warming to burnt umber at the foot (no olive); lit from behind at night */
-		background: linear-gradient(180deg in oklab, var(--foreground) 50%, #8a5a12);
-		background-clip: text;
-		color: transparent;
-		/* room for the g's descender inside the clipped background */
+		/* Solid ink on paper (a warm gradient turned olive in the g's descender); lit from behind at night */
+		color: var(--foreground);
+		/* room for the g's descender inside the clipped background (night) */
 		padding-bottom: 0.16em;
 		margin-left: -0.05em;
 	}
@@ -182,6 +180,7 @@
 	:global(.dark) .giant {
 		background: linear-gradient(180deg, var(--color-cream) 38%, var(--color-butter));
 		background-clip: text;
+		color: transparent;
 		text-shadow: 0 0 80px rgb(252 215 114 / 0.18);
 	}
 

@@ -49,8 +49,6 @@ Der Ausgangspunkt war das Kanalbanner Nachtstudio: ein Laptop auf einer Klippe u
 
 Die erste Runde mit HTML Entwürfen habe ich verworfen. Die Layouts waren ordentlich, aber sie hätten auch zu vielen anderen Websites passen können. Viel flaches Anthrazit, wenig von den gemalten Materialien, die Solo Stack ausmachen sollten. Für mich war das ein konkreter Hinweis, dass ein aufgeräumtes Layout allein noch keine passende Gestaltung ergibt.
 
-<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
-
 Danach entstanden gemalte Bildentwürfe für die einzelnen Abschnitte. Ich habe Favoriten ausgewählt und das Konzept besprochen, bevor neue Entwürfe entstanden. So bekam die Website eine gemeinsame Richtung, bevor die Umsetzung in einzelne Aufgaben zerlegt wurde.
 
 ## Viele Agenten brauchen klare Grenzen
@@ -71,6 +69,8 @@ Beim Scrollen vergeht auf der Startseite eine Nacht. Kleine Uhrzeitangaben marki
 
 Um 20:00 sitzt mein Maskottchen mit einem Laptop am Rand eines großen gemalten Mondes. Der Schriftzug SOLO STACK liegt teils in Creme auf dem Nachthimmel und teils in Anthrazit auf dem Mond. Du kannst den Mond anklicken und damit durch seine Phasen wechseln. Dahinter steckt eine Kugel mit gemalter Textur, umgesetzt mit Threlte, also Three.js für Svelte; bis sie geladen ist, bleibt das gemalte Bild sichtbar.
 
+<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
+
 Um 21:00 erzählt eine durchgehende Tintenlinie, was ich mache. Mit deinem Scrollen verwandelt sie sich von einer Glühbirne in einen Prompt, dann in Code, ein Telefon, ein Diagramm und schließlich einen Mond über einer Klippe. Jede Form bekommt dabei einen gelben Pigmentfleck. Mir gefällt daran, dass die Tätigkeiten sichtbar miteinander verbunden bleiben.
 
 Für 22:00 entstanden parallel drei Spielprototypen. Auf einem kleinen Mond mit radialer Schwerkraft zerdrückst du Bugs, bei Stack to the Moon stapelst du Blöcke mit meinen Werkzeugen, und bei der Sternbildsuche zeichnest du Formen von Werkzeugen wie Svelte und Cloudflare nach. Eigentlich wollte ich nach dem Spielen eines auswählen. Am Ende sind alle drei über Tabs erreichbar, und jedes Spiel lädt erst, wenn du auf Spielen klickst.
@@ -83,8 +83,6 @@ Die tippenden Hände waren zunächst ein separates Bildstück. Auf dem Telefon v
 
 Die deckend gemalten Bänder zwischen den Abschnitten zerschnitten die Seite in einzelne Stücke. Ich habe sie durch gemalten Nebel ersetzt, der über die Seite zieht und die Abschnitte ineinander übergehen lässt. Dazu kommen zwei Übergänge mit verwaschener Tinte. Von 20:00 bis 21:00 flutet nasse Tinte von unten über den Mond im Hero, während du scrollst. Von 04:00 bis 06:00 zieht sich die Nachttinte zurück und trocknet mit dem Sonnenaufgang.
 
-<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
-
 Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem buttergelben Papier dampft der Kaffee neben einem geschlossenen Laptop. Neben dem SOLO STACK Schriftzug siehst du ein Foto von mir, als wäre es mit anthrazitfarbener Tinte auf das Papier gedruckt. Danach kommen die Footer Links.
 
 <hr data-art="radio" />
@@ -94,6 +92,8 @@ Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem 
 Um 02:00 steht ein gemaltes altes Radio bereit. Die sozialen Plattformen sind seine Sender, ihre Logos sitzen auf den Sendertasten. Jeder Sender spielt seinen eigenen kurzen Song: etwa 30 bis 50 Sekunden auf Englisch, trauriger Rap oder Lo Fi, in Dauerschleife, solange du ihn eingestellt hast. Titel und Liedtexte stammen von gpt-6.1-sol. Die Musik habe ich mit dem offenen Musikmodell YuE2 lokal auf meiner eigenen Grafikkarte erzeugt; sie spielt erst, wenn du mit einem Klick einen Sender einstellst.
 
 Das Radio brachte ein sehr handfestes Problem mit: Das gemalte Gehäuse hatte sechs Plätze für Sendertasten, aber es gibt mehr soziale Plattformen. Deshalb wurde der Körper aus seinen eigenen gemalten Pixeln neu zusammengesetzt. So fanden alle Sendertasten Platz im Radio.
+
+<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
 
 Um 04:00 wird die Klippe zum Freiluftkino. Dort ist vorgesehen, dass der Laptop das jeweils neueste Video an den Nachthimmel projiziert. Der YouTube Player lädt erst nach einem Klick, und das Vorschaubild kommt von der eigenen Domain. Vorher wird dadurch nichts von YouTube geladen.
 

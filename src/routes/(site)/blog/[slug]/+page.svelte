@@ -472,8 +472,8 @@
 		font-size: clamp(2.25rem, 6vw, 4.75rem);
 		line-height: 0.98;
 		padding-bottom: 0.08em;
-		/* Ink on paper, warming to burnt umber on the last line (no olive); lit from behind at night (as the title on /blog) */
-		background: linear-gradient(180deg in oklab, var(--foreground) 42%, #8a5a12);
+		/* Ink on paper, a gentle warm cast across the whole title (no separate brown last line); lit from behind at night */
+		background: linear-gradient(180deg in oklab, var(--foreground) 10%, #6b4a12 160%);
 		background-clip: text;
 		color: transparent;
 	}
@@ -1310,19 +1310,21 @@
 	}
 
 	/*
-	 * Pull quote (section-breaks.ts): a sentence of the post set large, a lit butter stroke hanging in the gutter left of
-	 * the column, so the words stay on the text edge.
+	 * Pull quote (section-breaks.ts): a sentence of the post set a step up from the body in the display face at regular
+	 * weight (a voice, never a heading), a thin ochre stroke hanging in the gutter left of the column, so the words stay on
+	 * the text edge.
 	 */
 	.prose-post :global(.pull-quote) {
 		position: relative;
-		margin-block: 1.5em 1.6em;
+		max-width: 30ch;
+		margin-block: 1.6em 1.7em;
 		padding-left: 1.25rem;
 		color: var(--foreground);
 		font-family: var(--font-display);
-		font-size: clamp(1.45rem, 2.6vw, 1.75rem);
-		font-weight: 900;
-		letter-spacing: -0.03em;
-		line-height: 1.18;
+		font-size: clamp(1.25rem, 1.9vw, 1.4375rem);
+		font-weight: 400;
+		letter-spacing: -0.012em;
+		line-height: 1.38;
 		text-wrap: balance;
 		hyphens: manual;
 	}
@@ -1330,15 +1332,15 @@
 	.prose-post :global(.pull-quote::before) {
 		content: '';
 		position: absolute;
-		inset: 0.12em auto 0.12em 0;
-		width: 4px;
-		border-radius: 4px;
-		background: linear-gradient(180deg, var(--color-butter), var(--color-ochre));
+		inset: 0.3em auto 0.3em 0;
+		width: 2px;
+		border-radius: 2px;
+		background: var(--color-ochre);
 	}
 
 	:global(.dark) .prose-post :global(.pull-quote::before) {
-		background: linear-gradient(180deg, var(--color-moonlight), var(--color-butter));
-		box-shadow: 0 0 14px rgb(252 215 114 / 0.45);
+		background: var(--color-butter);
+		box-shadow: 0 0 10px rgb(252 215 114 / 0.35);
 	}
 
 	@media (min-width: 64rem) {
@@ -1393,11 +1395,12 @@
 		background-image: var(--art);
 	}
 
-	/* Night: a plate's sky dissolves into the page (torn edge left, right and below); an ink cut-out gets a moonlit rim */
+	/* Night: a plate's sky dissolves into the page, its sides feather out, only the torn edge below stays; an ink cut-out gets a moonlit rim */
 	:global(.dark) .prose-post :global(hr::after) {
 		mask:
 			var(--edge, linear-gradient(#000, #000)) center / 100% 100% no-repeat,
-			var(--night-fade, linear-gradient(#000, #000)) center / 100% 100% no-repeat;
+			var(--night-fade, linear-gradient(#000, #000)) center / 100% 100% no-repeat,
+			var(--night-feather, linear-gradient(#000, #000)) center / 100% 100% no-repeat;
 		mask-composite: intersect;
 		filter: var(--rim, none);
 	}
