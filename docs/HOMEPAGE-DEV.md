@@ -71,7 +71,7 @@ Placeholder heights from Phase 0 (`min-height: 100svh`) are starting points; no 
 - Readable ink on the sky: `var(--night-ink)` is cream at night and turns anthracite as `--dawn` completes. The nav and the rail do not use it: they track the real background under them (cream until the sunrise night edge has cleared them, then anthracite) and carry a soft opposite-ink halo for ragged edges.
 - Page chrome: the nav wordmark and the hour rail are hidden while the hero covers the top 40 % of the viewport. The rail shows its clock labels only on hover/focus, and only its dots take pointer events (24 px each, right edge), so art underneath stays clickable.
 - Overscroll: `html` is night; NightPage sets `html[data-night-end]` (butter) while the sunrise is on screen, so bottom overscroll shows paper.
-- Sunrise hook: `data-night-edge` marks the element whose box ends where the retreating night's ink is gone (`data-edge-clear`: the fraction of its height where that happens, default 0.72). The sunrise puts it on `.night-clear`, a box inside the translated `.night` (`data-edge-clear="1"`), so the measured line follows the wipe. Fallback without the attribute: `#sunrise .night`.
+- Sunrise hook: `data-night-edge` marks the element whose box ends where the retreating night's ink is gone (`data-edge-clear`: the fraction of its height where that happens, default 0.72). The sunrise puts it on `.night-clear`, a box from its top down to the dawn cloud bank's ragged underside (`shared/dawn.ts` `clear`, `data-edge-clear="1"`). Fallback without the attribute: `#sunrise .night`.
 - For progress **within** your section (morphs, pinning, sunrise), use `ScrollProgress` (§6.8), not `--night`.
 
 ## 3b. System tokens (lead)
@@ -169,7 +169,7 @@ $effect(() => on(window, SHOOTING_STAR_EVENT, (event) => lookAt((event as Custom
 
 ### 6.5 Section transitions (lead)
 
-No opaque bands between sections. Every boundary is air: each plate feathers its own edges with a painted soft edge, a partly transparent painted mist bank drifts across the boundary, and two boundaries are scroll-driven ink-wash wipes. Masters and prompts: `docs/art/transitions/`; optimized files: `shared/assets/transitions/` (`node src/lib/home/shared/tools/optimize-transitions.mjs`); URLs: `shared/transitions.ts`.
+No opaque bands between sections. Every boundary is air: each plate feathers its own edges with a painted soft edge, a partly transparent painted mist bank drifts across the boundary, the 20→21 boundary is a scroll-driven ink-wash wipe and 04→06 a painted dawn cloud bank. Masters and prompts: `docs/art/transitions/`; optimized files: `shared/assets/transitions/` (`node src/lib/home/shared/tools/optimize-transitions.mjs`); URLs: `shared/transitions.ts`.
 
 **Masks as CSS variables.** NightPage puts the painted masks on `[data-night-page]` as `url()` custom properties, so section CSS uses them directly:
 
@@ -178,8 +178,8 @@ No opaque bands between sections. Every boundary is air: each plate feathers its
 | `--feather-up`       | transparent above → opaque below           | soft top edge of a plate (`mask: var(--feather-up) top / …`) |
 | `--feather-down`     | opaque above → transparent below           | soft bottom edge                                             |
 | `--wash-spread-up`   | transparent above → opaque below, wet      | the 20→21 wipe front                                         |
-| `--wash-spread-down` | the same, opaque above → transparent below | lobes in the 04→06 retreating night                          |
-| `--wash-dry`         | opaque above → transparent below, drying   | the 04→06 retreating night                                   |
+| `--wash-spread-down` | the same, opaque above → transparent below | unused since round 3 (was the 04→06 night)                   |
+| `--wash-dry`         | opaque above → transparent below, drying   | unused since round 3 (was the 04→06 night)                   |
 
 All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use them instead of `linear-gradient` masks: a linear fade reads as a digital edge on painted art.
 
@@ -187,12 +187,12 @@ All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use
 
 **`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one): a zero-height boundary with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads lazily (enhanced-img), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion). Round 2: the lit mist is the far layer (keep it narrow and light, ≤ 0.4 opacity) and `cloud` adds a dark foreground silhouette (`strip` `a`/`b`/`c` from `docs/art/site/round-2/seam-cloud-*.png`, `height`, `above`, `opacity`, `mirror`, `stretch`, `shift`) that overlaps the upper plate's lit edge and drifts against the mist. Every seam uses a different strip, mirror or shift. Optimized by `node src/lib/home/shared/tools/optimize-round-2.mjs` (also the game posters and the cinema projection).
 
-**`DawnTint.svelte`** (between `<Cinema />` and `<Sunrise />`): a zero-height `mix-blend-mode: color` layer in ochre with painted soft edges over the 04→06 wipe. Hue and saturation only: where the sunrise's ink wash thins over the paper it reads umber → ochre → butter instead of olive grey; lightness is untouched. The cinema overlaps the radio by `--cinema-overlap` (negative margin, own links/buttons only take pointer events), so its painted sky meets the radio's rocks.
+**`DawnBank.svelte`** (between `<Cinema />` and `<Sunrise />`, round 3): one wide, non-repeating painted dawn cloud bank (`docs/art/site/round-3/dawn-cloud-bank*.png`; the portrait painting below 48rem, never a crop), zero height, z-index 2, rising a little on its own view timeline (static under reduced motion). Its opaque middle band hides the only lines of the 04→06 seam: the sunrise overlaps the cinema and feathers its top in inside that band, and the cinema cliff dissolves into it; cinema cliff, mascot, beam, screen and heading paint in front (z-index 3). All numbers live in `shared/dawn.ts` (`dawnVars()` on the cinema, the bank and the sunrise); change them together. Optimized by `node src/lib/home/shared/tools/optimize-round-3.mjs`. The cinema overlaps the radio by `--cinema-overlap` (negative margin, own links/buttons only take pointer events), so its painted sky meets the radio's rocks; the radio overlaps the night shift the same way (`--radio-overlap`, only its scene takes pointer events).
 
 **Wipes.**
 
 - 20→21, making: `#making` overlaps the hero by `--wipe-overlap` (45svh, negative margin; only its own `a`/`button` take pointer events there) and its `.track` is masked by two layers of `--wash-spread-up` plus a solid layer. The one-viewport stage starts `--stage-offset` below the section top (25svh with the wipe, the whole 45svh in the static fallback; `scroll-margin-top` makes `#making` links land on it). A registered `--wipe` (0…1) runs on the named view timeline `--making-wipe` (`animation-range: entry 45% contain 25svh`: from the page top until the section top is 25svh above the viewport top, i.e. the stage fills the viewport). The front starts at the viewport bottom and floods up over the moon ~1.25× faster than the page; the track's straight top is always transparent while the hero is on screen, and the ramp keeps room for its lobes because the stage sits below the track top. Static fallback (no support, reduced motion): the overlap is one soft wash from hero to plate. If you change the overlap, change the `entry 45%` start with it; if you change the stage offset, change the `contain 25svh` end with it.
-- 04→06, sunrise: `.night` is solid ink (`--ink-fade`, the cinema's bottom color) ending in `--wash-dry` plus a layer of `--wash-spread-down`; with `--sunrise` it translates up (`--night-travel`) and its ramp tightens from 55svh to 16svh (the wash dries). It always covers the section's top line. Reduced motion / no JS: the final state.
+- 04→06, sunrise: no wipe since round 3. The dawn cloud bank (`DawnBank.svelte`) covers the seam; under it the sunrise overlaps the cinema (`overlap`), feathers in with `--feather-up`, and its 16:9 stage rises 6vw above its top, so the far ridge is in view while the bank passes. `--sunrise` only drives the sky's sink, the sun glow and the laptop glint.
 
 The night shift frames its room with a night-ink vignette inside the feathered art (`Scene.svelte` `.art::after`), so the interior sinks into the dark before it meets the sky.
 

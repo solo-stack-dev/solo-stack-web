@@ -4,8 +4,12 @@
 
 	- Facade: self-hosted thumbnail (./thumbnail.ts) + moon play button; no request to YouTube before the click.
 	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
-	- No video (empty feed or offline build): a quiet painted projection in the screen (docs/art/site/round-2/cinema-projection.png)
-	  with the message and the channel link on it; the frame's outer bloom is toned down so the screen, not the fire, leads.
+	- No video (empty feed or offline build): the painted projection fills the screen (docs/art/site/round-2/cinema-projection.png);
+	  the message and the channel link sit centered on a soft ink scrim over its calm sky.
+	- The frame's outer bloom is halved in every state and the aperture has a thin bright inner edge: the screen, not the fire, leads.
+	- Heading: left of the screen, level with its top, above the mascot (desktop); above the frame (mobile).
+	- The 06:00 dawn cloud bank (shared/DawnBank.svelte) rolls over the landscape's bottom: the cliff dissolves into it; cliff,
+	  mascot, beam, frame, screen and heading paint in front of it (z-index 3), the plate behind.
 	- Dust motes (CSS) pause off screen; reduced motion: no motes, no beam animation.
 	- Rects: ./layout.ts. Dev only: `?cinema=demo` (public demo video), `?cinema=empty`.
 -->
@@ -20,6 +24,7 @@
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
+	import { dawnVars } from '#lib/home/shared/dawn.ts';
 	import { CINEMA_LAYOUT, beamMask, placeVars } from './layout.ts';
 	import VideoThumbnail from './VideoThumbnail.svelte';
 
@@ -70,6 +75,9 @@
 		return `${placeVars(mote, mobile)}; --size: ${mote.size}px; --delay: ${mote.delay}s; --duration: ${mote.duration}s; --drift-x: ${mote.drift.x}px; --drift-y: ${mote.drift.y}px`;
 	});
 
+	// Seam geometry (cloud bank) and the stage anchors of the heading.
+	const sectionStyle = `${dawnVars()}; --window-top: ${d.window.y / 100}; --frame-left: ${d.frame.x / 100}; --frame-top-m: ${mo.frame.y / 100}`;
+
 	// 04:00 sky color for .backdrop (see the note there).
 	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'cinema')!.sky;
 
@@ -85,13 +93,14 @@
 	data-night-hour="04:00"
 	class={['cinema', playing && 'is-playing', near.current && 'is-near', !video && 'is-empty']}
 	aria-labelledby="home-cinema-title"
+	style={sectionStyle}
 	style:--cinema-sky={SKY}
 >
 	<div class="backdrop" aria-hidden="true">
 		<StarField density={0.45} brightness={0.85} seed={404} />
 	</div>
-	<h2 id="home-cinema-title" class="sr-only">{m.home_cinema_title()}</h2>
 	<NightClock time="04:00" />
+	<h2 id="home-cinema-title" class="heading night-heading">{m.home_cinema_title()}</h2>
 
 	<div class="stage" {@attach near.attach}>
 		<enhanced:img src="./assets/cinema-landscape.webp?w=1920;1536;1080" alt="" class="layer landscape is-desktop" sizes="100vw" loading="lazy" decoding="async" />
@@ -121,7 +130,6 @@
 				<span class="dust" {style}></span>
 			{/each}
 		</div>
-		<div class="landscape-fade" aria-hidden="true"></div>
 
 		<div class="placed screen" style={place.window}>
 			{#if video && playing}
@@ -190,12 +198,27 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		overflow-x: clip;
-		--ink-fade: var(--color-night);
 		/* Pulled up under the radio's rock foreground: the cinema's painted sky meets the rocks, no dead band between them (the
 		   seam's mist and cloud sit on the overlap). Only its own links and buttons take pointer events there. */
 		margin-top: calc(var(--cinema-overlap) * -1);
 		--cinema-overlap: clamp(3rem, 11vw, 11rem);
 		pointer-events: none;
+		container-type: inline-size;
+		/* The 16:9 stage is bottom-anchored: clock and heading sit left of the screen, the clock level with the window's top */
+		--stage-top: calc(100% - 100cqw * 1440 / 2560);
+		--night-clock-top: calc(var(--stage-top) + 100cqw * 1440 / 2560 * var(--window-top));
+		/* the cliff dissolves into the dawn cloud bank (shared/dawn.ts) */
+		--cliff-cut: var(--dawn-cliff-cut);
+		--cliff-fade: var(--dawn-cliff-fade);
+	}
+
+	.heading {
+		position: absolute;
+		z-index: 3;
+		top: calc(var(--night-clock-top) + 1.5rem);
+		left: var(--page-gutter);
+		/* left of the frame's painted edge */
+		width: calc(100cqw * var(--frame-left) - var(--page-gutter) - 2rem);
 	}
 
 	.cinema :is(a, button, iframe) {
@@ -259,22 +282,14 @@
 		mask-image: linear-gradient(#000 70%, transparent);
 	}
 
-	/* Bottom melts into the night that opens the sunrise (its ink-wash wipe): intersect of two wet-wash copies at different
-	   widths/offsets, tiled near the painted aspect, so it ends in ink blooms, not a straight fade (the even haze squares away).
-	   Opaque at the bottom line, where the sunrise night continues. */
-	.landscape-fade {
-		position: absolute;
-		/* 2px past the stage bottom: no fractional last pixel row lets the cliff's lit bottom edge through */
-		inset: auto 0 -2px;
-		/* 26 % of the stage; --fade-tile: 1.6 × that height (the stage is 16:9 of the width, 1080:2340 on mobile) */
-		height: 26%;
-		--fade-tile: 23.4vw;
-		background: var(--ink-fade);
-		mask:
-			var(--wash-spread-up) 41% 100% / var(--fade-tile) 100% repeat-x,
-			var(--wash-spread-up) 0 100% / auto 100% repeat-x;
-		mask-composite: intersect, add;
-		pointer-events: none;
+	/* In front of the dawn cloud bank (z-index 2, shared/DawnBank.svelte); the landscape plate stays behind it. */
+	.cliff,
+	.mascot,
+	.beam,
+	.screen,
+	.frame,
+	.caption {
+		z-index: 3;
 	}
 
 	.cliff,
@@ -282,6 +297,13 @@
 		height: auto;
 		pointer-events: none;
 		user-select: none;
+	}
+
+	/* The cliff's foot dissolves into the cloud bank in a painted edge and is gone inside its opaque band (shared/dawn.ts). */
+	.cliff {
+		mask:
+			linear-gradient(#000 0 0) top / 100% calc(100% - var(--cliff-cut) - var(--cliff-fade) + 1px) no-repeat,
+			var(--feather-down) left 0 bottom var(--cliff-cut) / 100% var(--cliff-fade) repeat-x;
 	}
 
 	.mascot {
@@ -480,13 +502,20 @@
 			0 0 90px 30px color-mix(in oklab, var(--color-butter) 35%, transparent);
 	}
 
-	/* Empty screen: the projection runs quietly (dimmed on ink), the sentence and the channel link sit in its calm upper left. */
+	/* Empty screen: the projection is the whole picture (its hills scaled up from the bottom edge so they carry the screen, a
+	   projector hotspot in the middle); the sentence and the channel link sit centered on a soft ink scrim over its calm sky. */
 	.empty {
 		position: relative;
 		display: grid;
-		align-content: center;
-		padding: 0 9% 6%;
+		place-content: center;
+		justify-items: center;
+		padding: 0 8% 14%;
 		background: var(--color-ink);
+	}
+
+	/* enhanced:img's <picture> must not become a grid row */
+	.empty :global(picture) {
+		display: contents;
 	}
 
 	.empty :global(.projection) {
@@ -495,44 +524,91 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		opacity: 0.62;
+		scale: 1.32;
+		transform-origin: 50% 100%;
+		opacity: 0.92;
 		user-select: none;
+	}
+
+	.empty::before {
+		content: '';
+		position: absolute;
+		z-index: 1;
+		inset: 0;
+		background: radial-gradient(ellipse 60% 70% at 50% 42%, color-mix(in oklab, var(--color-butter) 16%, transparent), transparent 75%);
+		mix-blend-mode: screen;
+		pointer-events: none;
 	}
 
 	.empty-copy {
 		position: relative;
+		z-index: 2;
 		display: grid;
-		justify-items: start;
-		gap: clamp(0.75rem, 1.6vw, 1.5rem);
+		justify-items: center;
+		text-align: center;
+		gap: clamp(0.75rem, 1.4vw, 1.25rem);
+	}
+
+	/* Soft radial ink scrim behind the copy, no box */
+	.empty-copy::before {
+		content: '';
+		position: absolute;
+		inset: -45% -30%;
+		z-index: -1;
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ink) 72%, transparent),
+			color-mix(in oklab, var(--color-ink) 45%, transparent) 55%,
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	.empty-line {
-		max-width: 20ch;
-		font-size: clamp(1rem, 1.35vw, 1.25rem);
-		line-height: 1.45;
+		max-width: 24ch;
+		font-size: clamp(1.0625rem, 1.4vw, 1.3rem);
+		line-height: 1.4;
 		text-wrap: balance;
 		color: var(--color-cream);
 		text-shadow: var(--halo-ink);
 	}
 
-	/* A sharp lit inner edge on the aperture (over the screen's content) */
-	.is-empty .screen::after {
+	/* A thin bright inner edge on the aperture (over the screen's content): the strongest light is where picture meets screen */
+	.screen::after {
 		content: '';
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
 		box-shadow:
-			inset 0 0 0 1px color-mix(in oklab, var(--color-moonlight) 55%, transparent),
-			inset 0 0 0.9rem color-mix(in oklab, var(--color-butter) 18%, transparent);
+			inset 0 0 0 1px color-mix(in oklab, var(--color-moonlight) 80%, transparent),
+			inset 0 0 0 2px color-mix(in oklab, var(--color-butter) 35%, transparent),
+			inset 0 0 1.1rem color-mix(in oklab, var(--color-butter) 26%, transparent);
 	}
 
-	/* Empty state: the frame's outer bloom fades out toward its ragged edge; the rim at the aperture keeps full light. */
-	.is-empty .frame {
+	/* The frame's outer bloom at about half its painted strength: the halo beyond the burnt band fades out, the band itself is
+	   a little darker; full light stays at the aperture rim. */
+	.frame {
 		mask:
-			linear-gradient(to right, color-mix(in oklab, #000 35%, transparent), #000 6.5%, #000 93.5%, color-mix(in oklab, #000 35%, transparent)),
-			linear-gradient(to bottom, color-mix(in oklab, #000 35%, transparent), #000 11.5%, #000 88.5%, color-mix(in oklab, #000 35%, transparent));
+			linear-gradient(
+				to right,
+				color-mix(in oklab, #000 12%, transparent),
+				color-mix(in oklab, #000 45%, transparent) 3.5%,
+				#000 6%,
+				#000 94%,
+				color-mix(in oklab, #000 45%, transparent) 96.5%,
+				color-mix(in oklab, #000 12%, transparent)
+			),
+			linear-gradient(
+				to bottom,
+				color-mix(in oklab, #000 12%, transparent),
+				color-mix(in oklab, #000 45%, transparent) 5.5%,
+				#000 10%,
+				#000 89%,
+				color-mix(in oklab, #000 45%, transparent) 95%,
+				color-mix(in oklab, #000 12%, transparent)
+			);
 		mask-composite: intersect;
-		filter: saturate(0.9) brightness(0.9);
+		filter: saturate(0.88) brightness(0.8);
 	}
 
 	.caption {
@@ -541,6 +617,23 @@
 		gap: 0.6rem;
 		justify-items: start;
 		color: var(--color-cream);
+		text-shadow: var(--halo-ink);
+	}
+
+	/* Under the screen the caption meets the dawn bank's lit crown: a soft radial ink scrim keeps it readable, no box */
+	.caption::before {
+		content: '';
+		position: absolute;
+		inset: -1.5rem auto -1.5rem -3rem;
+		width: min(100%, 34rem);
+		z-index: -1;
+		background: radial-gradient(
+			closest-side,
+			color-mix(in oklab, var(--color-ink) 70%, transparent),
+			color-mix(in oklab, var(--color-ink) 40%, transparent) 60%,
+			transparent
+		);
+		pointer-events: none;
 	}
 
 	.caption.d-center {
@@ -584,16 +677,21 @@
 
 	@media (max-width: 47.99rem) {
 		.cinema {
-			/* a little sky above the portrait stage keeps the painted sky clear of the clock */
-			min-height: max(100svh, calc(216.67vw + 3rem));
+			/* sky above the portrait stage: clock and heading sit in it, above the frame */
+			min-height: max(100svh, calc(216.67vw + 6rem));
+			--stage-top: calc(100% - 100cqw * 2340 / 1080);
+			--night-clock-top: calc(var(--stage-top) + 100cqw * 2340 / 1080 * var(--frame-top-m) - 7.25rem);
+			--cliff-cut: var(--dawn-cliff-cut-m);
+			--cliff-fade: var(--dawn-cliff-fade-m);
+		}
+
+		.heading {
+			width: auto;
+			right: var(--page-gutter);
 		}
 
 		.stage {
 			aspect-ratio: 1080 / 2340;
-		}
-
-		.landscape-fade {
-			--fade-tile: 90vw;
 		}
 
 		.is-desktop {

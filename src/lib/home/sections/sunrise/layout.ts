@@ -68,9 +68,9 @@ const PLACEMENT: Record<Breakpoint, Placement> = {
 		sky: { x: 0, y: -10, w: 100 },
 		valley: { x: 0, y: 29.2, w: 100 },
 		cliffPath: { x: -2, y: 46.5, w: 104 },
-		coffee: { x: 9.5, w: 8.6, sink: 0.6 },
+		coffee: { x: 12.5, w: 8.6, sink: 0.6 },
 		// body ≈ 2.2 × the mug's width (the masters' px scale: coffee ÷ 1.286, docs/art/sunrise/README.md)
-		laptop: { x: 22, w: 15.6, sink: 0.6 },
+		laptop: { x: 25, w: 15.6, sink: 0.6 },
 		sunGlow: 22
 	},
 	mobile: {

@@ -1,10 +1,14 @@
 <!--
 	@component
-	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). The night retreats upward and reveals butter paper, a misty valley with the
-	rising sun, and coffee next to a closed laptop on the cliff path. The owner's duotone print (ochre and anthracite inks multiplied into the paper), legal links, and socials sit on the paper.
+	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). Under the dawn cloud bank (shared/DawnBank.svelte) the dawn sky opens on a
+	misty valley with the rising sun, and coffee next to a closed laptop on the cliff path; 06:00 stands beside the cup. The owner's
+	duotone print (ochre and anthracite inks multiplied into the paper), legal links, and socials sit on the paper.
 
-	`--sunrise` (0 → 1): CSS `view()` timeline from the footer's top entering to the page end; without `animation-timeline` support
-	ScrollProgress writes it. Reduced motion: the registered initial value 1 (final state, static).
+	The footer overlaps the cinema (shared/dawn.ts `overlap`) and its top feathers in with a painted edge inside the cloud bank's
+	opaque band, so the seam has no straight line and the far ridge is in view while the bank passes.
+
+	`--sunrise` (0 → 1): CSS `view()` timeline while the footer enters; without `animation-timeline` support ScrollProgress writes
+	it. Reduced motion: the registered initial value 1 (final state, static).
 	Rects: ./layout.ts. Assets: tools/build-assets.mjs.
 -->
 <script lang="ts">
@@ -13,6 +17,7 @@
 	import { linkedSocials } from '#lib/home/data/socials.ts';
 	import { InView, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
+	import { dawnVars } from '#lib/home/shared/dawn.ts';
 	import { SOCIAL_ICON_PATHS } from './icons.ts';
 	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars } from './layout.ts';
 	import portrait from './assets/sunrise-portrait.webp?w=320;240;160&enhanced';
@@ -36,20 +41,28 @@
 		laptopGlint: placeVars(d.laptopGlint, mo.laptopGlint)
 	};
 
+	// Seam geometry (shared/dawn.ts) and the cup the 06:00 clock stands beside (stage %).
+	const cupVars = [
+		dawnVars(),
+		`--cup-y: ${(d.coffee.y + d.coffee.h * 0.05) / 100}`,
+		`--cup-y-m: ${(mo.coffee.y + mo.coffee.h * 0.02) / 100}`,
+		`--cup-right-m: ${(mo.coffee.x + mo.coffee.w) / 100}`
+	].join('; ');
+
 	let root: HTMLElement;
 	const near = new InView();
 
-	// JS fallback without scroll-driven animations. As the last section it can't scroll out: at the page end `through`
-	// only reaches H / (vh + H), hence the rescale to 1.
-	const through = new ScrollProgress();
+	// JS fallback without scroll-driven animations, same range as the CSS one (`entry`: top at the viewport bottom → the
+	// section fully in, or its top at the viewport top when it is taller than the viewport).
+	const entering = new ScrollProgress({ mode: 'enter' });
 	let fallback = $state(false);
 	$effect(() => {
 		fallback = !reducedMotion.current && !CSS.supports('animation-timeline: view()');
 	});
 	$effect(() => {
 		if (!fallback) return;
-		const height = Math.max(1, root.offsetHeight);
-		const value = Math.min(1, (through.current * (window.innerHeight + height)) / height);
+		const viewport = window.innerHeight;
+		const value = Math.min(1, (entering.current * viewport) / Math.max(1, Math.min(viewport, root.offsetHeight)));
 		root.style.setProperty('--sunrise', value.toFixed(4));
 		return () => root.style.removeProperty('--sunrise');
 	});
@@ -61,7 +74,8 @@
 	data-night-hour="06:00"
 	class={['sunrise', near.current && 'is-near']}
 	aria-labelledby="home-sunrise-title"
-	{@attach through.attach}
+	style={cupVars}
+	{@attach entering.attach}
 	{@attach near.attach}
 >
 	<h2 id="home-sunrise-title" class="sr-only">{m.home_sunrise_title()}</h2>
@@ -118,10 +132,8 @@
 		<div class="placed laptop-glint" style={place.laptopGlint}></div>
 	</div>
 
-	<!-- Retreating night (ink-wash wipe, CSS below). NightPage tracks the cleared line for the nav ink. -->
-	<div class="night" aria-hidden="true">
-		<span class="night-clear" data-night-edge data-edge-clear="1"></span>
-	</div>
+	<!-- The night ends in the dawn cloud bank's underside (shared/DawnBank.svelte); NightPage tracks this line for the nav ink. -->
+	<span class="night-clear" data-night-edge data-edge-clear="1" aria-hidden="true"></span>
 
 	<NightClock time="06:00" />
 
@@ -163,44 +175,29 @@
 	.sunrise {
 		position: relative;
 		container-type: inline-size;
-		min-height: 100svh;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-end;
 		overflow: clip;
 		color: var(--color-night);
-		/* continues the cinema's --ink-fade */
-		--ink-fade: var(--color-night);
 		/*
-		 * Clock: cream with an ink halo on the night, anthracite with a butter halo once the paper dominates behind it. The night's
-		 * opaque part never reaches the clock line: the clock meets only its translucent ramp, darker than mid-tone (measured) only
-		 * until --sunrise ≈ 0.4 on landscape screens, and never on portrait ones (taller section, clock deeper in the paper).
+		 * Overlaps the cinema (shared/dawn.ts): the top line sits inside the dawn cloud bank's opaque band and feathers in with the
+		 * painted soft edge, so neither the line nor the cinema's bottom ever shows. The cliff, mascot and screen of the cinema
+		 * paint above (z-index 3), the bank between.
 		 */
-		--clock-switch: 0.36;
-		--clock-paper: calc(clamp(0, (var(--sunrise) - var(--clock-switch)) / 0.08, 1) * 100%);
-		--night-clock-color: color-mix(
-			in oklab,
-			color-mix(in oklab, var(--color-cream) 85%, transparent),
-			color-mix(in oklab, var(--color-night) 85%, transparent) var(--clock-paper)
-		);
-		--night-clock-halo:
-			0 0 2px color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)),
-			0 0 8px color-mix(in oklab, color-mix(in oklab, var(--color-ink), var(--color-butter) var(--clock-paper)) 80%, transparent);
-	}
-
-	/* Landscape: 06:00 sits in the scene, just above the far ridge on the left (30 % down the bottom-anchored 16:9 stage), not alone
-	   at the top of the sky. Lower on the paper, so its ink switches earlier. */
-	@media (min-width: 48rem) {
-		.sunrise {
-			--night-clock-top: max(var(--clock-top), calc(100% - 100cqw * 9 / 16 * 0.7));
-			--clock-switch: 0.2;
-		}
-	}
-
-	@media (max-aspect-ratio: 1/1) {
-		.sunrise {
-			--clock-switch: 0.04;
-		}
+		--overlap: var(--dawn-overlap);
+		--fade: var(--dawn-fade);
+		--clear: var(--dawn-clear);
+		margin-top: calc(var(--overlap) * -1);
+		/* the bottom-anchored 16:9 stage rises 6vw above the top (hidden under the bank): the far ridge sits right below it */
+		min-height: calc(100vw * 9 / 16 - 6vw);
+		mask:
+			var(--feather-up) top / 100% var(--fade) repeat-x,
+			linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--fade) + 1px) no-repeat;
+		/* 06:00 stands beside the coffee cup, on the paper sky: anthracite with a butter halo */
+		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
+		--night-clock-halo: 0 0 2px var(--color-butter), 0 0 8px color-mix(in oklab, var(--color-butter) 80%, transparent);
+		--night-clock-top: calc(100% - 100cqw * 9 / 16 * (1 - var(--cup-y)) - 0.5rem);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -208,7 +205,7 @@
 			.sunrise {
 				animation: sunrise-progress linear both;
 				animation-timeline: view();
-				animation-range: entry 0% contain 100%;
+				animation-range: entry 0% entry 100%;
 			}
 		}
 	}
@@ -222,19 +219,16 @@
 		}
 	}
 
-	/* Butter paper behind everything; matches the sky plates' bottom band and the banner. Opaque from the start: fading it in over the
-	   dark sky mixed a khaki fog; the retreating night above it is the only crossfade, and that one is warm (below). */
+	/* Butter paper behind everything; matches the sky plates' bottom band and the banner. */
 	.paper {
 		position: absolute;
 		inset: 0;
 		background: var(--color-butter);
 	}
 
-	/* Top fades into the paper; sinks as the night retreats so the baked sun rises behind the valley. */
+	/* Sinks a little while the footer enters, so the baked sun rises behind the valley. Its top is under the cloud bank. */
 	.sky {
-		opacity: clamp(0, var(--sunrise) * 1.6, 1);
 		translate: 0 calc((1 - var(--sunrise)) * 6%);
-		mask-image: linear-gradient(to bottom, transparent, black 14%);
 	}
 
 	.sky :global(img) {
@@ -374,76 +368,12 @@
 		}
 	}
 
-	/*
-	 * 04:00 → 06:00 ink-wash wipe: solid --ink-fade ending in the intersect of the drying wash and the wet bloom wash at another
-	 * size and offset (shared/transitions.ts). The intersect gives crisp lobes and tide lines that change as the front moves and
-	 * never visibly repeat, and squares away the washes' even haze (would read as fog). Both tile near their painted square aspect.
-	 *
-	 * Over --sunrise 0 → 1 it translates up by --night-travel (no layout; faster in the last fifth) and the ramp tightens
-	 * 55svh → 16svh. Tuned so that: the wash starts right under the cinema's painted bottom (no flat ink block); the opaque top
-	 * covers the section's top line while that line is > ~5svh below the viewport top (no straight seam on the paper); at the
-	 * page end the ink is gone below ~6svh, clear of the 06:00 clock.
-	 */
-	.night {
-		--night-ramp: calc(55svh - 39svh * var(--sunrise));
-		--night-late: max(0, (var(--sunrise) - 0.8) * 5);
-		--night-travel: calc(-31svh * var(--sunrise) - 9svh * var(--night-late) * var(--night-late));
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 48svh;
-		translate: 0 var(--night-travel);
-		/* Ink while opaque; through the drying ramp it warms to burnt ochre, so ink over butter passes through amber, never olive */
-		background: linear-gradient(
-			var(--ink-fade) calc(100% - var(--night-ramp)),
-			color-mix(in oklab, var(--color-ochre) 38%, var(--ink-fade)) calc(100% - var(--night-ramp) * 0.55),
-			color-mix(in oklab, var(--color-ochre) 78%, var(--ink-fade))
-		);
-		pointer-events: none;
-		mask-image: linear-gradient(#000 0 0), var(--wash-dry), var(--wash-spread-down);
-		mask-repeat: no-repeat, repeat-x, repeat-x;
-		mask-size:
-			100% calc(100% - var(--night-ramp) * 0.9),
-			calc(var(--night-ramp) * 1.2) var(--night-ramp),
-			calc(var(--night-ramp) * 1.5) calc(var(--night-ramp) * 1.1);
-		mask-position:
-			0 0,
-			calc(var(--sunrise) * -18svh) 100%,
-			calc(37% + var(--sunrise) * 24svh) calc(100% + var(--night-ramp) * 0.1);
-		mask-composite: add, intersect, add;
-	}
-
-	/* Reduced motion: the dried final state at rest, above the clock line. The ink stays opaque on the section's top line (continuing the
-	   cinema's ink, so no seam) and dissolves through a soft ramp unioned with two bloom-wash copies at unrelated widths. Both are lifted
-	   so their flat opaque bands sit above the box: only the lobed parts show, and the intersect never shows a repeat. */
-	@media (prefers-reduced-motion: reduce) {
-		.night {
-			--night-travel: 0px;
-			height: calc(var(--clock-top) * 1.4);
-			mask-image: linear-gradient(#000 20%, transparent 60%), var(--wash-spread-down), var(--wash-spread-down);
-			mask-repeat: no-repeat, repeat-x, repeat-x;
-			mask-size:
-				100% 100%,
-				38% 140%,
-				57% 130%;
-			mask-position:
-				0 0,
-				11% 100%,
-				63% 100%;
-			mask-composite: add, intersect;
-		}
-
-		.night-clear {
-			height: 40%;
-		}
-	}
-
-	/* The still-inked part of .night (down to ~50 % ramp alpha); NightPage's nav/rail ink switch reads this box (data-night-edge). */
+	/* Down to the dawn bank's ragged underside (shared/dawn.ts `clear`); NightPage's nav/rail ink switch reads this box. */
 	.night-clear {
 		position: absolute;
 		inset: 0 0 auto;
-		height: calc(100% - var(--night-ramp) * 0.45);
+		height: var(--clear);
+		pointer-events: none;
 	}
 
 	.bar {
@@ -565,14 +495,25 @@
 			display: block;
 		}
 
-		/* In the flow: open paper above, then the square scene band, then the footer bar */
+		.sunrise {
+			--overlap: var(--dawn-overlap-m);
+			--fade: var(--dawn-fade-m);
+			--clear: var(--dawn-clear-m);
+			min-height: 0;
+			--stage-margin: 20cqw;
+			/* 06:00 right of the cup, above the laptop */
+			--night-clock-top: calc(var(--stage-margin) + 100cqw * var(--cup-y-m));
+			--night-clock-left: calc(100cqw * var(--cup-right-m) + 0.25rem);
+		}
+
+		/* In the flow: a short band of dawn sky under the cloud bank, then the square scene, then the footer bar. The far ridge
+		   sits ~40vw under the bank's underside. */
 		.stage {
 			position: relative;
 			bottom: auto;
 			flex: none;
 			aspect-ratio: 1;
-			/* keeps the scene clear of the clock and the retreated night edge when the bar is tall */
-			margin-top: clamp(9rem, 24svh, 14rem);
+			margin-top: var(--stage-margin);
 		}
 
 		.placed {

@@ -8,7 +8,7 @@
 	import NightShift from '#lib/home/sections/night-shift/NightShift.svelte';
 	import Radio from '#lib/home/sections/radio/Radio.svelte';
 	import Sunrise from '#lib/home/sections/sunrise/Sunrise.svelte';
-	import DawnTint from '#lib/home/shared/DawnTint.svelte';
+	import DawnBank from '#lib/home/shared/DawnBank.svelte';
 	import Mist from '#lib/home/shared/Mist.svelte';
 </script>
 
@@ -47,11 +47,11 @@
 	<Mist
 		variant="night"
 		height="clamp(5rem, 10vw, 9rem)"
-		above={0.6}
+		above={1.05}
 		opacity={0.3}
 		gaps={[30, 72]}
 		offset={37}
-		cloud={{ strip: 'c', height: 'clamp(6rem, 14vw, 13rem)', above: 0.86, stretch: 1.3, shift: 10 }}
+		cloud={{ strip: 'c', height: 'clamp(6rem, 14vw, 13rem)', above: 1.2, stretch: 1.3, shift: 10 }}
 	/>
 	<Radio />
 	<Mist
@@ -64,6 +64,6 @@
 		cloud={{ strip: 'a', height: 'clamp(6rem, 16vw, 15rem)', above: 0.82, stretch: 1.5, shift: -10 }}
 	/>
 	<Cinema />
-	<DawnTint />
+	<DawnBank />
 	<Sunrise />
 </NightPage>

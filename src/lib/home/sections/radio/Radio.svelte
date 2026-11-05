@@ -329,8 +329,17 @@
 		min-height: 100svh;
 		padding: var(--heading-top) var(--page-gutter) clamp(3rem, 8vh, 5rem);
 		/* soft painted section edges so the clipped plate never ends in a straight line (NightPage [data-feather]) */
-		--feather-top: clamp(4rem, 9vw, 8rem);
+		--feather-top: clamp(1.5rem, 3vw, 3rem);
 		--feather-bottom: clamp(4rem, 9vw, 8rem);
+		/* Pulled up under the desk's dissolving bottom edge: 02:00 follows the night shift without a dead band of black. The
+		   overlap holds only the heading's top padding (the top feather stays short, above the clock); only the scene (radio, chart) takes pointer events. */
+		--radio-overlap: clamp(4rem, 9.5vw, 9rem);
+		margin-top: calc(var(--radio-overlap) * -1);
+		pointer-events: none;
+	}
+
+	.scene {
+		pointer-events: auto;
 	}
 
 	.head {
