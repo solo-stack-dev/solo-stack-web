@@ -299,7 +299,7 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
-		filter: grayscale(0.5) brightness(0.48);
+		filter: grayscale(0.4) brightness(0.62);
 		user-select: none;
 		transition: filter var(--dur-state) ease;
 	}
@@ -384,9 +384,19 @@
 		scale: 1 1;
 	}
 
-	/* clear of the backing sheet */
+	/* Keyboard focus in the page's idiom, not a box around a torn sheet: the backing lights butter and glows, the swash draws in */
 	.game-tab:focus-visible {
-		outline-offset: 0.5rem;
+		outline: none;
+		box-shadow: none;
+		filter: drop-shadow(0 0 0.5rem color-mix(in oklab, var(--color-butter) 55%, transparent));
+	}
+
+	.game-tab:focus-visible::before {
+		background: var(--color-butter);
+	}
+
+	.game-tab:focus-visible .strip-title::after {
+		scale: 1 1;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
