@@ -249,6 +249,11 @@
 		--small: max(0.75rem, 2.9cqw);
 	}
 
+	/* The tall glass content box runs under the painted bezel on its right: keep the song row (and its ellipsis) inside the glass */
+	.set-tall .glass {
+		padding-inline: 0.25rem 0.9rem;
+	}
+
 	.layer,
 	.set :global(.layer) {
 		position: absolute;
@@ -385,8 +390,10 @@
 		pointer-events: auto;
 	}
 
+	/* the inline-end padding keeps the italic overhang of the last letter inside the clip box */
 	.glass-song-title {
 		min-width: 0;
+		padding-inline-end: 0.2em;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

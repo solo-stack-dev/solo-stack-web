@@ -648,6 +648,11 @@
 			min-height: 9.5rem;
 		}
 
+		/* shorter slider on the tall glass, so the song title keeps room to show or ellipsize inside the painted bezel */
+		.song-volume input {
+			width: 3.5rem;
+		}
+
 		.variant-wide {
 			display: none;
 		}
