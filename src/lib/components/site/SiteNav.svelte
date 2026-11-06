@@ -8,9 +8,11 @@
 	- `variant="site"`: sticky, aligned to the pages' content grid (`content-frame`). The scrim is the page's own paper or
 	  night (`--background`) and appears once the page is scrolled. The (site) layout passes theme toggle and phone menu as
 	  `actions`; the links move into the menu below `sm`.
-	- `variant="night"` (homepage): fixed on `--page-gutter` / `--nav-pad-y`, cream ink with an opposite-ink halo to read over
-	  any art; scrim off while the hero shows the giant wordmark. NightPage passes its menu button as `actions` and lists the
-	  site links in that overlay on phones. `tone="paper"` = anthracite ink over the sunrise.
+	- `variant="night"` (homepage): fixed on `--page-gutter` / `--nav-pad-y`. Links and the menu button sit in one pill of
+	  smoked night pigment with a moonlit rim, so they read over the brightest moon; the wordmark keeps an opposite-ink halo.
+	  Scrim off while the hero shows the giant wordmark. NightPage passes its menu button as `actions` and lists the site
+	  links in that overlay on phones (the pill then holds only the button). `tone="paper"` = anthracite ink on butter paper
+	  over the sunrise.
 	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown here: the homepage must not ship it.
 -->
 <script lang="ts">
@@ -114,6 +116,43 @@
 </header>
 
 <style>
+	/* Registered so the dock crossfades between night and paper */
+	@property --dock-glass {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
+	@property --dock-rim-top {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
+	@property --dock-rim-bottom {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
+	@property --dock-rule {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
+	@property --dock-shade {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
+	@property --dock-edge {
+		syntax: '<color>';
+		inherits: true;
+		initial-value: transparent;
+	}
+
 	/*
 	 * Tokens per ground. `--nav-mark`: current-page swash and hover ink. On light paper the butter would be 1.3:1, so it is the
 	 * deep `--ink-lit` (5.7:1) there; the crescent is ochre ink (3.5:1). `--nav-scrim`: the ground the scrim is painted from.
@@ -432,13 +471,89 @@
 
 	.is-night .bar > * {
 		pointer-events: auto;
+	}
+
+	/* The wordmark floats free over the art: an opposite-ink halo keeps it readable (the links have the pill) */
+	.is-night .wordmark {
 		filter: drop-shadow(0 0 0.35rem var(--nav-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
 	}
 
 	/* Keeps the halo under the focus light */
-	.is-night .wordmark:focus-visible,
-	.is-night .links a:focus-visible {
+	.is-night .wordmark:focus-visible {
 		filter: drop-shadow(0 0 0.45rem var(--nav-focus-halo)) drop-shadow(0 0 0.1rem var(--nav-halo));
+	}
+
+	/*
+	 * The dock pill: a smoked wash of night pigment over the art (the blurred moon glows through it as warm amber), a rim
+	 * lit from above like the moon's edge, fading out toward the bottom, and an ink shadow that sets it off the butter moon.
+	 * No filter on it: that would break the backdrop blur. Over the sunrise it turns to butter paper with an ink rim.
+	 */
+	.is-night .dock {
+		/* night pigment with a trace of ochre, so it reads as ink wash, not grey glass */
+		--dock-glass: color-mix(in oklab, color-mix(in oklab, var(--color-night) 92%, var(--color-ochre)) 76%, transparent);
+		--dock-rim-top: color-mix(in oklab, var(--color-butter) 46%, transparent);
+		--dock-rim-bottom: color-mix(in oklab, var(--color-butter) 6%, transparent);
+		--dock-rule: color-mix(in oklab, var(--color-butter) 22%, transparent);
+		--dock-shade: color-mix(in oklab, var(--color-ink) 55%, transparent);
+		--dock-edge: color-mix(in oklab, var(--color-ink) 30%, transparent);
+		position: relative;
+		gap: 0.25rem;
+		/* outset into the gutter so the menu icon keeps its place at the page edge */
+		margin-right: -0.5rem;
+		padding: 0.25rem 0.25rem 0.25rem 0.4rem;
+		border-radius: 999px;
+		background-color: var(--dock-glass);
+		box-shadow:
+			0 0 0 1px var(--dock-edge),
+			0 0.7rem 1.6rem -0.7rem var(--dock-shade),
+			0 0.2rem 0.6rem -0.2rem var(--dock-shade);
+		backdrop-filter: blur(12px) saturate(1.25);
+		-webkit-backdrop-filter: blur(12px) saturate(1.25);
+		transition:
+			--dock-glass var(--dur-state) ease,
+			--dock-rim-top var(--dur-state) ease,
+			--dock-rim-bottom var(--dur-state) ease,
+			--dock-rule var(--dur-state) ease,
+			--dock-shade var(--dur-state) ease,
+			--dock-edge var(--dur-state) ease;
+	}
+
+	/* The rim: a 1px gradient ring (masked to the border) */
+	.is-night .dock::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		padding: 1px;
+		border-radius: inherit;
+		background: linear-gradient(var(--dock-rim-top), var(--dock-rim-bottom) 70%);
+		mask:
+			linear-gradient(#000 0 0) content-box exclude,
+			linear-gradient(#000 0 0);
+		pointer-events: none;
+	}
+
+	.is-night[data-tone='paper'] .dock {
+		--dock-glass: color-mix(in oklab, color-mix(in oklab, var(--color-cream) 55%, var(--color-butter)) 82%, transparent);
+		--dock-rim-top: color-mix(in oklab, var(--color-cream) 90%, transparent);
+		--dock-rim-bottom: color-mix(in oklab, var(--color-night) 14%, transparent);
+		--dock-rule: color-mix(in oklab, var(--color-night) 18%, transparent);
+		--dock-shade: color-mix(in oklab, color-mix(in oklab, var(--color-ochre) 60%, var(--color-night)) 30%, transparent);
+		--dock-edge: color-mix(in oklab, var(--color-night) 12%, transparent);
+	}
+
+	/* Inside the pill the menu button sits on its padding, not flush with the page edge */
+	.is-night .actions {
+		margin-right: 0;
+	}
+
+	@media (prefers-reduced-transparency: reduce) {
+		.is-night .dock {
+			--dock-glass: color-mix(in oklab, var(--color-night) 96%, var(--color-ochre));
+		}
+
+		.is-night[data-tone='paper'] .dock {
+			--dock-glass: color-mix(in oklab, var(--color-cream) 55%, var(--color-butter));
+		}
 	}
 
 	/* Hidden while the hero shows the giant wordmark */
@@ -456,6 +571,12 @@
 	@media (min-width: 48rem) {
 		.is-night .links {
 			display: block;
+		}
+
+		/* A hairline between the pages and the section menu */
+		.is-night .links + .actions {
+			padding-left: 0.25rem;
+			border-left: 1px solid var(--dock-rule);
 		}
 	}
 
