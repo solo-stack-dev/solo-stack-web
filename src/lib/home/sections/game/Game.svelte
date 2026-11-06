@@ -4,8 +4,13 @@
 	play button in the art's calm lower left; code loads on click (GameFrame). Only the selected tab's frame is mounted, so
 	switching tabs stops the previous game.
 
-	Layout on the page grid (gutter to gutter): wide screens put the frame on 8/12 and a game column on 4/12 (vertical tab list on the
-	frame's top line, the selected game's line and local record under it); narrower screens stack tabs, frame, game line.
+	The tabs are torn-off strips of the same posters (small `w=` ladder, lazy) with the title in the display face, so the three games
+	read as three things to pick: the selected strip lies straight on a butter backing in full color with the hand-drawn underline,
+	the others are dimmed and slightly askew until hover/focus.
+
+	Layout on the page grid (gutter to gutter): wide screens put the frame on 8/12 and a game column on 4/12 (the strips stacked from
+	the frame's top line, the selected game's line and local record under them); narrower screens stack a row of strips, frame,
+	game line (phones: the row scrolls sideways).
 	The section rises into the 21:00 stage's lower edge (--game-overlap), so the two hours meet without an empty band.
 -->
 <script lang="ts">
@@ -16,16 +21,26 @@
 	import posterConstellations from './assets/poster-constellations.webp?w=1664;1280;960;640&enhanced';
 	import posterMoonPlanet from './assets/poster-moon-planet.webp?w=1664;1280;960;640&enhanced';
 	import posterStackToMoon from './assets/poster-stack-to-moon.webp?w=1664;1280;960;640&enhanced';
+	import stripConstellations from './assets/poster-constellations.webp?w=1120;720;400&enhanced';
+	import stripMoonPlanet from './assets/poster-moon-planet.webp?w=1120;720;400&enhanced';
+	import stripStackToMoon from './assets/poster-stack-to-moon.webp?w=1120;720;400&enhanced';
 	import { CANDIDATE_IDS, GAME_CANDIDATES, HOMEPAGE_DEFAULT_GAME, type CandidateId } from './candidates.ts';
+	import { DECKLE_STRIPS, DECKLE_STRIPS_BACK } from './shared/deckle.ts';
 	import GameFrame from './shared/GameFrame.svelte';
 	import { loadHighScore } from './shared/highscore.ts';
 
-	/** Painted poster per game; `focus` is the subject's x (object-position) for the 4:5 phone crop. */
-	const POSTERS: Record<CandidateId, { src: typeof posterMoonPlanet; focus: string }> = {
-		'moon-planet': { src: posterMoonPlanet, focus: '78%' },
-		'stack-to-moon': { src: posterStackToMoon, focus: '100%' },
-		constellations: { src: posterConstellations, focus: '88%' }
+	/**
+	 * Painted poster per game; `focus` is the subject's x (object-position) for the 4:5 phone crop. `strip` is the same painting at
+	 * chooser size and `stripY` the subject's y for the wide strip crop (the strip shows the full width, its title on the calm left).
+	 */
+	const POSTERS: Record<CandidateId, { src: typeof posterMoonPlanet; focus: string; strip: typeof stripMoonPlanet; stripY: string }> = {
+		'moon-planet': { src: posterMoonPlanet, focus: '78%', strip: stripMoonPlanet, stripY: '8%' },
+		'stack-to-moon': { src: posterStackToMoon, focus: '100%', strip: stripStackToMoon, stripY: '6%' },
+		constellations: { src: posterConstellations, focus: '88%', strip: stripConstellations, stripY: '30%' }
 	};
+
+	/** Each strip lies a little askew, as if torn off and put down by hand; the selected one straightens. */
+	const TILTS = ['-0.7deg', '0.5deg', '-0.35deg'] as const;
 
 	/** What you do and how you play, under the tab list. */
 	const INFO: Record<CandidateId, () => string> = {
@@ -79,22 +94,38 @@
 	<NightClock time="22:00" />
 	<h2 id="home-game-title" class="night-heading">{m.home_game_title()}</h2>
 	<div class="content">
-		<!-- Tabs in the page-wide selection idiom (label + hand-drawn underline): a row on the gutter under the heading, or a list in the
-		     game column beside the frame -->
-		<div class="tabs label" role="tablist" aria-label={m.home_game_tabs_label()} aria-orientation={columns.current ? 'vertical' : 'horizontal'} onscroll={onTabsScroll}>
-			{#each CANDIDATE_IDS as id (id)}
+		<!-- Each tab is a torn-off strip of its game's poster with the title in the display face over the art's calm left (the
+		     selected one lit: butter edge, full color, the hand-drawn underline). A stack in the game column beside the frame, or a row
+		     on the gutter under the heading. -->
+		<div class="tabs" role="tablist" aria-label={m.home_game_tabs_label()} aria-orientation={columns.current ? 'vertical' : 'horizontal'} onscroll={onTabsScroll}>
+			{#each CANDIDATE_IDS as id, index (id)}
 				<button
 					type="button"
 					role="tab"
+					class="game-tab"
 					id="game-tab-{id}"
 					aria-controls="game-panel"
 					aria-selected={selected === id}
 					tabindex={selected === id ? 0 : -1}
+					style:--tilt={TILTS[index]}
+					style:--strip-deckle={DECKLE_STRIPS[index]}
+					style:--strip-deckle-back={DECKLE_STRIPS_BACK[index]}
 					onclick={() => select(id)}
 					onfocus={() => reveal(id)}
 					onkeydown={onTabKeydown}
 				>
-					{GAME_CANDIDATES[id].title()}
+					<span class="strip" aria-hidden="true">
+						<enhanced:img
+							src={POSTERS[id].strip}
+							alt=""
+							class="strip-art"
+							style="object-position: 50% {POSTERS[id].stripY}"
+							sizes="(min-width: 64rem) 34vw, (min-width: 40rem) 32vw, 16rem"
+							loading="lazy"
+							decoding="async"
+						/>
+					</span>
+					<span class="strip-title font-display font-black tracking-wordmark uppercase">{GAME_CANDIDATES[id].title()}</span>
 				</button>
 			{/each}
 		</div>
@@ -214,46 +245,97 @@
 		}
 	}
 
-	/* The tab text starts on the gutter (the padding hangs into it) */
+	/* Chooser: three torn-off strips of the games' posters (the frame's deckle technique at strip size), each title in the display
+	   face over its art's calm left. Dimmed and a little askew at rest; hover/focus straightens and lights them halfway; the
+	   selected one lies straight on a butter backing sheet in full color with the page's hand-drawn underline. Narrow screens: a
+	   row of three under the heading; wide: a stack in the game column. */
 	.tabs {
-		display: flex;
-		align-items: flex-start;
-		gap: 0 0.35rem;
-		margin-left: -0.55rem;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: clamp(0.9rem, 2vw, 1.4rem);
+		padding-block: 0.4rem;
 	}
 
-	.tabs [role='tab'] {
+	.game-tab {
+		--strip-h: clamp(5.25rem, 11vw, 6.75rem);
+		--title-size: clamp(1.05rem, 2.1vw, 1.45rem);
+		--nudge: 0 -0.2rem;
 		position: relative;
-		flex: none;
-		min-height: 2.75rem;
-		padding: 0.6rem 0.55rem;
-		color: var(--color-cream);
-		text-shadow: var(--halo-ink);
-		white-space: nowrap;
-		/* preflight resets buttons to none; the label style is uppercase */
-		text-transform: inherit;
+		display: grid;
+		align-items: center;
+		justify-items: start;
+		min-height: var(--strip-h);
+		padding: 0.85rem clamp(0.9rem, 2vw, 1.3rem) 1.05rem;
+		text-align: start;
+		text-transform: none;
 		cursor: pointer;
+		rotate: var(--tilt, 0deg);
+		transition:
+			rotate var(--dur-state) var(--ease-settle),
+			translate var(--dur-state) var(--ease-settle);
+	}
+
+	/* the torn backing sheet: dim ochre paper at rest, butter when lit (its own tear, so the edge never runs parallel) */
+	.game-tab::before {
+		content: '';
+		position: absolute;
+		inset: -0.24rem -0.3rem;
+		background: color-mix(in oklab, var(--color-ochre) 22%, var(--color-ink));
+		mask: var(--strip-deckle-back) center / 100% 100% no-repeat;
+		transition: background-color var(--dur-state) ease;
+	}
+
+	.strip {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		background: var(--color-ink);
+		mask: var(--strip-deckle) center / 100% 100% no-repeat;
+	}
+
+	.strip :global(.strip-art) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: grayscale(0.5) brightness(0.48);
+		user-select: none;
+		transition: filter var(--dur-state) ease;
+	}
+
+	/* an ink pool on the calm left carries the cream title */
+	.strip::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to right,
+			color-mix(in oklab, var(--color-ink) 72%, transparent),
+			color-mix(in oklab, var(--color-ink) 30%, transparent) 45%,
+			transparent 70%
+		);
+	}
+
+	.strip-title {
+		position: relative;
+		max-width: 11ch;
+		font-size: var(--title-size);
+		line-height: 0.95;
+		color: color-mix(in oklab, var(--color-cream) 68%, transparent);
+		text-shadow: var(--halo-ink);
+		text-wrap: balance;
 		transition: color var(--dur-hover);
 	}
 
-	.tabs [role='tab'] + [role='tab'] {
-		margin-left: 0.85rem;
-	}
-
-	.tabs [role='tab'] + [role='tab']::before {
-		content: '·';
-		position: absolute;
-		left: -0.75rem;
-		color: color-mix(in oklab, var(--color-cream) 55%, transparent);
-	}
-
-	.tabs [role='tab']::after {
+	/* the page's selection mark */
+	.strip-title::after {
 		content: '';
 		position: absolute;
-		left: 0.35rem;
-		right: 0.35rem;
-		bottom: 0.1rem;
-		height: 0.45rem;
+		left: 0;
+		right: 0;
+		bottom: -0.55rem;
+		height: 0.42rem;
 		background: var(--color-butter);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
 		scale: 0 1;
@@ -261,48 +343,88 @@
 		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
-	.tabs [role='tab']:hover,
-	.tabs [aria-selected='true'] {
-		color: var(--color-butter);
+	.game-tab:is(:hover, :focus-visible):not([aria-selected='true']) {
+		rotate: 0deg;
+		translate: var(--nudge);
 	}
 
-	.tabs [aria-selected='true']::after {
+	.game-tab:is(:hover, :focus-visible):not([aria-selected='true'])::before {
+		background: color-mix(in oklab, var(--color-ochre) 55%, var(--color-ink));
+	}
+
+	.game-tab:is(:hover, :focus-visible):not([aria-selected='true']) .strip :global(.strip-art) {
+		filter: grayscale(0.15) brightness(0.8);
+	}
+
+	.game-tab:is(:hover, :focus-visible) .strip-title {
+		color: var(--color-cream);
+	}
+
+	.game-tab:is(:hover, :focus-visible):not([aria-selected='true']) .strip-title::after {
+		scale: 0.3 1;
+	}
+
+	.game-tab[aria-selected='true'] {
+		rotate: 0deg;
+	}
+
+	.game-tab[aria-selected='true']::before {
+		background: color-mix(in oklab, var(--color-butter) 88%, var(--color-ochre));
+	}
+
+	.game-tab[aria-selected='true'] .strip :global(.strip-art) {
+		filter: none;
+	}
+
+	.game-tab[aria-selected='true'] .strip-title {
+		color: var(--color-cream);
+	}
+
+	.game-tab[aria-selected='true'] .strip-title::after {
 		scale: 1 1;
 	}
 
-	.tabs [role='tab']:focus-visible {
-		outline-offset: -2px;
+	/* clear of the backing sheet */
+	.game-tab:focus-visible {
+		outline-offset: 0.5rem;
 	}
 
-	/* Game column: the same labels as a list, top-aligned with the frame (the first label's cap line on the stage's top edge) */
+	@media (prefers-reduced-motion: reduce) {
+		.game-tab {
+			transition: none;
+		}
+	}
+
+	/* Game column: the strips stacked, the first one's top on the frame's top line; they lean toward the frame on hover */
 	@media (min-width: 64rem) {
 		.tabs {
-			flex-direction: column;
-			gap: 0.15rem;
-			margin-top: -0.6rem;
+			grid-template-columns: minmax(0, 1fr);
+			gap: clamp(1rem, 2.4vh, 1.5rem);
+			padding-block: 0;
 		}
 
-		.tabs [role='tab'] + [role='tab'] {
-			margin-left: 0;
-		}
-
-		.tabs [role='tab'] + [role='tab']::before {
-			content: none;
+		.game-tab {
+			--strip-h: clamp(5.75rem, 14vh, 8.5rem);
+			--title-size: clamp(1.4rem, 1.9vw, 2.1rem);
+			--nudge: -0.3rem 0;
+			padding-inline: clamp(1.1rem, 1.8vw, 1.6rem);
 		}
 	}
 
-	/* Phones: still one row, scrolling sideways under a fade at the open edge(s); the row runs to the screen edge. The fade is a
-	   wide ramp (about one tab word) that is fully clear a little before the edge, so a tab running off the edge visibly dissolves
-	   instead of reading as cut; it lifts once the row is scrolled to its end. The scroll padding lets the last tab leave it. */
+	/* Phones: the strips in one row scrolling sideways (about one and a half in view, so the next one peeks), under a fade at the
+	   open edge(s); the row runs edge to edge. The fade is a wide ramp that is fully clear a little before the edge, so a strip
+	   running off it visibly dissolves instead of reading as cut; it lifts once the row is scrolled to its end. */
 	@media (max-width: 40rem) {
 		.tabs {
 			--fade-start: 0rem;
-			--fade-end: 7rem;
-			margin-right: calc(var(--page-gutter) * -1);
-			padding-right: calc(var(--page-gutter) + 3rem);
+			--fade-end: 5rem;
+			display: flex;
+			gap: 1.1rem;
+			margin-inline: calc(var(--page-gutter) * -1);
+			padding: 0.5rem calc(var(--page-gutter) + 2rem) 0.6rem var(--page-gutter);
 			overflow-x: auto;
 			overscroll-behavior-x: contain;
-			scroll-padding-inline: 3rem 7rem;
+			scroll-padding-inline: calc(var(--page-gutter) + 2rem) 5rem;
 			scrollbar-width: none;
 			mask-image: linear-gradient(
 				to right,
@@ -319,9 +441,16 @@
 				--fade-end var(--dur-state) ease;
 		}
 
+		.game-tab {
+			--strip-h: 5.5rem;
+			--title-size: 1.2rem;
+			flex: none;
+			width: min(15rem, 62vw);
+		}
+
 		/* Without scroll timelines: the scroll handler's flags move the fades */
 		.tabs:global([data-scrolled]) {
-			--fade-start: 4rem;
+			--fade-start: 3rem;
 		}
 
 		.tabs:global([data-at-end]) {
@@ -349,22 +478,22 @@
 	@property --fade-end {
 		syntax: '<length>';
 		inherits: false;
-		initial-value: 7rem;
+		initial-value: 5rem;
 	}
 
 	/* The fade moves to the side that still has tabs to reveal */
 	@keyframes tab-fades {
 		0% {
 			--fade-start: 0rem;
-			--fade-end: 7rem;
+			--fade-end: 5rem;
 		}
 		15%,
 		85% {
-			--fade-start: 4rem;
-			--fade-end: 7rem;
+			--fade-start: 3rem;
+			--fade-end: 5rem;
 		}
 		100% {
-			--fade-start: 4rem;
+			--fade-start: 3rem;
 			--fade-end: 0rem;
 		}
 	}
