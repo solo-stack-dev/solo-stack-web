@@ -14,3 +14,6 @@ export const DECKLE_TALL = deckle(800, 1000, 9, 16, 31);
 /** The torn backing sheet under the stage (other seeds, so its edge never runs parallel to the poster's). */
 export const DECKLE_WIDE_BACK = deckle(1600, 900, 6, 36, 41);
 export const DECKLE_TALL_BACK = deckle(800, 1000, 5, 30, 47);
+/** The game chooser's poster strips (about 3:1; one seed per strip so no two tears match), and their backing sheets. */
+export const DECKLE_STRIPS = [deckle(720, 240, 7, 14, 53), deckle(720, 240, 7, 14, 59), deckle(720, 240, 7, 14, 61)] as const;
+export const DECKLE_STRIPS_BACK = [deckle(720, 240, 4, 24, 67), deckle(720, 240, 4, 24, 71), deckle(720, 240, 4, 24, 73)] as const;
