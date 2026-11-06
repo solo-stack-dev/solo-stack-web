@@ -521,11 +521,12 @@
 			height: auto;
 		}
 
+		/* Left-aligned on the column like the site footer on phones: brand line, legal links in one row, platforms in one row */
 		.bar {
-			grid-template-columns: 1fr;
-			justify-items: center;
-			text-align: center;
-			gap: 1.75rem;
+			grid-template-columns: minmax(0, 1fr);
+			justify-items: start;
+			text-align: start;
+			gap: 1.25rem;
 			padding-bottom: 2.5rem;
 		}
 
@@ -534,19 +535,47 @@
 			--wordmark-size: clamp(2rem, 10.5vw, 3.5rem);
 		}
 
+		/* one wrapping row; the first link's text starts on the column edge */
 		.legal ul {
-			flex-direction: column;
-			gap: 0.25rem;
-			font-size: 1.05rem;
+			gap: 0 1.5rem;
+			font-size: 1rem;
 		}
 
-		/* 44px targets in a balanced 5 / 4 block (9 in one row would not fit) */
+		.legal a {
+			display: inline-flex;
+			align-items: center;
+			min-height: 2.75rem;
+			padding-block: 0;
+		}
+
+		.legal a::after {
+			bottom: 0.35rem;
+		}
+
+		/*
+		 * All platforms in one row across the column. Each target is 44px tall and shares the column's width (~40px at 390px);
+		 * the row reaches 0.8rem past both edges, so the first and last glyph sit on the column edges.
+		 */
+		.socials {
+			justify-self: stretch;
+		}
+
 		.socials ul {
-			justify-content: center;
-			max-width: calc(5 * 2.75rem + 4 * 0.75rem);
-			margin-right: 0;
-			margin-inline: auto;
-			gap: 0.25rem 0.75rem;
+			flex-wrap: nowrap;
+			justify-content: flex-start;
+			gap: 0;
+			margin-inline: -0.8125rem;
+		}
+
+		.socials li {
+			flex: 1 1 0;
+			min-width: 0;
+			max-width: 2.75rem;
+		}
+
+		.socials a {
+			width: 100%;
+			border-radius: 0.75rem;
 		}
 	}
 </style>
