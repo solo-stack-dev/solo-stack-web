@@ -159,12 +159,11 @@
 	});
 
 	/**
-	 * Visibility gate, tied to the drawing's reveal (CSS `--reveal`): while the stage enters from below, its visible share is
-	 * 0.2 + 0.8 × --wipe (the wipe runs over the first 80svh of scroll, the stage starts 80svh below the viewport top), so ENTER_GATE
-	 * opens at --wipe ≈ 0.31, when the drawing is ~3/4 faded in and on screen down to its base; the first morph follows a dwell later.
-	 * Leaving at the top: half the stage. The hover zone lies over the hero's bottom edge early in the wipe, so it waits for the same gate.
+	 * Visibility gate: a third of the stage on screen while it enters from below (the stage starts at the hero's bottom edge, so after
+	 * about a third of a screen of scroll); the first morph follows a dwell later, when the drawing is in view. Leaving at the top: half the
+	 * stage. The hover zone lies over the hero's bottom edge before that, so it waits for the same gate.
 	 */
-	const ENTER_GATE = 0.45;
+	const ENTER_GATE = 0.33;
 	const LEAVE_GATE = 0.5;
 	const watchStage = inView(
 		(_, entry) => {
@@ -548,15 +547,15 @@
 	.making {
 		position: relative;
 		--ink-cream: var(--color-cream);
-		/* Ink-wash wipe: the section overlaps (and paints over) the hero's bottom by --wipe-overlap; its plate floods up over the moon as a
-		   wet wash front (.track mask). Only this section's controls take pointer events, so the hero's controls below stay usable. */
+		/* Ink-wash seam: the section overlaps (and paints over) the hero's bottom by --wipe-overlap with one fixed painted wash (.track mask).
+		   No scroll-driven wipe: the owner found the wash reshaping (and the hero clouds sliding through its holes) laggy, so it scrolls as
+		   one plain painted edge. Only this section's controls take pointer events, so the hero's controls below stay usable. */
 		--wipe-overlap: 45svh;
 		margin-top: calc(-1 * var(--wipe-overlap));
-		/* Where the stage starts in the track: below the whole static wash; with the wipe, at its tail (below) */
+		/* Where the stage starts in the track: below the whole wash */
 		--stage-offset: var(--wipe-overlap);
 		/* `#making` links land on the stage, not on the wash above it */
 		scroll-margin-top: calc(-1 * var(--stage-offset));
-		view-timeline: --making-wipe block;
 		pointer-events: none;
 	}
 
@@ -565,20 +564,13 @@
 		pointer-events: auto;
 	}
 
-	/* Wipe progress 0…1. Initial value 1 is unused: without animation the static fallback below applies. */
-	@property --wipe {
-		syntax: '<number>';
-		inherits: true;
-		initial-value: 1;
-	}
-
 	.track {
 		position: relative;
 		/* The stage starts --stage-offset below the track top, so the wash front always has room for its lobes above it.
-		   Static fallback (reduced motion, no scroll-driven animations): one soft hero → plate wash across the overlap, the stage below it.
+		   One soft hero → plate wash across the overlap, the stage below it.
 		   --wipe-b: bottom of the wash ramp (solid plate below); --wipe-w: ramp height. The ramp's top fifth is transparent, so
 		   --wipe-w ≤ 1.25 × --wipe-b hides the track's straight top edge while the hero is on screen.
-		   Front = intersect of two painted-ramp copies at different widths/offsets: the shape changes as it moves, never visibly repeats, and
+		   Front = intersect of two painted-ramp copies at different widths/offsets: the shape never visibly repeats, and
 		   the ramp's faint even haze (a straight line over the bright moon) squares away, leaving the blooms. Both tile sideways near the
 		   painted (square) aspect, not smeared into a line. The solid layer is added on top. */
 		--wipe-b: var(--wipe-overlap);
@@ -617,44 +609,6 @@
 		padding-top: var(--stage-offset);
 	}
 
-	/* The wipe runs from page top (the overlap's share of the entry range) until the section top is --wipe-tail above the viewport top,
-	   which is where the stage starts: it is unveiled exactly when it fills the viewport. The track is solid at --wipe-front,
-	   which starts at the hero's bottom edge (it must never show through the translucent ramp) and crosses the viewport linearly, reaching
-	   its top as the wipe ends. As the track's straight top edge is off screen by then, the ramp keeps room for deep lobes through the
-	   wordmark: up to 1.6 × 48svh tall (tiles at 1.6 × the painted aspect's height), tightening only to 1.1 × the front's distance from
-	   that edge. At scroll 0 only its faint first blooms touch the hero's bottom; drawing and controls fade in later (.stage). */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: view()) {
-			.making {
-				--stage-offset: 25svh;
-			}
-
-			.track {
-				--wipe-tail: var(--stage-offset);
-				--wipe-front: calc(var(--wipe-overlap) * (1 - var(--wipe)) + var(--wipe-tail) * var(--wipe));
-				--wipe-w: min(calc((28svh + var(--wipe) * 20svh) * 1.6), calc(var(--wipe-front) * 1.1));
-				--wipe-b: calc(var(--wipe-front) + var(--wipe-w) * 0.1);
-				--wipe-x: calc(10% + var(--wipe) * 45%);
-				mask-size:
-					100% 100%,
-					calc(var(--wipe-w) * 1.125) var(--wipe-w),
-					calc(var(--wipe-w) * 0.8125) var(--wipe-w);
-				animation: making-wipe linear both;
-				animation-timeline: --making-wipe;
-				animation-range: entry 45% contain 25svh;
-			}
-		}
-	}
-
-	@keyframes making-wipe {
-		from {
-			--wipe: 0;
-		}
-		to {
-			--wipe: 1;
-		}
-	}
-
 	.stage {
 		position: relative;
 		height: 100svh;
@@ -663,19 +617,6 @@
 		/* Plate px → CSS px: cover the stage, but shrink on narrow landscape windows to keep the laptop in view (the plate letterboxes into
 		   the sky via its faded edges). Resolved in descendants (cq units). */
 		--s: max(100cqw / 2560, min(100cqh / 1440, 100cqw / 2400));
-	}
-
-	/* The plate floods in first; drawing, clock, titles and controls fade in over --wipe 0.12…0.37, while the drawing scrolls into view
-	   (--wipe is 1 without the animation). The autoplay gate (ENTER_GATE in the script) opens near the end of this fade. */
-	.stage {
-		--reveal: clamp(0, (var(--wipe) - 0.12) / 0.25, 1);
-	}
-
-	.stage > :global(:not(.scene, .caption)),
-	.caption > *,
-	.bloom-mask,
-	.ink {
-		opacity: var(--reveal);
 	}
 
 	/* ── scene ───────────────────────────────────────────────────────────── */
@@ -816,8 +757,7 @@
 		stroke-width: calc(var(--stroke) * 1.05);
 	}
 
-	/* The drawing's bloom box down to below its title (plate px). Takes pointer events only once the stage is on screen (it covers the
-	   hero's lower half during the wipe). */
+	/* The drawing's bloom box down to below its title (plate px). Takes pointer events only once the stage is on screen. */
 	.hover-zone {
 		position: absolute;
 		left: calc((var(--cx) - var(--box) / 2 * var(--k)) / var(--pw) * 100%);

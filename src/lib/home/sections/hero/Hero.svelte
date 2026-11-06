@@ -202,28 +202,24 @@
 		if (!use3D) threeReady = false;
 	});
 
-	// --- Parallax (pointer + scroll) ----------------------------------------------------------------------------
+	// --- Parallax (pointer only: nothing in the hero moves with scroll, the owner found scroll-coupled layers laggy) ---------
 
 	let hero: HTMLElement;
 	const target = { x: 0, y: 0 };
-	const current = { x: 0, y: 0, scroll: 0 };
+	const current = { x: 0, y: 0 };
 
 	const parallax = new RafLoop(() => {
+		if (Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001) return;
 		current.x += (target.x - current.x) * 0.08;
 		current.y += (target.y - current.y) * 0.08;
-		const scroll = Math.min(window.scrollY, window.innerHeight);
-		const changed = Math.abs(scroll - current.scroll) > 0.5 || Math.abs(target.x - current.x) > 0.001 || Math.abs(target.y - current.y) > 0.001;
-		current.scroll = scroll;
-		if (!changed) return;
 		hero.style.setProperty('--px', current.x.toFixed(3));
 		hero.style.setProperty('--py', current.y.toFixed(3));
-		hero.style.setProperty('--sy', scroll.toFixed(1));
 	});
 
 	$effect(() => {
 		parallax.paused = reducedMotion.current;
 		if (reducedMotion.current) {
-			for (const name of ['--px', '--py', '--sy']) hero.style.removeProperty(name);
+			for (const name of ['--px', '--py']) hero.style.removeProperty(name);
 			return;
 		}
 		if (!matchMedia('(pointer: fine)').matches) return;
@@ -398,7 +394,7 @@
 		--wm-y: calc(50cqh - var(--wm-size) * 0.42);
 		/* Parallax (written by the RafLoop; 0 without JS and under reduced motion) */
 		--moon-tx: calc(var(--px, 0) * 9px);
-		--moon-ty: calc(var(--py, 0) * 6px + var(--sy, 0) * 0.16px);
+		--moon-ty: calc(var(--py, 0) * 6px);
 		--wm-tx: calc(var(--px, 0) * -4px);
 		--wm-ty: calc(var(--py, 0) * -3px);
 
@@ -417,7 +413,7 @@
 			--moon-r: 125cqw;
 			--moon-cx: 148cqw;
 			--moon-cy: 80cqh;
-			--mascot-at: -158deg;
+			--mascot-at: -166deg;
 			--mascot-lift: calc(var(--mascot-w) * 0.04);
 			--mascot-w: 28cqw;
 			--mascot-tilt: 4deg;
@@ -447,7 +443,7 @@
 	.sky {
 		z-index: 0;
 		inset: -3% -2%;
-		translate: calc(var(--px, 0) * -3px) calc(var(--py, 0) * -2px + var(--sy, 0) * 0.35px);
+		translate: calc(var(--px, 0) * -3px) calc(var(--py, 0) * -2px);
 	}
 
 	.sky picture,
@@ -460,7 +456,7 @@
 
 	.stars {
 		z-index: 1;
-		translate: calc(var(--px, 0) * -5px) calc(var(--py, 0) * -3px + var(--sy, 0) * 0.3px);
+		translate: calc(var(--px, 0) * -5px) calc(var(--py, 0) * -3px);
 		animation: fade-in 900ms 150ms ease-out backwards;
 	}
 
@@ -846,8 +842,7 @@
 		}
 	}
 
-	/* Fades out over the first 40 % of the making wipe (Making.svelte: wipe = first 55svh of scroll), clear of the 21:00 clock and heading
-	   riding up with the wash. Listed before `settle`, which wins while it runs. */
+	/* Fades out over the first 22svh of scroll, before it reaches the nav. Listed before `settle`, which wins while it runs. */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: scroll()) {
 			.tagline {
@@ -865,18 +860,6 @@
 	@keyframes scroll-out {
 		to {
 			opacity: 0;
-		}
-	}
-
-	/* The mascot is gone before the making wipe's ramp reaches it (phones: it sits low on the rim, the wash front would cut it). Desktop:
-	   it is already leaving the viewport top by then. Static under reduced motion. */
-	@media (prefers-reduced-motion: no-preference) {
-		@supports (animation-timeline: scroll()) {
-			.mascot {
-				animation: scroll-out linear both;
-				animation-timeline: scroll(root block);
-				animation-range: 18svh 42svh;
-			}
 		}
 	}
 
@@ -908,7 +891,7 @@
 		color: var(--color-butter);
 	}
 
-	/* above the wash now, so it leaves with the tagline instead of being covered */
+	/* leaves with the tagline */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: scroll()) {
 			.scroll-cue {
