@@ -4,7 +4,7 @@
 	`HunterEmblem.svelte`) opens the license issued to the mascot, No. 404 (native popover: light dismiss and Escape for free).
 	Desktop: the seal is pressed into the painting's dark lower corner like an artist's seal; phones: beside the 404 numerals,
 	like a seal beside a signature (the sky above the text has no quiet corner). The license is an aged paper document:
-	deckled edge, a printed rule, the emblem blind embossed, the mascot's photo printed on the paper, an ochre ink stamp.
+	deckled edge, a printed rule, the mascot's photo printed on the paper, one ochre ink stamp as its only emblem.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -48,11 +48,8 @@
 				onpointerleave={() => (glare = { x: 0.5, y: 0.5 })}
 			>
 				<div class="license-head">
-					<HunterEmblem stamp class="emblem" />
-					<div>
-						<p class="license-title font-display font-black tracking-wordmark uppercase">{m.error_404_license_title()}</p>
-						<p class="license-class">{m.error_404_license_class()}</p>
-					</div>
+					<p class="license-title font-display font-black tracking-wordmark uppercase">{m.error_404_license_title()}</p>
+					<p class="license-class">{m.error_404_license_class()}</p>
 				</div>
 				<div class="license-body">
 					<enhanced:img class="photo" src={photo} alt="" sizes="5rem" />
@@ -190,20 +187,6 @@
 		inset: 0.55rem;
 		border: 1px solid rgb(28 26 22 / 0.32);
 		pointer-events: none;
-	}
-
-	.license-head {
-		display: flex;
-		align-items: center;
-		gap: 0.8rem;
-	}
-
-	/* blind embossed: the paper's own colour, lit from the top left, shaded to the bottom right */
-	.license-head :global(.emblem) {
-		width: 3.4rem;
-		flex: none;
-		color: #e4d09f;
-		filter: drop-shadow(-0.7px -0.7px 0 rgb(255 251 238 / 0.95)) drop-shadow(1px 1px 0.4px rgb(110 76 28 / 0.8));
 	}
 
 	.license-title {
