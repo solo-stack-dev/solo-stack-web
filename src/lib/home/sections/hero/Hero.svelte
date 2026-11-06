@@ -292,7 +292,8 @@
 		<ShootingStars maxY={0.5} />
 	</div>
 
-	<div class="layer clouds-back" aria-hidden="true">
+	<!-- Clouds drift left on their own (CSS `cloud-drift`), paused while the hero is off screen -->
+	<div class="layer clouds-back" aria-hidden="true" data-drift-paused={visible.current ? undefined : ''}>
 		<enhanced:img class="cloud cloud-1" src={clouds1} alt="" sizes={SIZES.cloud1} fetchpriority="low" />
 		<enhanced:img class="cloud cloud-2" src={clouds2} alt="" sizes={SIZES.cloud2} fetchpriority="low" />
 	</div>
@@ -348,7 +349,7 @@
 		</div>
 	</div>
 
-	<div class="layer clouds-front" aria-hidden="true">
+	<div class="layer clouds-front" aria-hidden="true" data-drift-paused={visible.current ? undefined : ''}>
 		<enhanced:img class="cloud cloud-3" src={clouds3} alt="" sizes={SIZES.cloud3} fetchpriority="low" />
 	</div>
 
@@ -468,61 +469,97 @@
 		right: 35%;
 	}
 
+	/* Pointer parallax only: the clouds scroll with the page (a scroll offset slid them against the 21:00 wash) */
 	.clouds-back {
 		z-index: 2;
-		translate: calc(var(--px, 0) * -7px) calc(var(--py, 0) * -4px + var(--sy, 0) * 0.22px);
+		translate: calc(var(--px, 0) * -7px) calc(var(--py, 0) * -4px);
 	}
 
 	.clouds-front {
 		z-index: 4;
 		pointer-events: none;
-		translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -6px + var(--sy, 0) * 0.05px);
+		translate: calc(var(--px, 0) * -12px) calc(var(--py, 0) * -6px);
 	}
 
+	/* Cropped to content (art.ts); widths must match SIZES. 1 warm low bank, 2 thin wisps (behind the moon); 3 dark bank over the lower rim.
+	   --x/--w: left edge and width in cqw (unitless, the drift loop below computes with them); --speed: drift in cqw per second (depth:
+	   the far wisps slowest, the front bank fastest). */
 	.layer :global(.cloud) {
 		position: absolute;
+		left: calc(var(--x) * 1cqw);
+		width: calc(var(--w) * 1cqw);
 		height: auto;
 		pointer-events: none;
 	}
 
-	/* Cropped to content (art.ts); widths must match SIZES. 1 warm low bank, 2 thin wisps (behind the moon); 3 dark bank over the lower rim. */
 	.layer :global(.cloud-1) {
-		left: -12cqw;
+		--x: -12;
+		--w: 74;
+		--speed: 0.32;
 		bottom: 9cqh;
-		width: 74cqw;
 	}
 
 	.layer :global(.cloud-2) {
-		left: 6cqw;
+		--x: 6;
+		--w: 58;
+		--speed: 0.2;
 		top: 11cqh;
-		width: 58cqw;
 		opacity: 0.55;
 	}
 
 	.layer :global(.cloud-3) {
-		left: -14cqw;
+		--x: -14;
+		--w: 64;
+		--speed: 0.5;
 		bottom: -7cqh;
-		width: 64cqw;
 	}
 
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
 		.layer :global(.cloud-1) {
-			left: -70cqw;
+			--x: -70;
+			--w: 150;
+			--speed: 0.6;
 			bottom: 12cqh;
-			width: 150cqw;
 		}
 
 		.layer :global(.cloud-2) {
-			left: -48cqw;
+			--x: -48;
+			--w: 130;
+			--speed: 0.4;
 			top: 4cqh;
-			width: 130cqw;
 			opacity: 0.6;
 		}
 
 		.layer :global(.cloud-3) {
-			left: -78cqw;
+			--x: -78;
+			--w: 170;
+			--speed: 0.9;
 			bottom: -3cqh;
-			width: 170cqw;
+		}
+	}
+
+	/* Endless drift to the left, independent of scroll. Each cloud travels from just past the hero's right edge to just past its left edge
+	   (--drift-margin beyond the box, more than the pointer parallax), so the wrap happens while it is fully clipped: no seam, no pop, and
+	   the cutouts need not tile. The negative delay starts every cloud at its painted position (translate 0 at t = 0). Compositor-only
+	   (translate); paused while the hero is off screen; static under reduced motion. */
+	@media (prefers-reduced-motion: no-preference) {
+		.layer :global(.cloud) {
+			--drift-margin: 4;
+			animation: cloud-drift calc((100 + var(--w) + 2 * var(--drift-margin)) / var(--speed) * 1s) linear infinite;
+			animation-delay: calc((100 + var(--drift-margin) - var(--x)) / var(--speed) * -1s);
+		}
+
+		.layer[data-drift-paused] :global(.cloud) {
+			animation-play-state: paused;
+		}
+	}
+
+	@keyframes cloud-drift {
+		from {
+			translate: calc((100 + var(--drift-margin) - var(--x)) * 1cqw) 0;
+		}
+		to {
+			translate: calc((var(--x) + var(--w) + var(--drift-margin)) * -1cqw) 0;
 		}
 	}
 
