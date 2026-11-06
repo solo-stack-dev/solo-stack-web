@@ -196,3 +196,90 @@ export function beamMask(bp: Breakpoint): string {
 		`<polygon points='${points}' fill='white' filter='url(%23b)'/></svg>`;
 	return `url("data:image/svg+xml,${svg.replaceAll('<', '%3C').replaceAll('>', '%3E')}")`;
 }
+
+/**
+ * The video screen grows this much about its center, under the frame's inner edge: the frame art's hole is a few px larger
+ * than its recorded 16:9 aperture (x 114…1800, y 133…1091 vs 117…1797, 139…1084), which left a dark ruled gap around the picture.
+ */
+export const SCREEN_GROW = 0.017;
+
+export type Side = 'top' | 'right' | 'bottom' | 'left';
+
+/**
+ * Where the projected light reaches the picture's edge on the sides away from the beam, as lit stretches [from, to] in % of
+ * the picture's side (top/bottom left → right, left/right top → bottom). Everything between them is unlit: zero alpha in
+ * the frame art's mask AND in the CSS edge, which both read these numbers, so neither bridges the other's gaps. Each side
+ * has 2–3 gaps of 8–12 % of its length; the first and last stretch fade in from / out toward the corner. Only the sides
+ * away from the beam use them (top/right/bottom on desktop, top/right/left on mobile).
+ */
+const EDGE_LIGHT: Record<Side, [number, number][]> = {
+	// gaps 27–38, 60–70
+	top: [
+		[6, 27],
+		[38, 60],
+		[70, 93]
+	],
+	// gaps 26–36, 52–62, 76–85
+	right: [
+		[5, 26],
+		[36, 52],
+		[62, 76],
+		[85, 96]
+	],
+	// gaps 21–31, 52–62, 74–83
+	bottom: [
+		[5, 21],
+		[31, 52],
+		[62, 74],
+		[83, 95]
+	],
+	// gaps 28–37, 63–74
+	left: [
+		[7, 28],
+		[37, 63],
+		[74, 93]
+	]
+};
+
+/** Ramp (in % of the side) from unlit to full light: long toward a corner, short at the gaps' edges. */
+const CORNER_RAMP = 9;
+const GAP_RAMP = 2;
+
+/** The screen (picture grown by SCREEN_GROW) in % of the frame art, per axis: offset and length. */
+function screenInFrame(axis: 'x' | 'y') {
+	const { width, height, window } = ART.frame;
+	const [offset, length, total] = axis === 'x' ? [window.x, window.width, width] : [window.y, window.height, height];
+	return { start: ((offset - (length * SCREEN_GROW) / 2) / total) * 100, length: ((length * (1 + SCREEN_GROW)) / total) * 100 };
+}
+
+/**
+ * The lit stretches of one side as a linear gradient along it, in `color` on transparent. `space: 'screen'` positions it on
+ * the screen element (CSS edge); `'frame'` on the frame art (its mask), mapped through the aperture so both line up exactly.
+ */
+function edgeGradient(side: Side, color: string, space: 'screen' | 'frame'): string {
+	const stretches = EDGE_LIGHT[side];
+	const map = space === 'screen' ? { start: 0, length: 100 } : screenInFrame(side === 'top' || side === 'bottom' ? 'x' : 'y');
+	const at = (p: number) => `${n(map.start + (p * map.length) / 100)}%`;
+	const stops = ['transparent 0'];
+	stretches.forEach(([from, to], index) => {
+		const rampIn = index === 0 ? CORNER_RAMP : GAP_RAMP;
+		const rampOut = index === stretches.length - 1 ? CORNER_RAMP : GAP_RAMP;
+		stops.push(`transparent ${at(from)}`, `${color} ${at(from + rampIn)}`, `${color} ${at(to - rampOut)}`, `transparent ${at(to)}`);
+	});
+	const direction = side === 'top' || side === 'bottom' ? '90deg' : '180deg';
+	return `linear-gradient(${direction}, ${stops.join(', ')})`;
+}
+
+const SIDE_KEY: Record<Side, string> = { top: 't', right: 'r', bottom: 'b', left: 'l' };
+
+/**
+ * Inline CSS vars of the broken light edge: `--light-{t,r,b,l}` (frame mask strips, black on transparent) and
+ * `--edge-{t,r,b,l}` (CSS edge strokes in `var(--edge-lit)`, which the screen defines).
+ */
+export function edgeVars(): { frame: string; screen: string } {
+	const sides = Object.keys(EDGE_LIGHT) as Side[];
+	return {
+		frame: sides.map((side) => `--light-${SIDE_KEY[side]}: ${edgeGradient(side, '#000', 'frame')}`).join('; '),
+		screen: sides.map((side) => `--edge-${SIDE_KEY[side]}: ${edgeGradient(side, 'var(--edge-lit)', 'screen')}`).join('; ')
+	};
+}
