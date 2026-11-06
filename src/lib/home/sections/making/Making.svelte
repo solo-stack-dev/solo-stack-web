@@ -159,15 +159,19 @@
 	});
 
 	/**
-	 * Visibility gate: half the stage on screen, or three quarters while it still enters from below (the hero → 21:00 wipe is then still
-	 * revealing the drawing). The hover zone lies over the hero's lower half during the wipe, so it waits for the same gate.
+	 * Visibility gate, tied to the drawing's reveal (CSS `--reveal`): while the stage enters from below, its visible share is
+	 * 0.2 + 0.8 × --wipe (the wipe runs over the first 80svh of scroll, the stage starts 80svh below the viewport top), so ENTER_GATE
+	 * opens at --wipe ≈ 0.31, when the drawing is ~3/4 faded in and on screen down to its base; the first morph follows a dwell later.
+	 * Leaving at the top: half the stage. The hover zone lies over the hero's bottom edge early in the wipe, so it waits for the same gate.
 	 */
+	const ENTER_GATE = 0.45;
+	const LEAVE_GATE = 0.5;
 	const watchStage = inView(
 		(_, entry) => {
-			onStage = entry.intersectionRatio >= (entry.boundingClientRect.top > 0 ? 0.75 : 0.5) - 0.001;
+			onStage = entry.intersectionRatio >= (entry.boundingClientRect.top > 0 ? ENTER_GATE : LEAVE_GATE) - 0.001;
 			if (!onStage) hovered = false;
 		},
-		{ threshold: [0, 0.5, 0.75, 1] }
+		{ threshold: [0, ENTER_GATE, LEAVE_GATE, 1] }
 	);
 
 	// Morph state (per frame, not reactive). `points` is the drawn line; every morph starts from a snapshot of it, so a click mid-morph
@@ -585,15 +589,28 @@
 		background:
 			linear-gradient(var(--making-sky) 0 0) top / 100% var(--wipe-overlap) no-repeat,
 			linear-gradient(var(--making-sky), transparent) left 0 top calc(var(--wipe-overlap) - 1px) / 100% 30svh no-repeat;
-		/* the solid layer starts inside the ramps' fully opaque bottom (last ~15 %), so its straight top never shows */
-		mask-image: linear-gradient(#000 0 0), var(--wash-spread-up), var(--wash-spread-up);
+		/* The solid layer is a soft fill, not a block: the painted ramp has a flat floor (every column turns opaque between ~74 and 84 % of its
+		   height), so the hero seen through its last holes ended on one straight row over the 21:00 sky. The fill closes those holes gradually
+		   over --wipe-fill above that floor (eased: the ragged upper wash stays untouched) and is solid from the ramps' opaque bottom (last
+		   ~10 %) on, so nothing straight ever shows. */
+		--wipe-fill: calc(var(--wipe-w) * 0.5);
+		mask-image:
+			linear-gradient(
+				#0000,
+				#0000000a calc(var(--wipe-fill) * 0.25),
+				#00000033 calc(var(--wipe-fill) * 0.5),
+				#00000099 calc(var(--wipe-fill) * 0.75),
+				#000000e0 calc(var(--wipe-fill) * 0.9),
+				#000 var(--wipe-fill)
+			),
+			var(--wash-spread-up), var(--wash-spread-up);
 		mask-repeat: no-repeat, repeat-x, repeat-x;
 		mask-size:
 			100% 100%,
 			calc(var(--wipe-w) * 1.8) var(--wipe-w),
 			calc(var(--wipe-w) * 1.3) var(--wipe-w);
 		mask-position:
-			0 calc(var(--wipe-b) - var(--wipe-w) * 0.1),
+			0 calc(var(--wipe-b) - var(--wipe-w) * 0.1 - var(--wipe-fill)),
 			var(--wipe-x) calc(var(--wipe-b) - var(--wipe-w)),
 			0 calc(var(--wipe-b) - var(--wipe-w));
 		mask-composite: add, intersect, add;
@@ -648,13 +665,17 @@
 		--s: max(100cqw / 2560, min(100cqh / 1440, 100cqw / 2400));
 	}
 
-	/* During the wipe only the plate floods in; drawing, clock, titles and controls follow once the front passes the middle (--wipe is 1
-	   without the animation). */
+	/* The plate floods in first; drawing, clock, titles and controls fade in over --wipe 0.12…0.37, while the drawing scrolls into view
+	   (--wipe is 1 without the animation). The autoplay gate (ENTER_GATE in the script) opens near the end of this fade. */
+	.stage {
+		--reveal: clamp(0, (var(--wipe) - 0.12) / 0.25, 1);
+	}
+
 	.stage > :global(:not(.scene, .caption)),
 	.caption > *,
 	.bloom-mask,
 	.ink {
-		opacity: clamp(0, (var(--wipe) - 0.35) / 0.3, 1);
+		opacity: var(--reveal);
 	}
 
 	/* ── scene ───────────────────────────────────────────────────────────── */
@@ -676,19 +697,34 @@
 		   bloom-wash copies near their painted aspect, ≥ 18svh tall: never a cut, never the feather's streaks stretched over the bright cloud. */
 		--feather-top: max(18svh, calc(var(--ph) * var(--s) * 0.08));
 		--feather-bottom: calc(var(--ph) * var(--s) * 0.18);
-		mask-image: linear-gradient(#000 0 0), var(--feather-down), var(--wash-spread-up), var(--wash-spread-up);
-		mask-repeat: no-repeat, no-repeat, repeat-x, repeat-x;
+		/* The painted ramp is straight at both ends: a faint haze starts on one row (~20 %) across the whole width, and every column turns
+		   opaque on one row (~80 %). Over the bright painted clouds on the dark sky backing either reads as a horizontal line. So the ramps
+		   are intersected with an eased fade (0 until 20 %, which zeroes the haze onset) and the solid layer is an eased fill from 40 % that
+		   closes the last holes gradually, solid from 90 % on. */
+		mask-image:
+			linear-gradient(
+				#0000,
+				#0000000a calc(var(--feather-top) * 0.125),
+				#00000033 calc(var(--feather-top) * 0.25),
+				#00000099 calc(var(--feather-top) * 0.375),
+				#000000e0 calc(var(--feather-top) * 0.45),
+				#000 calc(var(--feather-top) * 0.5)
+			),
+			var(--feather-down), linear-gradient(#0000 20%, #0000001a 35%, #00000066 50%, #000000cc 65%, #000 80%), var(--wash-spread-up), var(--wash-spread-up);
+		mask-repeat: no-repeat, no-repeat, no-repeat, repeat-x, repeat-x;
 		mask-size:
-			100% calc(100% - var(--feather-top) - var(--feather-bottom) + 2px),
+			100% calc(100% - var(--feather-top) * 0.4 - var(--feather-bottom) + 1px),
 			100% var(--feather-bottom),
+			100% var(--feather-top),
 			calc(var(--feather-top) * 1.8) var(--feather-top),
 			calc(var(--feather-top) * 1.3) var(--feather-top);
 		mask-position:
-			0 calc(var(--feather-top) - 1px),
+			0 calc(var(--feather-top) * 0.4),
 			0 100%,
+			0 0,
 			37% 0,
 			0 0;
-		mask-composite: add, add, intersect, add;
+		mask-composite: add, add, intersect, intersect, add;
 	}
 
 	.plate {
