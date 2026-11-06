@@ -103,5 +103,21 @@ export const ART_CROPS: Record<string, ArtCrop> = {
 			width: 640,
 			height: 1057
 		}
+	},
+	'hero-cloud-seat': {
+		master: {
+			width: 2048,
+			height: 1152
+		},
+		crop: {
+			left: 146,
+			top: 256,
+			width: 1762,
+			height: 736
+		},
+		output: {
+			width: 640,
+			height: 267
+		}
 	}
 };

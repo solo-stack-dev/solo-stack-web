@@ -5,8 +5,9 @@
 // - cutouts (clouds, moon disc, mascot + golden): cropped to the alpha box, downscaled; crop rects go to ../art.ts so the layout keeps
 //   master coordinates (anchors, moon circle). Clouds also get `cleanFringe`.
 // - moon texture: 2048×1024 WebP for the Threlte sphere (plain URL).
+// - cloud seat (the cushion the mascot sits on): cropped to the alpha box, 640 px wide (rendered ≤ ~18rem; no fringe clean-up, clean alpha).
 //
-// Run: node src/lib/home/sections/hero/tools/build-assets.mjs [job ...]   (jobs: plates clouds moon mascot)
+// Run: node src/lib/home/sections/hero/tools/build-assets.mjs [job ...]   (jobs: plates clouds moon mascot cloud-seat)
 // `--preview <dir>` writes before/after crops of the cloud clean-up on dark and butter.
 // `sharp` comes from pnpm's virtual store (ships with @sveltejs/enhanced-img; no new dependency).
 import { createRequire } from 'node:module';
@@ -261,6 +262,10 @@ const jobs = {
 		const box = union(alphaBox(normal, 8, 6), alphaBox(golden, 8, 6));
 		await cutout('mascot-hero-moonrim', master('mascot/mascot-hero-moonrim.png'), { box, width: 640 });
 		await cutout('mascot-golden', master('mascot/mascot-golden.png'), { box, width: 640 });
+	},
+	async 'cloud-seat'() {
+		// Rendered ~1.3 × --mascot-w (≤ ~18rem desktop, ~37vw phones): 640 px covers 2×; the native generation is ~1430 px across the crop.
+		await cutout('hero-cloud-seat', master('hero/hero-cloud-seat.png'), { width: 640 });
 	}
 };
 

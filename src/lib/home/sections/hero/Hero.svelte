@@ -44,6 +44,7 @@
 	import moonDisc from './assets/hero-moon-disc.webp?w=1942;1520;1200;900;640&quality=38&enhanced';
 	import mascot from './assets/mascot-hero-moonrim.webp?w=640;420;280&quality=55&enhanced';
 	import mascotGolden from './assets/mascot-golden.webp?w=640;420;280&quality=55&enhanced';
+	import cloudSeat from './assets/hero-cloud-seat.webp?w=640;420;280&quality=50&enhanced';
 
 	const PHASE_NAMES: Record<MoonPhase, () => string> = {
 		full: m.home_hero_moon_phase_full,
@@ -79,6 +80,22 @@
 		sitY: ((MASCOT_SEAT.y - mascotCrop.top) / mascotCrop.height) * 100
 	};
 
+	/**
+	 * The cloud the mascot sits on (docs/art/hero/README.md, cloud-seat registration): its dent (1164, 435) in cloud master px meets the
+	 * mascot seat. CLOUD_SCALE = cloud master px per mascot master px, from the registration preview (758/2048 ÷ 594/1024).
+	 */
+	const CLOUD_DENT = { x: 1164, y: 435 };
+	const CLOUD_SCALE = 0.638;
+	const cloudCrop = ART_CROPS['hero-cloud-seat'].crop;
+	const cloudRig = {
+		/** % of the mascot box width */
+		width: ((cloudCrop.width * CLOUD_SCALE) / mascotCrop.width) * 100,
+		/** % of the cloud image itself */
+		dentX: ((CLOUD_DENT.x - cloudCrop.left) / cloudCrop.width) * 100,
+		dentY: ((CLOUD_DENT.y - cloudCrop.top) / cloudCrop.height) * 100
+	};
+	const cloudOfMascot = cloudRig.width / 100;
+
 	const pct = (value: number) => `${value.toFixed(3)}%`;
 
 	/** `sizes` per layer, mirroring the CSS below: phone/tall-portrait layout first, then desktop. */
@@ -89,7 +106,12 @@
 		cloud1: phone('150vw', '74vw'),
 		cloud2: phone('130vw', '58vw'),
 		cloud3: phone('170vw', '64vw'),
-		mascot: phone('28vw', 'clamp(7rem, 11vw, 13rem)')
+		mascot: phone('28vw', 'clamp(7rem, 11vw, 13rem)'),
+		// --mascot-w × cloudRig.width
+		cloudSeat: phone(
+			`${(28 * cloudOfMascot).toFixed(0)}vw`,
+			`clamp(${(7 * cloudOfMascot).toFixed(1)}rem, ${(11 * cloudOfMascot).toFixed(1)}vw, ${(13 * cloudOfMascot).toFixed(1)}rem)`
+		)
 	};
 
 	// --- Moon phase ---------------------------------------------------------------------------------------------
@@ -310,12 +332,18 @@
 			style:--mascot-aspect={mascotRig.aspect.toFixed(4)}
 			style:--sit-x={pct(mascotRig.sitX)}
 			style:--sit-y={pct(mascotRig.sitY)}
+			style:--cloud-w={pct(cloudRig.width)}
+			style:--dent-x={pct(cloudRig.dentX)}
+			style:--dent-y={pct(cloudRig.dentY)}
 		>
-			<div class="mascot-figure">
-				<enhanced:img class="mascot-art mascot-normal" src={mascot} alt="" sizes={SIZES.mascot} />
-				<!-- Shiny variant (1 in 4096): lazy and display:none, so the other visitors never download it -->
-				<enhanced:img class="mascot-art mascot-golden" src={mascotGolden} alt="" sizes={SIZES.mascot} loading="lazy" />
-				<span class="laptop-glow"></span>
+			<div class="mascot-bob">
+				<enhanced:img class="cloud-seat" src={cloudSeat} alt="" sizes={SIZES.cloudSeat} />
+				<div class="mascot-figure">
+					<enhanced:img class="mascot-art mascot-normal" src={mascot} alt="" sizes={SIZES.mascot} />
+					<!-- Shiny variant (1 in 4096): lazy and display:none, so the other visitors never download it -->
+					<enhanced:img class="mascot-art mascot-golden" src={mascotGolden} alt="" sizes={SIZES.mascot} loading="lazy" />
+					<span class="laptop-glow"></span>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -358,8 +386,9 @@
 		--moon-r: min(50cqw, 92cqh);
 		--moon-cx: 86cqw;
 		--moon-cy: 96cqh;
-		/* Mascot sit point on the rim (angle from the moon center) */
+		/* Mascot seat on its cloud: angle from the moon center, radial lift off the rim (the cloud's lower right rests on the moon) */
 		--mascot-at: -131deg;
+		--mascot-lift: calc(var(--mascot-w) * 0.2);
 		--mascot-w: clamp(7rem, 11cqw, 13rem);
 		--mascot-tilt: 4deg;
 		/* Wordmark */
@@ -388,8 +417,9 @@
 			--moon-cx: 148cqw;
 			--moon-cy: 80cqh;
 			--mascot-at: -158deg;
+			--mascot-lift: calc(var(--mascot-w) * 0.04);
 			--mascot-w: 28cqw;
-			--mascot-tilt: 6deg;
+			--mascot-tilt: 4deg;
 			--wm-size: min(27cqw, 15cqh);
 			/* the S's optical edge (and the tagline) on the page gutter, under the clock */
 			--wm-x: calc(var(--page-gutter) - 0.06 * var(--wm-size));
@@ -580,7 +610,8 @@
 		pointer-events: none;
 	}
 
-	/* Mascot (docs/art/mascot): seat point (--sit-x/y) on the rim, the pivot for the shooting-star lean; laptop glow flickers on face/hands. */
+	/* Mascot (docs/art/mascot) on its cloud seat: seat point (--sit-x/y) on the cloud's dent, lifted off the rim by --mascot-lift; the pivot
+	   for the shooting-star lean (figure only, the cloud stays). Cloud and figure bob together; laptop glow flickers on face/hands. */
 
 	.mascot {
 		/* laptop light, fractions of the cropped image (between the lid, the hands and the face) */
@@ -588,14 +619,36 @@
 		--glow-y: 45%;
 
 		position: absolute;
-		left: calc(50% + 50% * cos(var(--mascot-at)));
-		top: calc(50% + 50% * sin(var(--mascot-at)));
+		left: calc(50% + (50% + var(--mascot-lift)) * cos(var(--mascot-at)));
+		top: calc(50% + (50% + var(--mascot-lift)) * sin(var(--mascot-at)));
 		width: var(--mascot-w);
 		aspect-ratio: var(--mascot-aspect);
 		translate: calc(var(--sit-x) * -1) calc(var(--sit-y) * -1);
 		rotate: var(--mascot-tilt);
 		transform-origin: var(--sit-x) var(--sit-y);
 		pointer-events: none;
+	}
+
+	.mascot-bob {
+		position: absolute;
+		inset: 0;
+	}
+
+	/* Behind the figure (legs dangle in front), above the moon; dent on the seat point */
+	.mascot :global(.cloud-seat) {
+		position: absolute;
+		left: var(--sit-x);
+		top: var(--sit-y);
+		width: var(--cloud-w);
+		height: auto;
+		max-width: none;
+		translate: calc(var(--dent-x) * -1) calc(var(--dent-y) * -1);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.mascot-bob {
+			animation: bob 5.2s ease-in-out infinite alternate;
+		}
 	}
 
 	.mascot-figure {
@@ -919,6 +972,16 @@
 		}
 		80% {
 			opacity: 0.65;
+		}
+	}
+
+	/* ~3–4 px (1.2 % of the figure's height) up and back, compositor only */
+	@keyframes bob {
+		from {
+			transform: translateY(0.3%);
+		}
+		to {
+			transform: translateY(-0.9%);
 		}
 	}
 
