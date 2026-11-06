@@ -118,19 +118,21 @@
 	}
 
 	/*
-	 * Desktop: the laptop (its lit base starts at 85.5% of the strip) keeps 4% of the column clear of the K (`--laptop-x`; the
-	 * K's leg ends ~0.8% inside the column's right edge). Where the margin beside the column is too narrow for that, the strip
-	 * grows just enough to keep the laptop on that line: at 1280px it stands on the screen's edge, below ~1260px it leaves the
-	 * screen and only its glow spills in. It never touches the K.
+	 * Desktop: the strip is held at both ends against the wordmark. The laptop (its lit base starts at 85.5% of the strip)
+	 * keeps 4% of the column clear of the K (`--laptop-x`; the K's leg ends ~0.8% inside the column's right edge), and the
+	 * owl's tree (its crown ends at 13% of the strip) ends 2% of the column left of the S (`--tree-x`). Where the margins
+	 * beside the column are too narrow for both, the strip grows until both fit (72.5% of it lies between the two lines): the
+	 * laptop stands on the screen's right edge or leaves it (only its glow spills in), and the tree crops off the left edge.
+	 * Neither touches a letter.
 	 */
 	@media (min-width: 64rem) {
 		.site-footer {
 			--laptop-x: calc(50cqw + var(--column) * 0.532);
-			--land-w: max(110cqw, var(--laptop-x) / 0.855);
+			--tree-x: calc(50cqw - var(--column) * 0.52);
+			--land-w: max(110cqw, var(--laptop-x) / 0.855, (var(--laptop-x) - var(--tree-x)) / 0.725);
 			--anchor: 0.45;
 			--gap: 6.5rem;
 		}
-
 	}
 
 	/*
@@ -294,10 +296,10 @@
 		margin-bottom: -1px;
 	}
 
-	/* desktop: never closer to the K than `--laptop-x` (see the 64rem block above) */
+	/* desktop: the laptop never nearer the K than `--laptop-x`, the tree never nearer the S than `--tree-x` (64rem block above) */
 	@media (min-width: 64rem) {
 		.land {
-			margin-left: max((100cqw - var(--land-w)) * var(--anchor), var(--laptop-x) - var(--land-w) * 0.855);
+			margin-left: min(max((100cqw - var(--land-w)) * var(--anchor), var(--laptop-x) - var(--land-w) * 0.855), var(--tree-x) - var(--land-w) * 0.13);
 		}
 	}
 

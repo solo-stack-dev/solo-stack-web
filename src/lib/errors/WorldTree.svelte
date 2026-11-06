@@ -71,7 +71,7 @@
 			style:top="{TOP.y * 100}%"
 			style:height="{FIGURE.wanderer * 100}%"
 		/>
-		<p class="bubble is-wanderer" class:is-shown={atTop} style:left="{TOP.wanderer * 100}%" style:top="{(TOP.y - FIGURE.wanderer * 0.95) * 100}%" aria-live="polite">
+		<p class="bubble is-wanderer" class:is-shown={atTop} style:--x={TOP.wanderer} style:--fig={FIGURE.wanderer} aria-live="polite">
 			{#if atTop}{m.error_404_wanderer_line()}{/if}
 		</p>
 
@@ -388,12 +388,30 @@
 		transform-origin: 0 100%;
 	}
 
-	/* right of his head, so it never leaves the top of the screen */
+	/* Phones: right of his head, so it never leaves the top of the screen */
 	.is-wanderer {
+		left: calc(var(--x) * 100%);
+		top: calc((var(--top-y) - var(--fig) * 0.95) * 100%);
 		translate: 1.4rem 0;
 		max-width: min(14rem, 42vw);
 		rotate: 1.5deg;
 		transform-origin: 0 0;
+	}
+
+	/*
+	 * Desktop: beside him, below his shoulders, hanging from its corner nearest his head. Its left edge keeps 1.5rem clear of
+	 * the figure (half its width: the cutout is 0.56 as wide as tall), its top 3rem under the nav row's 4.5rem (the stage's top
+	 * sits at `--platform - --top-y * --h` on screen), its right edge 2 to 3.5rem from the screen's (the nav's end at 1440).
+	 */
+	@media (min-width: 64rem) {
+		.is-wanderer {
+			--half: calc(var(--fig) * 0.28 * 100cqh);
+			left: calc(var(--x) * 100% + var(--half) + 1.5rem);
+			top: max((var(--top-y) - var(--fig) * 0.5) * 100%, 7.5rem - var(--platform) + var(--top-y) * var(--h));
+			translate: none;
+			max-width: min(14rem, (1 - var(--x)) * 100cqw + 8vw - var(--half) - 1.5rem - clamp(2rem, 8vw - 3.5rem, 3.5rem));
+			rotate: 2deg;
+		}
 	}
 
 	.is-wanderer.is-shown {
