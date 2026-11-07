@@ -1,14 +1,14 @@
 # Critique round 6: Claude Opus 5.5 (high)
 
-| Area | R5 | R6 |
-|---|---|---|
-| Homepage | 9.4 | 9.5 |
-| /blog | 9.5 | 9.5 |
+| Area         | R5  | R6  |
+| ------------ | --- | --- |
+| Homepage     | 9.4 | 9.5 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.5 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.4 | 9.5 |
-| Overall | 9.4 | 9.5 |
+| /stats       | 9.5 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.4 | 9.5 |
+| Overall      | 9.4 | 9.5 |
 
 I checked all five of my round-5 requests and gpt's homepage item 1 against `critique/round-6/` and `round-6/<area>/`. I also compared crops and luminance profiles across the cinema edges with the round-5 shots. All are solved. One possible regression turned out to be a capture artefact: `round-6/shell/footer-1024-dark` shows no ridge under the wordmark, so the letters' feet end on a ruler-straight cut. A fresh 1024 dark capture of `/blog` from the dev server (kept in my scratch folder, not committed) shows the ridge and grass in place. The agent's shot was taken before the strip loaded. No deduction.
 

@@ -1,1 +1,14 @@
-{"de":{"blog_index_closing":"Das war es für jetzt. Jedes neue Video bringt einen neuen Artikel.","blog_post_newer":"Neuerer Artikel","blog_post_older":"Älterer Artikel","blog_post_more_label":"Navigation im Blog"},"en":{"blog_index_closing":"That's all for now. Every new video brings a new article.","blog_post_newer":"Newer article","blog_post_older":"Older article","blog_post_more_label":"Blog navigation"}}
+{
+	"de": {
+		"blog_index_closing": "Das war es für jetzt. Jedes neue Video bringt einen neuen Artikel.",
+		"blog_post_newer": "Neuerer Artikel",
+		"blog_post_older": "Älterer Artikel",
+		"blog_post_more_label": "Navigation im Blog"
+	},
+	"en": {
+		"blog_index_closing": "That's all for now. Every new video brings a new article.",
+		"blog_post_newer": "Newer article",
+		"blog_post_older": "Older article",
+		"blog_post_more_label": "Blog navigation"
+	}
+}

@@ -1,14 +1,14 @@
 # Critique round 4: gpt-6.1-sol (high)
 
-| Area | R3 | R4 |
-|---|---|---|
-| Homepage | 9.4 | 9.4 |
-| /blog | 9.5 | 9.5 |
+| Area         | R3  | R4  |
+| ------------ | --- | --- |
+| Homepage     | 9.4 | 9.4 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.2 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.3 | 9.5 |
-| Overall | 9.4 | 9.4 |
+| /stats       | 9.2 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.3 | 9.5 |
+| Overall      | 9.4 | 9.4 |
 
 Sent state verified live through the local honeypot discard path (no email sent): the small owl settles above the horizon, the merged footer stays legible, mobile success is compact.
 

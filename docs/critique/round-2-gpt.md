@@ -2,15 +2,15 @@
 
 Screens: `docs/screens/critique/round-2/`.
 
-| Area | R1 | R2 |
-|---|---|---|
-| Homepage | 8.3 | 8.8 |
-| /blog | 8.0 | 9.0 |
+| Area         | R1  | R2  |
+| ------------ | --- | --- |
+| Homepage     | 8.3 | 8.8 |
+| /blog        | 8.0 | 9.0 |
 | /blog/[slug] | 7.7 | 8.6 |
-| /stats | 7.6 | 8.3 |
-| /kontakt | 7.8 | 9.0 |
-| Site shell | 7.9 | 9.0 |
-| Overall | 7.9 | 8.8 |
+| /stats       | 7.6 | 8.3 |
+| /kontakt     | 7.8 | 9.0 |
+| Site shell   | 7.9 | 9.0 |
+| Overall      | 7.9 | 8.8 |
 
 ## 1. Homepage 8.8
 

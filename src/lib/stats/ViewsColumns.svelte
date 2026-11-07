@@ -126,6 +126,8 @@
 	let active = $state<number | null>(null);
 	let focused = $state(false);
 	let keyed = $state<number | null>(null);
+	/** The keyboard position, clamped: switching to a shorter period keeps `keyed` from an earlier, longer one. */
+	const position = $derived(Math.min(keyed ?? layout.best, rows.length - 1));
 
 	function scrub(event: PointerEvent) {
 		const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -134,7 +136,7 @@
 	}
 
 	function key(event: KeyboardEvent) {
-		const from = keyed ?? layout.best;
+		const from = position;
 		const next = { ArrowLeft: from - 1, ArrowDown: from - 1, ArrowRight: from + 1, ArrowUp: from + 1, Home: 0, End: rows.length - 1 }[event.key] ?? null;
 		if (next === null) return;
 		event.preventDefault();
@@ -166,8 +168,8 @@
 	aria-label="{m.stats_youtube_views_chart()}: {formatNumber(rows.reduce((sum, row) => sum + row.views, 0))}"
 	aria-valuemin={1}
 	aria-valuemax={rows.length}
-	aria-valuenow={(keyed ?? layout.best) + 1}
-	aria-valuetext={reading(Math.min(keyed ?? layout.best, rows.length - 1))}
+	aria-valuenow={position + 1}
+	aria-valuetext={reading(position)}
 >
 	<svg viewBox="0 0 {layout.w} {layout.h}" width={layout.w} height={layout.h} class="absolute inset-0 size-full" aria-hidden="true">
 		<defs>

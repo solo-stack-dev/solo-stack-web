@@ -217,201 +217,211 @@
 	</ol>
 {/snippet}
 
-<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
-	<div class="relative isolate">
-		<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
-		<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
-			<StarField density={0.45} brightness={0.65} seed={71} />
-		</div>
-
-		<header class="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-10 lg:px-8">
-			<a href={localizeHref('/blog')} class="back">
-				<ArrowLeftIcon class="size-4" aria-hidden="true" />
-				{m.blog_post_back()}
-			</a>
-
-			<h1 class="headline mt-5 max-w-4xl font-display font-black tracking-wordmark text-balance sm:mt-8">{post.title}</h1>
-			<!-- One quiet line under the title: date, reading time, format (the topics follow the summary) -->
-			<p class="meta mt-4 sm:mt-6">
-				<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
-				<span aria-hidden="true">·</span>
-				<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
-				<span aria-hidden="true">·</span>
-				<span>{FORMAT_LABELS[post.format]()}</span>
-			</p>
-
-			{#if post.outline.length}
-				<!-- Below lg: the same contents as a disclosure right under the metadata. Closed, it shows the article as a trail of
-				     fireflies on an ink thread, one per section; the section you are in glows. A chosen entry closes it. -->
-				<details class="toc-mobile lg:hidden" style:--ink-ground={`url("${inkGround}")`} {@attach closeOnPick}>
-					<summary>
-						<span class="toc-head">
-							<span class="toc-fly" aria-hidden="true"></span>
-							<span id="toc-mobile-title">{m.blog_toc_title()}</span>
-						</span>
-						<span class="trail" aria-hidden="true">
-							{#each post.outline as section (section.id)}
-								<i class:lit={current === section.id}></i>
-							{/each}
-						</span>
-						<span class="toggle" aria-hidden="true"><ChevronDownIcon class="chevron size-4" /></span>
-					</summary>
-					{@render contents('toc-mobile-title')}
-				</details>
-			{/if}
-		</header>
-
-		<div class="mx-auto mt-7 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
-			<div class="stage">
-				<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} format={post.format} />
+<!-- Keyed: SvelteKit reuses this component between posts; a playing video or an open <details> must not carry over. -->
+{#key post.slug}
+	<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
+		<div class="relative isolate">
+			<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
+			<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
+				<StarField density={0.45} brightness={0.65} seed={71} />
 			</div>
-			{#if watchUrl}
-				<p class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
-					<span>{m.blog_video_privacy_note()}</span>
-					<a href={watchUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-1 font-medium text-foreground hover:underline">
-						{m.blog_video_youtube_link()}
-						<ArrowUpRightIcon class="size-3.5" aria-hidden="true" />
-					</a>
-				</p>
-			{/if}
-		</div>
-	</div>
 
-	<!-- Reading column (66 ch at body size), sticky contents from lg -->
-	<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-12 pb-8 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_17rem] lg:px-8">
-		<div class="read">
-			{#if post.summary || post.tags.length}
-				<div class="opening">
-					{#if post.summary}
-						<section aria-labelledby="summary-title" class="summary">
-							<h2 id="summary-title" class="sr-only">{m.blog_summary_title()}</h2>
-							<p class="summary-text">{post.summary}</p>
-						</section>
-					{/if}
-					{#if post.tags.length}
-						<ul class="tags" aria-label={m.blog_tags_label()}>
-							{#each post.tags as tag, index (index)}
-								<li>{tag}</li>
+			<header class="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-10 lg:px-8">
+				<a href={localizeHref('/blog')} class="back">
+					<ArrowLeftIcon class="size-4" aria-hidden="true" />
+					{m.blog_post_back()}
+				</a>
+
+				<h1 class="headline mt-5 max-w-4xl font-display font-black tracking-wordmark text-balance sm:mt-8">{post.title}</h1>
+				<!-- One quiet line under the title: date, reading time, format (the topics follow the summary) -->
+				<p class="meta mt-4 sm:mt-6">
+					<time datetime={post.publishedAt}>{formatDate(post.publishedAt, post.lang)}</time>
+					<span aria-hidden="true">·</span>
+					<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
+					<span aria-hidden="true">·</span>
+					<span>{FORMAT_LABELS[post.format]()}</span>
+				</p>
+
+				{#if post.outline.length}
+					<!-- Below lg: the same contents as a disclosure right under the metadata. Closed, it shows the article as a trail of
+				     fireflies on an ink thread, one per section; the section you are in glows. A chosen entry closes it. -->
+					<details class="toc-mobile lg:hidden" style:--ink-ground={`url("${inkGround}")`} {@attach closeOnPick}>
+						<summary>
+							<span class="toc-head">
+								<span class="toc-fly" aria-hidden="true"></span>
+								<span id="toc-mobile-title">{m.blog_toc_title()}</span>
+							</span>
+							<span class="trail" aria-hidden="true">
+								{#each post.outline as section (section.id)}
+									<i class:lit={current === section.id}></i>
+								{/each}
+							</span>
+							<span class="toggle" aria-hidden="true"><ChevronDownIcon class="chevron size-4" /></span>
+						</summary>
+						{@render contents('toc-mobile-title')}
+					</details>
+				{/if}
+			</header>
+
+			<div class="mx-auto mt-7 max-w-6xl px-4 sm:mt-12 sm:px-6 lg:px-8">
+				<div class="stage">
+					<VideoFacade bind:this={video} youtubeId={post.youtubeId} title={post.title} format={post.format} />
+				</div>
+				{#if watchUrl}
+					<p class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
+						<span>{m.blog_video_privacy_note()}</span>
+						<a href={watchUrl} target="_blank" rel="noopener" class="inline-flex min-h-11 items-center gap-1 font-medium text-foreground hover:underline">
+							{m.blog_video_youtube_link()}
+							<ArrowUpRightIcon class="size-3.5" aria-hidden="true" />
+						</a>
+					</p>
+				{/if}
+			</div>
+		</div>
+
+		<!-- Reading column (66 ch at body size), sticky contents from lg -->
+		<div class="mx-auto grid max-w-6xl gap-x-16 px-4 pt-12 pb-8 sm:px-6 sm:pt-16 lg:grid-cols-[minmax(0,1fr)_17rem] lg:px-8">
+			<div class="read">
+				{#if post.summary || post.tags.length}
+					<div class="opening">
+						{#if post.summary}
+							<section aria-labelledby="summary-title" class="summary">
+								<h2 id="summary-title" class="sr-only">{m.blog_summary_title()}</h2>
+								<p class="summary-text">{post.summary}</p>
+							</section>
+						{/if}
+						{#if post.tags.length}
+							<ul class="tags" aria-label={m.blog_tags_label()}>
+								{#each post.tags as tag, index (index)}
+									<li>{tag}</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+				{/if}
+
+				{#if post.chapters.length}
+					<section aria-labelledby="chapters-title">
+						<h2 id="chapters-title" class="section-title">{m.blog_chapters_title()}</h2>
+						<ol class="chapters mt-5">
+							{#each post.chapters as chapter, index (index)}
+								{@const time = formatTimestamp(chapter.start)}
+								<li>
+									{#if watchUrl}
+										<a
+											href="{watchUrl}&t={chapter.start}s"
+											aria-label={m.blog_chapter_seek({ time, title: chapter.title })}
+											onclick={(event) => seek(event, chapter.start)}
+										>
+											<span class="time">{time}</span>
+											<span>{chapter.title}</span>
+										</a>
+									{:else}
+										<span class="chapter">
+											<span class="time">{time}</span>
+											<span>{chapter.title}</span>
+										</span>
+									{/if}
+								</li>
+							{/each}
+						</ol>
+					</section>
+				{/if}
+
+				{#if post.takeaways.length}
+					<section aria-labelledby="takeaways-title">
+						<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
+						<!-- Fireflies as bullets, glowing brighter down the list (as they rise from the laptop on /blog) -->
+						<ul class="takeaways mt-6">
+							{#each post.takeaways as takeaway, index (index)}
+								<li style:--glow={glow(index, post.takeaways.length)}>
+									<span class="firefly" aria-hidden="true"></span>
+									{takeaway}
+								</li>
 							{/each}
 						</ul>
-					{/if}
+					</section>
+				{/if}
+
+				<div class="prose-post" bind:this={body}>
+					<Body />
 				</div>
-			{/if}
 
-			{#if post.chapters.length}
-				<section aria-labelledby="chapters-title">
-					<h2 id="chapters-title" class="section-title">{m.blog_chapters_title()}</h2>
-					<ol class="chapters mt-5">
-						{#each post.chapters as chapter, index (index)}
-							{@const time = formatTimestamp(chapter.start)}
-							<li>
-								<a
-									href={watchUrl ? `${watchUrl}&t=${chapter.start}s` : undefined}
-									aria-label={m.blog_chapter_seek({ time, title: chapter.title })}
-									onclick={(event) => seek(event, chapter.start)}
-								>
-									<span class="time">{time}</span>
-									<span>{chapter.title}</span>
-								</a>
-							</li>
+				{#if post.transcript.length}
+					<section aria-labelledby="transcript-title">
+						<h2 id="transcript-title" class="section-title">{m.blog_transcript_title()}</h2>
+						<details class="transcript mt-5">
+							<summary>
+								<span>{m.blog_transcript_show()}</span>
+								<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
+							</summary>
+							<div class="transcript-body">
+								{#each post.transcript as segment, index (index)}
+									<p>
+										{#if watchUrl}
+											<a href={`${watchUrl}&t=${segment.start}s`} class="time" onclick={(event) => seek(event, segment.start)}>{formatTimestamp(segment.start)}</a>
+										{/if}
+										{segment.text}
+									</p>
+								{/each}
+							</div>
+						</details>
+					</section>
+				{/if}
+
+				{#if post.links.length}
+					<section aria-labelledby="links-title">
+						<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
+						<ul class="links mt-6">
+							{#each post.links as link, index (index)}
+								{@const [head, last] = splitLast(link.label)}
+								<li>
+									<a href={link.url} target="_blank" rel="noopener">
+										<span class="link-name">{head}<span class="last">{last}<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" /></span></span>
+										<span class="host">{linkHost(link.url)}</span>
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</section>
+				{/if}
+
+				<!-- The ending: who wrote it, then the way back into the blog (or on to the neighbouring articles) -->
+				<footer class="post-end">
+					<p class="generated">
+						<span class="firefly" aria-hidden="true"></span>
+						{m.blog_generated_note({ model: post.generatedBy })}
+					</p>
+					<nav class="onward" aria-label={m.blog_post_more_label()}>
+						<a href={localizeHref('/blog')} class="home">
+							<ArrowLeftIcon class="size-4" aria-hidden="true" />
+							{m.blog_post_back()}
+						</a>
+						{#each neighbours as item (item.post.slug)}
+							<a href={postHref(item.post)} hreflang={item.post.lang} class="neighbour">
+								<span class="neighbour-label">{item.label}</span>
+								<span class="neighbour-title" lang={item.post.lang}>{item.post.title}</span>
+							</a>
 						{/each}
-					</ol>
-				</section>
-			{/if}
-
-			{#if post.takeaways.length}
-				<section aria-labelledby="takeaways-title">
-					<h2 id="takeaways-title" class="section-title">{m.blog_takeaways_title()}</h2>
-					<!-- Fireflies as bullets, glowing brighter down the list (as they rise from the laptop on /blog) -->
-					<ul class="takeaways mt-6">
-						{#each post.takeaways as takeaway, index (index)}
-							<li style:--glow={glow(index, post.takeaways.length)}>
-								<span class="firefly" aria-hidden="true"></span>
-								{takeaway}
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
-
-			<div class="prose-post" bind:this={body}>
-				<Body />
+					</nav>
+				</footer>
 			</div>
 
-			{#if post.transcript.length}
-				<section aria-labelledby="transcript-title">
-					<h2 id="transcript-title" class="section-title">{m.blog_transcript_title()}</h2>
-					<details class="transcript mt-5">
-						<summary>
-							<span>{m.blog_transcript_show()}</span>
-							<ChevronDownIcon class="chevron size-4" aria-hidden="true" />
-						</summary>
-						<div class="transcript-body">
-							{#each post.transcript as segment, index (index)}
-								<p>
-									{#if watchUrl}
-										<a href={`${watchUrl}&t=${segment.start}s`} class="time" onclick={(event) => seek(event, segment.start)}>{formatTimestamp(segment.start)}</a>
-									{/if}
-									{segment.text}
-								</p>
-							{/each}
-						</div>
-					</details>
-				</section>
+			{#if post.outline.length}
+				<aside class="hidden lg:block">
+					<nav class="toc" aria-labelledby="toc-title">
+						<p id="toc-title" class="toc-title">
+							<!-- A firefly that lights up while you read (same scroll timeline as the progress hairline) -->
+							<span class="toc-fly" aria-hidden="true"></span>
+							{m.blog_toc_title()}
+						</p>
+						{@render contents('toc-title')}
+					</nav>
+				</aside>
 			{/if}
-
-			{#if post.links.length}
-				<section aria-labelledby="links-title">
-					<h2 id="links-title" class="section-title">{m.blog_links_title()}</h2>
-					<ul class="links mt-6">
-						{#each post.links as link, index (index)}
-							{@const [head, last] = splitLast(link.label)}
-							<li>
-								<a href={link.url} target="_blank" rel="noopener">
-									<span class="link-name">{head}<span class="last">{last}<ArrowUpRightIcon class="arrow size-4" aria-hidden="true" /></span></span>
-									<span class="host">{linkHost(link.url)}</span>
-								</a>
-							</li>
-						{/each}
-					</ul>
-				</section>
-			{/if}
-
-			<!-- The ending: who wrote it, then the way back into the blog (or on to the neighbouring articles) -->
-			<footer class="post-end">
-				<p class="generated">
-					<span class="firefly" aria-hidden="true"></span>
-					{m.blog_generated_note({ model: post.generatedBy })}
-				</p>
-				<nav class="onward" aria-label={m.blog_post_more_label()}>
-					<a href={localizeHref('/blog')} class="home">
-						<ArrowLeftIcon class="size-4" aria-hidden="true" />
-						{m.blog_post_back()}
-					</a>
-					{#each neighbours as item (item.post.slug)}
-						<a href={postHref(item.post)} hreflang={item.post.lang} class="neighbour">
-							<span class="neighbour-label">{item.label}</span>
-							<span class="neighbour-title" lang={item.post.lang}>{item.post.title}</span>
-						</a>
-					{/each}
-				</nav>
-			</footer>
 		</div>
-
-		{#if post.outline.length}
-			<aside class="hidden lg:block">
-				<nav class="toc" aria-labelledby="toc-title">
-					<p id="toc-title" class="toc-title">
-						<!-- A firefly that lights up while you read (same scroll timeline as the progress hairline) -->
-						<span class="toc-fly" aria-hidden="true"></span>
-						{m.blog_toc_title()}
-					</p>
-					{@render contents('toc-title')}
-				</nav>
-			</aside>
-		{/if}
-	</div>
-</article>
+	</article>
+{/key}
 
 <style>
 	/* Shared marks ---------------------------------------------------------------------------------------------- */
@@ -632,15 +642,19 @@
 		background: linear-gradient(90deg, var(--border) 0 85%, transparent);
 	}
 
-	.chapters a {
+	.chapters a,
+	.chapter {
 		display: flex;
 		align-items: baseline;
 		gap: 1.25rem;
 		min-height: 3rem;
 		padding: 0.75rem 0.25rem;
 		font-size: 1rem;
-		cursor: pointer;
 		transition: color var(--dur-hover) ease;
+	}
+
+	.chapters a {
+		cursor: pointer;
 	}
 
 	.chapters a:hover .time {

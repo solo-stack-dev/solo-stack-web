@@ -11,9 +11,9 @@ Round 4: Opus 9.3, gpt-6.1-sol 9.4 overall; gpt rates everything but the homepag
 
 ## Ownership
 
-| Agent | Files | Items |
-|---|---|---|
-| Home | `src/lib/home/**`, `src/routes/+page.svelte`, `messages/*` (only home keys) | Opus home 1–6, gpt home 1–2 (monitor: also drop subjects with `round \d`, agent lanes like "Home A/B", "Shell", "R2"–"R5", and regenerate `fallback-log.ts`) |
-| Blog | `src/routes/(site)/blog/**`, `src/lib/blog/**`, `src/content/blog/**` (structure only) | Opus post 1–4, Opus blog optional dot |
-| Stats | `src/routes/(site)/stats/**`, `src/lib/stats/**` | Opus stats 1–3 per the decision |
-| Shell | `src/lib/components/site/**`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 1–5 |
+| Agent | Files                                                                                                  | Items                                                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Home  | `src/lib/home/**`, `src/routes/+page.svelte`, `messages/*` (only home keys)                            | Opus home 1–6, gpt home 1–2 (monitor: also drop subjects with `round \d`, agent lanes like "Home A/B", "Shell", "R2"–"R5", and regenerate `fallback-log.ts`) |
+| Blog  | `src/routes/(site)/blog/**`, `src/lib/blog/**`, `src/content/blog/**` (structure only)                 | Opus post 1–4, Opus blog optional dot                                                                                                                        |
+| Stats | `src/routes/(site)/stats/**`, `src/lib/stats/**`                                                       | Opus stats 1–3 per the decision                                                                                                                              |
+| Shell | `src/lib/components/site/**`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 1–5                                                                                                                                               |

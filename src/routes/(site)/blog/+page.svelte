@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { replaceState } from '$app/navigation';
+	import { afterNavigate, replaceState } from '$app/navigation';
 	import { FORMAT_LABELS } from '#lib/blog/content.ts';
 	import FormatVignette from '#lib/blog/FormatVignette.svelte';
 	import { DRY_BRUSH_FADE_RIGHT } from '#lib/blog/materials.ts';
@@ -25,9 +25,10 @@
 	const FILTER_MIN_POSTS = 4;
 	const showFilters = $derived(posts.length >= FILTER_MIN_POSTS || format !== null);
 
-	$effect(() => {
-		const initial = new URLSearchParams(location.search).get('format');
-		if (initial && (POST_FORMATS as readonly string[]).includes(initial)) format = initial as PostFormat;
+	// Also on a navigation to /blog from /blog (the nav link), which keeps this component: the filter follows the URL.
+	afterNavigate(({ to }) => {
+		const value = to?.url.searchParams.get('format');
+		format = value && (POST_FORMATS as readonly string[]).includes(value) ? (value as PostFormat) : null;
 	});
 
 	function choose(next: PostFormat | null) {

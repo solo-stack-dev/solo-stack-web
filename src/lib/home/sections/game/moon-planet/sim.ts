@@ -463,7 +463,8 @@ function updatePlayer(game: Game, tuning: Tuning, input: StepInput, playing: boo
 
 	if (p.dead) {
 		// Knocked out: tumble off into space.
-		p.vr -= tuning.gravity * 0.25 * dt;
+		// Gravity slows it, but never pulls it back through the moon.
+		p.vr = Math.max(150, p.vr - tuning.gravity * 0.25 * dt);
 		p.h += p.vr * dt;
 		p.a += (p.vt * dt) / R;
 		p.spin += dt * 9;

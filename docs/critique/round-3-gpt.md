@@ -1,14 +1,14 @@
 # Critique round 3: gpt-6.1-sol (high)
 
-| Area | R2 | R3 |
-|---|---|---|
-| Homepage | 8.8 | 9.4 |
-| /blog | 9.0 | 9.5 |
+| Area         | R2  | R3  |
+| ------------ | --- | --- |
+| Homepage     | 8.8 | 9.4 |
+| /blog        | 9.0 | 9.5 |
 | /blog/[slug] | 8.6 | 9.5 |
-| /stats | 8.3 | 9.2 |
-| /kontakt | 9.0 | 9.5 |
-| Site shell | 9.0 | 9.3 |
-| Overall | 8.8 | 9.4 |
+| /stats       | 8.3 | 9.2 |
+| /kontakt     | 9.0 | 9.5 |
+| Site shell   | 9.0 | 9.3 |
+| Overall      | 8.8 | 9.4 |
 
 ## 1. Homepage 9.4
 

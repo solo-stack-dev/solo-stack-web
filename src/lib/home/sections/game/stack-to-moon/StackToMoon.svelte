@@ -102,10 +102,9 @@
 
 	$effect(() => {
 		loop.paused = paused;
-		if (paused) {
-			queued = false;
-			input.consume('action');
-		}
+		// Drop presses on pause and on resume, so a key pressed while paused doesn't drop a block.
+		queued = false;
+		input.flush();
 	});
 
 	function resize() {

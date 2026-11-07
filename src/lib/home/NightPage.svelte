@@ -266,7 +266,7 @@
 			<div class="sky-layer is-blend" style:background={skyBackground(hour)} style:--from={starts[index + 1]} style:--to={stops[index + 1]}></div>
 		{/each}
 		<div class="sky-stars">
-			<StarField twinkle={!heroFills} />
+			<StarField twinkle={!heroFills && !railOnPaper} />
 			<ShootingStars enabled={!heroCovers} />
 		</div>
 	</div>

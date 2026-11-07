@@ -70,7 +70,7 @@
 	class={['sunrise', near.current && 'is-near']}
 	aria-labelledby="home-sunrise-title"
 	style={cupVars}
-	{@attach entering.attach}
+	{@attach fallback && entering.attach}
 	{@attach near.attach}
 >
 	<h2 id="home-sunrise-title" class="sr-only">{m.home_sunrise_title()}</h2>

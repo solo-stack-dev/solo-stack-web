@@ -13,8 +13,8 @@ const TEST_SITE_KEY = '1x00000000000000000000AA';
 /** `vite build --mode <mode>`: only the deploy builds need the real key. */
 export const TURNSTILE_TESTING = import.meta.env.MODE !== 'staging' && import.meta.env.MODE !== 'production';
 
-/** Empty when a deploy build has no key yet (the widget then stays empty). */
-export const TURNSTILE_SITE_KEY = SITE_KEY || (TURNSTILE_TESTING ? TEST_SITE_KEY : '');
+/** The test key outside deploy builds: the real widget only accepts its own hostnames, and the test secret only test tokens. */
+export const TURNSTILE_SITE_KEY = TURNSTILE_TESTING ? TEST_SITE_KEY : SITE_KEY;
 
 /** Checked by the server, so a token from another site's form is rejected. */
 export const TURNSTILE_ACTION = 'contact';

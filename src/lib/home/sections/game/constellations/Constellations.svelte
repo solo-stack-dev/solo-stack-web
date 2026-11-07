@@ -103,6 +103,9 @@
 
 	$effect(() => {
 		loop.paused = paused;
+		// Drop presses on pause and on resume, so a key pressed while paused doesn't fire on the first frame.
+		input.flush();
+		enter = false;
 	});
 
 	$effect(() => {
@@ -124,6 +127,7 @@
 		card = null;
 		found = [];
 		ended = null;
+		onRestart?.();
 		engine.start(next);
 		engine.render();
 		exploreHint = next === 'explore';

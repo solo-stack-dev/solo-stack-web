@@ -1,14 +1,14 @@
 # Critique round 7: Claude Opus 5.5 (high)
 
-| Area | R6 | R7 |
-|---|---|---|
-| Homepage | 9.5 | 9.5 |
-| /blog | 9.5 | 9.5 |
+| Area         | R6  | R7  |
+| ------------ | --- | --- |
+| Homepage     | 9.5 | 9.5 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.5 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.5 | 9.5 |
-| Overall | 9.5 | 9.5 |
+| /stats       | 9.5 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.5 | 9.5 |
+| Overall      | 9.5 | 9.5 |
 
 Round 7 changed only the cinema perimeter: `git diff f61d5f9..HEAD -- src` touches only `src/lib/home/sections/cinema/Cinema.svelte` and `layout.ts`. I checked that item against `round-7/home/home-{1440,390}-cinema.webp`, `critique/round-7/home/home-{1440,390}-04.webp`, `home-1440-seam-cinema.webp` and `home-1440-reduced-04.webp`. I compared crops and per-pixel luminance profiles across all four edges with `round-6/home/home-*-cinema.webp`. I also spot-checked the unchanged areas in the round-7 set (blog 1440 light, stats 390 dark, kontakt 1920 dark, 404 1440) for capture or shell regressions and found none.
 

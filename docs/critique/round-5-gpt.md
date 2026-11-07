@@ -1,14 +1,14 @@
 # Critique round 5: gpt-6.1-sol (high)
 
-| Area | R4 | R5 |
-|---|---|---|
-| Homepage | 9.4 | 9.4 |
-| /blog | 9.5 | 9.5 |
+| Area         | R4  | R5  |
+| ------------ | --- | --- |
+| Homepage     | 9.4 | 9.4 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.5 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.5 | 9.5 |
-| Overall | 9.4 | 9.4 |
+| /stats       | 9.5 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.5 | 9.5 |
+| Overall      | 9.4 | 9.4 |
 
 Reviewed the supplied current-main captures at 1440/390, the 1920 subpage captures, homepage seams and reduced-motion frames, and round-5 detail shots, including the 1280/2560 footers and opened 404 licence. Visual craft only; no copy-wording deductions. Screenshot paths below are relative to `docs/screens/`.
 

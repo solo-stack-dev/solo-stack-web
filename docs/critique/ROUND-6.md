@@ -4,10 +4,10 @@ Round 5: Opus (`round-5-opus.md`) rates /blog, /blog/[slug], /stats, /kontakt 9.
 
 ## Ownership
 
-| Agent | Files | Items |
-|---|---|---|
-| Home | `src/lib/home/**`, `src/routes/+page.svelte` | Opus home 1–3 (cinema edge gaps, mobile radio title clipping, homepage mobile footer left-aligned like the shell footer) and gpt home 1 (the cinema frame ASSET's straight inner lip bridges the CSS gaps: mask/attenuate it too; acceptance: one uneven projected-light boundary at 390 and 1440, no second continuous rectangle, picture stays 16:9) |
-| Shell | `src/lib/components/site/**`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 4–5 (owl tree clear of the S at 1024–1280, desktop 404 note spacing); optional: drop the licence's small emblem or inner hairline if it calms the card |
+| Agent | Files                                                                         | Items                                                                                                                                                                                                                                                                                                                                                  |
+| ----- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Home  | `src/lib/home/**`, `src/routes/+page.svelte`                                  | Opus home 1–3 (cinema edge gaps, mobile radio title clipping, homepage mobile footer left-aligned like the shell footer) and gpt home 1 (the cinema frame ASSET's straight inner lip bridges the CSS gaps: mask/attenuate it too; acceptance: one uneven projected-light boundary at 390 and 1440, no second continuous rectangle, picture stays 16:9) |
+| Shell | `src/lib/components/site/**`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 4–5 (owl tree clear of the S at 1024–1280, desktop 404 note spacing); optional: drop the licence's small emblem or inner hairline if it calms the card                                                                                                                                                                                      |
 
 ## Lead decision
 

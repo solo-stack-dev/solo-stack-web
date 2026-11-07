@@ -17,6 +17,17 @@ export function headingId(text: string) {
 		.replace(/^-+|-+$/g, '');
 }
 
+/** Hands out `id`, `id-2`, `id-3`, … so repeated headings stay unique; an empty slug becomes `section`. */
+function uniqueIds() {
+	const seen = new Map<string, number>();
+	return (text: string) => {
+		const id = headingId(text) || 'section';
+		const count = (seen.get(id) ?? 0) + 1;
+		seen.set(id, count);
+		return count === 1 ? id : `${id}-${count}`;
+	};
+}
+
 /** Markdown inline syntax → plain text (links keep their label). */
 const plain = (markdown: string) =>
 	markdown
@@ -27,9 +38,10 @@ const plain = (markdown: string) =>
 /** The `##` sections of a Markdown source (frontmatter and fenced code skipped), in order. */
 export function outlineOf(source: string): { id: string; title: string }[] {
 	const body = source.replace(/^---[\s\S]*?\n---/, '').replace(/```[\s\S]*?```/g, '');
+	const idOf = uniqueIds();
 	return [...body.matchAll(/^##[ \t]+(.+?)[ \t#]*$/gm)].map(([, heading]) => {
 		const title = plain(heading);
-		return { id: headingId(title), title };
+		return { id: idOf(title), title };
 	});
 }
 
@@ -46,10 +58,11 @@ const textOf = (node: HastNode): string => (node.type === 'text' ? (node.value ?
 /** rehype plugin for mdsvex: an `id` on every `h2` that has none. */
 export function rehypeHeadingIds() {
 	return (tree: HastNode) => {
+		const idOf = uniqueIds();
 		const visit = (node: HastNode) => {
 			if (node.type === 'element' && node.tagName === 'h2') {
 				node.properties ??= {};
-				node.properties.id ??= headingId(textOf(node).trim());
+				node.properties.id ??= idOf(textOf(node).trim());
 			}
 			node.children?.forEach(visit);
 		};

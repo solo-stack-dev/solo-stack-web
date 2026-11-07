@@ -1,14 +1,14 @@
 # Critique round 5: Claude Opus 5.5 (high)
 
-| Area | R4 | R5 |
-|---|---|---|
-| Homepage | 9.3 | 9.4 |
-| /blog | 9.5 | 9.5 |
+| Area         | R4  | R5  |
+| ------------ | --- | --- |
+| Homepage     | 9.3 | 9.4 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.3 | 9.5 |
-| /stats | 9.2 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.2 | 9.4 |
-| Overall | 9.3 | 9.4 |
+| /stats       | 9.2 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.2 | 9.4 |
+| Overall      | 9.3 | 9.4 |
 
 Sent state verified live through the honeypot discard path (no mail sent), on the merged footer at 1440/1920 dark and 390 dark/light: `docs/screens/critique/round-5/opus/kontakt-sent-*.webp`. "Danke dir" + link sit cleanly above the wordmark, the footer stays legible, mobile is compact. That closes the open R4 item.
 

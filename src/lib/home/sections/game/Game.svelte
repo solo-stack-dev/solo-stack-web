@@ -28,6 +28,7 @@
 	import { DECKLE_STRIPS, DECKLE_STRIPS_BACK } from './shared/deckle.ts';
 	import GameFrame from './shared/GameFrame.svelte';
 	import { loadHighScore } from './shared/highscore.ts';
+	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 
 	/**
 	 * Painted poster per game; `focus` is the subject's x (object-position) for the 4:5 phone crop. `strip` is the same painting at
@@ -86,7 +87,7 @@
 
 	/** Phones: the tab row scrolls; keep the selected tab in view. */
 	function reveal(id: CandidateId) {
-		document.getElementById(`game-tab-${id}`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+		document.getElementById(`game-tab-${id}`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reducedMotion.current ? 'auto' : 'smooth' });
 	}
 </script>
 

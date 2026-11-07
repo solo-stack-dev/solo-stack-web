@@ -5,11 +5,12 @@ import { baseLocale, deLocalizeUrl, getTextDirection } from '#lib/paraglide/runt
 import { paraglideMiddleware } from '#lib/paraglide/server.js';
 
 // Base locale is unprefixed (`/blog`); Paraglide also accepts `/de/blog`, which is duplicate content: 308 to canonical.
+// Leading slashes are collapsed: `/de//evil.com` would otherwise redirect to the protocol relative `//evil.com`.
 const handleBaseLocalePrefix: Handle = ({ event, resolve }) => {
 	const { pathname } = event.url;
 	if (pathname === `/${baseLocale}` || pathname.startsWith(`/${baseLocale}/`)) {
 		const canonical = deLocalizeUrl(event.url);
-		redirect(308, canonical.pathname + canonical.search);
+		redirect(308, canonical.pathname.replace(/^\/+/, '/') + canonical.search);
 	}
 	return resolve(event);
 };

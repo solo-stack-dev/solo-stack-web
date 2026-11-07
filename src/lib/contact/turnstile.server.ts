@@ -14,9 +14,9 @@ interface SiteverifyResult {
 	action?: string;
 }
 
-/** `TURNSTILE_SECRET_KEY` is a Worker secret (`.env.staging` / `.env.production`). */
+/** `TURNSTILE_SECRET_KEY` is a Worker secret (`.env.staging` / `.env.production`); other builds pair the test secret with the test site key. */
 function secretKey(): string | undefined {
-	return TURNSTILE_SECRET_KEY || (TURNSTILE_TESTING ? TEST_SECRET_KEY : undefined);
+	return TURNSTILE_TESTING ? TEST_SECRET_KEY : TURNSTILE_SECRET_KEY || undefined;
 }
 
 export class TurnstileNotConfiguredError extends Error {
@@ -37,7 +37,7 @@ export async function verifyTurnstile(token: string, { ip, hostname }: { ip?: st
 	const response = await fetch(SITEVERIFY_URL, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ secret, response: token, remoteip: ip, idempotency_key: crypto.randomUUID() }),
+		body: JSON.stringify({ secret, response: token, remoteip: ip }),
 		signal: AbortSignal.timeout(10_000)
 	});
 	if (!response.ok) throw new Error(`Turnstile siteverify answered ${response.status}`);

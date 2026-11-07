@@ -1,14 +1,14 @@
 # Critique round 7: gpt-6.1-sol (high)
 
-| Area | R6 | R7 |
-|---|---|---|
-| Homepage | 9.4 | 9.5 |
-| /blog | 9.5 | 9.5 |
+| Area         | R6  | R7  |
+| ------------ | --- | --- |
+| Homepage     | 9.4 | 9.5 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.5 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.5 | 9.5 |
-| Overall | 9.4 | 9.5 |
+| /stats       | 9.5 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.5 | 9.5 |
+| Overall      | 9.4 | 9.5 |
 
 Reviewed the supplied current-main set in `docs/screens/critique/round-7/`: homepage at 1440/390, all six seam captures and all six reduced-motion frames; blog, article, stats and contact in both themes at 1440/390 and the 1920 dark captures; and the 404. Inspected the round-7 cinema details at native size beside their round-6 equivalents, and read `Cinema.svelte` and `layout.ts` to check the edge treatment. Earlier unchanged states were checked in the round-6 shell details and round-5 contact sent-state captures. Screenshot paths below are relative to `docs/screens/`.
 

@@ -2,15 +2,15 @@
 
 Screens: `docs/screens/critique/round-1/`. Overall 7.8.
 
-| Area | Score |
-|---|---|
-| Homepage (incl. 21:00) | 8.3 |
-| /blog index | 7.6 |
-| /blog/[slug] | 7.3 |
-| /stats | 7.8 |
-| /kontakt | 8.0 |
-| Site shell | 7.2 |
-| Overall | 7.8 |
+| Area                   | Score |
+| ---------------------- | ----- |
+| Homepage (incl. 21:00) | 8.3   |
+| /blog index            | 7.6   |
+| /blog/[slug]           | 7.3   |
+| /stats                 | 7.8   |
+| /kontakt               | 8.0   |
+| Site shell             | 7.2   |
+| Overall                | 7.8   |
 
 The painted art is award level. What holds the scores back is the craft between the paintings: grid alignment, empty bands, collisions, and template UI pieces (pill switches, dashboard row, footer).
 

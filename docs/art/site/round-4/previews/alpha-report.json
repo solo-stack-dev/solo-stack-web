@@ -1,82 +1,46 @@
 {
-  "generation": "Built-in image_gen; native transparent RGBA, 1254x1254; normal generation followed by reference edit.",
-  "export": {
-    "shared_source_crop": [
-      34,
-      59,
-      1178,
-      1197
-    ],
-    "content_size": [
-      672,
-      668
-    ],
-    "canvas": [
-      800,
-      800
-    ],
-    "offset": [
-      64,
-      66
-    ],
-    "resampling": "premultiplied alpha Lanczos"
-  },
-  "alpha": {
-    "identical_between_states": true,
-    "method": "minimum of native alpha channels, only alpha <= 3 removed before common crop and resize; no background extraction"
-  },
-  "assets": [
-    {
-      "file": "wax-seal.png",
-      "size": [
-        800,
-        800
-      ],
-      "mode": "RGBA",
-      "bytes": 579865,
-      "sha256": "1afe76139d7d4a8afeb179a1a8fffc22291153c042f2df8a5c1b15b8ee3c656a",
-      "alpha_extrema": [
-        0,
-        255
-      ],
-      "alpha_bbox": [
-        64,
-        66,
-        736,
-        734
-      ],
-      "transparent_pixels": 318655,
-      "partial_alpha_pixels": 320379,
-      "opaque_pixels": 966,
-      "canvas_border_fully_transparent": true,
-      "transparent_rgb_zero": true,
-      "partial_alpha_neutral_white_pixels": 118
-    },
-    {
-      "file": "wax-seal-pressed.png",
-      "size": [
-        800,
-        800
-      ],
-      "mode": "RGBA",
-      "bytes": 536982,
-      "sha256": "f8f8c53f52b481366e9d130ebc21b20cc9cb2574b1d28a466559b82566377354",
-      "alpha_extrema": [
-        0,
-        255
-      ],
-      "alpha_bbox": [
-        64,
-        66,
-        736,
-        734
-      ],
-      "transparent_pixels": 318655,
-      "partial_alpha_pixels": 320379,
-      "opaque_pixels": 966,
-      "canvas_border_fully_transparent": true,
-      "transparent_rgb_zero": true,
-      "partial_alpha_neutral_white_pixels": 42
-    }
-  ]
+	"generation": "Built-in image_gen; native transparent RGBA, 1254x1254; normal generation followed by reference edit.",
+	"export": {
+		"shared_source_crop": [34, 59, 1178, 1197],
+		"content_size": [672, 668],
+		"canvas": [800, 800],
+		"offset": [64, 66],
+		"resampling": "premultiplied alpha Lanczos"
+	},
+	"alpha": {
+		"identical_between_states": true,
+		"method": "minimum of native alpha channels, only alpha <= 3 removed before common crop and resize; no background extraction"
+	},
+	"assets": [
+		{
+			"file": "wax-seal.png",
+			"size": [800, 800],
+			"mode": "RGBA",
+			"bytes": 579865,
+			"sha256": "1afe76139d7d4a8afeb179a1a8fffc22291153c042f2df8a5c1b15b8ee3c656a",
+			"alpha_extrema": [0, 255],
+			"alpha_bbox": [64, 66, 736, 734],
+			"transparent_pixels": 318655,
+			"partial_alpha_pixels": 320379,
+			"opaque_pixels": 966,
+			"canvas_border_fully_transparent": true,
+			"transparent_rgb_zero": true,
+			"partial_alpha_neutral_white_pixels": 118
+		},
+		{
+			"file": "wax-seal-pressed.png",
+			"size": [800, 800],
+			"mode": "RGBA",
+			"bytes": 536982,
+			"sha256": "f8f8c53f52b481366e9d130ebc21b20cc9cb2574b1d28a466559b82566377354",
+			"alpha_extrema": [0, 255],
+			"alpha_bbox": [64, 66, 736, 734],
+			"transparent_pixels": 318655,
+			"partial_alpha_pixels": 320379,
+			"opaque_pixels": 966,
+			"canvas_border_fully_transparent": true,
+			"transparent_rgb_zero": true,
+			"partial_alpha_neutral_white_pixels": 42
+		}
+	]
 }

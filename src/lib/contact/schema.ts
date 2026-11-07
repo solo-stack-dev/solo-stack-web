@@ -14,7 +14,8 @@ export const CONTACT_LIMITS = { name: 120, email: 254, messageMin: 20, messageMa
  */
 export const ContactSchema = v.object({
 	topic: v.picklist(CONTACT_TOPICS, 'topic'),
-	name: v.pipe(v.string('name'), v.trim(), v.nonEmpty('name'), v.maxLength(CONTACT_LIMITS.name, 'name')),
+	// No control characters: the name goes into the mail subject and the Reply-To display name.
+	name: v.pipe(v.string('name'), v.trim(), v.nonEmpty('name'), v.regex(/^\P{Cc}*$/u, 'name'), v.maxLength(CONTACT_LIMITS.name, 'name')),
 	email: v.pipe(v.string('email'), v.trim(), v.email('email'), v.maxLength(CONTACT_LIMITS.email, 'email')),
 	message: v.pipe(v.string('message'), v.trim(), v.minLength(CONTACT_LIMITS.messageMin, 'message'), v.maxLength(CONTACT_LIMITS.messageMax, 'message')),
 	website: v.optional(v.string(), ''),

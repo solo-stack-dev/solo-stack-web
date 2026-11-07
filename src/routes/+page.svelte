@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import NightPage from '#lib/home/NightPage.svelte';
 	import Cinema from '#lib/home/sections/cinema/Cinema.svelte';
@@ -10,11 +11,20 @@
 	import Sunrise from '#lib/home/sections/sunrise/Sunrise.svelte';
 	import DawnBank from '#lib/home/shared/DawnBank.svelte';
 	import Mist from '#lib/home/shared/Mist.svelte';
+
+	const canonical = $derived(new URL(page.url.pathname, page.url.origin).href);
 </script>
 
 <svelte:head>
 	<title>{m.home_meta_title()}</title>
 	<meta name="description" content={m.home_meta_description()} />
+	<link rel="canonical" href={canonical} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="SOLO STACK" />
+	<meta property="og:title" content={m.home_meta_title()} />
+	<meta property="og:description" content={m.home_meta_description()} />
+	<meta property="og:url" content={canonical} />
+	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
 <!--

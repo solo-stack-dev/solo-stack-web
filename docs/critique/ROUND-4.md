@@ -11,10 +11,10 @@ Round 3: Opus 9.1, gpt-6.1-sol 9.4 overall; gpt already gives /blog, the post an
 
 ## Ownership
 
-| Agent | Files | Items |
-|---|---|---|
-| Shell | `src/lib/components/site/**`, `src/routes/(site)/+layout.svelte`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 1–5, gpt shell 1 |
-| Home | `src/lib/home/**`, `src/routes/+page.svelte` | Opus home 1–6, gpt home 1 |
-| Blog | `src/routes/(site)/blog/**`, `src/lib/blog/**`, `src/content/blog/**` (structure only) | Opus blog 1–2, Opus post 1–3 (pull quotes per the decision) |
-| Stats | `src/routes/(site)/stats/**`, `src/lib/stats/**` | Opus stats 1–5, gpt stats 1–2 |
-| Contact | `src/routes/(site)/kontakt/**`, `src/lib/contact/**` except the seal images | Opus kontakt 2–3 (re-verify the sent state on the merged footer, thin sent page) |
+| Agent   | Files                                                                                                                                      | Items                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Shell   | `src/lib/components/site/**`, `src/routes/(site)/+layout.svelte`, `src/routes/layout.css`, `src/lib/errors/**`, `src/routes/+error.svelte` | Opus shell 1–5, gpt shell 1                                                      |
+| Home    | `src/lib/home/**`, `src/routes/+page.svelte`                                                                                               | Opus home 1–6, gpt home 1                                                        |
+| Blog    | `src/routes/(site)/blog/**`, `src/lib/blog/**`, `src/content/blog/**` (structure only)                                                     | Opus blog 1–2, Opus post 1–3 (pull quotes per the decision)                      |
+| Stats   | `src/routes/(site)/stats/**`, `src/lib/stats/**`                                                                                           | Opus stats 1–5, gpt stats 1–2                                                    |
+| Contact | `src/routes/(site)/kontakt/**`, `src/lib/contact/**` except the seal images                                                                | Opus kontakt 2–3 (re-verify the sent state on the merged footer, thin sent page) |

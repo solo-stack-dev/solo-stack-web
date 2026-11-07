@@ -2,15 +2,15 @@
 
 Screens: `docs/screens/critique/round-3/`. Note: `home-1440-03` shows the hero instead of 02:00 (capture glitch). Agent state shots in `docs/screens/round-3/*` partly predate merges; judged against the live server.
 
-| Area | R2 | R3 |
-|---|---|---|
-| Homepage | 8.6 | 9.2 |
-| /blog | 8.8 | 9.4 |
+| Area         | R2  | R3  |
+| ------------ | --- | --- |
+| Homepage     | 8.6 | 9.2 |
+| /blog        | 8.8 | 9.4 |
 | /blog/[slug] | 8.7 | 9.1 |
-| /stats | 8.5 | 9.0 |
-| /kontakt | 8.9 | 9.4 |
-| Site shell | 8.2 | 8.9 |
-| Overall | 8.6 | 9.1 |
+| /stats       | 8.5 | 9.0 |
+| /kontakt     | 8.9 | 9.4 |
+| Site shell   | 8.2 | 8.9 |
+| Overall      | 8.6 | 9.1 |
 
 ## 1. Homepage 9.2 (to 9.5: fixes 1–3)
 
@@ -44,7 +44,7 @@ Keep: title scale, lede rule, measure, hollow-dot bullets, sticky TOC, two-colum
 2. Light KPI ground is a grey smudge (`stats-1440-light-02`, `390-light-03`). Fix: warm wash (butter ~18% with ochre granulation) or ink ≤10%.
 3. Light hill = full-width black mass ~250px tall (`light-00/01`). Fix: in light render the hill as ink wash, 70–80% at the crest fading to ~35% at the foot, glowing curve still reads.
 4. Mobile calendar dots still 5–9px (`stats-390-*-05/06`). Fix: ≥10px dots in 18px cells below 640px.
-5. "› Daten als Tabelle   Stand: 31. Oktober 2026" reads like debug output. Fix: Geist 14px sentence case, date as a separate muted line.
+5. "› Daten als Tabelle Stand: 31. Oktober 2026" reads like debug output. Fix: Geist 14px sentence case, date as a separate muted line.
 
 Keep: tree + curve path, mascot, giant follower count, constellation both themes, ledger, deltas, top-video ranks.
 

@@ -183,6 +183,8 @@
 	let threeReady = $state(false);
 
 	$effect(() => {
+		// Phones and reduced motion never use 3D: skip the WebGL probe (re-runs if either changes).
+		if (narrow.current || reducedMotion.current) return;
 		const nav = navigator as Navigator & { deviceMemory?: number };
 		const lowEnd = (nav.hardwareConcurrency ?? 8) < 4 || (nav.deviceMemory ?? 8) < 4;
 		let webgl = false;

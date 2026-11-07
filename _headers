@@ -4,6 +4,11 @@
 # in place:
 # - fonts: a changed font gets a new file name (update app.html and layout.css)
 # - prerendered video thumbnails: keyed by video id and width, re-encoded only from the same YouTube source
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+
 /fonts/*
   Cache-Control: public, max-age=2592000, stale-while-revalidate=86400
 

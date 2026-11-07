@@ -2,15 +2,15 @@
 
 Screens: `docs/screens/critique/round-1/`. Overall 7.9.
 
-| Area | Score |
-|---|---|
-| Homepage (incl. 21:00) | 8.3 |
-| /blog | 8.0 |
-| /blog/[slug] | 7.7 |
-| /stats | 7.6 |
-| /kontakt | 7.8 |
-| Site shell | 7.9 |
-| Overall | 7.9 |
+| Area                   | Score |
+| ---------------------- | ----- |
+| Homepage (incl. 21:00) | 8.3   |
+| /blog                  | 8.0   |
+| /blog/[slug]           | 7.7   |
+| /stats                 | 7.6   |
+| /kontakt               | 7.8   |
+| Site shell             | 7.9   |
+| Overall                | 7.9   |
 
 ## 1. Homepage 8.3
 

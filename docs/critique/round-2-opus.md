@@ -2,15 +2,15 @@
 
 Screens: `docs/screens/critique/round-2/`. Critic captures (`mk3`, `post-end`, `post-tab2/3`, `m-menu-home`, `st90`, `k*` .png): `C:\Users\peter\AppData\Local\Temp\claude\7fd82884588d2ef0\533573c9-754a-4d2d-b80e-51353927520b\scratchpad\out\`.
 
-| Area | R1 | R2 |
-|---|---|---|
-| Homepage | 8.3 | 8.6 |
-| /blog | 7.6 | 8.8 |
+| Area         | R1  | R2  |
+| ------------ | --- | --- |
+| Homepage     | 8.3 | 8.6 |
+| /blog        | 7.6 | 8.8 |
 | /blog/[slug] | 7.3 | 8.7 |
-| /stats | 7.8 | 8.5 |
-| /kontakt | 8.0 | 8.9 |
-| Site shell | 7.2 | 8.2 |
-| Overall | 7.8 | 8.6 |
+| /stats       | 7.8 | 8.5 |
+| /kontakt     | 8.0 | 8.9 |
+| Site shell   | 7.2 | 8.2 |
+| Overall      | 7.8 | 8.6 |
 
 ## 1. Homepage 8.6
 

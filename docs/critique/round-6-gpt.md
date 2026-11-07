@@ -1,14 +1,14 @@
 # Critique round 6: gpt-6.1-sol (high)
 
-| Area | R5 | R6 |
-|---|---|---|
-| Homepage | 9.4 | 9.4 |
-| /blog | 9.5 | 9.5 |
+| Area         | R5  | R6  |
+| ------------ | --- | --- |
+| Homepage     | 9.4 | 9.4 |
+| /blog        | 9.5 | 9.5 |
 | /blog/[slug] | 9.5 | 9.5 |
-| /stats | 9.5 | 9.5 |
-| /kontakt | 9.5 | 9.5 |
-| Site shell | 9.5 | 9.5 |
-| Overall | 9.4 | 9.4 |
+| /stats       | 9.5 | 9.5 |
+| /kontakt     | 9.5 | 9.5 |
+| Site shell   | 9.5 | 9.5 |
+| Overall      | 9.4 | 9.4 |
 
 Reviewed the supplied round-6 current-main captures at 1440/390 in both subpage themes, 1920 dark subpage samples, homepage section seams and all six reduced-motion frames, plus round-6 home and shell detail shots. Compared the cinema directly with its round-5 detail shots and read the current compositing selectors. Visual design and craft only; no copy-wording deductions. Screenshot paths below are relative to `docs/screens/`.
 

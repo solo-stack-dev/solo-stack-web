@@ -159,7 +159,10 @@
 	style:--band-wide={WAVEFORM_BAND.wide}
 	style:--band-tall={WAVEFORM_BAND.tall}
 	{@attach inView((visible) => {
-		if (!visible && playing) player?.pause();
+		if (visible) return;
+		if (playing) player?.pause();
+		// The next tuning gesture resumes it through `audio.unlock()`.
+		void audio.suspend();
 	})}
 	{@attach inView((near) => near && void loadSound(), { rootMargin: '50% 0px', once: true })}
 >

@@ -87,12 +87,8 @@
 
 	$effect(() => {
 		loop.paused = paused;
-		// Drop presses made while paused so resuming doesn't fire a stale jump.
-		if (paused) {
-			input.consume('action');
-			input.consume('up');
-			input.consume('down');
-		}
+		// Drop presses on pause and on resume, so a key pressed while paused doesn't fire a stale jump.
+		input.flush();
 	});
 
 	$effect(() => {
@@ -124,6 +120,6 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-		touch-action: none;
+		touch-action: manipulation;
 	}
 </style>

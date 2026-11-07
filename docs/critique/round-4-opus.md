@@ -1,14 +1,14 @@
 # Critique round 4: Claude Opus 5.5 (high)
 
-| Area | R3 | R4 |
-|---|---|---|
-| Homepage | 9.2 | 9.3 |
-| /blog | 9.4 | 9.5 |
+| Area         | R3  | R4  |
+| ------------ | --- | --- |
+| Homepage     | 9.2 | 9.3 |
+| /blog        | 9.4 | 9.5 |
 | /blog/[slug] | 9.1 | 9.3 |
-| /stats | 9.0 | 9.2 |
-| /kontakt | 9.4 | 9.5 |
-| Site shell | 8.9 | 9.2 |
-| Overall | 9.1 | 9.3 |
+| /stats       | 9.0 | 9.2 |
+| /kontakt     | 9.4 | 9.5 |
+| Site shell   | 8.9 | 9.2 |
+| Overall      | 9.1 | 9.3 |
 
 Not verified live: the sent state on the merged footer (round-4 contact shots predate the shell merge). Recapture sent at 390/1440/1920 before calling it done.
 

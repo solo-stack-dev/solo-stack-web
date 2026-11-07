@@ -265,6 +265,6 @@ export function bloomMask(state: MakingStateId): string {
 	const { d, stroke } = SHAPE_MASKS[state];
 	const half = BLOOM_BOX / 2;
 	const paint = stroke ? `fill='none' stroke='white' stroke-width='${stroke}' stroke-linecap='round' stroke-linejoin='round'` : `fill='white'`;
-	const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${-half} ${-half} ${BLOOM_BOX} ${BLOOM_BOX}'>` + `<path d='${d}' ${paint}/></svg>`;
+	const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${-half} ${-half} ${BLOOM_BOX} ${BLOOM_BOX}'><path d='${d}' ${paint}/></svg>`;
 	return `url("data:image/svg+xml,${svg.replaceAll('<', '%3C').replaceAll('>', '%3E').replaceAll('"', "'")}")`;
 }

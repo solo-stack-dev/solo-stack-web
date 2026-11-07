@@ -87,8 +87,11 @@
 
 	let ready = false;
 	let textureLoaded = false;
+	let disposed = false;
 
 	new TextureLoader().load(moonTexture, (texture: Texture) => {
+		// 3D switched off before the texture arrived: the material is gone, nothing else would dispose it.
+		if (disposed) return texture.dispose();
 		texture.colorSpace = NoColorSpace;
 		texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 		material.uniforms.map.value = texture;
@@ -126,6 +129,7 @@
 			onlost?.();
 		});
 		return () => {
+			disposed = true;
 			detach?.();
 			offLost();
 			geometry.dispose();

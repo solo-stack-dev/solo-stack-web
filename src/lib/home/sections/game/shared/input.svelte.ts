@@ -60,6 +60,11 @@ export class GameInput {
 		this.held[button] = false;
 	}
 
+	/** Drops pending presses (e.g. made while paused) without touching held state. */
+	flush(): void {
+		this.#pressed.clear();
+	}
+
 	reset(): void {
 		for (const button of BUTTONS) this.held[button] = false;
 		this.#pressed.clear();
@@ -70,6 +75,8 @@ export class GameInput {
 		const offDown = on(element, 'keydown', (event) => {
 			const button = KEY_MAP[event.code];
 			if (!button || event.altKey || event.ctrlKey || event.metaKey) return;
+			// Space on a button inside the surface (mode switch, cards, "again") activates the button, not the game.
+			if (button === 'action' && event.target !== element && event.target instanceof HTMLButtonElement) return;
 			event.preventDefault();
 			if (!event.repeat) this.press(button);
 		});

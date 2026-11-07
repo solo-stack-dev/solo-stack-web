@@ -43,14 +43,12 @@ Every section component renders one root element with:
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `id="<section id>"` from `NIGHT_HOURS`       | Menu and rail anchors (`#hero`, `#making`, `#game`, `#night-shift`, `#radio`, `#cinema`, `#sunrise`) |
 | `data-night-hour="<time>"`                   | NightPage anchors the sky color stops to the section's real position                                 |
-| `position: relative`                         | NightClock, MockupRef are absolutely positioned inside it                                            |
+| `position: relative`                         | NightClock is absolutely positioned inside it                                                        |
 | `<NightClock time="…" />`                    | Same clock position in every section                                                                 |
 | a heading with `aria-labelledby` on the root | Landmark and outline. Hero owns the only `<h1>` (the wordmark); others use `<h2>`                    |
 | transparent background                       | The global sky shows through; paint your art on top of it                                            |
 
 Placeholder heights from Phase 0 (`min-height: 100svh`) are starting points; no section pins or scrubs by scroll (making rotates on its own inside one viewport). Change your own height freely: the sky stops re-measure on resize.
-
-`MockupRef` (the low-opacity round-2 mockup behind each section) is temporary. Keep it while you build, delete its usage and your `assets/*-mockup-ref.webp` once real art is in place. In dev, `?ref=0` hides all references and `?ref=1` shows them at 0.9 opacity for comparison.
 
 ## 3. The `--night` contract
 
@@ -140,7 +138,7 @@ interface GameProps {
 - `GameFrame` owns: poster + play button, lazy load on click, focus on the game surface, pause (button, P, Escape, off screen, hidden tab), restart (button or R, remounts the game), score and high score in mono, touch buttons (coarse pointers). High scores: `localStorage` key `solostack:game:<id>:highscore`.
 - Fill your canvas/scene to the parent box. The stage is 16:9 (4:5 below 40 rem); override with `--game-aspect` / `--game-aspect-mobile` on the frame if your game needs it (tell the lead).
 - Drive your loop with `RafLoop` and set `loop.paused = paused` in an `$effect`. Keep a round between 30 and 90 seconds, instant restart, no network.
-- Each candidate folder currently holds a stub wrapping `game/shared/PlaceholderGame.svelte`. Replace your folder's files; do not edit the placeholder. The lead deletes it once all three are replaced.
+- Each candidate folder holds its own game; the placeholder stub they started from is gone.
 - Message keys: `home_game_moon_*` (A), `home_game_stack_*` (B), `home_game_stars_*` (C). Each already has a `_title` key.
 - The 22:00 section shows all three games as tabs. `HOMEPAGE_DEFAULT_GAME` in `candidates.ts` picks the tab selected first (`moon-planet`). Only the selected tab's frame is mounted.
 
@@ -215,10 +213,6 @@ Mounts a heavy component from a dynamic import when its box comes within `rootMa
 
 Props: `load` (required), `props`, `rootMargin` (`'100% 0px'`), `when` (true; extra condition), `idle` (false; also wait for `requestIdleCallback`), `fallback`, `failed` (snippet, gets the error), `onloaded`, `class`. The wrapper is a `div`: give it the final size via `class` so nothing shifts when the component replaces the fallback.
 
-### 6.7 `MockupRef.svelte` (temporary)
-
-`<MockupRef src={mockup} opacity={0.3} fit="cover" />`. Decorative reference image, see §2. The game shell no longer uses it; it stays until making and radio drop their references.
-
 ### 6.8 `motion.svelte.ts`
 
 ```ts
@@ -277,7 +271,6 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 - Naming: `<section>-<layer>[-mobile][@frame].png`, e.g. `hero-moon-disc.png`, `nightshift-mascot-typing@2.png`. Mascot frames: one sprite sheet per animation.
 - Budgets: hero above the fold ≤ ~250 kB AVIF (desktop); each section's initial images ≤ ~400 kB; `loading="lazy"` below the fold, `fetchpriority="high"` only on the hero image; explicit sizes (no CLS).
 - Decorative art: `alt=""`. Meaningful images get an `alt` message key.
-- `*-mockup-ref.webp` files are temporary references (1280 px, ~100 kB each); delete them with `MockupRef`.
 
 ## 9. Before you commit
 
