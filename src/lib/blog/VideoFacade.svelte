@@ -1,7 +1,7 @@
 <!--
 	@component
-	YouTube facade: a self-hosted thumbnail (/media/video-thumbnail/…, no request reaches YouTube) until the click swaps in a
-	youtube-nocookie iframe with autoplay. `seek()` seeks a running player via the IFrame API postMessage protocol (no API
+	YouTube facade: a self-hosted thumbnail (/media/video-thumbnail/…, no request reaches YouTube). The click opens the consent
+	panel (#lib/components/site/YouTubeConsent.svelte); its button swaps in a youtube-nocookie iframe with autoplay. `seek()` seeks a running player via the IFrame API postMessage protocol (no API
 	script). Without `youtubeId`: the format's silhouette vignette with the "video follows" note on an ink scrim in its sky
 	(phones: as a caption below the art). The thumbnail and the vignette sit on a torn paper edge; the running player gets
 	clean corners.
@@ -9,6 +9,7 @@
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
 	import VideoThumbnail from '#lib/home/sections/cinema/VideoThumbnail.svelte';
+	import YouTubeConsent from '#lib/components/site/YouTubeConsent.svelte';
 	import FormatVignette from './FormatVignette.svelte';
 	import { DECKLE_MASK } from './materials.ts';
 	import type { PostFormat } from './schema.ts';
@@ -29,6 +30,7 @@
 	let root = $state<HTMLElement>();
 	let iframe = $state<HTMLIFrameElement>();
 	let playing = $state(false);
+	let asking = $state(false);
 	let startAt = $state(0);
 
 	const embedUrl = $derived.by(() => {
@@ -42,7 +44,7 @@
 		iframe?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func, args }), YOUTUBE_ORIGIN);
 	}
 
-	/** Starts the player at `seconds` or seeks the running one, and scrolls it into view. */
+	/** Seeks the running player, or asks for consent and starts at `seconds` once given; scrolls it into view. */
 	export function seek(seconds: number) {
 		if (!youtubeId) return;
 		if (playing) {
@@ -50,7 +52,7 @@
 			command('playVideo');
 		} else {
 			startAt = seconds;
-			playing = true;
+			asking = true;
 		}
 		const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 		root?.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'center' });
@@ -70,12 +72,15 @@
 				{@attach (element) => element.focus()}
 			></iframe>
 		{:else}
-			<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} onclick={() => (playing = true)}>
+			<button type="button" class="facade group" aria-label={m.blog_video_play({ title })} inert={asking} onclick={() => (asking = true)}>
 				<VideoThumbnail id={youtubeId} class="frame thumbnail" sizes={SIZES} fetchpriority="high" />
 				<span class="play" aria-hidden="true">
 					<svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" /></svg>
 				</span>
 			</button>
+			{#if asking}
+				<YouTubeConsent onaccept={() => (playing = true)} />
+			{/if}
 		{/if}
 	</div>
 {:else}
@@ -142,6 +147,10 @@
 	.facade :global(.thumbnail) {
 		object-fit: cover;
 		transition: scale 600ms var(--ease-settle);
+	}
+
+	.facade[inert] .play {
+		display: none;
 	}
 
 	.facade:hover :global(.thumbnail) {

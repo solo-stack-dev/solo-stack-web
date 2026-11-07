@@ -3,7 +3,8 @@
 	04:00 Open air cinema (docs/HANDOFF-HOMEPAGE.md §5.6): the mascot's laptop on the cliff projects the latest video into a painted frame.
 
 	- Facade: self-hosted thumbnail (./thumbnail.ts) + moon play button; no request to YouTube before the click.
-	- Click: youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
+	- First click: the consent panel (#lib/components/site/YouTubeConsent.svelte) over the thumbnail. Its button loads the
+	  youtube-nocookie.com iframe with autoplay (the click is the user gesture); the beam brightens.
 	- No video (empty feed or offline build): the painted projection fills the screen (docs/art/site/round-2/cinema-projection.png);
 	  the message and the channel link sit centered on a soft ink scrim over its calm sky.
 	- The frame keeps its light where the beam arrives (left edge on desktop, bottom edge on mobile); on the three sides away
@@ -25,6 +26,7 @@
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
+	import YouTubeConsent from '#lib/components/site/YouTubeConsent.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { dawnVars } from '#lib/home/shared/dawn.ts';
 	import { CINEMA_LAYOUT, SCREEN_GROW, beamMask, edgeVars, placeVars } from './layout.ts';
@@ -47,6 +49,7 @@
 	const video = $derived(dev && preview === 'demo' ? DEV_DEMO : dev && preview === 'empty' ? null : latest);
 
 	let playing = $state(false);
+	let asking = $state(false);
 	let thumbnailFailed = $state(false);
 	const near = new InView({ rootMargin: '10% 0px' });
 
@@ -148,13 +151,16 @@
 					{@attach (element) => element.focus()}
 				></iframe>
 			{:else if video}
-				<button type="button" class="facade" aria-label={m.home_cinema_play_label({ title: video.title })} onclick={play}>
+				<button type="button" class="facade" aria-label={m.home_cinema_play_label({ title: video.title })} inert={asking} onclick={() => (asking = true)}>
 					{#if !thumbnailFailed}
 						<!-- The window is 1344/2560 of the stage on desktop, 907/1080 on mobile (./layout.ts) -->
 						<VideoThumbnail id={video.id} class="thumbnail" sizes="(min-width: 48rem) 53vw, 84vw" loading="lazy" onerror={() => (thumbnailFailed = true)} />
 					{/if}
 					<span class="moon" aria-hidden="true"><span class="moon-play"></span></span>
 				</button>
+				{#if asking}
+					<YouTubeConsent onaccept={play} />
+				{/if}
 			{:else}
 				<div class="empty">
 					<enhanced:img
@@ -507,6 +513,10 @@
 		background: var(--color-night);
 		clip-path: polygon(0 0, 100% 50%, 0 100%);
 		opacity: 0.88;
+	}
+
+	.facade[inert] .moon {
+		display: none;
 	}
 
 	.facade:hover .moon,
