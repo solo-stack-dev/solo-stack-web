@@ -16,12 +16,14 @@
 		/** Accessible name; must match the real trigger's. */
 		label: string;
 		haspopup: 'menu' | 'dialog';
+		/** Trigger look of the placeholder; must match the real trigger's. Default: the 44px icon button. */
+		trigger?: string;
 		class?: ClassValue;
 		/** Placeholder content; must match the real trigger's (the icon). */
 		children: Snippet;
 	}
 
-	let { load, label, haspopup, class: className, children }: Props = $props();
+	let { load, label, haspopup, trigger = MENU_TRIGGER, class: className, children }: Props = $props();
 
 	let Loaded = $state<Menu>();
 	let open = $state(false);
@@ -46,7 +48,7 @@
 {:else}
 	<button
 		type="button"
-		class={[MENU_TRIGGER, className]}
+		class={[trigger, className]}
 		aria-label={label}
 		aria-haspopup={haspopup}
 		aria-expanded="false"

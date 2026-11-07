@@ -1,8 +1,9 @@
 <!--
 	@component
 	The site navbar, one language on every page: crescent wordmark (home), uppercase tracked display links with the hand-drawn
-	`--ink-underline` swash under the current page, `actions` snippet on the right. No bar: a painted scrim of the ground under
-	it (night ink, sunrise butter, or the subpage paper) dissolves into the page, eased so it has no edge.
+	`--ink-underline` swash under the current page, the language dropdown (`LocaleSwitch`) and the
+	`actions` snippet on the right. No bar: a painted scrim of the ground under it (night ink, sunrise butter, or the subpage
+	paper) dissolves into the page, eased so it has no edge.
 	It slides away while you scroll down and comes back on the first scroll up (never while it holds keyboard focus), so
 	headings and art below the fold are never covered.
 	- `variant="site"`: sticky, aligned to the pages' content grid (`content-frame`). The scrim is the page's own paper or
@@ -23,6 +24,7 @@
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import { restoreEclipseMoon } from './eclipse-moon.ts';
 	import { SITE_LINKS, siteCurrent, siteHref } from './links.ts';
+	import LocaleSwitch from './LocaleSwitch.svelte';
 
 	interface Props {
 		variant?: 'site' | 'night';
@@ -107,6 +109,9 @@
 					{/each}
 				</ul>
 			</nav>
+
+			<!-- Language dropdown (current code), on every page and at every width -->
+			<div class="locale"><LocaleSwitch /></div>
 
 			{#if actions}
 				<div class="actions">{@render actions()}</div>
@@ -253,7 +258,8 @@
 		align-items: center;
 	}
 
-	.links a {
+	.links a,
+	.locale :global(.locale-trigger) {
 		position: relative;
 		display: inline-flex;
 		align-items: center;
@@ -268,7 +274,8 @@
 	}
 
 	/* Current page swash (--ink-underline), drawn in from the left */
-	.links a::after {
+	.links a::after,
+	.locale :global(.locale-trigger)::after {
 		content: '';
 		position: absolute;
 		left: 0.6rem;
@@ -288,12 +295,16 @@
 		scale: 1 1;
 	}
 
-	.links a:hover {
+	.links a:hover,
+	.locale :global(.locale-trigger:hover),
+	.locale :global(.locale-trigger[aria-expanded='true']) {
 		color: var(--nav-mark);
 	}
 
 	/* Hover previews the mark, faint */
-	.links a:not([aria-current]):hover::after {
+	.links a:not([aria-current]):hover::after,
+	.locale :global(.locale-trigger:hover)::after,
+	.locale :global(.locale-trigger[aria-expanded='true'])::after {
 		scale: 1 1;
 		opacity: 0.45;
 	}
@@ -304,6 +315,7 @@
 	 * word. Same for the wordmark, under its name.
 	 */
 	.links a:focus-visible,
+	.locale :global(.locale-trigger:focus-visible),
 	.wordmark:focus-visible {
 		outline: none;
 		box-shadow: none;
@@ -312,7 +324,8 @@
 		filter: drop-shadow(0 0 0.45rem var(--nav-focus-halo));
 	}
 
-	.links a:focus-visible::after {
+	.links a:focus-visible::after,
+	.locale :global(.locale-trigger:focus-visible)::after {
 		scale: 1 1;
 		opacity: 1;
 		height: 0.55rem;
@@ -342,6 +355,35 @@
 
 	.wordmark:focus-visible::after {
 		scale: 1 1;
+	}
+
+	/* The code and a small chevron: a dropdown, not a page. The 44px target stays, with less padding than a page name. */
+	.locale {
+		display: flex;
+	}
+
+	.locale :global(.locale-trigger) {
+		justify-content: center;
+		gap: 0.2rem;
+		min-width: 2.75rem;
+		padding: 0 0.5rem 0 0.65rem;
+		cursor: pointer;
+	}
+
+	.locale :global(.chevron) {
+		width: 0.875rem;
+		height: 0.875rem;
+		stroke-width: 2.75;
+		transition: rotate var(--dur-state) var(--ease-settle);
+	}
+
+	.locale :global(.locale-trigger[aria-expanded='true'] .chevron) {
+		rotate: 180deg;
+	}
+
+	/* the swash sits under the code, not the chevron */
+	.locale :global(.locale-trigger)::after {
+		right: 1.3rem;
 	}
 
 	/* Icon flush with the edge (mirroring the wordmark) while the button keeps its 44px target */
@@ -573,14 +615,15 @@
 			display: block;
 		}
 
-		/* A hairline between the pages and the section menu */
-		.is-night .links + .actions {
+		/* A hairline between the pages (and the language switch) and the section menu */
+		.is-night .locale + .actions {
 			padding-left: 0.25rem;
 			border-left: 1px solid var(--dock-rule);
 		}
 	}
 
-	.is-night[data-tone='paper'] .links a:hover {
+	.is-night[data-tone='paper'] .links a:hover,
+	.is-night[data-tone='paper'] .locale :global(.locale-trigger:hover) {
 		color: inherit;
 	}
 </style>

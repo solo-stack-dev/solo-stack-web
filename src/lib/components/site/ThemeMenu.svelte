@@ -2,10 +2,7 @@
 	@component
 	Light / dark / system (mode-watcher, mounted by the (site) layout). The trigger icon swaps via the `dark` class (CSS only),
 	so server HTML and hydration agree. Heavy (bits-ui dropdown): never import statically; ThemeToggle loads it on first tap.
-
-	Not a stock popover: a slip torn from the page's own paper (or night), deckled along the top, with a hairline ink edge
-	and no floating card shadow. The rows are words in the nav's display type; the chosen one carries a brushed ink tick, the highlighted one
-	(keyboard or pointer) the shell's focus swash and soft light, like every other focus in the shell.
+	The torn paper slip is shared with LocaleMenu (`menu-sheet.css`).
 -->
 <script lang="ts">
 	import MoonIcon from '@lucide/svelte/icons/moon';
@@ -14,6 +11,7 @@
 	import { setMode, userPrefersMode } from 'mode-watcher';
 	import { m } from '#lib/paraglide/messages.js';
 	import { MENU_TRIGGER } from './lazy-menu.ts';
+	import './menu-sheet.css';
 
 	let { open = $bindable(false) }: { open?: boolean } = $props();
 
@@ -32,13 +30,13 @@
 		<MoonIcon class="hidden size-5 dark:block" aria-hidden="true" />
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Portal>
-		<DropdownMenu.Content align="end" sideOffset={6} class="theme-sheet">
+		<DropdownMenu.Content align="end" sideOffset={6} class="menu-sheet">
 			<DropdownMenu.RadioGroup value={userPrefersMode.current} onValueChange={(value) => setMode(value as Mode)}>
 				{#each options as option (option.value)}
-					<DropdownMenu.RadioItem value={option.value} closeOnSelect={false} class="theme-option">
+					<DropdownMenu.RadioItem value={option.value} closeOnSelect={false} class="menu-option">
 						{#snippet children({ checked })}
-							<span class="tick" data-checked={checked || undefined} aria-hidden="true"></span>
-							<span class="word">{option.label()}</span>
+							<span class="menu-tick" data-checked={checked || undefined} aria-hidden="true"></span>
+							<span class="menu-word">{option.label()}</span>
 						{/snippet}
 					</DropdownMenu.RadioItem>
 				{/each}
@@ -46,121 +44,3 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Portal>
 </DropdownMenu.Root>
-
-<style>
-	/* Portalled to <body>, outside the layout: the theme tokens live on <html>, so paper and night still apply. */
-	/*
-	 * The slip is torn from the page: its paper (`::before`) has a deckle top edge (a torn-paper mask) and square sides; the
-	 * hairline ink edge is a 1px shadow of that shape, so it follows the tear too.
-	 */
-	:global(.theme-sheet) {
-		position: relative;
-		isolation: isolate;
-		z-index: 50;
-		min-width: 14rem;
-		padding-block: 0.875rem 0.375rem;
-		color: var(--foreground);
-		outline: none;
-		filter: drop-shadow(0 0 0.5px color-mix(in oklab, var(--foreground) 70%, transparent))
-			drop-shadow(0 0.35rem 0.6rem color-mix(in oklab, var(--color-ink) 10%, transparent));
-		transform-origin: var(--bits-dropdown-menu-content-transform-origin);
-	}
-
-	:global(.theme-sheet)::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: -1;
-		/* the page's paper with its dusk wash, and the same pigment mottling */
-		background:
-			var(--surface-mottle-a) 0 0 / 704px 704px,
-			linear-gradient(in oklab to bottom, var(--surface-dusk), var(--background));
-		mask:
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='10'%3E%3Cpath d='M0 10V1.2L9 2.5L13 4.6L19 2.7L27 4.7L33 4.3L40 5L44 2.9L51 4.4L54 4.3L60 5.4L68 1.8L74 5.4L81 4.2L87 5.4L95 2.9L100 5.1L105 1.9L110 3.2L115 5.5L121 4.6L129 1.5L134 3.8L140 3.1L144 5.4L147 2.9L152 4.3L160 1.2V10Z'/%3E%3C/svg%3E")
-				0 0 / 160px 10px repeat-x,
-			linear-gradient(#000 0 0) 0 9px / 100% calc(100% - 9px) no-repeat;
-	}
-
-	@media (prefers-reduced-motion: no-preference) {
-		:global(.theme-sheet[data-state='open']) {
-			animation: theme-sheet-in var(--dur-hover) var(--ease-settle);
-		}
-	}
-
-	@keyframes theme-sheet-in {
-		from {
-			opacity: 0;
-			translate: 0 -0.25rem;
-		}
-	}
-
-	:global(.theme-option) {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		min-height: 2.75rem;
-		padding: 0 1.25rem 0 0.875rem;
-		font-family: var(--font-display);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		cursor: default;
-		outline: none;
-		user-select: none;
-		transition: color var(--dur-hover) ease;
-	}
-
-	:global(.theme-option[data-state='checked']) {
-		color: var(--ink-lit);
-	}
-
-	/* Highlighted (arrow keys or pointer): the focus swash under the word and a soft light, the shared focus tokens */
-	:global(.theme-option[data-highlighted]) {
-		color: var(--ink-lit);
-		filter: drop-shadow(0 0 0.4rem var(--focus-halo));
-	}
-
-	.word {
-		position: relative;
-	}
-
-	.word::after {
-		content: '';
-		position: absolute;
-		left: -0.05em;
-		right: -0.1em;
-		bottom: -0.3rem;
-		height: 0.35rem;
-		background: var(--focus-ring);
-		mask: var(--ink-underline) center / 100% 100% no-repeat;
-		scale: 0 1;
-		transform-origin: left;
-		transition: scale var(--dur-state) var(--ease-settle);
-	}
-
-	:global(.theme-option[data-highlighted]) .word::after {
-		scale: 1 1;
-	}
-
-	/*
-	 * The selection mark: one brushed ink tick in the current-page ink. A filled stroke, not a line: it presses in heavy at
-	 * the turn and lifts off thin at both ends, and the long stroke runs a little dry.
-	 */
-	.tick {
-		flex: none;
-		width: 1.125rem;
-		height: 1.125rem;
-		background: var(--ink-lit);
-		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cfilter id='d' x='0' y='0' width='1' height='1'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4 .35' numOctaves='2' seed='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -3 0 0 0 2.55'/%3E%3CfeComposite in='SourceGraphic' operator='in'/%3E%3C/filter%3E%3Cpath filter='url(%23d)' d='M1.9 10.9C3.3 10.3 5.4 11.8 7.3 14.3 9.9 8.9 13.4 4.9 18 2.3c.6-.3 1 .3.5.7-4 3.4-7 7.6-9.8 13.6-.4.9-1.5 1-2 .1C5.3 14.2 3.8 12.6 2 11.7c-.5-.2-.5-.7-.1-.8Z'/%3E%3C/svg%3E")
-			center / contain no-repeat;
-		opacity: 0;
-		scale: 0.7;
-		transition:
-			opacity var(--dur-hover) ease,
-			scale var(--dur-state) var(--ease-settle);
-	}
-
-	.tick[data-checked] {
-		opacity: 1;
-		scale: 1;
-	}
-</style>

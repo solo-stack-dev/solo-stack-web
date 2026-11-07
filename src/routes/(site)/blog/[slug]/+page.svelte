@@ -253,7 +253,7 @@
 					<!-- The other language version, labelled in its own language -->
 					{#each post.translations as translation (translation.lang)}
 						<span aria-hidden="true">·</span>
-						<a href={postHref(translation)} hreflang={translation.lang} lang={translation.lang} class="translation">
+						<a href={postHref(translation)} hreflang={translation.lang} lang={translation.lang} class="translation" data-sveltekit-reload>
 							{m.blog_post_translation_link({}, { locale: translation.lang })}
 						</a>
 					{/each}

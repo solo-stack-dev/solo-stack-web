@@ -151,6 +151,7 @@
 	"site_nav_menu_open": "Open menu",
 	"site_nav_menu_close": "Close menu",
 	"site_nav_menu_title": "Site menu",
+	"site_locale_label": "Language",
 	"site_theme_label": "Choose color theme",
 	"site_theme_light": "Light",
 	"site_theme_dark": "Dark",

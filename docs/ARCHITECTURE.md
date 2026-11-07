@@ -46,7 +46,8 @@ Paraglide compiles `messages/*.json` into `src/lib/paraglide/` (generated, git i
 - **The URL is the only locale source** (`strategy: ['url', 'baseLocale']`). German is the base locale at unprefixed URLs (`/`, `/blog/…`), English lives under `/en/…`. No cookie or `Accept-Language` detection and no automatic redirects, so crawlers, prerendering and the Workers cache (keyed by path) always see one language per URL.
 - `src/hooks.ts` `reroute` strips the locale prefix, so one route file serves every locale. `src/hooks.server.ts` sets `lang`/`dir` and 308-redirects `/de/…` to the unprefixed canonical URL.
 - The root layout emits `hreflang` alternates (absolute URLs, plus `x-default`). The prerender crawler follows them, so every locale variant of a prerendered page is built.
-- Build internal links with `localizeHref()` so they stay in the current locale. A locale switcher links to `localizeHref(page.url.pathname, { locale })`.
+- Build internal links with `localizeHref()` so they stay in the current locale.
+- **Language switch:** a dropdown in `SiteNav` (`LocaleSwitch`, the bits-ui `LocaleMenu` loads on first tap like the theme menu; logic in `locale-switch.ts`). Each option is a plain link with `data-sveltekit-reload`; crawlers use the hreflang tags. Changing the locale is a full document load (as Paraglide's `setLocale` does), because the messages are not reactive and `/blog` and `/en/blog` are the same route component. On a post it links to the translation (own slug) or, without one, to that language's blog index. Every link that changes the locale needs `data-sveltekit-reload`.
 - Blog posts: one file per language. A translation sets `translationOf: <original slug>` (validated at build time); post pages, the sitemap and the blog index (one version per video, in the visitor's language when it exists) derive the hreflang pairs from it. A post without translation advertises only its own language.
 
 ## Environments
