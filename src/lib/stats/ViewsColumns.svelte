@@ -34,6 +34,8 @@
 		for (const exponent of [magnitude / 10, magnitude])
 			for (const nice of [1, 2, 2.5, 5]) {
 				const step = nice * exponent;
+				// Views are whole numbers: no 0.2 or 12.5 guides on a young channel.
+				if (!Number.isInteger(step)) continue;
 				if (Math.ceil(max / step) <= 5) return { step, top: Math.ceil(max / step) * step };
 			}
 		return { step: magnitude * 10, top: magnitude * 10 };
