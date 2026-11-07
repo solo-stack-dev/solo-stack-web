@@ -25,8 +25,6 @@
 	import ridgeMask from './assets/footer-horizon.webp?url';
 
 	const socials = linkedSocials();
-	// TODO(owner): imprint and privacy pages do not exist yet (/kontakt does; same in the sunrise footer).
-	// rel="external" keeps the prerender crawler from failing on them; drop it once they exist.
 	const legalLabels = { imprint: m.site_footer_imprint, privacy: m.site_footer_privacy, contact: m.site_footer_contact };
 	const year = new Date().getFullYear();
 
@@ -82,7 +80,7 @@
 				<ul class="legal">
 					{#each LEGAL_LINKS as link (link.id)}
 						<li>
-							<a class="swash-focus" href={localizeHref(link.path)} rel={link.id === 'contact' ? undefined : 'external'}>{legalLabels[link.id]()}</a>
+							<a class="swash-focus" href={localizeHref(link.path)}>{legalLabels[link.id]()}</a>
 						</li>
 					{/each}
 				</ul>

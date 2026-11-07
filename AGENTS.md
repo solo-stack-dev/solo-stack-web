@@ -24,6 +24,10 @@ SvelteKit 3 + Svelte 5 (runes, experimental `async`) on Cloudflare Workers, D1 v
 - Install packages only via `sfw pnpm …` (e.g. `sfw pnpm add -D foo`).
 - Format and lint with oxfmt/oxlint (tabs, single quotes, width 170).
 
+## Blog posts
+
+New post for a video, its translation, or a revision: follow the `blog-post` skill ([.claude/skills/blog-post/SKILL.md](.claude/skills/blog-post/SKILL.md)). A translation names its original in `translationOf`; that links the versions for hreflang, the sitemap and the blog index.
+
 ## Commands
 
 - `pnpm dev`: dev server

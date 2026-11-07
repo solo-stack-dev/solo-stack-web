@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { Component } from 'svelte';
 import { m } from '#lib/paraglide/messages.js';
 import { getLocale, localizeHref, type Locale } from '#lib/paraglide/runtime.js';
-import type { PostFormat } from './schema.ts';
+import type { Post, PostFormat } from './schema.ts';
 
 /** Rendered post bodies, one lazy chunk each. */
 const bodies = import.meta.glob<{ default: Component }>('/src/content/blog/*.md');
@@ -23,6 +23,13 @@ export const FORMAT_LABELS: Record<PostFormat, () => string> = {
 
 /** Uses the post's own `lang`, so the link never points to a missing translation. */
 export const postHref = (post: { slug: string; lang: Locale }) => localizeHref(`/blog/${post.slug}`, { locale: post.lang });
+
+/**
+ * The posts a visitor of `locale` sees: every post in that language, plus posts that have no version in it.
+ * Translations of one video never show twice.
+ */
+export const postsFor = <P extends Pick<Post, 'lang' | 'translations'>>(posts: P[], locale: Locale) =>
+	posts.filter((post) => post.lang === locale || !post.translations.some((translation) => translation.lang === locale));
 
 /** `2026-11-01` → "1. November 2026", in UTC so build and browser agree. */
 export function formatDate(isoDate: string, locale: string = getLocale()) {

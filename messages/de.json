@@ -176,6 +176,7 @@
 	"blog_empty": "Zu diesem Format gibt es hier noch keine Artikel.",
 	"blog_reading_time": "{minutes} Min.",
 	"blog_card_no_video": "Video folgt",
+	"blog_post_translation_link": "Auf Deutsch lesen",
 	"blog_post_back": "Zur Blogübersicht",
 	"blog_video_play": "Video abspielen: {title}",
 	"blog_video_privacy_note": "Der Player von YouTube wird erst nach deinem Klick geladen.",

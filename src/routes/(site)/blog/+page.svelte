@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { afterNavigate, replaceState } from '$app/navigation';
-	import { FORMAT_LABELS } from '#lib/blog/content.ts';
+	import { FORMAT_LABELS, postsFor } from '#lib/blog/content.ts';
 	import FormatVignette from '#lib/blog/FormatVignette.svelte';
 	import { DRY_BRUSH_FADE_RIGHT } from '#lib/blog/materials.ts';
 	import groundLine from '#lib/blog/assets/ink-ground.svg?url';
@@ -13,7 +13,8 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { getLocale } from '#lib/paraglide/runtime.js';
 
-	const posts = $derived(await getPosts());
+	// One version per video: the one in this page's language when it has been translated
+	const posts = $derived(postsFor(await getPosts(), getLocale()));
 
 	// Client side filter (the page is prerendered once), mirrored to `?format=` so a filtered view can be shared.
 	let format = $state<PostFormat | null>(null);

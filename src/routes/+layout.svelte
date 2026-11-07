@@ -10,8 +10,10 @@
 	// Absolute (Google requires it for hreflang). The prerender crawler follows these, so every locale variant gets built.
 	const alternateHref = (locale: Locale) => new URL(localizeHref(page.url.pathname, { locale }), page.url.origin).href;
 
-	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]).
-	const ownAlternates = $derived(page.route.id === '/(site)/blog/[slug]');
+	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]);
+	// the legal texts are German only and name the German URL as canonical (LegalPage.svelte).
+	const SINGLE_LOCALE_ROUTES = new Set(['/(site)/blog/[slug]', '/(site)/impressum', '/(site)/datenschutz']);
+	const ownAlternates = $derived(SINGLE_LOCALE_ROUTES.has(page.route.id ?? ''));
 
 	// Console egg, loaded on idle
 	const installConsoleEgg = () => import('#lib/components/site/console-egg.ts').then((module) => module.install()).catch(() => {});

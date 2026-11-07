@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { locales } from '#lib/paraglide/runtime.js';
+import { locales, type Locale } from '#lib/paraglide/runtime.js';
 import { VIDEO_ID_PATTERN } from '#lib/home/sections/cinema/thumbnail.ts';
 
 /**
@@ -44,6 +44,11 @@ export const PostFrontmatterSchema = v.object({
 	transcript: v.optional(v.array(TranscriptSegmentSchema), []),
 	tags: v.optional(v.array(TextSchema), []),
 	lang: v.picklist(locales),
+	/**
+	 * Only on a translation: the slug of the original post (the one in the video's language). Links both ways for hreflang,
+	 * the sitemap and the language link under the title; the blog index then shows each visitor one version per video.
+	 */
+	translationOf: v.optional(v.pipe(v.string(), v.regex(SLUG_PATTERN))),
 	generatedBy: v.literal('gpt-6.1-sol'),
 	/** Drafts are only listed and built in dev. */
 	draft: v.optional(v.boolean(), false)
@@ -56,7 +61,14 @@ export interface Post extends PostFrontmatter {
 	readingMinutes: number;
 	/** The `##` sections of the body, for the table of contents. */
 	outline: { id: string; title: string }[];
+	/** The other language versions of this post (published ones only). */
+	translations: { slug: string; lang: Locale }[];
+	/** Language spoken in the video: the original post's `lang`. */
+	videoLang: Locale;
 }
 
 /** Card data for the index (no transcript, links or takeaways). */
-export type PostSummary = Pick<Post, 'slug' | 'title' | 'description' | 'youtubeId' | 'publishedAt' | 'format' | 'lang' | 'readingMinutes' | 'durationSeconds'>;
+export type PostSummary = Pick<
+	Post,
+	'slug' | 'title' | 'description' | 'youtubeId' | 'publishedAt' | 'format' | 'lang' | 'readingMinutes' | 'durationSeconds' | 'translations'
+>;

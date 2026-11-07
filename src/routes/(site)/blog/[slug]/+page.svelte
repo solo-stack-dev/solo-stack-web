@@ -3,7 +3,7 @@
 	import ArrowUpRightIcon from '@lucide/svelte/icons/arrow-up-right';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { page } from '$app/state';
-	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref } from '#lib/blog/content.ts';
+	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref, postsFor } from '#lib/blog/content.ts';
 	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
 	import { breakStyles } from '#lib/blog/section-breaks.ts';
 	import inkGround from '#lib/blog/assets/ink-ground.svg?url';
@@ -13,7 +13,7 @@
 	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
 	import { YOUTUBE_CHANNEL_URL } from '#lib/home/data/socials.ts';
 	import { m } from '#lib/paraglide/messages.js';
-	import { localizeHref } from '#lib/paraglide/runtime.js';
+	import { baseLocale, localizeHref } from '#lib/paraglide/runtime.js';
 	import type { PageProps } from './$types';
 
 	let { params }: PageProps = $props();
@@ -21,12 +21,13 @@
 	// Data, the rendered body chunk and the index (for the neighbours at the end) load in parallel
 	const [post, Body, posts] = $derived(await Promise.all([getPost(params.slug), loadPostBody(params.slug), getPosts()]));
 
-	// The ending: the newer and the older neighbour in the index (newest first)
+	// The ending: the newer and the older neighbour in the index (newest first), among the posts of this language
 	const neighbours = $derived.by(() => {
-		const index = posts.findIndex((candidate) => candidate.slug === post.slug);
+		const list = postsFor(posts, post.lang);
+		const index = list.findIndex((candidate) => candidate.slug === post.slug);
 		if (index < 0) return [];
-		const newer = posts[index - 1];
-		const older = posts[index + 1];
+		const newer = list[index - 1];
+		const older = list[index + 1];
 		return [newer && { post: newer, label: m.blog_post_newer() }, older && { post: older, label: m.blog_post_older() }].filter((item) => !!item);
 	});
 
@@ -47,11 +48,16 @@
 	let video = $state<VideoFacade>();
 
 	const origin = $derived(page.url.origin);
-	// A post exists in one language only: canonical and hreflang point to its URL (the root layout skips alternates here).
+	// Each language version is its own canonical; hreflang links it with its translations (`translationOf`, posts.server.ts).
+	// The root layout skips its alternates here. x-default: the German version if there is one.
 	const canonical = $derived(new URL(postHref(post), origin).href);
+	const versions = $derived([post, ...post.translations].map((version) => ({ lang: version.lang, href: new URL(postHref(version), origin).href })));
+	const defaultVersion = $derived(versions.find((version) => version.lang === baseLocale) ?? versions[0]);
 	const image = $derived(post.youtubeId ? new URL(thumbnailPath(post.youtubeId), origin).href : null);
 	const watchUrl = $derived(post.youtubeId ? `https://www.youtube.com/watch?v=${post.youtubeId}` : null);
 	const transcriptText = $derived(post.transcript.map((segment) => segment.text).join(' '));
+
+	const ogLocale = (lang: string) => (lang === 'de' ? 'de_DE' : 'en_US');
 
 	const graph = (nodes: object[]) => ({ '@context': 'https://schema.org', '@graph': nodes });
 
@@ -82,8 +88,9 @@
 			duration: post.durationSeconds ? isoDuration(post.durationSeconds) : undefined,
 			embedUrl: `https://www.youtube-nocookie.com/embed/${post.youtubeId}`,
 			contentUrl: watchUrl,
-			inLanguage: post.lang,
-			transcript: transcriptText || undefined,
+			inLanguage: post.videoLang,
+			// The transcript of a translation is translated: only the video's own words count as its transcript
+			transcript: (post.lang === post.videoLang && transcriptText) || undefined,
 			hasPart: post.chapters.length
 				? post.chapters.map((chapter, index) => ({
 						'@type': 'Clip',
@@ -173,14 +180,17 @@
 	<title>{post.title} · SOLO STACK</title>
 	<meta name="description" content={post.description} />
 	<link rel="canonical" href={canonical} />
-	<link rel="alternate" hreflang={post.lang} href={canonical} />
-	<link rel="alternate" hreflang="x-default" href={canonical} />
+	{#each versions as version (version.lang)}
+		<link rel="alternate" hreflang={version.lang} href={version.href} />
+	{/each}
+	<link rel="alternate" hreflang="x-default" href={defaultVersion.href} />
 	<meta property="og:type" content="article" />
 	<meta property="og:site_name" content="SOLO STACK" />
 	<meta property="og:title" content={post.title} />
 	<meta property="og:description" content={post.description} />
 	<meta property="og:url" content={canonical} />
-	<meta property="og:locale" content={post.lang === 'de' ? 'de_DE' : 'en_US'} />
+	<meta property="og:locale" content={ogLocale(post.lang)} />
+	{#each post.translations as translation (translation.lang)}<meta property="og:locale:alternate" content={ogLocale(translation.lang)} />{/each}
 	<meta property="article:published_time" content={post.publishedAt} />
 	{#if post.updatedAt}<meta property="article:modified_time" content={post.updatedAt} />{/if}
 	{#each post.tags as tag, index (index)}<meta property="article:tag" content={tag} />{/each}
@@ -240,6 +250,13 @@
 					<span>{m.blog_reading_time({ minutes: post.readingMinutes })}</span>
 					<span aria-hidden="true">·</span>
 					<span>{FORMAT_LABELS[post.format]()}</span>
+					<!-- The other language version, labelled in its own language -->
+					{#each post.translations as translation (translation.lang)}
+						<span aria-hidden="true">·</span>
+						<a href={postHref(translation)} hreflang={translation.lang} lang={translation.lang} class="translation">
+							{m.blog_post_translation_link({}, { locale: translation.lang })}
+						</a>
+					{/each}
 				</p>
 
 				{#if post.outline.length}
@@ -506,6 +523,19 @@
 		color: var(--muted-foreground);
 		font-size: 0.9375rem;
 		font-variant-numeric: tabular-nums;
+	}
+
+	.meta .translation {
+		color: var(--foreground);
+		text-decoration: underline;
+		text-decoration-color: var(--color-ochre);
+		text-decoration-thickness: 2px;
+		text-underline-offset: 0.2em;
+		transition: text-decoration-color var(--dur-hover) ease;
+	}
+
+	.meta .translation:hover {
+		text-decoration-color: currentColor;
 	}
 
 	/* The video sits in a pigment bloom: backlight at night, a butter wash on paper */

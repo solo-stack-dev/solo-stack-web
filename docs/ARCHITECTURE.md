@@ -47,7 +47,7 @@ Paraglide compiles `messages/*.json` into `src/lib/paraglide/` (generated, git i
 - `src/hooks.ts` `reroute` strips the locale prefix, so one route file serves every locale. `src/hooks.server.ts` sets `lang`/`dir` and 308-redirects `/de/…` to the unprefixed canonical URL.
 - The root layout emits `hreflang` alternates (absolute URLs, plus `x-default`). The prerender crawler follows them, so every locale variant of a prerendered page is built.
 - Build internal links with `localizeHref()` so they stay in the current locale. A locale switcher links to `localizeHref(page.url.pathname, { locale })`.
-- Blog posts that exist in only one language must not advertise an `hreflang` alternate for the missing language (filter `locales` per post once posts exist).
+- Blog posts: one file per language. A translation sets `translationOf: <original slug>` (validated at build time); post pages, the sitemap and the blog index (one version per video, in the visitor's language when it exists) derive the hreflang pairs from it. A post without translation advertises only its own language.
 
 ## Environments
 
@@ -97,7 +97,9 @@ Every page except the homepage lives in the route group `src/routes/(site)/`. It
 - **Pages:** `/blog` (newest first, client side format filter mirrored to `?format=`), `/blog/[slug]` (video facade, summary, chapters that seek the player, takeaways, body, collapsible transcript, links). Post links always point to the post's own language; the root layout skips its hreflang alternates on post pages, which emit their own canonical and hreflang.
 - **Video facade** (`src/lib/blog/VideoFacade.svelte`): self-hosted thumbnail via the cinema's `VideoThumbnail` (prerendered `/media/video-thumbnail/[id]/[width].[format]`: sharp crops YouTube's thumbnail to 16:9 at build time and encodes 480/768/1280 px AVIF + WebP, plus the 1280 px JPEG for the `<img>` fallback and `og:image`), youtube-nocookie iframe on click, chapter seeks via the IFrame API `postMessage` protocol (no API script). Without `youtubeId` the format's backlit silhouette vignette (`FormatVignette`, also on post cards) with a "video follows" note is shown and no `VideoObject` is emitted.
 - **SEO:** `BlogPosting` (+ `VideoObject` with clips and transcript when a video exists) as one JSON-LD `@graph`, canonical, Open Graph, Twitter card.
-- **TODO:** `sitemap.xml` (super-sitemap) and the RSS feed do not exist yet; add `/blog` and the posts there.
+- **Sitemap and robots:** `src/routes/sitemap.xml/+server.ts` (super-sitemap, prerendered) lists every page route automatically; `processPaths` adds the `/en` variants with hreflang alternates, lists each post only under its own language, and the legal pages only in German. `src/routes/robots.txt/+server.ts` points to it (staging disallows everything). A new parameterized route fails the build until it gets `paramValues` there.
+- **Legal pages:** `/impressum` and `/datenschutz` render `src/content/legal/*.md` through `LegalPage.svelte`. The texts are German only: `/en/…` shows the German text (`lang="de"`) with the German URL as canonical and no hreflang.
+- **TODO:** the RSS feed does not exist yet.
 
 ## Contact page (built)
 
