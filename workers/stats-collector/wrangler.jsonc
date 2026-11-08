@@ -1,0 +1,97 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	// /stats collector (docs/ARCHITECTURE.md#stats-page): a Workflow on a schedule fetches the platform numbers, upserts them
+	// into the site's D1 and rebuilds the KV snapshot `stats:v1` that the site reads. Separate Worker because
+	// adapter-cloudflare only emits a fetch handler. Run from the repo root: `pnpm stats:dev`, `pnpm stats:deploy:<env>`.
+	"name": "solo-stack-stats-collector",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-10-30",
+	// No public URL: the fetch handler only serves the manual trigger in `wrangler dev`.
+	"workers_dev": false,
+	"preview_urls": false,
+	"upload_source_maps": true,
+	"observability": {
+		"enabled": true
+	},
+	"dev": {
+		"port": 8788
+	},
+	// Same bindings as the site (root wrangler.jsonc), per environment; migrations are applied with the site's config
+	// (`pnpm db:migrate*`). Local: the dummy ids of the site's local state, so
+	// `pnpm stats:dev` (persisting to the root `.wrangler/state`) writes the snapshot `pnpm dev`/`pnpm preview` read.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "solo-stack-web-local",
+			"database_id": "00000000-0000-0000-0000-000000000000"
+		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "KV",
+			"id": "00000000000000000000000000000000"
+		}
+	],
+	// Uploaded from the repo-root `.env.<env>` by `pnpm stats:deploy:<env>` (`--secrets-file`); locally read from `.env`.
+	// Not inherited: repeated per environment.
+	"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+	// Every 6 hours (UTC); the last run of a day wins in D1.
+	"workflows": [
+		{
+			"name": "solo-stack-stats-collector-local",
+			"binding": "STATS_WORKFLOW",
+			"class_name": "StatsCollector",
+			"schedules": ["17 */6 * * *"]
+		}
+	],
+	"env": {
+		"staging": {
+			"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "solo-stack-web-staging",
+					"database_id": "3a2bf35c-80d6-4099-8bcd-91e11ecf4896"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "KV",
+					"id": "9811bb0a672143eab3060fe08b8f531f"
+				}
+			],
+			"workflows": [
+				{
+					"name": "solo-stack-stats-collector-staging",
+					"binding": "STATS_WORKFLOW",
+					"class_name": "StatsCollector",
+					"schedules": ["17 */6 * * *"]
+				}
+			]
+		},
+		"production": {
+			"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "solo-stack-web",
+					"database_id": "8f3f99f9-1fca-4305-8ea2-0351cacefff9"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "KV",
+					"id": "30915a3709f441728ec41a971122b7ca"
+				}
+			],
+			"workflows": [
+				{
+					"name": "solo-stack-stats-collector",
+					"binding": "STATS_WORKFLOW",
+					"class_name": "StatsCollector",
+					"schedules": ["17 */6 * * *"]
+				}
+			]
+		}
+	}
+}

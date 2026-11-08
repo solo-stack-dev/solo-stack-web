@@ -1,10 +1,6 @@
-import { prerender } from '$app/server';
-import * as v from 'valibot';
-import { StatsSchema, type Stats } from './schema.ts';
+import { query } from '$app/server';
+import type { Stats } from './schema.ts';
 import { loadStats } from './source.server.ts';
 
-/**
- * All /stats numbers, computed once per build. For live data without rebuilds: switch to `query`, set `prerender = false` for
- * /stats and let `loadStats()` handle freshness (planned KV snapshot with edge cache).
- */
-export const getStats = prerender(async (): Promise<Stats> => v.parse(StatsSchema, await loadStats()));
+/** All /stats numbers: the collector's KV snapshot (validated in `loadStats()`), or the mock while there is none. */
+export const getStats = query(async (): Promise<Stats> => loadStats());

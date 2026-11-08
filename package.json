@@ -15,7 +15,7 @@
 		"staging:deploy": "vite build --mode staging && wrangler deploy --env staging --secrets-file .env.staging",
 		"production:deploy": "vite build && wrangler deploy --env production --secrets-file .env.production",
 		"prepare": "svelte-kit sync || echo ''",
-		"check": "pnpm paraglide:compile && wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check": "pnpm paraglide:compile && wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json && pnpm stats:check",
 		"check:watch": "pnpm paraglide:compile && wrangler types && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "oxfmt",
 		"format:check": "oxfmt --check",
@@ -27,7 +27,15 @@
 		"db:migrate": "wrangler d1 migrations apply DB --local",
 		"db:migrate:staging": "wrangler d1 migrations apply DB --remote --env staging",
 		"db:migrate:production": "wrangler d1 migrations apply DB --remote --env production",
-		"paraglide:compile": "paraglide-js compile --project ./project.inlang --silent"
+		"paraglide:compile": "paraglide-js compile --project ./project.inlang --silent",
+		"test": "node --test \"workers/**/*.test.ts\"",
+		"stats:dev": "wrangler dev -c workers/stats-collector/wrangler.jsonc --persist-to .wrangler/state --env-file .env",
+		"stats:run": "node -e \"fetch('http://127.0.0.1:8788/run',{method:'POST'}).then(r=>r.text()).then(console.log)\"",
+		"stats:types": "wrangler types -c workers/stats-collector/wrangler.jsonc workers/stats-collector/worker-configuration.d.ts",
+		"stats:check": "pnpm stats:types && tsc -p workers/stats-collector",
+		"stats:twitch-login": "node scripts/stats/twitch-login.ts",
+		"stats:deploy:staging": "wrangler deploy -c workers/stats-collector/wrangler.jsonc --env staging --secrets-file .env.staging",
+		"stats:deploy:production": "wrangler deploy -c workers/stats-collector/wrangler.jsonc --env production --secrets-file .env.production"
 	},
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.29.3",

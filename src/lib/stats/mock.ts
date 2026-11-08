@@ -1,6 +1,6 @@
 /**
- * MOCK DATA for /stats: made-up numbers, seeded so builds are stable. Shape: `Stats` (`schema.ts`); replaced in `source.server.ts`
- * once real APIs are connected. Video titles come from gpt-6.1-sol (docs/copy/stats-mock-videos-*.md).
+ * MOCK DATA for /stats: made-up numbers, seeded so builds are stable. Shape: `Stats` (`schema.ts`); the fallback of
+ * `source.server.ts` while KV holds no valid live snapshot. Video titles come from gpt-6.1-sol (docs/copy/stats-mock-videos-*.md).
  */
 import { HISTORY_DAYS, STAT_PLATFORM_IDS, type Stats, type StatPlatformId, type TopVideo } from './schema.ts';
 

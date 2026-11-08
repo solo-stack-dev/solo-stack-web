@@ -1,0 +1,267 @@
+{
+	"version": "7",
+	"dialect": "sqlite",
+	"id": "97369619-e313-47b3-b810-bcd9b65d2b11",
+	"prevIds": ["5336bcf5-29bd-45b2-ba93-30966ed0bf82"],
+	"ddl": [
+		{
+			"name": "daily_metrics",
+			"entityType": "tables"
+		},
+		{
+			"name": "video_daily_views",
+			"entityType": "tables"
+		},
+		{
+			"name": "videos",
+			"entityType": "tables"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "day",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "platform",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "metric",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "value",
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "fetched_at",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": "(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_id",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "day",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "views",
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "total_views",
+			"type": "integer",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "videos",
+			"name": "id",
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "videos",
+			"name": "title",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "videos",
+			"name": "duration_seconds",
+			"type": "integer",
+			"notNull": true,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "videos",
+			"name": "published_at",
+			"type": "text",
+			"notNull": false,
+			"autoincrement": false,
+			"default": null,
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "videos",
+			"name": "updated_at",
+			"type": "text",
+			"notNull": true,
+			"autoincrement": false,
+			"default": "(strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))",
+			"generated": null,
+			"entityType": "columns"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "daily_metrics_metric_day",
+			"columns": [
+				{
+					"value": "metric",
+					"isExpression": false
+				},
+				{
+					"value": "day",
+					"isExpression": false
+				}
+			],
+			"isUnique": false,
+			"where": null,
+			"origin": "manual",
+			"entityType": "indexes"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_daily_views_day",
+			"columns": [
+				{
+					"value": "day",
+					"isExpression": false
+				}
+			],
+			"isUnique": false,
+			"where": null,
+			"origin": "manual",
+			"entityType": "indexes"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "fk_video_daily_views_video_id_videos_id_fk",
+			"columns": ["video_id"],
+			"tableTo": "videos",
+			"columnsTo": ["id"],
+			"onUpdate": "NO ACTION",
+			"onDelete": "CASCADE",
+			"nameExplicit": false,
+			"entityType": "fks"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "daily_metrics_pk",
+			"columns": ["platform", "metric", "day"],
+			"nameExplicit": false,
+			"entityType": "pks"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_daily_views_pk",
+			"columns": ["video_id", "day"],
+			"nameExplicit": false,
+			"entityType": "pks"
+		},
+		{
+			"table": "videos",
+			"name": "videos_pk",
+			"columns": ["id"],
+			"nameExplicit": false,
+			"entityType": "pks"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "daily_metrics_day_format",
+			"value": "\"day\" GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'",
+			"entityType": "checks"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "daily_metrics_metric_known",
+			"value": "\"metric\" IN ('followers', 'views', 'watch_minutes', 'total_views', 'posts')",
+			"entityType": "checks"
+		},
+		{
+			"table": "daily_metrics",
+			"name": "daily_metrics_value_positive",
+			"value": "\"value\" >= 0",
+			"entityType": "checks"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_daily_views_day_format",
+			"value": "\"day\" GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'",
+			"entityType": "checks"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_daily_views_views_positive",
+			"value": "\"views\" >= 0",
+			"entityType": "checks"
+		},
+		{
+			"table": "video_daily_views",
+			"name": "video_daily_views_total_views_positive",
+			"value": "\"total_views\" >= 0",
+			"entityType": "checks"
+		},
+		{
+			"table": "videos",
+			"name": "videos_duration_positive",
+			"value": "\"duration_seconds\" >= 0",
+			"entityType": "checks"
+		}
+	],
+	"renames": []
+}

@@ -14,6 +14,9 @@ export const PERIODS = [7, 30, 90] as const;
 export type Period = (typeof PERIODS)[number];
 export const HISTORY_DAYS = 2 * PERIODS[PERIODS.length - 1] + 1;
 
+/** KV key of the `Stats` snapshot, written by the collector (`workers/stats-collector/`), read by `getStats()`. Bump the version when `StatsSchema` changes incompatibly. */
+export const STATS_KV_KEY = 'stats:v1';
+
 const Count = v.pipe(v.number(), v.integer(), v.minValue(0));
 const DailySeries = v.pipe(v.array(Count), v.length(HISTORY_DAYS));
 
@@ -33,7 +36,7 @@ export const TopVideoSchema = v.object({
 });
 
 export const StatsSchema = v.object({
-	/** `mock` until real APIs are connected; the page shows a notice for it. */
+	/** `live` from the collector snapshot in KV (`workers/stats-collector/`), `mock` as fallback; the page shows a notice for it. */
 	source: v.picklist(['mock', 'live']),
 	/** Last day of every daily series (YYYY-MM-DD, UTC). */
 	asOf: v.pipe(v.string(), v.isoDate()),
@@ -41,8 +44,8 @@ export const StatsSchema = v.object({
 	youtube: v.object({
 		/** Channel views per day. */
 		views: DailySeries,
-		/** Watch time per day in minutes. */
-		watchMinutes: DailySeries,
+		/** Watch time per day in minutes; `null` while unavailable (needs YouTube Analytics), the page then hides watch time. */
+		watchMinutes: v.nullable(DailySeries),
 		/** Most watched videos, any order (the page sorts per period). */
 		topVideos: v.array(TopVideoSchema)
 	}),

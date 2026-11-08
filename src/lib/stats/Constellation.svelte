@@ -67,7 +67,8 @@
 		SOCIALS.map((social) => {
 			const platform = stats.platforms.find((entry) => entry.id === social.id);
 			const change = platform ? changeOf(platform.followers, period) : null;
-			const share = change ? change.value / sum : 0;
+			// No followers anywhere yet (live data from a fresh start): every share is 0, never NaN.
+			const share = change && sum > 0 ? change.value / sum : 0;
 			return { social, platform, change, share };
 		})
 	);
@@ -140,7 +141,7 @@
 
 			{#each rows as row (row.social.id)}
 				{@const [x, y] = PLACE[row.social.id].at}
-				{@const r = row.platform ? 1.1 + Math.sqrt(row.share / biggest) * 3.4 : 1.1}
+				{@const r = row.platform ? 1.1 + Math.sqrt(biggest > 0 ? row.share / biggest : 0) * 3.4 : 1.1}
 				{@const lit = active === row.social.id}
 				{@const label = anchor(PLACE[row.social.id].side, [x, y], r)}
 				<!-- svelte-ignore a11y_no_static_element_interactions -->

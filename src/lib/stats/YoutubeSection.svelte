@@ -6,6 +6,8 @@
 	ochre under an ochre line, so the strip never reads as a black band or a grey smudge. The ground is one painting per row: every figure shows its slice of it (container
 	units of the list), so the brush runs on unbroken across the figures. Subgrid rows give every number one shared baseline,
 	however the labels wrap. Below: daily views (columns of light) beside the top videos, the chart as tall as the list.
+	Without watch time (`watchMinutes: null`, live data before YouTube Analytics) watch time and average duration are left out and
+	the two remaining figures keep the two-column strip at every width.
 -->
 <script lang="ts">
 	import { m } from '#lib/paraglide/messages.js';
@@ -22,8 +24,9 @@
 	const youtube = $derived(stats.platforms.find((platform) => platform.id === 'youtube'));
 	const subscribers = $derived(youtube ? changeOf(youtube.followers, period) : null);
 	const views = $derived(sumOf(stats.youtube.views, period));
-	const watch = $derived(sumOf(stats.youtube.watchMinutes, period));
+	const watch = $derived(stats.youtube.watchMinutes ? sumOf(stats.youtube.watchMinutes, period) : null);
 	const average = $derived.by(() => {
+		if (!watch) return null;
 		const current = views.value ? (watch.value * 60) / views.value : 0;
 		const previous = views.previous ? (watch.previous * 60) / views.previous : 0;
 		return { value: current, ratio: previous ? (current - previous) / previous : 0 };
@@ -39,13 +42,15 @@
 
 <div class="grid gap-14">
 	<div class="grid gap-4">
-		<dl class="ridge grid grid-cols-2 lg:grid-cols-4" style:--ground="url({ground})">
+		<dl class={['ridge grid grid-cols-2', watch && 'lg:grid-cols-4']} data-compact={watch ? undefined : ''} style:--ground="url({ground})">
 			{#if subscribers}
 				{@render figure(m.stats_youtube_subscribers(), formatNumber(subscribers.value), subscribers.ratio, formatSigned(subscribers.delta), 0)}
 			{/if}
 			{@render figure(m.stats_youtube_views(), formatNumber(views.value), views.ratio, undefined, 1)}
-			{@render figure(m.stats_youtube_watch_time(), formatHours(watch.value), watch.ratio, undefined, 2, hours)}
-			{@render figure(m.stats_youtube_avg_duration(), formatDuration(average.value), average.ratio, undefined, 3)}
+			{#if watch && average}
+				{@render figure(m.stats_youtube_watch_time(), formatHours(watch.value), watch.ratio, undefined, 2, hours)}
+				{@render figure(m.stats_youtube_avg_duration(), formatDuration(average.value), average.ratio, undefined, 3)}
+			{/if}
 		</dl>
 		<p class="text-xs text-muted-foreground">{m.stats_delta_previous({ days: period })}</p>
 	</div>
@@ -148,6 +153,10 @@
 		.ridge {
 			--cols: 4;
 			--run: 2rem;
+		}
+
+		.ridge[data-compact] {
+			--cols: 2;
 		}
 	}
 
@@ -271,6 +280,12 @@
 			--run-left: 0rem;
 			--run-right: 0rem;
 			mask-image: none;
+		}
+
+		/* Two figures only: the second one ends the row at every width */
+		.ridge[data-compact] .figure[data-index='1'] .ground {
+			--run-right: var(--run);
+			mask-image: linear-gradient(270deg, transparent, #000 var(--run));
 		}
 	}
 
