@@ -1,6 +1,8 @@
 import { defineConfig } from '@inlang/paraglide-js';
 
 // Single source of compiler options for both the Vite plugin and `pnpm paraglide:compile`.
+// `outputStructure` stays unset on purpose: Vite defaults to "virtual-modules" (only entry points on disk),
+// the CLI to "message-modules". The CLI rejects "virtual-modules", so pinning it here would break `pnpm check`.
 export default defineConfig({
 	outdir: './src/lib/paraglide',
 	emitTsDeclarations: true,
