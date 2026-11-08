@@ -23,11 +23,8 @@ export const YOUTUBE_CHANNEL_ID = 'UCv6ihOMjTq6zdJC7IbCdpKQ';
 export const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@solostack_dev';
 export const GITHUB_OWNER = 'solo-stack-dev';
 
-/**
- * TODO(owner): permanent Discord invite. The one linked on YouTube (discord.gg/y7MPvkm8R) has unknown expiry, so it
- * stays unpublished until the owner confirms a non-expiring invite.
- */
-export const DISCORD_INVITE_URL: string | null = null;
+/** Discord invite. Must be a non-expiring invite (Discord: Invite People > Edit invite link > Expire After: Never). */
+export const DISCORD_INVITE_URL: string | null = 'https://discord.gg/qzB5yQ2mvs';
 
 /** Order: YouTube, GitHub, then roughly by reach. */
 export const SOCIALS: readonly Social[] = [

@@ -278,9 +278,6 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 
 ## 10. Open TODOs from Phase 0
 
-- `TODO(copy)`: every message value.
-- `TODO(owner)`: permanent Discord invite (`DISCORD_INVITE_URL` in `socials.ts`); optional `GITHUB_TOKEN` if CI builds hit the GitHub rate limit.
-- `TODO(sunrise agent)`: legal links (Impressum, Datenschutz, Kontakt) once the pages exist.
 - The YouTube feed is currently empty (no public video yet), so the cinema shows the channel fallback until the first upload and the next build.
 
 ## 11. Easter eggs (`src/lib/home/eggs/`)

@@ -72,7 +72,7 @@
 	<meta property="og:description" content={m.blog_meta_description()} />
 	<meta property="og:url" content={canonical} />
 	<meta name="twitter:card" content="summary" />
-	<!-- TODO(owner): RSS feed for the blog (/blog/rss.xml) and sitemap.xml (super-sitemap) once the launch pages exist -->
+	<!-- TODO(owner): RSS feed for the blog (/blog/rss.xml) -->
 </svelte:head>
 
 <div class="relative isolate overflow-x-clip">

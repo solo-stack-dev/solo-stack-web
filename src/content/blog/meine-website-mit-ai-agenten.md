@@ -4,12 +4,10 @@ title: 'Wie ich die Website von Solo Stack mit AI Agenten gebaut habe'
 slug: meine-website-mit-ai-agenten
 description: 'So entstand die Website von Solo Stack mit AI Agenten: eine gemalte Nacht, parallele Entwicklung und Korrekturen an den kleinen Details.'
 summary: 'Für die Website von Solo Stack habe ich eine gemalte Nacht als durchgehendes Konzept umgesetzt. AI Agenten bauten die einzelnen Bereiche parallel, nachdem die Gestaltung und die gemeinsame Grundlage standen. Hier erzähle ich, wie daraus eine Website mit Spielen, Nachtradio und bewegten Szenen wurde und wo ich nacharbeiten musste.'
-# TODO(owner): YouTube video ID of the first video (about building this site) once it is public
 youtubeId: null
 publishedAt: '2026-11-01'
 durationSeconds: null
 format: project
-# TODO(owner): chapters ({ start: seconds, title }) and the transcript ({ start, text }) from the published video
 chapters: []
 takeaways:
   - 'Die erste Designrunde war zu austauschbar; gemalte Entwürfe brachten die Website näher an die Bildwelt von Solo Stack.'

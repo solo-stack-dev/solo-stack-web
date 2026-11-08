@@ -173,7 +173,7 @@ export function placeVars(desktop: Rect, mobile: Rect): string {
 	].join('; ');
 }
 
-/** Legal pages linked in the footer. TODO(lead): the routes do not exist yet (see Sunrise.svelte). */
+/** Legal pages linked in the footer. */
 export const LEGAL_LINKS = [
 	{ id: 'imprint', path: '/impressum' },
 	{ id: 'privacy', path: '/datenschutz' },

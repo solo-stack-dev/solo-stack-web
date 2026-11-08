@@ -6,15 +6,15 @@ import { m } from '#lib/paraglide/messages.js';
  * Local 0…100 box, y down. Edges are star index pairs to trace, order-agnostic. Shapes are original: Svelte follows its
  * logo outline (fan use); every other brand is an allusion (cloud, droplet, elephant, letters), not a logo.
  *
- * Names: proper names are literal, everything else is a Paraglide message (`TODO(copy)`).
+ * Names: proper names are literal, everything else is a Paraglide message.
  */
 export interface SignDef {
 	id: SignId;
 	/** Visible name (proper name literal or message). */
 	name: () => string;
-	/** One line on the paper note card (message, `TODO(copy)`). */
+	/** One line on the paper note card (Paraglide message). */
 	note: () => string;
-	/** TODO(owner): placeholder link target on the note card. */
+	/** Link on the note card: the tool's site, or a homepage section for the personal signs. */
 	href: string;
 	points: readonly (readonly [number, number])[];
 	edges: readonly (readonly [number, number])[];

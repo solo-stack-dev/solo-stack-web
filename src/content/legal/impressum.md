@@ -1,6 +1,5 @@
 <!--
   Impressum (§ 5 DDG, § 18 Abs. 2 MStV), written by gpt-6.1-sol (prompt: docs/copy/impressum-prompt.md). German only: /en/impressum shows this text too.
-  TODO(owner): once the BZSt assigns the USt-IdNr., replace "beantragt" below with the number (DE + 9 digits).
 -->
 
 ## Anbieter gemäß [§ 5 DDG](https://www.gesetze-im-internet.de/ddg/__5.html)

@@ -291,8 +291,7 @@
 						</button>
 						<p class="max-w-sm text-sm text-pretty text-muted-foreground">
 							{m.contact_privacy_note()}
-							<!-- TODO(owner): drop rel="external" once /datenschutz exists (keeps the prerender crawler from failing on it) -->
-							<a href={localizeHref('/datenschutz')} rel="external" class="privacy">
+							<a href={localizeHref('/datenschutz')} class="privacy">
 								{m.contact_privacy_link()}
 							</a>
 						</p>

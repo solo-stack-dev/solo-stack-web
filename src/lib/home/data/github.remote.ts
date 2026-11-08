@@ -30,7 +30,8 @@ async function getJson(url: string): Promise<unknown> {
  * carries commit messages). Prerendered, unauthenticated: 1 + GITHUB_REPO_LIMIT requests per build (limit 60/h).
  * Any error returns `FALLBACK_COMMITS` (empty); messages are never invented.
  *
- * TODO(owner): if builds hit the rate limit (shared CI IPs), add a read-only GITHUB_TOKEN via src/env.ts.
+ * Builds run on the owner's PC, so the per-IP limit is plenty. If a build ever comes out with an empty monitor, add a read-only
+ * GITHUB_TOKEN via src/env.ts.
  */
 export const getRecentCommits = prerender(async (): Promise<Commit[]> => {
 	try {
