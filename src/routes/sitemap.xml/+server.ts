@@ -11,12 +11,12 @@ import type { RequestHandler } from './$types';
  * option does not apply. `processPaths` localizes instead, mirroring the page heads:
  * - pages that exist in every locale: one entry per locale, each with hreflang alternates + x-default (= the root layout)
  * - blog posts: each language version under its own URL, alternates only between its translations (= the post page's head)
- * - legal texts: German only (= LegalPage's canonical)
+ * - imprint: German only (= LegalPage's canonical); privacy exists in both locales
  */
 
 export const prerender = true;
 
-const GERMAN_ONLY = new Set(['/impressum', '/datenschutz']);
+const GERMAN_ONLY = new Set(['/impressum']);
 
 const localized = (path: string, locale: Locale) => localizeHref(path, { locale });
 

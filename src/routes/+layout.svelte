@@ -11,8 +11,8 @@
 	const alternateHref = (locale: Locale) => new URL(localizeHref(page.url.pathname, { locale }), page.url.origin).href;
 
 	// Blog posts exist in one language only and emit their own canonical/hreflang (src/routes/(site)/blog/[slug]);
-	// the legal texts are German only and name the German URL as canonical (LegalPage.svelte).
-	const SINGLE_LOCALE_ROUTES = new Set(['/(site)/blog/[slug]', '/(site)/impressum', '/(site)/datenschutz']);
+	// the imprint is German only and names the German URL as canonical (LegalPage.svelte).
+	const SINGLE_LOCALE_ROUTES = new Set(['/(site)/blog/[slug]', '/(site)/impressum']);
 	const ownAlternates = $derived(SINGLE_LOCALE_ROUTES.has(page.route.id ?? ''));
 
 	// Console egg, loaded on idle

@@ -3,7 +3,7 @@ import { env } from 'cloudflare:workers';
 import type { ContactMessage } from './schema.ts';
 
 /** Must be on a domain onboarded to Cloudflare Email Sending; pinned by `allowed_sender_addresses` of `CONTACT_EMAIL` (`wrangler.jsonc`). */
-const FROM = { email: 'kontakt@solo-stack.dev', name: 'solo-stack.dev Kontakt' } as const;
+const FROM = { email: 'contact@solo-stack.dev', name: 'solo-stack.dev Kontakt' } as const;
 
 /**
  * Public address; Email Routing (dashboard) forwards it to the owner's private inbox, which thus stays out of this public repo.

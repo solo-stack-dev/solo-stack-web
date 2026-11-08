@@ -1,17 +1,21 @@
 <!--
 	@component
-	Frame of the legal pages (/impressum, /datenschutz): the title and the Markdown text from src/content/legal/. The texts are
-	German only, so every locale variant renders the German text (marked `lang="de"`) and names the German URL as canonical;
-	the root layout emits no hreflang alternates for these routes, and the sitemap lists only the German URL.
+	Frame of the legal pages. The content locale controls language and canonical URL.
+	Defaults to German for the untranslated imprint; privacy passes the current locale.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { page } from '$app/state';
-	import { baseLocale, localizeHref } from '#lib/paraglide/runtime.js';
+	import { baseLocale, localizeHref, type Locale } from '#lib/paraglide/runtime.js';
 
-	let { title, path, children }: { title: string; /** Unlocalized path, e.g. `/impressum`. */ path: string; children: Snippet } = $props();
+	let {
+		title,
+		path,
+		locale = baseLocale,
+		children
+	}: { title: string; /** Unlocalized path, e.g. `/impressum`. */ path: string; locale?: Locale; children: Snippet } = $props();
 
-	const canonical = $derived(new URL(localizeHref(path, { locale: baseLocale }), page.url.origin).href);
+	const canonical = $derived(new URL(localizeHref(path, { locale }), page.url.origin).href);
 </script>
 
 <svelte:head>
@@ -25,7 +29,7 @@
 
 <article class="mx-auto max-w-3xl px-4 pt-12 pb-24 sm:px-6 sm:pt-20 lg:px-8">
 	<h1 class="font-display text-5xl leading-[0.9] font-black tracking-wordmark text-balance sm:text-6xl">{title}</h1>
-	<div class="legal-text mt-12" lang={baseLocale}>
+	<div class="legal-text mt-12" lang={locale}>
 		{@render children()}
 	</div>
 </article>

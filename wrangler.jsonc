@@ -52,7 +52,7 @@
 		{
 			"name": "CONTACT_EMAIL",
 			"destination_address": "business@solo-stack.dev",
-			"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+			"allowed_sender_addresses": ["contact@solo-stack.dev"]
 		}
 	],
 	// Bindings and `vars` are not inherited: repeat them in every environment.
@@ -63,7 +63,7 @@
 				{
 					"name": "CONTACT_EMAIL",
 					"destination_address": "business@solo-stack.dev",
-					"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+					"allowed_sender_addresses": ["contact@solo-stack.dev"]
 				}
 			],
 			"d1_databases": [
@@ -88,7 +88,7 @@
 				{
 					"name": "CONTACT_EMAIL",
 					"destination_address": "business@solo-stack.dev",
-					"allowed_sender_addresses": ["kontakt@solo-stack.dev"]
+					"allowed_sender_addresses": ["contact@solo-stack.dev"]
 				}
 			],
 			"d1_databases": [
