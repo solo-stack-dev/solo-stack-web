@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { afterNavigate, replaceState } from '$app/navigation';
 	import { FORMAT_LABELS, postsFor } from '#lib/blog/content.ts';
+	import { feedHref } from '#lib/blog/feed.ts';
 	import FormatVignette from '#lib/blog/FormatVignette.svelte';
 	import { DRY_BRUSH_FADE_RIGHT } from '#lib/blog/materials.ts';
 	import groundLine from '#lib/blog/assets/ink-ground.svg?url';
@@ -72,7 +73,7 @@
 	<meta property="og:description" content={m.blog_meta_description()} />
 	<meta property="og:url" content={canonical} />
 	<meta name="twitter:card" content="summary" />
-	<!-- TODO(owner): RSS feed for the blog (/blog/rss.xml) -->
+	<link rel="alternate" type="application/rss+xml" title={m.blog_meta_title()} href={feedHref(getLocale())} />
 </svelte:head>
 
 <div class="relative isolate overflow-x-clip">

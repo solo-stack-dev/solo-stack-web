@@ -4,6 +4,7 @@
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { page } from '$app/state';
 	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref, postsFor } from '#lib/blog/content.ts';
+	import { feedHref } from '#lib/blog/feed.ts';
 	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
 	import { breakStyles } from '#lib/blog/section-breaks.ts';
 	import inkGround from '#lib/blog/assets/ink-ground.svg?url';
@@ -184,6 +185,8 @@
 		<link rel="alternate" hreflang={version.lang} href={version.href} />
 	{/each}
 	<link rel="alternate" hreflang="x-default" href={defaultVersion.href} />
+	<!-- The feed of the post's language -->
+	<link rel="alternate" type="application/rss+xml" title={m.blog_meta_title({}, { locale: post.lang })} href={feedHref(post.lang)} />
 	<meta property="og:type" content="article" />
 	<meta property="og:site_name" content="SOLO STACK" />
 	<meta property="og:title" content={post.title} />
