@@ -4,6 +4,7 @@
  */
 export const TWITCH_TOKEN_KEY = 'stats:twitch-token';
 export const INSTAGRAM_TOKEN_KEY = 'stats:instagram-token';
+export const THREADS_TOKEN_KEY = 'stats:threads-token';
 
 /** Twitch user token from the authorization-code flow (`pnpm stats:twitch-login`). */
 export interface TwitchToken {
@@ -13,7 +14,7 @@ export interface TwitchToken {
 	expiresAt: string;
 }
 
-/** Instagram long-lived user token (60 days), seeded from the `INSTAGRAM_ACCESS_TOKEN` secret. */
+/** Long-lived user token (60 days) of Instagram or Threads, seeded from its `*_ACCESS_TOKEN` secret. */
 export interface InstagramToken {
 	token: string;
 	/** ISO timestamp of the last successful refresh; `null` = seeded from the secret, age unknown. */

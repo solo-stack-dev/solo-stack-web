@@ -1,6 +1,6 @@
 /* oxlint-disable no-console -- server logs end up in Workers Logs (observability), the only place to see collector failures */
 /**
- * The collector run (docs/ARCHITECTURE.md#stats-page), started by the Workflow's `schedules` (every 6 hours) or manually
+ * The collector run (docs/ARCHITECTURE.md#stats-page), started by the Workflow's `schedules` (daily, 23:17 UTC) or manually
  * (`index.ts`). One step per platform fetches and upserts today's rows, with its own retries: a failing API is logged and
  * keeps its last good rows, the others carry on. The last step rebuilds the `Stats` snapshot from D1 and replaces the KV value
  * only when it validates.
@@ -11,19 +11,21 @@ import { STATS_KV_KEY, StatsSchema, type StatPlatformId } from '#lib/stats/schem
 import { collectBluesky } from './platforms/bluesky.ts';
 import { collectGithub } from './platforms/github.ts';
 import { collectInstagram } from './platforms/instagram.ts';
+import { collectThreads } from './platforms/threads.ts';
 import { collectTwitch } from './platforms/twitch.ts';
 import type { CollectContext, Reading } from './platforms/types.ts';
 import { collectYoutube } from './platforms/youtube.ts';
 import { addDays, buildStats, dayOf, historyDays } from './series.ts';
 import { getDb, readSnapshotRows, storeReading, type StoreSummary } from './store.ts';
 
-/** Platforms with live numbers. Threads, TikTok, X, Facebook: see `platforms/threads.ts`. */
+/** Platforms with live numbers. TikTok, X, Facebook: no credentials yet (add a collector like `platforms/threads.ts`). */
 const COLLECTORS: [StatPlatformId, (context: CollectContext) => Promise<Reading>][] = [
 	['youtube', collectYoutube],
 	['github', collectGithub],
 	['bluesky', collectBluesky],
 	['twitch', collectTwitch],
-	['instagram', collectInstagram]
+	['instagram', collectInstagram],
+	['threads', collectThreads]
 ];
 
 const STEP: WorkflowStepConfig = { retries: { limit: 2, delay: '30 seconds', backoff: 'exponential' }, timeout: '2 minutes' };

@@ -4,7 +4,7 @@
  * 10,000 per day). Watch time needs YouTube Analytics (OAuth), not wired yet.
  */
 import { YOUTUBE_CHANNEL_ID } from '#lib/home/data/socials.ts';
-import { count, fetchJson } from '../http.ts';
+import { count, fetchJson, HttpError } from '../http.ts';
 import type { CollectContext, Reading, VideoReading } from './types.ts';
 
 const API = 'https://www.googleapis.com/youtube/v3';
@@ -49,10 +49,17 @@ export async function collectYoutube({ env, since }: CollectContext): Promise<Re
 	const ids: string[] = [];
 	let pageToken: string | undefined;
 	do {
-		const page = await fetchJson<PlaylistPage>(
-			'youtube playlistItems',
-			url('playlistItems', { part: 'contentDetails', playlistId: channel.contentDetails.relatedPlaylists.uploads, maxResults: '50', ...(pageToken && { pageToken }) })
-		);
+		let page: PlaylistPage;
+		try {
+			page = await fetchJson<PlaylistPage>(
+				'youtube playlistItems',
+				url('playlistItems', { part: 'contentDetails', playlistId: channel.contentDetails.relatedPlaylists.uploads, maxResults: '50', ...(pageToken && { pageToken }) })
+			);
+		} catch (error) {
+			// A channel without public uploads has no uploads playlist yet (404): no videos, not a failure.
+			if (error instanceof HttpError && error.status === 404 && ids.length === 0) break;
+			throw error;
+		}
 		ids.push(...page.items.map((item) => item.contentDetails.videoId));
 		pageToken = page.nextPageToken;
 	} while (pageToken && ids.length < MAX_UPLOADS);
