@@ -1,5 +1,5 @@
 ---
-# Based on the owner interview (2026-11-08); prompt and model output: docs/copy/blog/.
+# Based on the owner interview and verified thread history (2026-11-08); prompts and model outputs: docs/copy/blog/.
 title: 'How I Built My Website with AI Agents'
 slug: building-my-website-with-ai-agents
 description: 'My website built with AI agents: my own design ideas, a familiar stack, seven rounds of critique and about six hours of active personal work.'
@@ -54,6 +54,8 @@ I didn't have the finished design in mind at the start. The starting point was t
 
 I described my own ideas for image concepts and tried different design directions. I rejected the first drafts because they felt too generic or didn't work together. To me, a personal website can be more playful and a little over the top in places. It took plenty of feedback before the homepage, individual sections and subpages shared a common direction. This part needed the most iterations.
 
+I felt the moon appeared too often across the subpages, and I found it out of place on the stats page. So I asked for trees, silhouettes and an owl as additional motifs within the existing nighttime theme.
+
 ## My Tasks and the Agents' Work
 
 I handled the initial project setup entirely myself. That included the tech stack, libraries, Cloudflare, Git and security decisions. I used T3 Code as the interface for working with the agents. I find its ability to combine different models and providers particularly useful. I used Claude for coding, OpenAI GPT Image for images and gpt-6.1-sol for text.
@@ -67,6 +69,8 @@ I like using Git worktrees for parallel work. Larger tasks ran in parallel, espe
 Once the overall design was established, I went through seven rounds of hill climbing. By that, I mean repeatedly having the current version critically reviewed, addressing the critique and looking at the result again. In each round, a lead agent brought in two more agents to provide critique. They assessed the user interface and usability.
 
 The internal target was for the agents' ratings to exceed 9.5 out of 10. That number served as a guide within the process and, on its own, says little about how you experience the website. In practice, the focus was mainly on consistent spacing, animations and a cohesive design across multiple pages. Design guidelines and linting helped keep things within the requirements and identify inconsistencies.
+
+Before the critique rounds, I had already raised the issue of the homepage section with the drawings blocking scrolling. You can now scroll straight through it while the drawings change automatically.
 
 ## The Surprise on the Stats Page
 

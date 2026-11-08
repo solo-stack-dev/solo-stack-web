@@ -1,5 +1,5 @@
 ---
-# Based on the owner interview (2026-11-08); prompt and model output: docs/copy/blog/.
+# Based on the owner interview and verified thread history (2026-11-08); prompts and model outputs: docs/copy/blog/.
 title: 'Wie ich meine Website mit AI Agenten gebaut habe'
 slug: meine-website-mit-ai-agenten
 description: 'Meine Website mit AI Agenten: eigene Designideen, vertrauter Stack, sieben Kritikrunden und ungefähr sechs Stunden persönliche Arbeit.'
@@ -53,6 +53,8 @@ Die fertige Gestaltung hatte ich am Anfang noch nicht im Kopf. Ausgangspunkt war
 
 Ich habe eigene Ideen für Bildentwürfe beschrieben und verschiedene Designrichtungen ausprobiert. Die ersten Entwürfe habe ich verworfen, weil sie mir zu standardmäßig waren oder untereinander nicht zusammenpassten. Eine persönliche Website darf für mich verspielter und an manchen Stellen etwas übertrieben sein. Bis Homepage, einzelne Abschnitte und Unterseiten eine gemeinsame Richtung hatten, war entsprechend viel Feedback nötig. Dieser Teil hat die meisten Iterationen gebraucht.
 
+Mir kam der Mond auf den Unterseiten zu oft vor, besonders auf der Statistikseite fand ich ihn unpassend. Deshalb habe ich um Bäume, Silhouetten und eine Eule als weitere Motive im bestehenden Nachtthema gebeten.
+
 ## Meine Aufgaben und die Arbeit der Agenten
 
 Das initiale Projekt habe ich komplett selbst eingerichtet. Dazu gehörten der Tech Stack, die Libraries, Cloudflare, Git und die Sicherheitsentscheidungen. Für die Arbeit mit den Agenten habe ich T3 Code als Oberfläche genutzt. Besonders hilfreich finde ich dort, verschiedene Modelle und Anbieter miteinander kombinieren zu können. Claude habe ich fürs Coding eingesetzt, OpenAI GPT Image für Bilder und gpt-6.1-sol für Texte.
@@ -66,6 +68,8 @@ Für parallele Arbeit nutze ich gern Git Worktrees. Größere Aufgaben liefen vo
 Nachdem die allgemeine Gestaltung feststand, folgten sieben Runden Hillclimbing. Damit meine ich, den vorhandenen Stand wiederholt kritisch prüfen zu lassen, die Kritik umzusetzen und das Ergebnis erneut anzusehen. Pro Runde setzte ein leitender Agent zwei weitere Agenten für die Kritik ein. Sie bewerteten die Benutzeroberfläche und die Bedienung.
 
 Als interne Zielmarke sollten die Bewertungen der Agenten über 9,5 von 10 Punkten liegen. Diese Zahl war eine Orientierung innerhalb des Ablaufs und sagt für sich genommen wenig darüber aus, wie du die Website erlebst. Konkret ging es vor allem um konsistente Abstände, Animationen und eine zusammenpassende Gestaltung über mehrere Seiten hinweg. Designrichtlinien und Linting halfen dabei, Vorgaben einzuhalten und Unstimmigkeiten zu finden.
+
+Schon vor den Kritikrunden hatte ich bemängelt, dass der Abschnitt mit den Zeichnungen auf der Homepage das Scrollen blockierte. Jetzt kannst du dort direkt weiterscrollen, während die Zeichnungen automatisch wechseln.
 
 ## Die Überraschung auf der Statistikseite
 
