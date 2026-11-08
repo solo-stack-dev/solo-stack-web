@@ -14,6 +14,11 @@
 	| three stars    | 1 in 6 page views after 30–90 s idle in a dark section, `night:egg-three-stars` |
 	| shiny mascot   | 1 in 4096 sessions, `?shiny=1` (forces on) / `?shiny=0` (forces off)      |
 -->
+<script module lang="ts">
+	/** The shiny roll of this page load (module scope: survives remounts, gone on reload). */
+	let shinyRoll: boolean | undefined;
+</script>
+
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import { on } from 'svelte/events';
@@ -84,22 +89,6 @@
 	function isTyping(target: EventTarget | null) {
 		if (!(target instanceof HTMLElement)) return false;
 		return target.isContentEditable || target.matches('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
-	}
-
-	function readSession(key: string) {
-		try {
-			return sessionStorage.getItem(key);
-		} catch {
-			return null;
-		}
-	}
-
-	function writeSession(key: string, value: string) {
-		try {
-			sessionStorage.setItem(key, value);
-		} catch {
-			// Storage blocked: the roll just is not cached.
-		}
 	}
 
 	// Hero moon: crescent slash and presence
@@ -177,14 +166,13 @@
 		return stop;
 	});
 
-	// Shiny mascot: one 12-bit draw per session, cached so remounts never reroll.
+	// Shiny mascot: one 12-bit draw per page load, kept in memory (not in browser storage) so remounts never reroll.
 	$effect(() => {
 		const forced = new URLSearchParams(location.search).get('shiny');
 		let shiny = forced === '1';
 		if (forced !== '1' && forced !== '0') {
-			const cached = readSession('solostack:shiny');
-			shiny = cached === null ? (crypto.getRandomValues(new Uint16Array(1))[0] & 0xfff) === 0 : cached === '1';
-			if (cached === null) writeSession('solostack:shiny', shiny ? '1' : '0');
+			shinyRoll ??= (crypto.getRandomValues(new Uint16Array(1))[0] & 0xfff) === 0;
+			shiny = shinyRoll;
 		}
 		if (!shiny) return;
 		const page = anchor.closest('[data-night-page]');

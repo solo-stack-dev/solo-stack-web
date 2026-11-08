@@ -68,7 +68,7 @@ Further information: [data and metrics](https://developers.cloudflare.com/web-an
 
 In addition to cookies, local storage and session storage can store information in your browser. Local storage generally remains until you delete the data or your browser removes them. Session storage is limited to the respective browser session or tab.
 
-The website stores your chosen light or dark appearance and local game high scores in local storage. Session storage holds the state of small hidden website features, for example to prevent a console message from appearing on every page load or to retain a discovered appearance during the session. These functions do not transmit these local values to us as a game account or usage profile.
+The website stores your chosen light or dark appearance and local game high scores in local storage. Session storage holds the state of small hidden website features, for example to retain a discovered appearance during the session. These functions do not transmit these local values to us as a game account or usage profile.
 
 Processing serves your chosen appearance and interactive features. Where personal data are involved, our legitimate interest under Article 6(1)(f) GDPR is providing these features in a user friendly way. Storage access strictly necessary to provide an explicitly requested feature may fall under section 25(2)(2) TDDDG; other access requires consent under section 25(1) TDDDG. Third party providers may use their own storage technologies after you activate their services, particularly YouTube.
 

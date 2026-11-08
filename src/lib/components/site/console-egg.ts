@@ -1,5 +1,5 @@
 /**
- * Console egg, every page (root layout, on idle, also in production). Once per session: a gradient block-letter wordmark and
+ * Console egg, every page (root layout, on idle, also in production). Once per page load (nothing stored in the browser): a gradient block-letter wordmark and
  * a Solo Leveling style System window. `window.arise()` dispatches ARISE_EVENT on the homepage (= Konami code), else declines.
  */
 /* oxlint-disable no-console -- printing to the console is this egg */
@@ -12,7 +12,7 @@ declare global {
 	}
 }
 
-const SESSION_KEY = 'solostack:console';
+let printed = false;
 
 /** Block letters (6 rows each) for the wordmark; ' ' is a narrow gap. */
 const GLYPHS: Record<string, string[]> = {
@@ -53,12 +53,8 @@ export function install() {
 		return m.egg_console_arise_reply();
 	};
 
-	try {
-		if (sessionStorage.getItem(SESSION_KEY)) return;
-		sessionStorage.setItem(SESSION_KEY, '1');
-	} catch {
-		// Storage blocked: print anyway, once per page load.
-	}
+	if (printed) return;
+	printed = true;
 
 	// One %c segment per row, each its own color
 	const rows = wordmark('SOLO STACK');
