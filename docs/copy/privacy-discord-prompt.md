@@ -6,6 +6,7 @@ Generate only the new Discord subsection for each of the German and English priv
 Voice rules from docs/PROJECT.md: German is primary, with a complete natural English adaptation. Personal, direct, approachable, factual, no marketing. No invented facts, numbers, dates, contractual assurances, retention periods or promises. Avoid stylistic hyphens/dashes in public profile prose; preserve proper names, official provider spelling, URLs, normal legal citations and necessary spelling. This is legal copy: match the existing formal German Sie and plural wir, and English we/you, rather than the site's informal UI voice.
 
 Verified facts and scope:
+
 - The operator is Peter Ruß, sole trader in Germany; Solo Stack is the channel name. Existing general sections already explain controller details, own legal bases (Art. 6(1)(f) communication/moderation, (b) contractual requests), retention criteria, rights and international transfers. Do not duplicate these at length.
 - Solo Stack operates a Discord community server linked from the website by an ordinary external link: https://discord.gg/qzB5yQ2mvs (src/lib/home/data/socials.ts). There is no embedded Discord widget/feed in the website.
 - Describe our server operation/moderation: information visible to us, including profile/display names and user identifiers, messages/posts/reactions and membership/roles as relevant for communication, server administration and moderation. Do not suggest access to private messages between other users, their email addresses or IP addresses; do not invent custom bots, recordings, exports or moderation archives.
@@ -62,7 +63,6 @@ Unser Kanal: [solo_stack](https://www.twitch.tv/solo_stack). Anbieter ist Twitch
 
 Unser Profil: [solo-stack-dev](https://github.com/solo-stack-dev). Anbieter sind je nach Standort und Dienst GitHub, Inc. oder GitHub B.V. Wir verarbeiten öffentliche Beiträge, Issues, Pull Requests und andere für uns sichtbare Interaktionen zur Zusammenarbeit und zur Pflege unserer Projekte. Öffentliche Repositoryinhalte und Beiträge können kopiert, geforkt und dauerhaft in Versionshistorien erhalten bleiben. GitHub verarbeitet zudem technische Nutzungsdaten für den Plattformbetrieb und eigene Zwecke. Einzelheiten: [GitHub Datenschutzerklärung](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
-
 ## Existing English social section
 
 <h2 id="social-media">10. Professional profiles and social media</h2>
@@ -108,4 +108,3 @@ Our channel: [solo_stack](https://www.twitch.tv/solo_stack). The provider is Twi
 ### GitHub
 
 Our profile: [solo-stack-dev](https://github.com/solo-stack-dev). Depending on location and service, the providers are GitHub, Inc. or GitHub B.V. We process public contributions, issues, pull requests and other interactions visible to us for collaboration and maintaining our projects. Public repository contents and contributions may be copied, forked and retained permanently in version histories. GitHub also processes technical usage data for platform operation and its own purposes. Details: [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
-

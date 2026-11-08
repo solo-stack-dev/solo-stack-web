@@ -1,6 +1,7 @@
 Schreibe den Text für das Impressum der Website https://solo-stack.dev (persönliche Website und Videoblog des YouTube Kanals „Solo Stack“). Rechtsstand: Deutschland, November 2026.
 
 Fakten (nur diese verwenden, nichts erfinden):
+
 - Anbieter: Peter Ruß, Einzelunternehmer (Nebenerwerb), kein Handelsregistereintrag, keine Beschäftigten, keine zusätzliche Firmenbezeichnung. „Solo Stack“ ist nur der Kanal und Projektname, kein Firmenname.
 - Anschrift: c/o POSTFLEX PFX-656-644, Emsdettener Straße 10, 48268 Greven, Deutschland
 - E-Mail: business@solo-stack.dev
@@ -11,6 +12,7 @@ Fakten (nur diese verwenden, nichts erfinden):
 - Kein reglementierter Beruf, keine Aufsichtsbehörde.
 
 Anforderungen:
+
 - Pflichtangaben nach § 5 DDG (Digitale-Dienste-Gesetz, nicht mehr TMG) und § 18 Abs. 2 MStV.
 - KEIN Link zur EU-Plattform zur Online-Streitbeilegung (die OS-Plattform wurde im Juli 2025 eingestellt).
 - Kurzer Hinweis zur Verbraucherstreitbeilegung nach § 36 VSBG: nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
