@@ -150,6 +150,10 @@ Our channel: [solo_stack](https://www.twitch.tv/solo_stack). The provider is Twi
 
 Our profile: [solo-stack-dev](https://github.com/solo-stack-dev). Depending on location and service, the providers are GitHub, Inc. or GitHub B.V. We process public contributions, issues, pull requests and other interactions visible to us for collaboration and maintaining our projects. Public repository contents and contributions may be copied, forked and retained permanently in version histories. GitHub also processes technical usage data for platform operation and its own purposes. Details: [GitHub privacy statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
+### Discord
+
+Our community server: [Solo Stack](https://discord.gg/qzB5yQ2mvs). This website links to the server without embedding Discord content. The provider and controller for people in the European Economic Area is Discord Netherlands B.V., Schiphol Boulevard 195, 1118 BG Schiphol, Netherlands. As server operators, we process profile names, display names, user identifiers, messages, posts, reactions and membership and role information visible to us for communication, server administration and moderation. Discord separately processes account data, content, connection data, device data and usage data under its own responsibility to provide and secure its service and for the other purposes described in its privacy policy. Information about this processing, retention, international transfers, your rights and settings is available in the [Discord privacy policy](https://discord.com/privacy).
+
 ## 11. Your rights
 
 ### Access, rectification and erasure

@@ -150,6 +150,10 @@ Unser Kanal: [solo_stack](https://www.twitch.tv/solo_stack). Anbieter ist Twitch
 
 Unser Profil: [solo-stack-dev](https://github.com/solo-stack-dev). Anbieter sind je nach Standort und Dienst GitHub, Inc. oder GitHub B.V. Wir verarbeiten öffentliche Beiträge, Issues, Pull Requests und andere für uns sichtbare Interaktionen zur Zusammenarbeit und zur Pflege unserer Projekte. Öffentliche Repositoryinhalte und Beiträge können kopiert, geforkt und dauerhaft in Versionshistorien erhalten bleiben. GitHub verarbeitet zudem technische Nutzungsdaten für den Plattformbetrieb und eigene Zwecke. Einzelheiten: [GitHub Datenschutzerklärung](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement).
 
+### Discord
+
+Unser Communityserver: [Solo Stack](https://discord.gg/qzB5yQ2mvs). Die Website verlinkt den Server ohne eingebettete Discord-Inhalte. Anbieter und Verantwortlicher für Personen im Europäischen Wirtschaftsraum ist Discord Netherlands B.V., Schiphol Boulevard 195, 1118 BG Schiphol, Niederlande. Als Serverbetreiber verarbeiten wir die für uns sichtbaren Profilnamen, Anzeigenamen, Nutzerkennungen, Nachrichten, Beiträge, Reaktionen sowie Angaben zu Mitgliedschaften und Rollen zur Kommunikation, Serververwaltung und Moderation. Discord verarbeitet daneben in eigener Verantwortung Kontodaten, Inhalte, Verbindungsdaten, Gerätedaten und Nutzungsdaten zur Bereitstellung und Absicherung seines Dienstes sowie für die weiteren in seiner Datenschutzerklärung beschriebenen Zwecke. Informationen zu dieser Verarbeitung, Speicherung, internationalen Übermittlungen, Ihren Rechten und Einstellungen finden Sie in der [Datenschutzerklärung von Discord](https://discord.com/privacy).
+
 ## 11. Ihre Rechte
 
 ### Auskunft, Berichtigung und Löschung
