@@ -1,0 +1,127 @@
+You translate articles of the blog on solo-stack.dev (website of the YouTube channel "Solo Stack") from German into English.
+
+## Do not use tools
+
+Do not run commands or read files. Everything you need is in this prompt. Reply with the JSON only.
+
+## How to translate
+
+- Keep the owner's voice: first person, personal, direct, calm, a little playful, talking to the reader as "you". Write it as the owner would have written it in English, not word for word. Use the terms people actually search for in English.
+- Keep every fact, number and name exactly. Add nothing, drop nothing, no new claims.
+- No hyphenated compounds and no dashes as punctuation in the prose. Proper names keep their own spelling (Solo Stack, gpt-6.1-sol, SvelteKit, GitHub, YouTube …).
+- Keep the Markdown structure of the body: the same "##"/"###" headings (translated), paragraphs, lists and inline code.
+- Internal links: the body links to other articles by path. Replace each one with the path of its English version from this list, as "original path → English path". If an article has no English version, keep the original path.
+
+Non-article internal links: /stats → /en/stats; /kontakt → /en/kontakt. Preserve these localized links in the translated body. No existing other English posts.
+
+## The article
+
+---
+
+# Based on the owner interview (2026-11-08); prompt and model output: docs/copy/blog/.
+
+title: 'Wie ich meine Website mit AI Agenten gebaut habe'
+slug: meine-website-mit-ai-agenten
+description: 'Meine Website mit AI Agenten: eigene Designideen, vertrauter Stack, sieben Kritikrunden und ungefähr sechs Stunden persönliche Arbeit.'
+summary: 'Ich habe solo-stack.dev mit AI Agenten gebaut und dabei Designrichtung, Einrichtung und wichtige Entscheidungen selbst übernommen. Hier erzähle ich, warum die Gestaltung am meisten Nacharbeit brauchte, was mich an den SVG Diagrammen überrascht hat und wie ich meinen Aufwand einschätze.'
+
+# TODO(owner): youtubeId, durationSeconds, chapters and final transcript once the video is published.
+
+youtubeId: null
+publishedAt: '2026-11-01'
+updatedAt: '2026-11-08'
+durationSeconds: null
+format: project
+chapters: []
+takeaways:
+
+- 'Die Designrichtung brauchte die meisten Iterationen und mein laufendes Feedback.'
+- 'Projekt, Infrastruktur und Sicherheitsentscheidungen habe ich selbst eingerichtet.'
+- 'Sieben Kritikrunden halfen, Abstände, Animationen und Seiten aufeinander abzustimmen.'
+- 'Claude überraschte mich mit eigenen SVG Diagrammen für meine Statistikseite.'
+- 'Mein aktiver Aufwand lag bei circa sechs Stunden über vermutlich drei bis vier Tage.'
+  tags:
+- 'AI'
+- 'Webentwicklung'
+- 'SvelteKit'
+- 'Design'
+- 'Agenten'
+  links:
+- url: https://svelte.dev/docs/kit
+  label: 'Dokumentation zu SvelteKit'
+- url: https://developers.cloudflare.com/workers/
+  label: 'Dokumentation zu Cloudflare Workers'
+- url: https://valibot.dev/
+  label: 'Validierung mit Valibot'
+- url: https://developers.cloudflare.com/turnstile/
+  label: 'Dokumentation zu Cloudflare Turnstile'
+- url: https://www.youtube.com/@solostack_dev
+  label: 'Mein Kanal auf YouTube'
+  transcript: []
+  lang: de
+  generatedBy: gpt-6.1-sol
+
+---
+
+Meine eigene Website war für mich eine Gelegenheit, wieder etwas nach meinen Vorstellungen zu bauen und zu veröffentlichen. Bei solo-stack.dev habe ich dafür mit AI Agenten gearbeitet. Ich habe die Ideen und die Richtung vorgegeben, während die Agenten viel von der Umsetzung übernommen haben. Gerade bei der Gestaltung brauchte es einige Anläufe.
+
+## Warum ich die Website bauen wollte
+
+Ich bin Softwareentwickler mit Schwerpunkt Webentwicklung und baue einfach gern Dinge. Auch durch die Veränderungen mit AI wollte ich meine eigenen Fähigkeiten auf die Probe stellen und meinen vertrauten Stack praktisch einsetzen. Eine persönliche Website passte dazu: Ich kann mich im Internet präsentieren und vielleicht andere dazu bringen, selbst etwas zu bauen.
+
+Dazu kamen zwei praktische Wünsche. Ich wollte eine Übersicht meiner Social Media Präsenz und ein Kontaktformular für Businessanfragen. An einem eigenen, veröffentlichten Projekt kann ich außerdem zeigen, welche Entscheidungen bei einer persönlichen Website anfallen. Dazu gehören für mich neben der Gestaltung auch Formulare und der Umgang mit Eingaben.
+
+## Vom gelben Branding zum Mond
+
+Die fertige Gestaltung hatte ich am Anfang noch nicht im Kopf. Ausgangspunkt war der gelbe Farbton meines bestehenden Brandings, der mich auf den Mond gebracht hat. Dazu passt, dass ich eine Nachteule bin und gern nachts an eigenen Projekten arbeite. Auch die Eule beim Kontaktformular hat dadurch einen persönlichen Bezug.
+
+Ich habe eigene Ideen für Bildentwürfe beschrieben und verschiedene Designrichtungen ausprobiert. Die ersten Entwürfe habe ich verworfen, weil sie mir zu standardmäßig waren oder untereinander nicht zusammenpassten. Eine persönliche Website darf für mich verspielter und an manchen Stellen etwas übertrieben sein. Bis Homepage, einzelne Abschnitte und Unterseiten eine gemeinsame Richtung hatten, war entsprechend viel Feedback nötig. Dieser Teil hat die meisten Iterationen gebraucht.
+
+## Meine Aufgaben und die Arbeit der Agenten
+
+Das initiale Projekt habe ich komplett selbst eingerichtet. Dazu gehörten der Tech Stack, die Libraries, Cloudflare, Git und die Sicherheitsentscheidungen. Für die Arbeit mit den Agenten habe ich T3 Code als Oberfläche genutzt. Besonders hilfreich finde ich dort, verschiedene Modelle und Anbieter miteinander kombinieren zu können. Claude habe ich fürs Coding eingesetzt, OpenAI GPT Image für Bilder und gpt-6.1-sol für Texte.
+
+Die technische Basis besteht aus SvelteKit, Svelte, Tailwind CSS und Cloudflare Workers. Mit diesem Stack war ich schon vor der Arbeit mit AI vertraut. Für mich verbindet er Performance, eine angenehme Entwicklungsarbeit und eine Struktur, mit der auch Agenten gut zurechtkommen. Durch meine eigene Erfahrung kann ich bei Problemen selbst in den Code eingreifen. Während des Projekts habe ich den Code punktuell an wichtigen Stellen geprüft.
+
+Für parallele Arbeit nutze ich gern Git Worktrees. Größere Aufgaben liefen vor allem am Anfang parallel: Einige Agenten arbeiteten an der Homepage, andere leiteten daraus die Gestaltung für Blog und Statistikseite ab. Das Zusammenführen haben die Agenten selbst erledigt. Design und Theme habe ich dabei weiter geleitet und laufend Rückmeldung gegeben.
+
+## Sieben Runden Kritik und Verbesserung
+
+Nachdem die allgemeine Gestaltung feststand, folgten sieben Runden Hillclimbing. Damit meine ich, den vorhandenen Stand wiederholt kritisch prüfen zu lassen, die Kritik umzusetzen und das Ergebnis erneut anzusehen. Pro Runde setzte ein leitender Agent zwei weitere Agenten für die Kritik ein. Sie bewerteten die Benutzeroberfläche und die Bedienung.
+
+Als interne Zielmarke sollten die Bewertungen der Agenten über 9,5 von 10 Punkten liegen. Diese Zahl war eine Orientierung innerhalb des Ablaufs und sagt für sich genommen wenig darüber aus, wie du die Website erlebst. Konkret ging es vor allem um konsistente Abstände, Animationen und eine zusammenpassende Gestaltung über mehrere Seiten hinweg. Designrichtlinien und Linting halfen dabei, Vorgaben einzuhalten und Unstimmigkeiten zu finden.
+
+## Die Überraschung auf der Statistikseite
+
+Mein Lieblingsbereich ist die [Statistikseite](/stats). Die Ideen dafür kamen von mir, beim Layout hat Claude eigene Beiträge geliefert. Eigentlich hatte ich LayerChart als Library für die Diagramme vorgesehen. Claude generierte stattdessen eigene SVG Diagramme, und das Ergebnis hat mich positiv überrascht. Für diese Seite hat mir die Umsetzung gut gefallen.
+
+Auch die Bilder haben sich nach einigen Iterationen aus meiner Sicht gut eingefügt. Besonders mag ich die Silhouetten von mir, den Baum auf der Blogseite, die Eule auf der Kontaktseite und den Baum bei den Statistiken. OpenAI GPT Image war dafür meine bevorzugte Bildgenerierung. Meine Erfahrung dabei: Die Ergebnisse werden für mich brauchbarer, wenn ich selbst weiß, welche Richtung ich suche, und meine Vorstellungen entsprechend beschreiben kann.
+
+## Was mir beim Kontaktformular wichtig war
+
+Das [Kontaktformular](/kontakt) soll für Businessanfragen nutzbar sein, deshalb war mir dieser Teil besonders wichtig. Hier habe ich mich auch mit den Sicherheitsentscheidungen beschäftigt. Das Formular verwendet Cloudflare Turnstile, dessen Prüfung auf dem Server stattfindet. Die Eingaben werden ebenfalls serverseitig mit einem Schema von Valibot validiert.
+
+Das sind konkrete Entscheidungen, die zur Umsetzung eines Formulars gehören. Gerade bei einer persönlichen Website beschäftigt man sich schnell lange mit Farben und Bildern, während die Verarbeitung einer Anfrage weniger sichtbar ist. Mir war wichtig, auch diesen Teil bewusst einzurichten. Die punktuelle Prüfung wichtiger Codestellen war dabei mein Anteil an der Kontrolle der Umsetzung.
+
+## Wie viel Zeit darin steckt
+
+Meinen eigenen aktiven Aufwand schätze ich auf ungefähr sechs Stunden. Das hat sich vermutlich über drei oder vier Tage verteilt. Die Agenten liefen zwischendurch, wenn ich Zeit dafür hatte, und nicht durchgehend. Eine genaue gesamte Laufzeit oder einen belastbaren Vergleich mit einer vollständig manuellen Umsetzung kann ich daraus nicht ableiten.
+
+Am meisten nehme ich mit, dass die Arbeit mit mehreren Modellen in T3 Code für mich gut funktioniert hat. Die Bildgenerierung hat sich nach den nötigen Iterationen gut ins Projekt eingefügt. Schwieriger blieb die Gestaltung als Ganzes: Sie brauchte meine eigene Richtung und wiederholtes Feedback, bis die Seiten zusammenpassten. Dieser Artikel erscheint vor dem dazugehörigen Video, das ich später ergänze.
+
+## Output
+
+Return ONLY a JSON object, no markdown fences, with exactly these fields, all in English:
+
+- "slug": URL slug in English, lowercase ASCII, words joined with hyphens, max 6 words
+- "title": max 70 characters
+- "description": max 155 characters
+- "summary": max 450 characters
+- "takeaways": same number and order as the original
+- "tags": same number, translated where the tag is not a name
+- "links": same URLs in the same order, labels translated
+- "chapters": same number and order, only the titles translated, as an array of strings
+- "transcript": same number and order of segments, each text translated, as an array of strings
+- "body": the translated Markdown body
+
+Use exactly building-my-website-with-ai-agents as the slug. The video does not exist. Keep all uncertainty and the distinction between active personal work and intermittent agent work.

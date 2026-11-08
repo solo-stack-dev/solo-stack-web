@@ -1,108 +1,86 @@
 ---
-# Example post, written by gpt-6.1-sol (prompt and raw output: docs/copy/blog-example-post-*). The video does not exist yet.
-title: 'Wie ich die Website von Solo Stack mit AI Agenten gebaut habe'
+# Based on the owner interview (2026-11-08); prompt and model output: docs/copy/blog/.
+title: 'Wie ich meine Website mit AI Agenten gebaut habe'
 slug: meine-website-mit-ai-agenten
-description: 'So entstand die Website von Solo Stack mit AI Agenten: eine gemalte Nacht, parallele Entwicklung und Korrekturen an den kleinen Details.'
-summary: 'Für die Website von Solo Stack habe ich eine gemalte Nacht als durchgehendes Konzept umgesetzt. AI Agenten bauten die einzelnen Bereiche parallel, nachdem die Gestaltung und die gemeinsame Grundlage standen. Hier erzähle ich, wie daraus eine Website mit Spielen, Nachtradio und bewegten Szenen wurde und wo ich nacharbeiten musste.'
+description: 'Meine Website mit AI Agenten: eigene Designideen, vertrauter Stack, sieben Kritikrunden und ungefähr sechs Stunden persönliche Arbeit.'
+summary: 'Ich habe solo-stack.dev mit AI Agenten gebaut und dabei Designrichtung, Einrichtung und wichtige Entscheidungen selbst übernommen. Hier erzähle ich, warum die Gestaltung am meisten Nacharbeit brauchte, was mich an den SVG Diagrammen überrascht hat und wie ich meinen Aufwand einschätze.'
+# TODO(owner): youtubeId, durationSeconds, chapters and final transcript once the video is published.
 youtubeId: null
 publishedAt: '2026-11-01'
+updatedAt: '2026-11-08'
 durationSeconds: null
 format: project
 chapters: []
 takeaways:
-  - 'Die erste Designrunde war zu austauschbar; gemalte Entwürfe brachten die Website näher an die Bildwelt von Solo Stack.'
-  - 'Parallele AI Agenten arbeiteten in eigenen Git Worktrees mit klar zugeordneten Abschnittsordnern.'
-  - 'Getrennte Bildebenen machten Bewegung möglich, brauchten aber sorgfältige Korrekturen beim Zusammensetzen.'
-  - 'Die Coding Agenten schrieben Code und Platzhalter, während alle sichtbaren Texte von gpt-6.1-sol stammen.'
-  - 'Bewusste Ladezeitpunkte, Tastaturbedienung und ruhige Ansichten gehören für mich zum Konzept.'
+  - 'Die Designrichtung brauchte die meisten Iterationen und mein laufendes Feedback.'
+  - 'Projekt, Infrastruktur und Sicherheitsentscheidungen habe ich selbst eingerichtet.'
+  - 'Sieben Kritikrunden halfen, Abstände, Animationen und Seiten aufeinander abzustimmen.'
+  - 'Claude überraschte mich mit eigenen SVG Diagrammen für meine Statistikseite.'
+  - 'Mein aktiver Aufwand lag bei circa sechs Stunden über vermutlich drei bis vier Tage.'
 tags:
-  - 'AI Agenten'
+  - 'AI'
+  - 'Webentwicklung'
   - 'SvelteKit'
-  - 'Webdesign'
-  - 'Cloudflare Workers'
-  - 'Solo Stack'
+  - 'Design'
+  - 'Agenten'
 links:
   - url: https://svelte.dev/docs/kit
-    label: 'SvelteKit Dokumentation lesen'
+    label: 'Dokumentation zu SvelteKit'
   - url: https://developers.cloudflare.com/workers/
-    label: 'Cloudflare Workers Dokumentation'
-  - url: https://threlte.xyz
-    label: 'Threlte kennenlernen'
-  - url: https://tailwindcss.com
-    label: 'Tailwind CSS kennenlernen'
+    label: 'Dokumentation zu Cloudflare Workers'
+  - url: https://valibot.dev/
+    label: 'Validierung mit Valibot'
+  - url: https://developers.cloudflare.com/turnstile/
+    label: 'Dokumentation zu Cloudflare Turnstile'
   - url: https://www.youtube.com/@solostack_dev
-    label: 'Solo Stack auf YouTube'
-  - url: https://github.com/solo-stack-dev
-    label: 'Solo Stack auf GitHub'
+    label: 'Mein Kanal auf YouTube'
 transcript: []
 lang: de
 generatedBy: gpt-6.1-sol
 ---
 
-Ich bin Softwareentwickler und baue eigene Apps und Projekte mit viel AI. Mit Solo Stack möchte ich dich dabei mitnehmen: beim Projektfortschritt, bei Tests von AI Modellen, bei Nachrichten aus Entwicklersicht und beim Aufbau eines kleinen Unternehmens. Für die Website wollte ich einen Ort, der etwas von dieser Arbeit erzählt. Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.
+Meine eigene Website war für mich eine Gelegenheit, wieder etwas nach meinen Vorstellungen zu bauen und zu veröffentlichen. Bei solo-stack.dev habe ich dafür mit AI Agenten gearbeitet. Ich habe die Ideen und die Richtung vorgegeben, während die Agenten viel von der Umsetzung übernommen haben. Gerade bei der Gestaltung brauchte es einige Anläufe.
 
-## Erst die Stimmung, dann der Code
+## Warum ich die Website bauen wollte
 
-Der Ausgangspunkt war das Kanalbanner Nachtstudio: ein Laptop auf einer Klippe unter dem Mond. Darin steckte schon die Bildwelt für die Website, mit warmem Buttergelb, dunklem Anthrazit, Aquarellpapier und gezeichneten Tintenlinien. Dazu kommt eine gemalte Chibi Version von mir, mit kurzen dunklen Haaren, Bartstoppeln und schwarzem Shirt.
+Ich bin Softwareentwickler mit Schwerpunkt Webentwicklung und baue einfach gern Dinge. Auch durch die Veränderungen mit AI wollte ich meine eigenen Fähigkeiten auf die Probe stellen und meinen vertrauten Stack praktisch einsetzen. Eine persönliche Website passte dazu: Ich kann mich im Internet präsentieren und vielleicht andere dazu bringen, selbst etwas zu bauen.
 
-Die erste Runde mit HTML Entwürfen habe ich verworfen. Die Layouts waren ordentlich, aber sie hätten auch zu vielen anderen Websites passen können. Viel flaches Anthrazit, wenig von den gemalten Materialien, die Solo Stack ausmachen sollten. Für mich war das ein konkreter Hinweis, dass ein aufgeräumtes Layout allein noch keine passende Gestaltung ergibt.
+Dazu kamen zwei praktische Wünsche. Ich wollte eine Übersicht meiner Social Media Präsenz und ein Kontaktformular für Businessanfragen. An einem eigenen, veröffentlichten Projekt kann ich außerdem zeigen, welche Entscheidungen bei einer persönlichen Website anfallen. Dazu gehören für mich neben der Gestaltung auch Formulare und der Umgang mit Eingaben.
 
-Danach entstanden gemalte Bildentwürfe für die einzelnen Abschnitte. Ich habe Favoriten ausgewählt und das Konzept besprochen, bevor neue Entwürfe entstanden. So bekam die Website eine gemeinsame Richtung, bevor die Umsetzung in einzelne Aufgaben zerlegt wurde.
+## Vom gelben Branding zum Mond
 
-## Viele Agenten brauchen klare Grenzen
+Die fertige Gestaltung hatte ich am Anfang noch nicht im Kopf. Ausgangspunkt war der gelbe Farbton meines bestehenden Brandings, der mich auf den Mond gebracht hat. Dazu passt, dass ich eine Nachteule bin und gern nachts an eigenen Projekten arbeite. Auch die Eule beim Kontaktformular hat dadurch einen persönlichen Bezug.
 
-Damit mehrere Agenten an derselben Website arbeiten können, brauchen sie eine gemeinsame Grundlage. Ein leitender Agent schrieb deshalb ein ausführliches Übergabedokument und baute zuerst den Nachthimmel, gemeinsame Komponenten, den Rahmen für die Spiele und Platzhalter für die Texte. Die einzelnen Abschnitte konnten darauf aufsetzen.
+Ich habe eigene Ideen für Bildentwürfe beschrieben und verschiedene Designrichtungen ausprobiert. Die ersten Entwürfe habe ich verworfen, weil sie mir zu standardmäßig waren oder untereinander nicht zusammenpassten. Eine persönliche Website darf für mich verspielter und an manchen Stellen etwas übertrieben sein. Bis Homepage, einzelne Abschnitte und Unterseiten eine gemeinsame Richtung hatten, war entsprechend viel Feedback nötig. Dieser Teil hat die meisten Iterationen gebraucht.
 
-Die Coding Agenten liefen in T3 Code, der Anwendung, mit der ich arbeite, und nutzten Claude Modelle. Jeder Agent bekam einen eigenen Git Worktree, einen eigenen Branch und einen Abschnittsordner als Zuständigkeitsbereich. Anschließend wurden die Ergebnisse wieder zusammengeführt. Diese Aufteilung machte aus dem großen Entwurf einzelne, klar umrissene Aufgaben.
+## Meine Aufgaben und die Arbeit der Agenten
 
-Auch die Bilder mussten für die Umsetzung vorbereitet werden. Ein flaches Bild einer Szene lässt sich schließlich nicht einfach in einzelne bewegliche Gegenstände zerlegen. Deshalb erzeugte ein Bildmodell separate Ebenen für Himmel, Mond, Wolken, verschiedene Posen meines Maskottchens und Requisiten. Kleine Skripte übernahmen danach das Zuschneiden und Optimieren.
+Das initiale Projekt habe ich komplett selbst eingerichtet. Dazu gehörten der Tech Stack, die Libraries, Cloudflare, Git und die Sicherheitsentscheidungen. Für die Arbeit mit den Agenten habe ich T3 Code als Oberfläche genutzt. Besonders hilfreich finde ich dort, verschiedene Modelle und Anbieter miteinander kombinieren zu können. Claude habe ich fürs Coding eingesetzt, OpenAI GPT Image für Bilder und gpt-6.1-sol für Texte.
 
-Die Git Historie enthält 67 Commits einschließlich der Zusammenführungen der parallelen Branches. Sie sind auf den 1.&nbsp;November&nbsp;2026 zwischen 01:27 und 08:09&nbsp;Uhr datiert.
+Die technische Basis besteht aus SvelteKit, Svelte, Tailwind CSS und Cloudflare Workers. Mit diesem Stack war ich schon vor der Arbeit mit AI vertraut. Für mich verbindet er Performance, eine angenehme Entwicklungsarbeit und eine Struktur, mit der auch Agenten gut zurechtkommen. Durch meine eigene Erfahrung kann ich bei Problemen selbst in den Code eingreifen. Während des Projekts habe ich den Code punktuell an wichtigen Stellen geprüft.
 
-<hr data-art="horizon" />
+Für parallele Arbeit nutze ich gern Git Worktrees. Größere Aufgaben liefen vor allem am Anfang parallel: Einige Agenten arbeiteten an der Homepage, andere leiteten daraus die Gestaltung für Blog und Statistikseite ab. Das Zusammenführen haben die Agenten selbst erledigt. Design und Theme habe ich dabei weiter geleitet und laufend Rückmeldung gegeben.
 
-## Vom Mond bis zu den Spielen
+## Sieben Runden Kritik und Verbesserung
 
-<aside class="pull-quote" aria-hidden="true">Daraus wurde eine Nacht im Studio, durch die du scrollen kannst.</aside>
+Nachdem die allgemeine Gestaltung feststand, folgten sieben Runden Hillclimbing. Damit meine ich, den vorhandenen Stand wiederholt kritisch prüfen zu lassen, die Kritik umzusetzen und das Ergebnis erneut anzusehen. Pro Runde setzte ein leitender Agent zwei weitere Agenten für die Kritik ein. Sie bewerteten die Benutzeroberfläche und die Bedienung.
 
-Beim Scrollen vergeht auf der Startseite eine Nacht. Kleine Uhrzeitangaben markieren die Abschnitte, während sich der Himmel von der Dämmerung über die tiefe Nacht bis zum Sonnenaufgang verändert. So verbindet die Bewegung durch die Seite auch ihre unterschiedlichen Inhalte.
+Als interne Zielmarke sollten die Bewertungen der Agenten über 9,5 von 10 Punkten liegen. Diese Zahl war eine Orientierung innerhalb des Ablaufs und sagt für sich genommen wenig darüber aus, wie du die Website erlebst. Konkret ging es vor allem um konsistente Abstände, Animationen und eine zusammenpassende Gestaltung über mehrere Seiten hinweg. Designrichtlinien und Linting halfen dabei, Vorgaben einzuhalten und Unstimmigkeiten zu finden.
 
-Um 20:00 sitzt mein Maskottchen mit einem Laptop am Rand eines großen gemalten Mondes. Der Schriftzug SOLO STACK liegt teils in Creme auf dem Nachthimmel und teils in Anthrazit auf dem Mond. Du kannst den Mond anklicken und damit durch seine Phasen wechseln. Dahinter steckt eine Kugel mit gemalter Textur, umgesetzt mit Threlte, also Three.js für Svelte; bis sie geladen ist, bleibt das gemalte Bild sichtbar.
+## Die Überraschung auf der Statistikseite
 
-Um 21:00 erzählt eine durchgehende Tintenlinie, was ich mache. Mit deinem Scrollen verwandelt sie sich von einer Glühbirne in einen Prompt, dann in Code, ein Telefon, ein Diagramm und schließlich einen Mond über einer Klippe. Jede Form bekommt dabei einen gelben Pigmentfleck. Mir gefällt daran, dass die Tätigkeiten sichtbar miteinander verbunden bleiben.
+Mein Lieblingsbereich ist die [Statistikseite](/stats). Die Ideen dafür kamen von mir, beim Layout hat Claude eigene Beiträge geliefert. Eigentlich hatte ich LayerChart als Library für die Diagramme vorgesehen. Claude generierte stattdessen eigene SVG Diagramme, und das Ergebnis hat mich positiv überrascht. Für diese Seite hat mir die Umsetzung gut gefallen.
 
-Für 22:00 entstanden parallel drei Spielprototypen. Auf einem kleinen Mond mit radialer Schwerkraft zerdrückst du Bugs, bei Stack to the Moon stapelst du Blöcke mit meinen Werkzeugen, und bei der Sternbildsuche zeichnest du Formen von Werkzeugen wie Svelte und Cloudflare nach. Eigentlich wollte ich nach dem Spielen eines auswählen. Am Ende sind alle drei über Tabs erreichbar, und jedes Spiel lädt erst, wenn du auf Spielen klickst.
+Auch die Bilder haben sich nach einigen Iterationen aus meiner Sicht gut eingefügt. Besonders mag ich die Silhouetten von mir, den Baum auf der Blogseite, die Eule auf der Kontaktseite und den Baum bei den Statistiken. OpenAI GPT Image war dafür meine bevorzugte Bildgenerierung. Meine Erfahrung dabei: Die Ergebnisse werden für mich brauchbarer, wenn ich selbst weiß, welche Richtung ich suche, und meine Vorstellungen entsprechend beschreiben kann.
 
-## Wo die gemalten Teile nicht passten
+## Was mir beim Kontaktformular wichtig war
 
-Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt. Die Nachtschicht um 01:00 musste neu gemalt werden, weil mein Maskottchen, der Stuhl, die Tastatur und die Maus nicht zusammenpassten. Jetzt sitzt die Figur mit Kopfhörern am Schreibtisch, während auf dem Monitor echte Commits aus meinem GitHub wie bei `git log` eingetippt werden.
+Das [Kontaktformular](/kontakt) soll für Businessanfragen nutzbar sein, deshalb war mir dieser Teil besonders wichtig. Hier habe ich mich auch mit den Sicherheitsentscheidungen beschäftigt. Das Formular verwendet Cloudflare Turnstile, dessen Prüfung auf dem Server stattfindet. Die Eingaben werden ebenfalls serverseitig mit einem Schema von Valibot validiert.
 
-Die tippenden Hände waren zunächst ein separates Bildstück. Auf dem Telefon verschoben sie sich um ungefähr einen halben Pixel gegenüber der Szene. Das klingt klein, fällt an einer solchen Naht aber auf. Inzwischen stecken Hände und Szene in derselben Bilddatei.
+Das sind konkrete Entscheidungen, die zur Umsetzung eines Formulars gehören. Gerade bei einer persönlichen Website beschäftigt man sich schnell lange mit Farben und Bildern, während die Verarbeitung einer Anfrage weniger sichtbar ist. Mir war wichtig, auch diesen Teil bewusst einzurichten. Die punktuelle Prüfung wichtiger Codestellen war dabei mein Anteil an der Kontrolle der Umsetzung.
 
-Die deckend gemalten Bänder zwischen den Abschnitten zerschnitten die Seite in einzelne Stücke. Ich habe sie durch gemalten Nebel ersetzt, der über die Seite zieht und die Abschnitte ineinander übergehen lässt. Dazu kommen zwei Übergänge mit verwaschener Tinte. Von 20:00 bis 21:00 flutet nasse Tinte von unten über den Mond im Hero, während du scrollst. Von 04:00 bis 06:00 zieht sich die Nachttinte zurück und trocknet mit dem Sonnenaufgang.
+## Wie viel Zeit darin steckt
 
-Um 06:00 ist die Nachtschicht vorbei. Die Nacht zieht sich zurück, und auf dem buttergelben Papier dampft der Kaffee neben einem geschlossenen Laptop. Neben dem SOLO STACK Schriftzug siehst du ein Foto von mir, als wäre es mit anthrazitfarbener Tinte auf das Papier gedruckt. Danach kommen die Footer Links.
+Meinen eigenen aktiven Aufwand schätze ich auf ungefähr sechs Stunden. Das hat sich vermutlich über drei oder vier Tage verteilt. Die Agenten liefen zwischendurch, wenn ich Zeit dafür hatte, und nicht durchgehend. Eine genaue gesamte Laufzeit oder einen belastbaren Vergleich mit einer vollständig manuellen Umsetzung kann ich daraus nicht ableiten.
 
-<hr data-art="radio" />
-
-## Musik und Kino für die späten Stunden
-
-<aside class="pull-quote" aria-hidden="true">Bei den Bildern zeigte sich, wie viel Arbeit zwischen einem schönen Entwurf und einer funktionierenden Szene liegt.</aside>
-
-Um 02:00 steht ein gemaltes altes Radio bereit. Die sozialen Plattformen sind seine Sender, ihre Logos sitzen auf den Sendertasten. Jeder Sender spielt seinen eigenen kurzen Song: etwa 30 bis 50 Sekunden auf Englisch, trauriger Rap oder Lo Fi, in Dauerschleife, solange du ihn eingestellt hast. Titel und Liedtexte stammen von gpt-6.1-sol. Die Musik habe ich mit dem offenen Musikmodell YuE2 lokal auf meiner eigenen Grafikkarte erzeugt; sie spielt erst, wenn du mit einem Klick einen Sender einstellst.
-
-Das Radio brachte ein sehr handfestes Problem mit: Das gemalte Gehäuse hatte sechs Plätze für Sendertasten, aber es gibt mehr soziale Plattformen. Deshalb wurde der Körper aus seinen eigenen gemalten Pixeln neu zusammengesetzt. So fanden alle Sendertasten Platz im Radio.
-
-Um 04:00 wird die Klippe zum Freiluftkino. Dort ist vorgesehen, dass der Laptop das jeweils neueste Video an den Nachthimmel projiziert. Der YouTube Player lädt erst nach einem Klick, und das Vorschaubild kommt von der eigenen Domain. Vorher wird dadurch nichts von YouTube geladen.
-
-## Was unter der Nacht arbeitet
-
-Die technische Grundlage besteht aus SvelteKit, Svelte 5 und Tailwind CSS 4, gehostet auf Cloudflare Workers. Die Seiten werden beim Build vorgerendert, die Blogartikel liegen als Markdown Dateien im Repository. Deutsch ist die Hauptsprache, Englisch liegt unter /en. Abgesehen vom räumlichen Mond verwende ich SVG, CSS, Canvas 2D und Web Audio.
-
-Für die Texte gilt eine feste Regel im Repository: Alles, was du als Besucher liest, schreibt gpt-6.1-sol. Dazu gehören Überschriften, Beschriftungen, Alternativtexte, Meta Beschreibungen, Übersetzungen und auch dieser Artikel. Die Coding Agenten schreiben Code und Textplatzhalter. So bleibt die Verantwortung für die Sprache über die einzelnen Abschnitte hinweg klar zugeordnet.
-
-Die verspielten Elemente sollen dir Raum lassen, die Seite in deinem Tempo zu benutzen. Aufwendige Teile laden erst, wenn sie ins Sichtfeld kommen, und pausieren außerhalb davon; Spiele brauchen zusätzlich deinen Klick. Für jeden Abschnitt gibt es eine ruhige statische Ansicht, wenn du Animationen über reduzierte Bewegung abschaltest. Alles ist mit der Tastatur erreichbar, und neben den spielerischen Elementen stehen einfache Links.
-
-Ein paar Kleinigkeiten darfst du trotzdem entdecken. Der Konami Code ruft Tintenschatten mit ARISE herbei, und in der Browserkonsole wartet ein Mond aus ASCII Zeichen. Selbst die Fehlerseiten gehören zur Bildwelt: Bei 404 landest du in einer Tintenleere, bei 500 schaut ein Riese über eine Mauer.
-
-Der Blog soll die Videos jeweils als Artikel mit Zusammenfassung, Kapiteln, Kernaussagen, Transkript und Links begleiten. Diesen ersten Text schreibe ich schon vor dem ersten Video. Ein Video über den Bau dieser Website kommt auf den Kanal. Hier beginnt Solo Stack also mit dem Ort, an dem die weiteren Projekte ihren Platz bekommen.
+Am meisten nehme ich mit, dass die Arbeit mit mehreren Modellen in T3 Code für mich gut funktioniert hat. Die Bildgenerierung hat sich nach den nötigen Iterationen gut ins Projekt eingefügt. Schwieriger blieb die Gestaltung als Ganzes: Sie brauchte meine eigene Richtung und wiederholtes Feedback, bis die Seiten zusammenpassten. Dieser Artikel erscheint vor dem dazugehörigen Video, das ich später ergänze.
