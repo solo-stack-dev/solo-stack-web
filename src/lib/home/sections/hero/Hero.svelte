@@ -386,7 +386,7 @@
 		--moon-cx: 86cqw;
 		--moon-cy: 96cqh;
 		/* Mascot seat on its cloud: angle from the moon center, radial lift off the rim (the cloud's lower right rests on the moon) */
-		--mascot-at: -131deg;
+		--mascot-at: -135deg;
 		--mascot-lift: calc(var(--mascot-w) * 0.2);
 		--mascot-w: clamp(7rem, 11cqw, 13rem);
 		--mascot-tilt: 4deg;
