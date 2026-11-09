@@ -30,6 +30,8 @@ export interface TurnstileRenderOptions {
 	callback?: (token: string) => void;
 	'error-callback'?: (code: string) => boolean | void;
 	'expired-callback'?: () => void;
+	/** The challenge needs the visitor: with `interaction-only` the checkbox is about to show. */
+	'before-interactive-callback'?: () => void;
 	'timeout-callback'?: () => void;
 }
 
@@ -51,7 +53,7 @@ const SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render
 let loading: Promise<TurnstileApi> | undefined;
 
 /**
- * Loads the script once, on the contact page only. Must come from Cloudflare directly: a proxied or cached copy breaks
+ * Loads the script once, on the contact page only (on the first touch of the form, see `TurnstileWidget.svelte`). Must come from Cloudflare directly: a proxied or cached copy breaks
  * with their updates. A failed load can be retried.
  */
 export function loadTurnstile(): Promise<TurnstileApi> {
