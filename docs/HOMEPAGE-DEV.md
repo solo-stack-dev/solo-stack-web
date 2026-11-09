@@ -154,7 +154,7 @@ Repeating grain tile (decoded once). Default: the painted grain from `docs/art/s
 
 ### 6.3 `StarField.svelte`
 
-One canvas, fills its positioned parent, deterministic per seed, twinkle at ≤ 20 fps, paused off screen and in hidden tabs, static under reduced motion. The few bright stars (~3 %) are drawn with the painted star sprites once decoded. Props: `density` (1 ≈ one star per 7000 px²), `brightness` (1), `seed` (7), `twinkle` (true), `sprites` (true), `class`. The global sky already has one; add your own only for a denser local sky.
+One canvas, fills its positioned parent, deterministic per seed, twinkle at ≤ 20 fps, paused off screen and in hidden tabs, static under reduced motion. The canvas is sized in a ResizeObserver callback (no forced layout during hydration) and allocated only once it comes within a screen of the viewport, or at idle. The few bright stars (~3 %) are drawn with the painted star sprites once decoded. Props: `density` (1 ≈ one star per 7000 px²), `brightness` (1), `seed` (7), `twinkle` (true), `sprites` (true), `class`. The global sky already has one; add your own only for a denser local sky.
 
 ### 6.4 `ShootingStars.svelte`
 
@@ -183,7 +183,7 @@ All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use
 
 **`[data-feather]` helper.** Put `data-feather` on a plate (or its wrapper) and set `--feather-top` / `--feather-bottom` (lengths, not percentages; default 0) in your CSS. NightPage's rule owns the element's `mask`: painted soft edge over those heights, solid in between. Without the attribute, write the mask yourself (the cinema backdrop uses `var(--feather-up) top / 100% 20% no-repeat, linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat`).
 
-**`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one): a zero-height boundary with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads lazily (enhanced-img), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion). Round 2: the lit mist is the far layer (keep it narrow and light, ≤ 0.4 opacity) and `cloud` adds a dark foreground silhouette (`strip` `a`/`b`/`c` from `docs/art/site/round-2/seam-cloud-*.png`, `height`, `above`, `opacity`, `mirror`, `stretch`, `shift`) that overlaps the upper plate's lit edge and drifts against the mist. Every seam uses a different strip, mirror or shift. Optimized by `node src/lib/home/shared/tools/optimize-round-2.mjs` (also the game posters and the cinema projection).
+**`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one): a zero-height boundary with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads after the hero moon (`DeferredArt`, §6.7), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion). Round 2: the lit mist is the far layer (keep it narrow and light, ≤ 0.4 opacity) and `cloud` adds a dark foreground silhouette (`strip` `a`/`b`/`c` from `docs/art/site/round-2/seam-cloud-*.png`, `height`, `above`, `opacity`, `mirror`, `stretch`, `shift`) that overlaps the upper plate's lit edge and drifts against the mist. Every seam uses a different strip, mirror or shift. Optimized by `node src/lib/home/shared/tools/optimize-round-2.mjs` (also the game posters and the cinema projection).
 
 **`DawnBank.svelte`** (between `<Cinema />` and `<Sunrise />`, round 3): one wide, non-repeating painted dawn cloud bank (`docs/art/site/round-3/dawn-cloud-bank*.png`; the portrait painting below 48rem, never a crop), zero height, z-index 2, rising a little on its own view timeline (static under reduced motion). Its opaque middle band hides the only lines of the 04→06 seam: the sunrise overlaps the cinema and feathers its top in inside that band, and the cinema cliff dissolves into it; cinema cliff, mascot, beam, screen and heading paint in front (z-index 3). All numbers live in `shared/dawn.ts` (`dawnVars()` on the cinema, the bank and the sunrise); change them together. Optimized by `node src/lib/home/shared/tools/optimize-round-3.mjs`. The cinema overlaps the radio by `--cinema-overlap` (negative margin, own links/buttons only take pointer events), so its painted sky meets the radio's rocks; the radio overlaps the night shift the same way (`--radio-overlap`, only its scene takes pointer events).
 
@@ -213,6 +213,19 @@ Mounts a heavy component from a dynamic import when its box comes within `rootMa
 
 Props: `load` (required), `props`, `rootMargin` (`'100% 0px'`), `when` (true; extra condition), `idle` (false; also wait for `requestIdleCallback`), `fallback`, `failed` (snippet, gets the error), `onloaded`, `class`. The wrapper is a `div`: give it the final size via `class` so nothing shifts when the component replaces the fallback.
 
+### 6.7 `DeferredArt.svelte` and `deferred.svelte.ts`
+
+Below-the-fold art waits for the hero moon (the LCP image), so it never shares a slow link with it (docs/perf/AUDIT-2026-11.md #7). `DeferredArt` keeps its children out of the DOM until its tier of the `belowFold` gate opens; without JS they render from a `<noscript>` (made `display: contents` under `@media (scripting: none)`, so the images sit in the parent as usual). Keep `loading="lazy"` on the images inside as the backstop, and only wrap images that do not size their box (absolutely positioned or filling a sized box), so nothing shifts.
+
+```svelte
+<DeferredArt><enhanced:img src={plate} alt="" loading="lazy" onload={belowFold.settle} /></DeferredArt>
+<DeferredArt rest><enhanced:img src={poster} alt="" loading="lazy" /></DeferredArt>
+```
+
+- `belowFold.ready` (first tier: the 21:00 plate and its first bloom) opens when the moon's bytes have arrived (resource timing; the hero marks the moon with `{@attach lcpImage}`), when it loaded or failed, on the first scroll, or at window `load`.
+- `belowFold.rest` (`<DeferredArt rest>`: everything further down: the other blooms, game posters, mists, `--wash-spread-down`) opens once the plate has loaded (`belowFold.settle`), on the first scroll, or 4 s after `ready`.
+- CSS-only art: NightPage sets `--wash-spread-down` from `belowFold.rest` and repeats it in a `<noscript>` style.
+
 ### 6.8 `motion.svelte.ts`
 
 ```ts
@@ -224,7 +237,7 @@ import { reducedMotion, pageVisibility, inView, InView, ScrollProgress, RafLoop 
 - `inView(callback, { rootMargin, threshold, once })`: attachment, `callback(visible, entry)`. Usage: `<div {@attach inView((v) => (near = v))}>`.
 - `new InView(options)`: reactive `.current`, attach with `{@attach seen.attach}`.
 - `new ScrollProgress({ mode, cssVar })`: reactive `.current` 0…1, attach to the element. Modes: `through` (enter bottom → leave top), `enter` (top at viewport bottom → top at viewport top). `cssVar: '--progress'` also writes the value to the element, which is cheaper than reactive markup for per-frame styling. Only measures while near the viewport.
-- `new RafLoop(tick, { fps, paused })`: `tick(dtSeconds, time)`; runs only while attached element is on screen, tab visible, and `!paused`. `.paused` (get/set), `.running` (reactive). dt is clamped to 0.1 s. With `fps`, it waits on a timer between ticks instead of requesting every display frame (an empty rAF still costs a main-thread frame and restyles every running CSS animation); ticks keep the same vsync cadence. A loop without `fps` requests every frame while it runs, so pause it once it has nothing to do (hero and night-shift parallax).
+- `new RafLoop(tick, { fps, paused })`: `tick(dtSeconds, time)`; runs only while attached element is on screen, tab visible, and `!paused`. `.paused` (get/set), `.running` (reactive). dt is clamped to 0.1 s. With `fps`, it waits on a timer between ticks instead of requesting every display frame (an empty rAF still costs a main-thread frame and restyles every running CSS animation); ticks keep the same vsync cadence. A loop without `fps` requests every frame while it runs, so pause it once it has nothing to do (hero and night-shift parallax; Making sleeps between morphs and wakes on the frame its drawing would change).
 
 ```svelte
 <script lang="ts">
@@ -269,7 +282,7 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 - **Masters** (full-size PNGs from the art agents) go to `docs/art/<section>/` with `PROMPTS.md` and `README.md` (layer list, intended position, size, z order). Never into `static/`.
 - **Optimized imports** live in `src/lib/home/sections/<section>/assets/`, consumed with `@sveltejs/enhanced-img` (`<enhanced:img src={layer} alt="" sizes="…" />` or `import layer from './assets/x.png?enhanced'`), which emits AVIF/WebP in responsive sizes. Downscale before copying if the master is far larger than the largest rendered size (2× of the max CSS width).
 - Naming: `<section>-<layer>[-mobile][@frame].png`, e.g. `hero-moon-disc.png`, `nightshift-mascot-typing@2.png`. Mascot frames: one sprite sheet per animation.
-- Budgets: hero above the fold ≤ ~250 kB AVIF (desktop); each section's initial images ≤ ~400 kB; `loading="lazy"` below the fold, `fetchpriority="high"` only on the hero image; explicit sizes (no CLS).
+- Budgets: hero above the fold ≤ ~250 kB AVIF (desktop); each section's initial images ≤ ~400 kB; `loading="lazy"` below the fold, and `DeferredArt` (§6.7) for art that Chrome's wide lazy margin would otherwise fetch alongside the moon; `fetchpriority="high"` only on the hero image; explicit sizes (no CLS).
 - Decorative art: `alt=""`. Meaningful images get an `alt` message key.
 
 ## 9. Before you commit
