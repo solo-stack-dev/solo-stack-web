@@ -55,6 +55,8 @@
 	};
 
 	const hours: readonly NightHourDef[] = NIGHT_HOURS;
+	/** Menu pages: all but Start (the homepage itself; its hours are listed under the pages). */
+	const pages = SITE_LINKS.filter((link) => link.id !== 'home');
 	/** Sections with their own progress dots: the rail hides while they are active (one indicator at a time). */
 	const OWN_PROGRESS = new Set<SectionId>(['making']);
 	const maskVars = transitionMaskVars();
@@ -280,7 +282,7 @@
 				class={['menu-button swash-focus', menuOpen && 'is-open']}
 				aria-haspopup="dialog"
 				aria-expanded={menuOpen}
-				aria-label={m.home_nav_menu_open()}
+				aria-label={m.site_nav_menu_open()}
 				onclick={openMenu}
 			>
 				<span class="menu-icon" aria-hidden="true"></span>
@@ -288,31 +290,38 @@
 		{/snippet}
 	</SiteNav>
 
-	<dialog bind:this={menu} class="menu" aria-label={m.home_nav_menu_title()} onclose={() => (menuOpen = false)}>
+	<dialog bind:this={menu} class="menu" aria-label={m.site_nav_menu_title()} onclose={() => (menuOpen = false)}>
 		<div class="menu-inner">
 			<button type="button" class="menu-close swash-focus" aria-label={m.home_nav_menu_close()} onclick={closeMenu}>
 				<span class="close-icon" aria-hidden="true"></span>
 			</button>
-			<nav aria-label={m.home_nav_menu_title()}>
-				<ol class="menu-list">
-					{#each NIGHT_HOURS as hour (hour.id)}
-						<li>
-							<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
-								<span class="label-sm text-cream/60">{hour.time}</span>
-								<span class="title font-display text-2xl font-black tracking-wordmark md:text-4xl">{labels[hour.id]()}</span>
-							</a>
-						</li>
-					{/each}
-				</ol>
-			</nav>
-			<!-- Site pages: inline in the bar from 48rem, here on phones -->
-			<nav class="menu-site" aria-label={m.site_nav_label()}>
-				<ul>
-					{#each SITE_LINKS as link (link.id)}
-						<li><a class="swash-focus label" href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a></li>
-					{/each}
-				</ul>
-			</nav>
+			<div class="menu-body">
+				<!-- The site pages first, large like the subpage phone menu (MobileMenu). Start is left out: this is it, and the hours below
+				     are its map. From 48rem the pages are also inline in the bar. -->
+				<nav class="menu-pages" aria-label={m.site_nav_label()}>
+					<ul>
+						{#each pages as link, index (link.id)}
+							<li style:--i={index}>
+								<a href={siteHref(link)} aria-current={siteCurrent(link, page.url.pathname)} onclick={closeMenu}>{link.label()}</a>
+							</li>
+						{/each}
+					</ul>
+				</nav>
+				<!-- The night's hours as a compact timeline under them: mono time, the rail's dot on a hairline, the hour's title -->
+				<nav class="menu-hours" aria-label={m.home_nav_menu_title()}>
+					<ol>
+						{#each NIGHT_HOURS as hour, index (hour.id)}
+							<li style:--i={pages.length + index}>
+								<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
+									<span class="time label-sm">{hour.time}</span>
+									<span class="tick" aria-hidden="true"></span>
+									<span class="title">{labels[hour.id]()}</span>
+								</a>
+							</li>
+						{/each}
+					</ol>
+				</nav>
+			</div>
 		</div>
 	</dialog>
 
@@ -537,10 +546,16 @@
 
 	.menu-inner {
 		position: relative;
-		display: grid;
-		align-content: center;
+		display: flex;
+		flex-direction: column;
 		min-height: 100%;
-		padding: 5rem clamp(var(--page-gutter), 8vw, 8rem);
+		/* clear of the close button's row on top */
+		padding: calc(2 * var(--nav-pad-y) + 2.75rem) clamp(var(--page-gutter), 8vw, 8rem) clamp(1.25rem, 4vh, 3rem);
+	}
+
+	/* Centered in the room left; auto margins never go negative, so on short screens it starts at the top and scrolls */
+	.menu-body {
+		margin-block: auto;
 	}
 
 	/* Exactly where the menu button sits in the nav bar */
@@ -550,37 +565,139 @@
 		right: var(--page-gutter);
 	}
 
-	.menu-list {
+	/* Pages: the primary navigation, set like MobileMenu's (display face, large, the bar's swash under the current one) */
+	.menu-pages ul {
 		display: grid;
-		gap: clamp(0.75rem, 2.2vh, 1.5rem);
+		gap: clamp(0rem, 1vh, 0.75rem);
 	}
 
-	.menu-list a {
-		display: flex;
-		align-items: baseline;
-		gap: 1.25rem;
-		width: fit-content;
-	}
-
-	/* Keyboard focus: the shell's swash under the hour's name and a soft light, not a box */
-	.menu-list a:focus-visible {
-		outline: none;
-		color: var(--color-butter);
-		filter: drop-shadow(0 0 0.45rem var(--focus-halo));
-	}
-
-	.menu-list .title {
+	.menu-pages a {
 		position: relative;
+		display: inline-flex;
+		align-items: center;
+		min-height: 3.5rem;
+		font-family: var(--font-display);
+		font-size: clamp(2.75rem, min(14vw, 10vh), 5.5rem);
+		font-weight: 900;
+		line-height: 1;
+		letter-spacing: var(--tracking-wordmark);
+		transition: color var(--dur-hover) ease;
 	}
 
-	.menu-list .title::after {
+	.menu-pages a::after {
 		content: '';
 		position: absolute;
 		left: -0.05em;
 		right: -0.1em;
-		bottom: -0.15em;
-		height: 0.16em;
-		min-height: 0.3rem;
+		bottom: -0.1em;
+		height: 0.2em;
+		background: var(--color-butter);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
+	}
+
+	.menu-pages a[aria-current]::after {
+		scale: 1 1;
+	}
+
+	.menu-pages a:hover {
+		color: var(--color-butter);
+	}
+
+	/* Keyboard focus: the swash at full strength, heavier than the current page's, and a soft light, not a box */
+	.menu-pages a:focus-visible {
+		outline: none;
+		color: var(--color-butter);
+		filter: drop-shadow(0 0 0.5rem var(--focus-halo));
+	}
+
+	.menu-pages a:focus-visible::after {
+		scale: 1 1;
+		height: 0.26em;
+	}
+
+	/* Hours: the secondary list, a compact timeline (mono time, the rail's dot on a hairline, the hour's title) */
+	.menu-hours {
+		margin-top: clamp(1.25rem, 4.5vh, 3rem);
+	}
+
+	.menu-hours a {
+		display: grid;
+		grid-template-columns: auto 0.75rem auto;
+		align-items: center;
+		column-gap: clamp(0.6rem, 2.5vw, 0.85rem);
+		width: fit-content;
+		min-height: clamp(2.25rem, 5.4vh, 2.75rem);
+		transition: color var(--dur-hover) ease;
+	}
+
+	.time {
+		color: color-mix(in oklab, var(--color-cream) 60%, transparent);
+		transition: color var(--dur-hover) ease;
+	}
+
+	/* One cell per row, full height: their hairlines join into the night's line, from the first dot to the last */
+	.tick {
+		position: relative;
+		align-self: stretch;
+	}
+
+	.tick::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 1px;
+		translate: -50% 0;
+		background: color-mix(in oklab, var(--color-cream) 22%, transparent);
+	}
+
+	.menu-hours li:first-child .tick::before {
+		top: 50%;
+	}
+
+	.menu-hours li:last-child .tick::before {
+		bottom: 50%;
+	}
+
+	.tick::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 0.35rem;
+		height: 0.35rem;
+		translate: -50% -50%;
+		border-radius: 999px;
+		background: currentColor;
+		opacity: 0.55;
+		transition:
+			opacity var(--dur-hover),
+			scale var(--dur-hover),
+			background-color var(--dur-hover);
+	}
+
+	.title {
+		position: relative;
+		font-family: var(--font-display);
+		/* every title on one line from 320px */
+		font-size: clamp(0.9375rem, min(5vw, 0.95rem + 0.5vw), 1.5rem);
+		font-weight: 800;
+		line-height: 1.15;
+		letter-spacing: -0.02em;
+	}
+
+	/* the swash, small: keyboard focus only (the current hour has its dot) */
+	.title::after {
+		content: '';
+		position: absolute;
+		left: -0.05em;
+		right: -0.1em;
+		bottom: -0.2em;
+		height: 0.3rem;
 		background: var(--focus-ring);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
 		scale: 0 1;
@@ -588,68 +705,69 @@
 		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
-	.menu-list a:focus-visible .title::after {
+	.menu-hours a:hover,
+	.menu-hours a[aria-current],
+	.menu-hours a:hover .time,
+	.menu-hours a[aria-current] .time {
+		color: var(--color-butter);
+	}
+
+	.menu-hours a:hover .tick::after {
+		opacity: 1;
+	}
+
+	.menu-hours a[aria-current] .tick::after {
+		opacity: 1;
+		scale: 1.6;
+		box-shadow: var(--glow-sm);
+	}
+
+	.menu-hours a:focus-visible {
+		outline: none;
+		color: var(--color-butter);
+		filter: drop-shadow(0 0 0.45rem var(--focus-halo));
+	}
+
+	.menu-hours a:focus-visible .title::after {
 		scale: 1 1;
 	}
 
-	.menu-site a {
-		--swash-x: 0;
-		--swash-y: 0.35rem;
-		--swash-h: 0.3rem;
-	}
+	/* Short landscape screens (phones turned sideways): pages and hours side by side, so the overlay still fits without scrolling */
+	@media (orientation: landscape) and (max-height: 32rem) {
+		.menu-body {
+			display: grid;
+			grid-template-columns: auto auto;
+			justify-content: start;
+			column-gap: clamp(2.5rem, 9vw, 7rem);
+		}
 
-	.menu-list a {
-		transition: color var(--dur-hover) ease;
-	}
-
-	.menu-list a:hover,
-	.menu-list a[aria-current] {
-		color: var(--color-butter);
-	}
-
-	/* The site pages under the hours, as quiet mono labels like the clock times */
-	.menu-site {
-		margin-top: clamp(1.5rem, 4vh, 3rem);
-		padding-top: clamp(0.75rem, 2vh, 1.25rem);
-		border-top: 1px solid color-mix(in oklab, var(--color-cream) 14%, transparent);
-	}
-
-	.menu-site ul {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.25rem 1.5rem;
-	}
-
-	.menu-site a {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		min-height: 2.75rem;
-		color: color-mix(in oklab, var(--color-cream) 72%, transparent);
-	}
-
-	.menu-site a:hover,
-	.menu-site a[aria-current] {
-		color: var(--color-butter);
-	}
-
-	.menu-site a[aria-current]::before {
-		content: '';
-		width: 0.35rem;
-		height: 0.35rem;
-		border-radius: 999px;
-		background: currentColor;
+		.menu-hours {
+			margin-top: 0;
+		}
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
 		.menu[open] {
 			animation: menu-in var(--dur-state) var(--ease-settle);
 		}
+
+		/* the pages, then the hours, rise in one after another (as in MobileMenu) */
+		.menu[open] li {
+			animation: menu-rise var(--dur-reveal) var(--ease-settle) both;
+			animation-delay: calc(60ms + var(--i) * 35ms);
+		}
 	}
 
 	@keyframes menu-in {
 		from {
 			opacity: 0;
+		}
+	}
+
+	@keyframes menu-rise {
+		from {
+			opacity: 0;
+			translate: 0 0.75rem;
 		}
 	}
 

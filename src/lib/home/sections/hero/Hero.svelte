@@ -354,7 +354,9 @@
 	<div class="wordmark-layer">
 		<h1 id="home-hero-title" class="wordmark is-cream settle">{@render wordmarkText()}</h1>
 		<!-- The brand tagline (the four pillars); 21:00 names them by what happens there, so the row is not echoed one screen later -->
-		<p class="tagline settle label">{m.home_hero_tagline()}</p>
+		<div class="tagline-slot">
+			<p class="tagline settle label">{m.home_hero_tagline()}</p>
+		</div>
 	</div>
 
 	<div class="moon-box night-copy" aria-hidden="true" bind:clientWidth={nightBoxSize} style:clip-path={nightClip}>
@@ -422,7 +424,9 @@
 			--wm-size: min(27cqw, 15cqh);
 			/* the S's optical edge (and the tagline) on the page gutter, under the clock */
 			--wm-x: calc(var(--page-gutter) - 0.06 * var(--wm-size));
-			--wm-y: 19cqh;
+			/* Under the clock with room for the tagline between them, even when it wraps to two lines (short and landscape screens) */
+			--tagline-top: calc(var(--clock-top) + var(--text-label-sm) + 0.75rem);
+			--wm-y: max(19cqh, calc(var(--tagline-top) + 2 * 1.5 * var(--text-label) + 0.75rem));
 		}
 	}
 
@@ -833,14 +837,35 @@
 		pointer-events: none;
 	}
 
+	.tagline-slot {
+		display: contents;
+	}
+
 	@media (max-width: 47.99rem), (max-aspect-ratio: 4/5) {
-		/* Grows upwards from just above the stacked wordmark */
-		.tagline {
-			top: auto;
+		/* The band between the clock and the stacked wordmark. The tagline sits at its bottom, just above the wordmark; a wrapped
+		   line grows upwards but stops at the band's top (auto margin, never negative), so it can never reach the clock. */
+		.tagline-slot {
+			position: absolute;
+			left: calc(var(--wm-x) + 0.06 * var(--wm-size));
+			top: var(--tagline-top);
 			bottom: calc(100cqh - var(--wm-y) + 0.75rem);
-			max-width: calc(100cqw - 2 * var(--page-gutter));
-			/* one line on a phone: five words get the narrow tracking (wide tracking is for three words or fewer) */
+			display: flex;
+			flex-direction: column;
+			width: calc(100cqw - 2 * var(--page-gutter));
+		}
+
+		.tagline {
+			position: relative;
+			left: auto;
+			top: auto;
+			max-width: none;
+			margin-top: auto;
+			line-height: 1.5;
+			/* One line on every phone: five words get the narrow tracking (wide tracking is for three words or fewer), and the size
+			   follows the width. 25.6em = the line's length in Geist Mono at this tracking (36 characters × 0.7em, plus slack). */
+			font-size: min(var(--text-label), (100cqw - 2 * var(--page-gutter)) / 25.6);
 			letter-spacing: 0.1em;
+			text-wrap: balance;
 		}
 	}
 
