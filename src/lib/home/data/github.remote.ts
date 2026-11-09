@@ -1,17 +1,7 @@
 import { prerender } from '$app/server';
 import * as v from 'valibot';
-import {
-	CommitListSchema,
-	CommitSchema,
-	FALLBACK_COMMITS,
-	GITHUB_COMMIT_LIMIT,
-	GITHUB_REPO_LIMIT,
-	RepoListSchema,
-	commitsUrl,
-	reposUrl,
-	toCommits,
-	type Commit
-} from './github.ts';
+import { FALLBACK_COMMITS, GITHUB_COMMIT_LIMIT, GITHUB_REPO_LIMIT, commitsUrl, reposUrl, type Commit } from './github.ts';
+import { CommitListSchema, CommitSchema, RepoListSchema, toCommits } from './github.server.ts';
 
 const headers = {
 	accept: 'application/vnd.github+json',
