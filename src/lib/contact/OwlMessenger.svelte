@@ -13,7 +13,8 @@
 -->
 <script lang="ts">
 	import { inView, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
-	import wash from '#lib/components/site/assets/backlight-wash.webp?w=720&format=webp&quality=55&enhanced';
+	import { avifImageSet, webpUrl } from '#lib/image-set.ts';
+	import wash from '#lib/components/site/assets/backlight-wash.webp?w=720&format=avif;webp&quality=55&enhanced';
 	import branch from './assets/owl-branch.webp?w=1254;840;560;360&enhanced';
 	import owlClosed from './assets/owl-closed.webp?w=1254;840;560;360&enhanced';
 	import owlFlying from './assets/owl-flying.webp?w=1513;1024;680&enhanced';
@@ -138,7 +139,7 @@
 	bind:this={root}
 	{@attach inView((value) => (visible = value))}
 >
-	<div class="wash" style:--wash="url({wash.img.src})"></div>
+	<div class="wash" style:--wash-webp={webpUrl(wash)} style:--wash-set={avifImageSet(wash)}></div>
 
 	<div class="bough">
 		{#if armed}
@@ -194,6 +195,8 @@
 	 * Once the owl has gone it dims to an afterglow.
 	 */
 	.wash {
+		/* AVIF where `image-set(… type())` is known, else WebP (#lib/image-set.ts) */
+		--wash: var(--wash-webp);
 		position: absolute;
 		left: -14%;
 		top: 2%;
@@ -204,6 +207,12 @@
 		mix-blend-mode: multiply;
 		rotate: -4deg;
 		transition: opacity 2.4s ease 0.6s;
+	}
+
+	@supports (background-image: image-set(url('') type('image/avif'))) {
+		.wash {
+			--wash: var(--wash-set);
+		}
 	}
 
 	:global(.dark) .wash {

@@ -28,19 +28,22 @@
 
 /*
  * Geist Mono variable (release v1.8.2 / Google Fonts, SIL OFL 1.1: static/fonts/OFL-Geist.txt), same split:
- * - GeistMono-latin-wght.woff2 (23 kB): Google Fonts Latin subset. Preloaded in app.html with fetchpriority="low": the clock
- *   and scroll cue need it above the fold, but it must not compete with the hero moon (LCP) or the Geist text face.
- * - GeistMono-wght.woff2 (71 kB, release webfont): the rest (→, Latin Extended, Cyrillic…), on demand.
+ * - GeistMono-latin-arrows-wght.woff2 (23 kB): Google Fonts Latin subset (v1.701) plus → ↗ ↘ (U+2192, U+2197-2198, the stats
+ *   deltas) from the release, outlines and variations copied unchanged (`docs/perf/tools/font-add-glyph.py`), so /stats does
+ *   not fetch the full file for its arrows.
+ *   Preloaded in app.html with fetchpriority="low": the clock and scroll cue need it above the fold, but it must not compete
+ *   with the hero moon (LCP) or the Geist text face.
+ * - GeistMono-wght.woff2 (71 kB, release webfont): the rest (Latin Extended, Cyrillic…), on demand.
  */
 @font-face {
 	font-family: 'Geist Mono';
-	src: url('/fonts/GeistMono-latin-wght.woff2') format('woff2');
+	src: url('/fonts/GeistMono-latin-arrows-wght.woff2') format('woff2');
 	font-weight: 100 900;
 	font-style: normal;
 	font-display: swap;
 	unicode-range:
-		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF,
-		U+FFFD;
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191-2193, U+2197-2198, U+2212, U+2215,
+		U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -51,7 +54,7 @@
 	font-display: swap;
 	unicode-range:
 		U+0100-0130, U+0132-0151, U+0154-02BA, U+02BD-02C5, U+02C7-02D9, U+02DB, U+02DD-0303, U+0305-0307, U+0309-0328, U+032A-1FFF, U+2070-20AB, U+20AD-2121, U+2123-2190,
-		U+2192, U+2194-2211, U+2213-2214, U+2216-FEFE, U+FF00-FFFC, U+FFFE-10FFFF;
+		U+2194-2196, U+2199-2211, U+2213-2214, U+2216-FEFE, U+FF00-FFFC, U+FFFE-10FFFF;
 }
 
 @import 'tailwindcss';

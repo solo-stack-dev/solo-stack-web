@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
+	import * as v from 'valibot';
 	import { page } from '$app/state';
 	import { sendContact } from '#lib/contact/contact.remote.ts';
 	import { CONTACT_LIMITS, CONTACT_TOPICS, ContactSchema, type ContactTopic } from '#lib/contact/schema.ts';
@@ -14,7 +15,8 @@
 	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import seal from '#lib/contact/assets/wax-seal.webp?w=288;216;144&enhanced';
 	import sealPressed from '#lib/contact/assets/wax-seal-pressed.webp?w=288;216;144&enhanced';
-	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=webp&quality=40&enhanced';
+	import { avifImageSet, webpUrl } from '#lib/image-set.ts';
+	import bloom from '#lib/home/sections/making/assets/making-bloom-chart.webp?w=480&format=avif;webp&quality=40&enhanced';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 
@@ -25,14 +27,25 @@
 		other: m.contact_topic_other
 	};
 
-	const contact = sendContact.preflight(ContactSchema);
+	let turnstile = $state<ReturnType<typeof TurnstileWidget>>();
+
+	// Turnstile starts on the first touch of the letter, so a quick send can come before its token. While one is on its way,
+	// preflight lets the empty token through and the send waits for it (below); the server still requires it.
+	const contact = sendContact.preflight(
+		v.object({
+			...ContactSchema.entries,
+			turnstile: v.pipe(
+				v.string('turnstile'),
+				v.check((value) => value !== '' || !!turnstile?.pending(), 'turnstile')
+			)
+		})
+	);
 	const { fields } = contact;
 
 	let sent = $state(false);
 	let failed = $state(false);
 	let challengeFailed = $state(false);
 	let token = $state('');
-	let turnstile = $state<ReturnType<typeof TurnstileWidget>>();
 	let successHeading = $state<HTMLElement>();
 	/** Where the owl's flight ends once the letter is sent (tablets and up) */
 	let landing = $state<HTMLElement>();
@@ -40,12 +53,28 @@
 	let hovering = $state(false);
 	let focused = $state(false);
 
-	// Runs after preflight passed, so every call reaches the server and spends the Turnstile token.
+	// Runs after preflight passed (the button shows "sending" from here on). A send without a token waits for it, then sends the
+	// form as it is now, token included; if none comes on its own, the challenge message shows as for any send without one.
+	// Every send that goes out reaches the server and spends the Turnstile token.
 	const enhanced = contact.enhance(async (instance) => {
 		failed = false;
+		let submission: ReturnType<typeof instance.submit>;
+		if (token) {
+			submission = instance.submit();
+		} else {
+			try {
+				await turnstile?.ready();
+				await tick();
+			} catch {
+				await contact.validate({ preflightOnly: true });
+				revealFirstIssue(instance.element);
+				return;
+			}
+			submission = contact.submit();
+		}
 		try {
 			// No arguments: nothing on this page needs a refresh
-			if (await instance.submit().updates()) {
+			if (await submission.updates()) {
 				instance.element.reset();
 				sent = true;
 			}
@@ -68,8 +97,7 @@
 	 * Once the issues are on the page, scroll that field's block under the sticky nav (`scroll-margin-top`) and focus its
 	 * control (the topic: its first choice). The Turnstile input is hidden, so its message is only brought into view.
 	 */
-	function revealFirstIssue(event: SubmitEvent) {
-		const form = event.currentTarget as HTMLFormElement;
+	function revealFirstIssue(form: HTMLFormElement) {
 		setTimeout(async () => {
 			await tick();
 			if (sent || contact.pending > 0) return;
@@ -156,7 +184,7 @@
 				<div class="relative isolate w-fit">
 					<span
 						class="bloom pointer-events-none absolute top-[30%] -left-6 -z-10 block h-[90%] w-[85%] opacity-55 mix-blend-multiply dark:opacity-25 dark:mix-blend-normal"
-						style:background-image="url({bloom.img.src})"
+						style="background-image: {webpUrl(bloom)}; background-image: {avifImageSet(bloom)}"
 						aria-hidden="true"
 					></span>
 					{#if sent}
@@ -188,7 +216,7 @@
 				class="letter relative mt-10 grid gap-12 sm:mt-20"
 				data-sending={contact.pending > 0 || undefined}
 				novalidate
-				onsubmit={revealFirstIssue}
+				onsubmit={(event) => revealFirstIssue(event.currentTarget)}
 				oninput={recheck}
 				onchange={recheck}
 				onpointerenter={() => (hovering = true)}

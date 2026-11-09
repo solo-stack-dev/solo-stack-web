@@ -9,7 +9,8 @@
 	import { breakStyles } from '#lib/blog/section-breaks.ts';
 	import inkGround from '#lib/blog/assets/ink-ground.svg?url';
 	import VideoFacade from '#lib/blog/VideoFacade.svelte';
-	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=webp&quality=50&enhanced';
+	import { avifImageSet, webpUrl } from '#lib/image-set.ts';
+	import wash from '#lib/components/site/assets/backlight-wash.webp?w=960&format=avif;webp&quality=50&enhanced';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { thumbnailPath } from '#lib/home/sections/cinema/thumbnail.ts';
 	import { YOUTUBE_CHANNEL_URL } from '#lib/home/data/socials.ts';
@@ -234,7 +235,7 @@
 
 <!-- Keyed: SvelteKit reuses this component between posts; a playing video or an open <details> must not carry over. -->
 {#key post.slug}
-	<article class="post" lang={post.lang} style:--wash="url({wash.img.src})">
+	<article class="post" lang={post.lang} style:--wash-webp={webpUrl(wash)} style:--wash-set={avifImageSet(wash)}>
 		<div class="relative isolate">
 			<!-- Night sky over the header, dark theme only (as on /stats and /blog) -->
 			<div class="pointer-events-none absolute inset-x-0 top-0 -z-10 hidden h-[30rem] mask-b-from-30% dark:block" aria-hidden="true">
@@ -446,6 +447,17 @@
 {/key}
 
 <style>
+	/* The pigment wash of the stage and the section titles: AVIF where `image-set(… type())` is known, else WebP (#lib/image-set.ts) */
+	.post {
+		--wash: var(--wash-webp);
+	}
+
+	@supports (background-image: image-set(url('') type('image/avif'))) {
+		.post {
+			--wash: var(--wash-set);
+		}
+	}
+
 	/* Shared marks ---------------------------------------------------------------------------------------------- */
 
 	/* A firefly: moonlight core, butter halo (ochre core on paper, where moonlight would vanish) */
