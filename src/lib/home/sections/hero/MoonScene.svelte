@@ -1,6 +1,6 @@
 <!--
 	@component
-	Threlte moon, a lazy chunk: Hero.svelte loads it after hydration + idle, only with WebGL, motion allowed, and not on narrow or low-end
+	Threlte moon, a lazy chunk: Hero.svelte loads it after hydration + idle, only with hardware WebGL, motion allowed, and not on narrow or low-end
 	devices. Fills its parent (= the moon circle). Rendering: 30 fps RafLoop in MoonBody.svelte.
 -->
 <script lang="ts">

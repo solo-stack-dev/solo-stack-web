@@ -132,7 +132,7 @@ Each section is a self contained folder. Section agents own only their folder pl
 
 ### 4.3 Lazy loading rules
 
-- Hero: the painted moon image and the wordmark render immediately (LCP). The Threlte moon replaces or enhances the painted image after hydration and idle (`requestIdleCallback`), only if WebGL is available and motion is allowed.
+- Hero: the painted moon image and the wordmark render immediately (LCP). The Threlte moon replaces or enhances the painted image after hydration and idle (`requestIdleCallback`), only if hardware-accelerated WebGL is available (software renderers such as SwiftShader keep the painted image) and motion is allowed.
 - Everything below the fold mounts its heavy parts through `LazyMount` (IntersectionObserver with roughly a one viewport `rootMargin`), using dynamic `import()` so Threlte, audio, and large logic are separate chunks.
 - All loops (rAF, audio analysis, Threlte render) stop when the section leaves the viewport or the tab is hidden. With Threlte, use `renderMode: 'on-demand'` or stop the task scheduler when not visible.
 

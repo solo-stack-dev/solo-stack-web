@@ -106,8 +106,13 @@
 		const lowEnd = (nav.hardwareConcurrency ?? 8) < 4 || (nav.deviceMemory ?? 8) < 4;
 		let webgl = false;
 		try {
-			const context = document.createElement('canvas').getContext('webgl2');
-			webgl = !!context;
+			// Hardware WebGL only. Software renderers (no GPU, blocklisted driver, VM, Lighthouse/PageSpeed) draw the ~1300 px moon on the
+			// CPU at 30 fps and keep the main thread blocked for seconds; those visitors keep the painted moon. The caveat flag catches
+			// most of them, the renderer name the rest (SwiftShader enabled explicitly reports no caveat).
+			const context = document.createElement('canvas').getContext('webgl2', { failIfMajorPerformanceCaveat: true });
+			const info = context?.getExtension('WEBGL_debug_renderer_info');
+			const renderer = info ? String(context?.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+			webgl = !!context && !/swiftshader|llvmpipe|lavapipe|softpipe|basic render|software/i.test(renderer);
 			context?.getExtension('WEBGL_lose_context')?.loseContext();
 		} catch {
 			webgl = false;
