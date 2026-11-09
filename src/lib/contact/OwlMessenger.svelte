@@ -453,7 +453,7 @@
 		}
 	}
 
-	/* Phones: the owl perches above the title, so the twigs that hang below the branch fade out 1.5rem above its ink */
+	/* Phones: the owl perches beside the stacked title, so the twigs that hang below the branch fade out before the intro below */
 	@media (max-width: 47.99rem) {
 		.bough {
 			mask: linear-gradient(to bottom, #000 72%, transparent 86%);
