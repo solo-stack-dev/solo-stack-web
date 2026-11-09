@@ -1,7 +1,7 @@
 <!--
 	@component
 	Cheap canvas star field with twinkle; fills its positioned parent. 20 fps cap, pauses off screen and in hidden tabs,
-	one static frame under reduced motion. Deterministic per `seed`, so resizing does not reshuffle. Bright stars (~3 %)
+	one static frame under reduced motion. The canvas is allocated when it comes within a screen of the viewport (or at idle). Deterministic per `seed`, so resizing does not reshuffle. Bright stars (~3 %)
 	use the painted sprites (materials.ts, < 4 kB total) once decoded; until then, or with `sprites={false}`, dots.
 
 	NightPage renders the global sky stars; sections may add their own:
@@ -115,7 +115,18 @@
 		};
 	});
 
+	/** Runs `callback` when the main thread is idle (a timeout where requestIdleCallback is missing); returns a cancel function. */
+	function whenIdle(callback: () => void) {
+		if ('requestIdleCallback' in window) {
+			const handle = requestIdleCallback(callback, { timeout: 4000 });
+			return () => cancelIdleCallback(handle);
+		}
+		const handle = setTimeout(callback, 1000);
+		return () => clearTimeout(handle);
+	}
+
 	function draw() {
+		if (!allocated) return;
 		const context = canvas?.getContext('2d');
 		if (!context) return;
 		context.clearRect(0, 0, canvas.width, canvas.height);
@@ -155,11 +166,30 @@
 		draw();
 	});
 
+	/**
+	 * The canvas gets its backing store (and its first frame) once it comes within a screen of the viewport, or when the browser is
+	 * idle after load, whichever is first: off-screen star fields cost nothing during hydration, yet are drawn long before they show.
+	 * Sizing runs in the ResizeObserver callback, where layout is already clean (no forced layout while the page hydrates).
+	 */
+	let allocated = false;
+
 	$effect(() => {
 		const starList = stars;
 		const area = density;
+		let measured = false;
+		const claim = () => {
+			allocated = true;
+			near.disconnect();
+			cancelIdle();
+		};
 		const resize = () => {
+			measured = true;
 			const rect = canvas.getBoundingClientRect();
+			if (!allocated) {
+				// already within a screen (the sky, the hero): draw in this frame, as before
+				if (rect.bottom < -window.innerHeight || rect.top > 2 * window.innerHeight) return;
+				claim();
+			}
 			devicePixelRatioCapped = Math.min(window.devicePixelRatio || 1, 2);
 			width = Math.round(rect.width * devicePixelRatioCapped);
 			height = Math.round(rect.height * devicePixelRatioCapped);
@@ -169,10 +199,23 @@
 			visible = starList.slice(0, count);
 			draw();
 		};
+		const allocate = () => {
+			if (allocated) return;
+			claim();
+			// before the first ResizeObserver callback, that callback sizes and draws
+			if (measured) resize();
+		};
+		const near = new IntersectionObserver((entries) => entries.some((entry) => entry.isIntersecting) && allocate(), { rootMargin: '100% 0px' });
+		const cancelIdle = whenIdle(allocate);
 		const observer = new ResizeObserver(resize);
 		observer.observe(canvas);
-		resize();
-		return () => observer.disconnect();
+		if (!allocated) near.observe(canvas);
+		else cancelIdle();
+		return () => {
+			observer.disconnect();
+			near.disconnect();
+			cancelIdle();
+		};
 	});
 </script>
 

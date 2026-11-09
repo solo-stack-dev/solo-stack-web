@@ -24,6 +24,8 @@
 	import DeferredArt from '#lib/home/shared/DeferredArt.svelte';
 	import { belowFold } from '#lib/home/shared/deferred.svelte.ts';
 	import { RafLoop, inView, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
+	import grainTile from './assets/making-grain.png?no-inline';
+	import blotMask from './assets/making-blot.webp?no-inline';
 	import { BLOOM_BOX, LAYOUTS, LINE_POINTS, PILLARS, STATE_IDS, bloomMask, composeLine, morphPoints, toPathData, type MakingStateId } from './morph.ts';
 	// Bloom width ladder (rendered ~200–440 CSS px). `…&enhanced` types: sections/hero/imagetools.d.ts.
 	import bloomIdea from './assets/making-bloom-idea.webp?w=900;640;450;300&quality=45&enhanced';
@@ -93,72 +95,35 @@
 	const dots: HTMLButtonElement[] = [];
 	const pillarButtons: HTMLButtonElement[] = [];
 
-	// Ink grain: a small noise tile generated once on the client, used as a stroke pattern over the solid line.
-	let grain = $state('');
-	$effect(() => {
-		const size = 128;
-		const canvas = document.createElement('canvas');
-		canvas.width = canvas.height = size;
-		const context = canvas.getContext('2d');
-		if (!context) return;
-		const image = context.createImageData(size, size);
-		let seed = 21;
-		const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-		for (let i = 0; i < size * size; i++) {
-			const speck = random();
-			// mostly clear, some soft dry-brush gaps, a few dark flecks
-			const alpha = speck > 0.93 ? 200 : speck > 0.7 ? 70 * random() : 0;
-			image.data.set([24, 25, 27, alpha], i * 4);
-		}
-		context.putImageData(image, 0, 0);
-		grain = canvas.toDataURL();
-	});
-
 	/**
-	 * Pigment blot: the mask that grows each bloom from the shape's center. A solid core with a wobbly edge that breaks into hard pigment
-	 * granules (no blur anywhere), generated once on the client. The bloom scales its mask-size, so the edge stays sharp while it grows;
-	 * the shape mask (crisp, morph.ts) cuts the final outline.
+	 * Ink grain (a 128 px noise tile, stroke pattern over the solid line) and pigment blot (the mask that grows each bloom from the
+	 * shape's center: a solid core with a wobbly edge that breaks into hard pigment granules, no blur; the bloom scales its mask-size,
+	 * so the edge stays sharp while it grows, and the shape mask, crisp, morph.ts, cuts the final outline). Both are deterministic
+	 * noise, baked by scripts/making-noise.mjs from the generators that used to run here at mount. They load with the first tier of
+	 * below-the-fold art and apply once decoded, as the generated ones did on the client.
 	 */
+	let grain = $state('');
 	let blot = $state('');
-	/** Smooth value noise: bilinear (smoothstep-eased) lookup in a (cells + 1)² lattice of random values, x and y in 0…1. */
-	function sample(grid: number[], cells: number, x: number, y: number) {
-		const gx = x * cells;
-		const gy = y * cells;
-		const ix = Math.min(cells - 1, Math.floor(gx));
-		const iy = Math.min(cells - 1, Math.floor(gy));
-		const fx = smooth(gx - ix);
-		const fy = smooth(gy - iy);
-		const at = (cx: number, cy: number) => grid[cy * (cells + 1) + cx];
-		const top = at(ix, iy) + (at(ix + 1, iy) - at(ix, iy)) * fx;
-		const bottom = at(ix, iy + 1) + (at(ix + 1, iy + 1) - at(ix, iy + 1)) * fx;
-		return top + (bottom - top) * fy;
+	/** Resolves with `src` once the image is decoded (or failed to). */
+	function decoded(src: string) {
+		const image = new Image();
+		image.src = src;
+		return image.decode().then(
+			() => src,
+			() => src
+		);
 	}
 	$effect(() => {
-		const size = 320;
-		const canvas = document.createElement('canvas');
-		canvas.width = canvas.height = size;
-		const context = canvas.getContext('2d');
-		if (!context) return;
-		let seed = 2100;
-		const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-		// two octaves of smooth value noise for the edge wobble
-		const lattice = (cells: number) => Array.from({ length: (cells + 1) * (cells + 1) }, random);
-		const fine = lattice(18);
-		const coarse = lattice(6);
-		const image = context.createImageData(size, size);
-		for (let y = 0; y < size; y++) {
-			for (let x = 0; x < size; x++) {
-				const u = x / (size - 1);
-				const v = y / (size - 1);
-				const edge = Math.hypot(u * 2 - 1, v * 2 - 1) + 0.2 * (sample(coarse, 6, u, v) - 0.5) + 0.09 * (sample(fine, 18, u, v) - 0.5);
-				// solid core; a band of granules thinning out; a few loose specks beyond
-				const granule = random();
-				const solid = edge < 0.72 || (edge < 0.9 && granule < ((0.9 - edge) / 0.18) ** 0.8) || (edge < 0.98 && granule > 0.985);
-				image.data.set([255, 255, 255, solid ? 255 : 0], (y * size + x) * 4);
-			}
-		}
-		context.putImageData(image, 0, 0);
-		blot = `url(${canvas.toDataURL()})`;
+		if (!belowFold.ready) return;
+		let cancelled = false;
+		void Promise.all([decoded(grainTile), decoded(blotMask)]).then(([grainSrc, blotSrc]) => {
+			if (cancelled) return;
+			grain = grainSrc;
+			blot = `url(${blotSrc})`;
+		});
+		return () => {
+			cancelled = true;
+		};
 	});
 
 	/**
