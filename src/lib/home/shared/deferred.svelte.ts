@@ -14,7 +14,7 @@ const REST_FALLBACK = 4000;
  *   REST_FALLBACK after `ready`.
  *
  * ```svelte
- * <button {@attach lcpImage}><enhanced:img src={moon} alt="" fetchpriority="high" /></button>
+ * <div {@attach lcpImage}><enhanced:img src={moon} alt="" fetchpriority="high" /></div>
  * <DeferredArt><enhanced:img src={plate} alt="" loading="lazy" onload={belowFold.settle} /></DeferredArt>
  * ```
  */

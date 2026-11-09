@@ -156,7 +156,7 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 ### 5.1 20:00 Hero: moonrise
 
-**References:** `02-hero/05-painted-moon-desktop.png` (main), `02-hero/06-painted-moon-mobile.png`, `02-hero/07-painted-moon-phase-strip.png`. Ignore the mockup's mascot style (style lock §3.4).
+**References:** `02-hero/05-painted-moon-desktop.png` (main), `02-hero/06-painted-moon-mobile.png`. Ignore the mockup's mascot style (style lock §3.4).
 
 **Composition:** night sky on the left with painted clouds and stars; a huge painted moon on the right, partly off screen; the wordmark across the middle, **"SOLO" in cream over the night and "STACK" in night anthracite over the moon** (the letters change color exactly where they cross the moon's edge); the mascot sitting on the moon's upper rim with a glowing laptop; clock `20:00` top left; a scroll cue at the bottom.
 
@@ -164,19 +164,19 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 - On load, a short moonrise: the moon eases up 5–10 % and brightens, stars fade in, then the wordmark settles. Under 1.5 s, never blocks reading.
 - The moon slowly rotates (Threlte) with a soft rim glow. Subtle parallax on pointer move (a few px per layer) and on scroll.
-- **Moon phases:** clicking the moon cycles full → waning gibbous → half → crescent → new → back. In 3D this is just the light direction, which is why Threlte is worth it here. Reaching the crescent for the third time in a visit wakes the eclipse moon egg (`src/lib/components/site/eclipse-moon.ts`). The moon is a real `<button>` with an aria label.
+- **Always full:** the moon is decorative and not interactive. The clickable phase cycle (and the presence and eclipse eggs it triggered) was removed on 2026-11-09 at the owner's request.
 - The mascot: idle loop (laptop glow flicker, occasional blink, maybe a small head turn when a shooting star passes).
 - Shooting stars occasionally.
 
 **Build:**
 
-- Moon: Threlte `Canvas` with a sphere, a painted equirectangular moon texture (generated in Phase 1, watercolor craters as pigment blooms), and a custom or toon material that keeps the watercolor look. One directional light controls the phase. A soft glow sprite or post effect provides the halo. Fallback before hydration and for reduced motion or no WebGL: the painted moon image layer, which has the same position and size.
+- Moon: Threlte `Canvas` with a sphere, a painted equirectangular moon texture (generated in Phase 1, watercolor craters as pigment blooms), and a custom or toon material that keeps the watercolor look, lit from the viewer (full moon). A soft glow sprite or post effect provides the halo. Fallback before hydration and for reduced motion or no WebGL: the painted moon image layer, which has the same position and size.
 - Wordmark color split: render the wordmark twice, cream and night, and clip the night copy to the moon's circle (`clip-path: circle(...)`) whose geometry is shared with the moon layout. Keep the moon at a fixed layout position per breakpoint so the clip always matches.
 - Layers: sky plate, cloud layers (2–3), star field (shared), painted moon fallback, moon texture for 3D, mascot on the rim (transparent).
 
 **Mobile:** follow `06-painted-moon-mobile.png`: moon at the top right, wordmark stacked, mascot smaller. The 3D moon may be replaced by the painted image on low end devices (check `navigator.hardwareConcurrency` and `deviceMemory`, or simply use the image below a width threshold).
 
-**Reduced motion:** static painted composition, no rotation or moonrise; phases still clickable but switch instantly.
+**Reduced motion:** static painted composition, no rotation or moonrise.
 
 **Acceptance:** LCP element is the wordmark or the painted moon image (not the canvas); no layout shift when the 3D moon takes over; wordmark split is pixel accurate at all breakpoints; Threlte chunk is not in the initial JS.
 
@@ -342,7 +342,6 @@ References in `01-mascot-easter-eggs/` (mascot style there is outdated; use mode
 
 | Egg                  | Trigger                                               | Effect                                                                                          | Mockup                                      |
 | -------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Presence on the moon | Click the full moon ~10 times                         | A faint, ambiguous giant silhouette appears on the moon for a moment                            | `05-egg-moon-presence-desktop.png`          |
 | ARISE                | Konami code anywhere                                  | Ink shadow figures rise from the cliff behind the mascot, then dissolve                         | `06-egg-arise-shadows-desktop.png`          |
 | Golden tree          | Hover or focus the bonsai (01:00)                     | The bonsai glows gold and its canopy grows into a luminous tree                                 | `09-…`, `12-…`                              |
 | Three stars          | Rare at random in the star field, or a game milestone | Three stars align into stacked triangles for a moment                                           | `10-egg-three-stars-desktop.png`            |
@@ -419,7 +418,7 @@ Collect results, check them yourself (open the images), reject anything off styl
 
 One implementation agent per section, each with `isolation: "worktree"` from the Phase 0 commit:
 
-- I1 Hero (20:00), including the Threlte moon and phases.
+- I1 Hero (20:00), including the Threlte moon.
 - I2 Making (21:00), the path morph.
 - I3a Game prototype A, moon planet (§5.3).
 - I3b Game prototype B, stack to the moon (§5.3).

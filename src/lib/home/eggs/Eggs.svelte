@@ -7,8 +7,6 @@
 
 	| Egg            | Trigger                                                                  |
 	| -------------- | ------------------------------------------------------------------------ |
-	| eclipse moon   | 3rd crescent of a visit, `?eclipse=1` / `?eclipse=0` (site/eclipse-moon.ts) |
-	| moon presence  | `night:moon-full-clicks` count 10, 20, 30 …                              |
 	| ARISE          | Konami code (not while typing), `arise()` in the console (site/console-egg.ts), `night:egg-arise` |
 	| three stars    | 1 in 6 page views after 30–90 s idle in a dark section, `night:egg-three-stars` |
 	| shiny mascot   | 1 in 4096 sessions, `?shiny=1` (forces on) / `?shiny=0` (forces off)      |
@@ -22,20 +20,16 @@
 	import type { Component } from 'svelte';
 	import { on } from 'svelte/events';
 	import { reducedMotion } from '#lib/home/shared/motion.svelte.ts';
-	import { MOON_FULL_CLICKS_EVENT, MOON_PHASE_EVENT, type MoonFullClicksDetail, type MoonPhaseDetail } from '#lib/home/sections/hero/moon.ts';
-	import { ECLIPSE_AFTER_CRESCENTS, wakeEclipseMoon } from '#lib/components/site/eclipse-moon.ts';
-	import { ARISE_EVENT, EGG_MOON_ATTR, SHINY_ATTR, THREE_STARS_EVENT, type EggProps } from './events.ts';
+	import { ARISE_EVENT, SHINY_ATTR, THREE_STARS_EVENT, type EggProps } from './events.ts';
 
-	type EggId = 'presence' | 'arise' | 'stars';
+	type EggId = 'arise' | 'stars';
 	type EggModule = Promise<{ default: Component<EggProps> }>;
 
 	const loaders: Record<EggId, () => EggModule> = {
-		presence: () => import('./moon-presence/MoonPresence.svelte'),
 		arise: () => import('./arise/Arise.svelte'),
 		stars: () => import('./three-stars/ThreeStars.svelte')
 	};
 
-	const PRESENCE_EVERY = 10;
 	const STARS_CHANCE = 1 / 6;
 	const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
 
@@ -87,26 +81,6 @@
 		if (!(target instanceof HTMLElement)) return false;
 		return target.isContentEditable || target.matches('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
 	}
-
-	// Hero moon: eclipse moon (crescent phases) and presence
-	$effect(() => {
-		let crescents = 0;
-		const offPhase = on(window, MOON_PHASE_EVENT, (event) => {
-			if ((event as CustomEvent<MoonPhaseDetail>).detail?.phase !== 'crescent') return;
-			// The eclipse moon is static, so it wakes under reduced motion too
-			if (++crescents === ECLIPSE_AFTER_CRESCENTS) wakeEclipseMoon();
-		});
-		const offClicks = on(window, MOON_FULL_CLICKS_EVENT, (event) => {
-			const count = (event as CustomEvent<MoonFullClicksDetail>).detail?.count ?? 0;
-			if (count < PRESENCE_EVERY || count % PRESENCE_EVERY !== 0) return;
-			const moon = document.querySelector(`[${EGG_MOON_ATTR}]`);
-			if (moon) void play('presence', { target: moon });
-		});
-		return () => {
-			offPhase();
-			offClicks();
-		};
-	});
 
 	// Konami code, ARISE event, Escape
 	$effect(() => {

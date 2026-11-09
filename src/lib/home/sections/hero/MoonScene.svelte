@@ -9,20 +9,18 @@
 	import MoonBody from './MoonBody.svelte';
 
 	type Props = {
-		/** Phase angle in degrees (see moon.ts). */
-		angle: number;
 		/** First frame with the texture is on screen. */
 		onready?: () => void;
 		/** WebGL context lost: the hero falls back to the painted image. */
 		onlost?: () => void;
 	};
 
-	let { angle, onready, onlost }: Props = $props();
+	let { onready, onlost }: Props = $props();
 </script>
 
 <div class="moon-scene">
 	<Canvas renderMode="on-demand" dpr={[1, 1.5]} toneMapping={NoToneMapping}>
-		<MoonBody {angle} {onready} {onlost} />
+		<MoonBody {onready} {onlost} />
 	</Canvas>
 </div>
 

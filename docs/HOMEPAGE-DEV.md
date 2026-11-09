@@ -205,7 +205,7 @@ QA screenshots: `node src/lib/home/shared/tools/scroll-screens.mjs <dev url> doc
 Mounts a heavy component from a dynamic import when its box comes within `rootMargin` (one viewport) of the screen. The import becomes its own chunk.
 
 ```svelte
-<LazyMount load={() => import('./MoonScene.svelte')} props={{ phase }} when={webgl && !reducedMotion.current} idle class="moon-slot">
+<LazyMount load={() => import('./MoonScene.svelte')} props={{ onready }} when={webgl && !reducedMotion.current} idle class="moon-slot">
 	{#snippet fallback()}<enhanced:img src={moonDisc} alt="" />{/snippet}
 	{#snippet failed()}<enhanced:img src={moonDisc} alt="" />{/snippet}
 </LazyMount>
@@ -297,14 +297,12 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 
 `NightPage` mounts `<Eggs />` once. `Eggs.svelte` is the only egg code in the initial bundle (a few window listeners and dice rolls); every effect is its own lazy chunk, loaded on its trigger, rendered as a fixed `pointer-events: none` overlay (z-index 2: over the content, under the paper grain and the nav), and unmounted when done. Escape removes running eggs. Copy keys: `egg_*`.
 
-| Egg           | Trigger                                                                                                                         | Folder                                    |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| Eclipse moon  | hero `night:moon-phase` reaches `crescent` for the 3rd time in a visit (also under reduced motion), `?eclipse=1` / `?eclipse=0` | `src/lib/components/site/eclipse-moon.ts` |
-| Moon presence | hero `night:moon-full-clicks` count 10, 20, 30 …; positioned over `[data-egg-moon]`                                             | `moon-presence/`                          |
-| ARISE         | Konami code (ignored while typing in inputs, textareas, contenteditable), `arise()` in the console, `night:egg-arise`           | `arise/`                                  |
-| Three stars   | 1 in 6 page views after 30–90 s without input while a dark section (21:00–04:00) is centered, or `night:egg-three-stars`        | `three-stars/`                            |
-| Shiny mascot  | 1 in 4096 sessions (12-bit draw, cached in `sessionStorage`), `?shiny=1` forces it, `?shiny=0` forces it off                    | `shiny/`                                  |
-| Console       | idle after load (production too): ASCII moon + message once per session, defines `window.arise()`                               | `console/`                                |
+| Egg          | Trigger                                                                                                                  | Folder         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| ARISE        | Konami code (ignored while typing in inputs, textareas, contenteditable), `arise()` in the console, `night:egg-arise`    | `arise/`       |
+| Three stars  | 1 in 6 page views after 30–90 s without input while a dark section (21:00–04:00) is centered, or `night:egg-three-stars` | `three-stars/` |
+| Shiny mascot | 1 in 4096 sessions (12-bit draw, cached in `sessionStorage`), `?shiny=1` forces it, `?shiny=0` forces it off             | `shiny/`       |
+| Console      | idle after load (production too): ASCII moon + message once per session, defines `window.arise()`                        | `console/`     |
 
 Reduced motion: eggs that would move render a calm opacity-only variant (`fade.ts`, Web Animations, because the global guard in `layout.css` collapses CSS animations).
 

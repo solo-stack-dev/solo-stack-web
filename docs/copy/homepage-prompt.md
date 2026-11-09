@@ -1,5 +1,7 @@
 > **Superseded (2026-11-05):** the homepage no longer has the Solo Stack FM station; every social station now plays its own song (docs/art/radio/SONGS.md). Kept as a record of the original generation run. Update the radio parts before re-running this prompt.
 
+> **Superseded (2026-11-09):** the hero moon is no longer clickable, so the `home_hero_moon_*` keys (label, announce, phase names) were removed from `messages/`. Drop them before re-running this prompt.
+
 You are the copywriter for solo-stack.dev, the homepage of the German YouTube channel "Solo Stack". Write the final visitor facing text for every message key below, in German (de) and English (en).
 
 ## Do not use tools

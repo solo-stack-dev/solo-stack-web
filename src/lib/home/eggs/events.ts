@@ -17,15 +17,10 @@ export const ARISE_EVENT = 'night:egg-arise';
 /** Attribute on `[data-night-page]` while the visitor rolled the shiny mascot (1 in 4096, or `?shiny=1`). */
 export const SHINY_ATTR = 'data-shiny';
 
-/** Attribute on the hero moon element; the moon presence egg is positioned over it. */
-export const EGG_MOON_ATTR = 'data-egg-moon';
-
 /** Props every lazy egg component receives from `Eggs.svelte`. */
 export interface EggProps {
 	/** `prefers-reduced-motion: reduce` at trigger time: render the calm variant. */
 	reducedMotion: boolean;
-	/** Element the egg anchors to (moon presence: the hero moon). */
-	target?: Element | null;
 	/** Call when finished to unmount. Escape unmounts all eggs early. */
 	ondone: () => void;
 }

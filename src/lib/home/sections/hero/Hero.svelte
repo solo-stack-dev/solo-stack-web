@@ -3,14 +3,15 @@
 	20:00 Hero: moonrise (docs/HANDOFF-HOMEPAGE.md §5.1).
 
 	Geometry: `--moon-r`, `--moon-cx`, `--moon-cy` on `.hero` (hero container units, per breakpoint) define the moon circle once. The moon
-	rig (glow, painted/3D moon, mascot) and the anthracite wordmark copy use them. That copy sits in a moon-sized box clipped to the lit region
-	(moon.ts), counter-positioned onto the cream wordmark, so the color split is pixel exact at every size and phase.
+	rig (glow, painted/3D moon, mascot) and the anthracite wordmark copy use them. That copy sits in a moon-sized box clipped to the moon
+	circle, counter-positioned onto the cream wordmark, so the color split is pixel exact at every size.
+
+	The moon is always full and purely decorative (not interactive). Its painted disc is the LCP image.
 
 	Layers (bottom → top): sky, stars, back clouds (1, 2), moon rig, front cloud (3), cream wordmark, anthracite wordmark, clock, scroll cue.
 	Masters live in docs/art; tools/build-assets.mjs writes cropped copies to ./assets and their crop rects to art.ts (README.md).
 
-	Events (window): emits `night:moon-phase` { phase } per phase change and `night:moon-full-clicks` { count } per full-moon click (every
-	10th keeps the moon full for the presence egg). Listens to `night:shooting-star` (mascot leans back, looks up).
+	Events (window): listens to `night:shooting-star` (mascot leans back, looks up).
 -->
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
@@ -23,18 +24,6 @@
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { lcpImage } from '#lib/home/shared/deferred.svelte.ts';
 	import { InView, RafLoop, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
-	import {
-		MOON_FULL_CLICKS_EVENT,
-		MOON_PHASE_EVENT,
-		PHASE_ANGLE,
-		circlePath,
-		forwardAngle,
-		litPath,
-		nextPhase,
-		type MoonFullClicksDetail,
-		type MoonPhase,
-		type MoonPhaseDetail
-	} from './moon.ts';
 	import { ART_CROPS } from './art.ts';
 	// Width ladders (`…&enhanced`, imagetools.d.ts) stop at the native detail of the masters (they are upscales); AVIF quality fits the
 	// above-the-fold budget (handoff §6.4). Clouds capped at 1280 px, quality 50 keeps their grain: ~55 kB less at 1440@2x.
@@ -47,19 +36,6 @@
 	import mascot from './assets/mascot-hero-moonrim.webp?w=640;420;280&quality=55&enhanced';
 	import mascotGolden from './assets/mascot-golden.webp?w=640;420;280&quality=55&enhanced';
 	import cloudSeat from './assets/hero-cloud-seat.webp?w=640;420;280&quality=50&enhanced';
-
-	const PHASE_NAMES: Record<MoonPhase, () => string> = {
-		full: m.home_hero_moon_phase_full,
-		'waning-gibbous': m.home_hero_moon_phase_waning_gibbous,
-		half: m.home_hero_moon_phase_half,
-		crescent: m.home_hero_moon_phase_crescent,
-		new: m.home_hero_moon_phase_new
-	};
-
-	/** Phase change tween in ms (instant under reduced motion). */
-	const PHASE_DURATION = 750;
-	/** Every n-th click on the full moon keeps it full and summons the moon presence egg (eggs/, HOMEPAGE-DEV §11). */
-	const PRESENCE_EVERY = 10;
 
 	// --- Painted layer geometry (master px → layout), from the crop rects in art.ts -----------------------------
 
@@ -115,67 +91,6 @@
 			`clamp(${(7 * cloudOfMascot).toFixed(1)}rem, ${(11 * cloudOfMascot).toFixed(1)}vw, ${(13 * cloudOfMascot).toFixed(1)}rem)`
 		)
 	};
-
-	// --- Moon phase ---------------------------------------------------------------------------------------------
-
-	let phase = $state<MoonPhase>('full');
-	/** Phase angle in degrees, animated (moon.ts). 0 = full. */
-	let angle = $state(0);
-	let announcement = $state('');
-	let fullClicks = 0;
-	let tween = 0;
-
-	const normalized = $derived(((angle % 360) + 360) % 360);
-	const isFull = $derived(Math.cos((normalized * Math.PI) / 180) > 0.9999);
-	/** 0…1 lit fraction of the disc, drives the glow. */
-	const litFraction = $derived((1 + Math.cos((normalized * Math.PI) / 180)) / 2);
-
-	function cyclePhase() {
-		if (phase === 'full') {
-			fullClicks += 1;
-			window.dispatchEvent(new CustomEvent<MoonFullClicksDetail>(MOON_FULL_CLICKS_EVENT, { detail: { count: fullClicks } }));
-			// The presence egg appears over the moon: this click keeps it full instead of moving on to gibbous.
-			if (fullClicks % PRESENCE_EVERY === 0) return;
-		}
-		const next = nextPhase(phase);
-		phase = next;
-		announcement = m.home_hero_moon_announce({ phase: PHASE_NAMES[next]() });
-		window.dispatchEvent(new CustomEvent<MoonPhaseDetail>(MOON_PHASE_EVENT, { detail: { phase: next } }));
-		animateAngle(forwardAngle(angle, next === 'full' ? 360 : PHASE_ANGLE[next]));
-	}
-
-	function animateAngle(target: number) {
-		cancelAnimationFrame(tween);
-		if (reducedMotion.current) {
-			angle = target % 360;
-			return;
-		}
-		const from = angle;
-		const start = performance.now();
-		const step = (now: number) => {
-			const t = Math.min(1, (now - start) / PHASE_DURATION);
-			const eased = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-			angle = t < 1 ? from + (target - from) * eased : target % 360;
-			if (t < 1) tween = requestAnimationFrame(step);
-		};
-		tween = requestAnimationFrame(step);
-	}
-
-	$effect(() => () => cancelAnimationFrame(tween));
-
-	// Lit region in the units of the 2D shade overlay (viewBox -1 -1 2 2)
-	const shadePath = $derived.by(() => {
-		if (isFull) return null;
-		return `${circlePath(1, 0, 0)} ${litPath(normalized, 1, 0, 0) ?? ''}`;
-	});
-
-	// Clip of the anthracite wordmark: the lit region in px of the moon box. Full moon uses the CSS default circle(50%).
-	let nightBoxSize = $state(0);
-	const nightClip = $derived.by(() => {
-		if (isFull || !nightBoxSize) return undefined;
-		const d = litPath(normalized, nightBoxSize / 2);
-		return d ? `path('${d}')` : 'inset(50%)';
-	});
 
 	// --- 3D moon (lazy) -----------------------------------------------------------------------------------------
 
@@ -286,7 +201,6 @@
 	data-night-hour="20:00"
 	class="hero"
 	aria-labelledby="home-hero-title"
-	style:--lit={litFraction.toFixed(3)}
 	style:--disc-left={pct(discBox.left)}
 	style:--disc-top={pct(discBox.top)}
 	style:--disc-size={pct(discBox.size)}
@@ -320,30 +234,12 @@
 
 	<div class="moon-box moon-rig" class:is-3d={threeReady}>
 		<div class="moon-glow" aria-hidden="true"></div>
-		<button type="button" class="moon" data-egg-moon aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase} {@attach lcpImage}>
+		<div class="moon" aria-hidden="true" {@attach lcpImage}>
 			<enhanced:img class="moon-img" src={moonDisc} alt="" sizes={SIZES.moon} fetchpriority="high" />
 			{#if use3D}
-				<LazyMount
-					load={() => import('./MoonScene.svelte')}
-					props={{ angle: normalized, onready: () => (threeReady = true), onlost: () => (threeFailed = true) }}
-					idle
-					class="moon-3d"
-				/>
+				<LazyMount load={() => import('./MoonScene.svelte')} props={{ onready: () => (threeReady = true), onlost: () => (threeFailed = true) }} idle class="moon-3d" />
 			{/if}
-			{#if shadePath && !threeReady}
-				<svg class="moon-shade" viewBox="-1 -1 2 2" aria-hidden="true">
-					<defs>
-						<clipPath id="hero-moon-circle"><circle r="1" /></clipPath>
-						<filter id="hero-moon-soft" x="-0.1" y="-0.1" width="1.2" height="1.2">
-							<feGaussianBlur stdDeviation="0.012" />
-						</filter>
-					</defs>
-					<g clip-path="url(#hero-moon-circle)">
-						<path d={shadePath} fill-rule="evenodd" filter="url(#hero-moon-soft)" />
-					</g>
-				</svg>
-			{/if}
-		</button>
+		</div>
 
 		<div
 			class="mascot"
@@ -381,15 +277,13 @@
 		</div>
 	</div>
 
-	<div class="moon-box night-copy" aria-hidden="true" bind:clientWidth={nightBoxSize} style:clip-path={nightClip}>
+	<div class="moon-box night-copy" aria-hidden="true">
 		<div class="night-copy-inner">
 			<p class="wordmark is-night settle">{@render wordmarkText()}</p>
 		</div>
 	</div>
 
 	<NightClock time="20:00" />
-
-	<p class="sr-only" aria-live="polite">{announcement}</p>
 </section>
 
 <!-- Outside the hero's stacking context (it isolates): the 21:00 wipe paints its first wash over the hero's bottom, which greyed the cue
@@ -608,28 +502,15 @@
 			color-mix(in oklab, var(--color-ochre) 14%, transparent) 91%,
 			transparent 100%
 		);
-		opacity: calc(0.12 + 0.88 * var(--lit, 1));
 		pointer-events: none;
-		transition: opacity var(--dur-reveal) ease;
 		animation: fade-in var(--dur-entrance) ease-out backwards;
 	}
 
 	.moon {
 		position: absolute;
 		inset: 0;
-		display: block;
-		padding: 0;
-		border: 0;
 		border-radius: 50%;
-		background: none;
-		cursor: pointer;
-		-webkit-tap-highlight-color: transparent;
 		animation: moonlight var(--dur-entrance) ease-out backwards;
-	}
-
-	.moon:focus-visible {
-		outline: 3px solid var(--color-cream);
-		outline-offset: 6px;
 	}
 
 	.moon :global(.moon-3d) {
@@ -663,15 +544,6 @@
 	.is-3d :global(.moon-img),
 	.is-3d .moon::before {
 		opacity: 0;
-	}
-
-	.moon-shade {
-		position: absolute;
-		inset: 0;
-		width: 100%;
-		height: 100%;
-		fill: color-mix(in oklab, var(--color-night) 92%, transparent);
-		pointer-events: none;
 	}
 
 	/* Mascot (docs/art/mascot) on its cloud seat: seat point (--sit-x/y) on the cloud's dent, lifted off the rim by --mascot-lift; the pivot
@@ -1000,15 +872,6 @@
 		.scroll-cue-arrow {
 			animation: nudge 2.4s 1.6s ease-in-out infinite;
 		}
-	}
-
-	.sr-only {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		clip-path: inset(50%);
-		white-space: nowrap;
 	}
 
 	/* Motion --------------------------------------------------------------------------------------------------- */

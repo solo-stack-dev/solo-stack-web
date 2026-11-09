@@ -14,7 +14,7 @@
 	  Scrim off while the hero shows the giant wordmark. NightPage passes its menu button as `actions` and lists the site
 	  links in that overlay on phones (the pill then holds only the button). `tone="paper"` = anthracite ink on butter paper
 	  over the sunrise.
-	Restores the eclipse moon egg (`eclipse-moon.ts`) on mount. Never import the dropdown here: the homepage must not ship it.
+	Never import the dropdown here: the homepage must not ship it.
 -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
@@ -22,7 +22,6 @@
 	import { page } from '$app/state';
 	import { m } from '#lib/paraglide/messages.js';
 	import { localizeHref } from '#lib/paraglide/runtime.js';
-	import { restoreEclipseMoon } from './eclipse-moon.ts';
 	import { SITE_LINKS, siteCurrent, siteHref } from './links.ts';
 	import LocaleSwitch from './LocaleSwitch.svelte';
 
@@ -84,8 +83,6 @@
 			cancelAnimationFrame(frame);
 		};
 	});
-
-	$effect(restoreEclipseMoon);
 </script>
 
 <header
@@ -223,24 +220,6 @@
 		background: radial-gradient(circle at 70% 35%, transparent 0 46%, var(--nav-moon) 48%);
 		box-shadow: 0 0 0.9em var(--nav-moon-glow);
 		rotate: -20deg;
-	}
-
-	/* Eclipse egg: its halo fills the box, so it is larger with a negative margin (no shift). On light paper it gets a night disc. */
-	:global(html[data-eclipse-moon]) .site-nav .moon {
-		width: 1.3em;
-		height: 1.3em;
-		margin: -0.225em;
-		border-radius: 0;
-		background: url('../../assets/moon-eclipse.svg') center / contain no-repeat;
-		box-shadow: none;
-		rotate: none;
-	}
-
-	:global(html[data-eclipse-moon]:not(.dark)) .is-site .moon,
-	:global(html[data-eclipse-moon]) .is-night[data-tone='paper'] .moon {
-		background:
-			url('../../assets/moon-eclipse.svg') center / 92% no-repeat,
-			radial-gradient(circle, var(--color-night) 0 64%, transparent 66%);
 	}
 
 	.dock {

@@ -4,7 +4,7 @@
 	until loaded; on failure keeps it (or renders `failed`).
 
 	```svelte
-	<LazyMount load={() => import('./MoonScene.svelte')} props={{ phase }} when={!reducedMotion.current} idle class="absolute inset-0">
+	<LazyMount load={() => import('./MoonScene.svelte')} props={{ onready }} when={!reducedMotion.current} idle class="absolute inset-0">
 		{#snippet fallback()}<img src={moon} alt="" />{/snippet}
 	</LazyMount>
 	```
