@@ -3,7 +3,7 @@
 	import ArrowUpRightIcon from '@lucide/svelte/icons/arrow-up-right';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import { page } from '$app/state';
-	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref, postsFor } from '#lib/blog/content.ts';
+	import { FORMAT_LABELS, formatDate, formatTimestamp, isoDuration, jsonLdScript, loadPostBody, postHref, postMarkdownHref, postsFor } from '#lib/blog/content.ts';
 	import { feedHref } from '#lib/blog/feed.ts';
 	import { getPost, getPosts } from '#lib/blog/posts.remote.ts';
 	import { breakStyles } from '#lib/blog/section-breaks.ts';
@@ -187,6 +187,8 @@
 	<link rel="alternate" hreflang="x-default" href={defaultVersion.href} />
 	<!-- The feed of the post's language -->
 	<link rel="alternate" type="application/rss+xml" title={m.blog_meta_title({}, { locale: post.lang })} href={feedHref(post.lang)} />
+	<!-- This post as Markdown for agents (blog/[slug].md) -->
+	<link rel="alternate" type="text/markdown" href={postMarkdownHref(post)} />
 	<meta property="og:type" content="article" />
 	<meta property="og:site_name" content="SOLO STACK" />
 	<meta property="og:title" content={post.title} />

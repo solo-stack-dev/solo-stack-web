@@ -23,6 +23,13 @@ function countReadingMinutes(source: string) {
 	return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
 }
 
+const FRONTMATTER = /^---[\s\S]*?\n---\r?\n?/;
+
+/** The Markdown body of a post as written (frontmatter removed, its YAML comments are internal notes). */
+export function postSource(slug: string): string {
+	return (sources[`/src/content/blog/${slug}.md`] ?? '').replace(FRONTMATTER, '').trim();
+}
+
 type LoadedPost = Omit<Post, 'translations' | 'videoLang'>;
 
 function loadAll(): LoadedPost[] {

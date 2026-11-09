@@ -21,3 +21,15 @@
 
 /en/blog/rss.xml
   Content-Type: application/rss+xml; charset=utf-8
+
+# Markdown versions of the posts for agents (blog/[slug].md): the HTML page is the indexed one.
+/*.md
+  Content-Type: text/markdown; charset=utf-8
+  X-Robots-Tag: noindex
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+
+# RFC 9116 requires this exact type.
+/.well-known/security.txt
+  Content-Type: text/plain; charset=utf-8

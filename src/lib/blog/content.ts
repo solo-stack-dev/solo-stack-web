@@ -24,6 +24,9 @@ export const FORMAT_LABELS: Record<PostFormat, () => string> = {
 /** Uses the post's own `lang`, so the link never points to a missing translation. */
 export const postHref = (post: { slug: string; lang: Locale }) => localizeHref(`/blog/${post.slug}`, { locale: post.lang });
 
+/** The Markdown version of a post for agents (`blog/[slug].md`), next to its page. */
+export const postMarkdownHref = (post: { slug: string; lang: Locale }) => `${postHref(post)}.md`;
+
 /**
  * The posts a visitor of `locale` sees: every post in that language, plus posts that have no version in it.
  * Translations of one video never show twice.
