@@ -966,7 +966,7 @@
 	 * pigment inks in under the words; a press sinks the slab and swaps in the pressed wax; while the owl takes the letter the
 	 * seal stays pressed and wet ink runs through the slab. Keyboard focus is drawn in the material: an ink ring around the
 	 * seal, a swash under the slab (`--focus-ring`, ≥ 3:1 on the paper) and a soft light around it. The words on the slab are
-	 * ≥ 12:1 in both themes. The wax fills ≈ 80 % of its canvas, so the 4.5rem seal shows ≈ 58px of wax.
+	 * ≥ 10:1 in both themes (also over the pooled edge). The wax fills ≈ 80 % of its canvas, so the 4.5rem seal shows ≈ 58px of wax.
 	 */
 	.send {
 		--seal: 4.5rem;
