@@ -15,6 +15,7 @@
 -->
 <script lang="ts">
 	import type { Attachment } from 'svelte/attachments';
+	import { untrack } from 'svelte';
 	import { on } from 'svelte/events';
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
@@ -219,8 +220,50 @@
 		redrawPhase = -1;
 	}
 
+	/**
+	 * Sleep: once nothing on screen changes (the line rests, every bloom and the glow have settled), the loop stops asking for frames
+	 * instead of running empty ones; while the rotation plays, a timer wakes it a few frames before the dwell ends. Anything that would
+	 * change the drawing on the next frame wakes it: a jump (`goTo`), `playing`, the layout. The skipped frames only counted the dwell
+	 * up, so the first frame after a wake credits it with the time it would have counted (`sleptAt`, `pausedAt`) and ticks with the last
+	 * frame's dt: morphs, dwell and state changes land on the same frames as with a loop that never sleeps.
+	 */
+	let asleep = false;
+	let waking = false;
+	/** rAF time of the last tick before the sleep, and whether the dwell was counting then. */
+	let sleptAt = 0;
+	let sleptPlaying = false;
+	/** performance.now() when the rotation paused during a sleep (-1: it didn't), so the dwell is credited up to that moment. */
+	let pausedAt = -1;
+	/** A jump during the sleep restarted the dwell: nothing to credit. */
+	let sleepReset = false;
+	let wakeTimer: ReturnType<typeof setTimeout> | undefined;
+	/** Last measured frame interval (s): the dt a never-sleeping loop would have had on the frame after a wake. */
+	let frameDt = 1 / 60;
+	/** Wake this long before the dwell ends; the last frames tick normally, so a late timer never moves the morph. */
+	const WAKE_LEAD = 100;
+
+	function sleep(time: number) {
+		asleep = true;
+		sleptAt = time;
+		sleptPlaying = playing;
+		pausedAt = -1;
+		sleepReset = false;
+		loop.paused = true;
+		if (sleptPlaying) wakeTimer = setTimeout(wake, sleptAt + (DWELL - dwell) * 1000 - WAKE_LEAD - performance.now());
+	}
+
+	function wake() {
+		if (!asleep) return;
+		clearTimeout(wakeTimer);
+		asleep = false;
+		waking = true;
+		loop.paused = reducedMotion.current;
+	}
+
 	/** Jump to a state (pillar, dot, arrow key): morph there and restart the dwell. */
 	function goTo(state: number) {
+		if (asleep) sleepReset = true;
+		wake();
 		active = state;
 		dwell = 0;
 		if (reducedMotion.current) return;
@@ -238,7 +281,18 @@
 		begin(state, 'morph');
 	}
 
-	const loop = new RafLoop((dt) => {
+	const loop = new RafLoop((dt, time) => {
+		if (waking) {
+			// The first frame after a sleep (RafLoop restarts with dt 0): tick as the frame after the last one, and credit the dwell the
+			// skipped frames would have counted (up to the frame before a pause, as the loop counts only while playing).
+			waking = false;
+			dt = frameDt;
+			if (sleptPlaying && !sleepReset) {
+				const until = pausedAt < 0 ? time - dt * 1000 : Math.min(time - dt * 1000, pausedAt);
+				dwell += Math.max(0, until - sleptAt) / 1000;
+			}
+		} else if (dt > 0 && dt < 0.05) frameDt = dt;
+
 		if (layoutId !== drawnLayout) {
 			// First frame, or a switch across the portrait breakpoint: settle on the target in the new plate coordinates.
 			points.set(target());
@@ -329,10 +383,34 @@
 			glow.style.opacity = String(screenGlow);
 			glowWritten = screenGlow;
 		}
+
+		// Settled: the line rests and every bloom sits at its rest level, so the next frames would draw the same picture. While the
+		// rotation plays, only the dwell counts on; sleep unless it ends within the wake lead.
+		if (t < 1) return;
+		for (let i = 0; i < levels.length; i++) if (levels[i] !== (i === to ? 1 : 0)) return;
+		if (!playing || (DWELL - dwell) * 1000 > WAKE_LEAD + 3 * frameDt * 1000) sleep(time);
 	});
 
 	$effect(() => {
-		loop.paused = reducedMotion.current;
+		const reduced = reducedMotion.current;
+		// untracked: `sleep` pauses the loop too, which must not re-run this
+		untrack(() => {
+			clearTimeout(wakeTimer);
+			asleep = false;
+			waking = false;
+			loop.paused = reduced;
+		});
+		return () => clearTimeout(wakeTimer);
+	});
+
+	// Whatever changes what the next frame draws wakes a sleeping loop (jumps call `wake` themselves).
+	$effect(() => {
+		void [playing, layoutId];
+		untrack(() => {
+			if (!asleep) return;
+			if (!playing && sleptPlaying && pausedAt < 0) pausedAt = performance.now();
+			wake();
+		});
 	});
 
 	// Reduced motion: one still frame of the active state, redrawn when a control switches it.
