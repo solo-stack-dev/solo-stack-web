@@ -23,12 +23,17 @@ export const TRANSITION_MASKS = {
 	washDry
 } as const;
 
-/** Inline style string for NightPage's wrapper. */
-export const transitionMaskVars = (): string =>
+/**
+ * Inline style string for NightPage's wrapper. `deferred` leaves out the masks used only far below the first screen
+ * (`--wash-spread-down`, the night shift), so NightPage can set them once the hero moon has loaded (docs/perf/AUDIT-2026-11.md #7).
+ */
+export const transitionMaskVars = ({ deferred = false } = {}): string =>
 	[
 		`--feather-up: url("${featherUp}")`,
 		`--feather-down: url("${featherDown}")`,
 		`--wash-spread-up: url("${washSpreadUp}")`,
-		`--wash-spread-down: url("${washSpreadDown}")`,
+		!deferred && `--wash-spread-down: url("${washSpreadDown}")`,
 		`--wash-dry: url("${washDry}")`
-	].join('; ');
+	]
+		.filter(Boolean)
+		.join('; ');

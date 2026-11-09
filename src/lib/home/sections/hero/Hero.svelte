@@ -21,6 +21,7 @@
 	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import ShootingStars, { SHOOTING_STAR_EVENT } from '#lib/home/shared/ShootingStars.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
+	import { lcpImage } from '#lib/home/shared/deferred.svelte.ts';
 	import { InView, RafLoop, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import {
 		MOON_FULL_CLICKS_EVENT,
@@ -319,7 +320,7 @@
 
 	<div class="moon-box moon-rig" class:is-3d={threeReady}>
 		<div class="moon-glow" aria-hidden="true"></div>
-		<button type="button" class="moon" data-egg-moon aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase}>
+		<button type="button" class="moon" data-egg-moon aria-label={m.home_hero_moon_label({ phase: PHASE_NAMES[phase]() })} onclick={cyclePhase} {@attach lcpImage}>
 			<enhanced:img class="moon-img" src={moonDisc} alt="" sizes={SIZES.moon} fetchpriority="high" />
 			{#if use3D}
 				<LazyMount

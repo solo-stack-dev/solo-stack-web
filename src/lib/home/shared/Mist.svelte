@@ -9,7 +9,7 @@
 	  plate edges. Give every seam a different strip, mirror and shift, so no two boundaries share a silhouette.
 
 	Parallax via its own view timeline, transform only (compositor); the foreground travels further than the mist. Static
-	without support and under reduced motion. Lazy images, so only strips near the viewport load.
+	without support and under reduced motion. Lazy images that start after the hero moon (`DeferredArt`).
 
 	```svelte
 	<Making />
@@ -50,6 +50,8 @@
 </script>
 
 <script lang="ts">
+	import DeferredArt from './DeferredArt.svelte';
+
 	interface Props {
 		/** Lit mist bank: `dusk` (20–22 h, warm catch-lights), `night` (01–02 h), `predawn` (02–04 h, warm glow below). Omit for none. */
 		variant?: MistVariant;
@@ -99,11 +101,13 @@
 			style:opacity
 		>
 			<div class="tiles">
-				<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
-				{#if offset}
-					<!-- wrapped-around remainder (same source, decoded once) -->
+				<DeferredArt rest>
 					<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
-				{/if}
+					{#if offset}
+						<!-- wrapped-around remainder (same source, decoded once) -->
+						<enhanced:img src={MISTS[variant]} alt="" sizes="112vw" loading="lazy" decoding="async" class={[mirror && 'is-mirrored']} />
+					{/if}
+				</DeferredArt>
 			</div>
 		</div>
 	{/if}
@@ -117,14 +121,16 @@
 			style:--mist-drift={cloud.drift ?? '4rem'}
 			style:opacity={cloud.opacity ?? 0.9}
 		>
-			<enhanced:img
-				src={CLOUDS[cloud.strip]}
-				alt=""
-				sizes="{Math.round((cloud.stretch ?? 1.15) * 100)}vw"
-				loading="lazy"
-				decoding="async"
-				class={[cloud.mirror && 'is-mirrored']}
-			/>
+			<DeferredArt rest>
+				<enhanced:img
+					src={CLOUDS[cloud.strip]}
+					alt=""
+					sizes="{Math.round((cloud.stretch ?? 1.15) * 100)}vw"
+					loading="lazy"
+					decoding="async"
+					class={[cloud.mirror && 'is-mirrored']}
+				/>
+			</DeferredArt>
 		</div>
 	{/if}
 </div>

@@ -21,6 +21,8 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
+	import DeferredArt from '#lib/home/shared/DeferredArt.svelte';
+	import { belowFold } from '#lib/home/shared/deferred.svelte.ts';
 	import { RafLoop, inView, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import { BLOOM_BOX, LAYOUTS, LINE_POINTS, PILLARS, STATE_IDS, bloomMask, composeLine, morphPoints, toPathData, type MakingStateId } from './morph.ts';
 	// Bloom width ladder (rendered ~200–440 CSS px). `…&enhanced` types: sections/hero/imagetools.d.ts.
@@ -503,14 +505,34 @@
 			<div class="scene" aria-hidden="true">
 				<div class="frame" {@attach loop.attach}>
 					<!-- string src: enhanced-img derives a full width ladder from `sizes` (the plate covers the stage) -->
-					<enhanced:img class="plate plate-desktop" src="./assets/making-plate.webp" alt="" sizes="max(100vw, min(178vh, 107vw))" loading="lazy" />
-					<enhanced:img class="plate plate-mobile" src="./assets/making-plate-mobile.webp" alt="" sizes="100vw" loading="lazy" />
+					<!-- The plate and blooms load after the hero moon (DeferredArt): the stage starts below the first screen. The plate and the
+					     first bloom come first; once the plate has loaded, the other blooms and the art further down follow. -->
+					<DeferredArt>
+						<enhanced:img
+							class="plate plate-desktop"
+							src="./assets/making-plate.webp"
+							alt=""
+							sizes="max(100vw, min(178vh, 107vw))"
+							loading="lazy"
+							onload={belowFold.settle}
+							onerror={belowFold.settle}
+						/>
+						<enhanced:img
+							class="plate plate-mobile"
+							src="./assets/making-plate-mobile.webp"
+							alt=""
+							sizes="100vw"
+							loading="lazy"
+							onload={belowFold.settle}
+							onerror={belowFold.settle}
+						/>
+					</DeferredArt>
 					<div class="screen-glow" bind:this={glow}></div>
 
 					{#each STATE_IDS as id, i (id)}
 						<div class="bloom-mask" data-state={id} style:mask-image={MASKS[id]} style:-webkit-mask-image={MASKS[id]}>
 							<div class="bloom" {@attach (element) => void (blooms[i] = element)}>
-								<enhanced:img src={BLOOMS[id]} alt="" sizes="(max-aspect-ratio: 1/1) 54vw, 31vw" loading="lazy" />
+								<DeferredArt rest={i > 0}><enhanced:img src={BLOOMS[id]} alt="" sizes="(max-aspect-ratio: 1/1) 54vw, 31vw" loading="lazy" /></DeferredArt>
 							</div>
 						</div>
 					{/each}

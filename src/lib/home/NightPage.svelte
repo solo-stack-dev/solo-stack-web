@@ -31,7 +31,8 @@
 	import ShootingStars from './shared/ShootingStars.svelte';
 	import StarField from './shared/StarField.svelte';
 	import { reducedMotion } from './shared/motion.svelte.ts';
-	import { transitionMaskVars } from './shared/transitions.ts';
+	import { belowFold } from './shared/deferred.svelte.ts';
+	import { TRANSITION_MASKS, transitionMaskVars } from './shared/transitions.ts';
 
 	interface Props {
 		children: Snippet;
@@ -59,7 +60,10 @@
 	const pages = SITE_LINKS.filter((link) => link.id !== 'home');
 	/** Sections with their own progress dots: the rail hides while they are active (one indicator at a time). */
 	const OWN_PROGRESS = new Set<SectionId>(['making']);
-	const maskVars = transitionMaskVars();
+	const maskVars = transitionMaskVars({ deferred: true });
+	// Only the night shift uses this mask: it loads after the hero moon (belowFold); without JS the <noscript> style sets it.
+	const washSpreadDown = `url("${TRANSITION_MASKS.washSpreadDown}")`;
+	$effect(() => belowFold.arm());
 	const last = NIGHT_HOURS.length - 1;
 
 	let wrapper: HTMLDivElement;
@@ -252,6 +256,11 @@
 	}
 </script>
 
+<svelte:head>
+	<!-- eslint-disable-next-line svelte/no-at-html-tags -- build-time asset URL -->
+	<noscript>{@html `<style>[data-night-page]{--wash-spread-down:${washSpreadDown} !important}</style>`}</noscript>
+</svelte:head>
+
 <div
 	bind:this={wrapper}
 	class="night-page"
@@ -261,6 +270,7 @@
 	style:--dawn-from={starts[last]}
 	style:--dawn-to={stops[last]}
 	style={maskVars}
+	style:--wash-spread-down={belowFold.rest ? washSpreadDown : 'none'}
 >
 	<div class="sky" aria-hidden="true">
 		<div class="sky-layer" style:background={skyBackground(hours[0])}></div>

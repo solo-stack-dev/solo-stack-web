@@ -17,6 +17,7 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
 	import NightClock from '#lib/home/shared/NightClock.svelte';
+	import DeferredArt from '#lib/home/shared/DeferredArt.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import posterConstellations from './assets/poster-constellations.webp?w=1664;1280;960;640&enhanced';
 	import posterMoonPlanet from './assets/poster-moon-planet.webp?w=1664;1280;960;640&enhanced';
@@ -116,15 +117,17 @@
 					onkeydown={onTabKeydown}
 				>
 					<span class="strip" aria-hidden="true">
-						<enhanced:img
-							src={POSTERS[id].strip}
-							alt=""
-							class="strip-art"
-							style="object-position: 50% {POSTERS[id].stripY}"
-							sizes="(min-width: 64rem) 34vw, (min-width: 40rem) 32vw, 16rem"
-							loading="lazy"
-							decoding="async"
-						/>
+						<DeferredArt rest>
+							<enhanced:img
+								src={POSTERS[id].strip}
+								alt=""
+								class="strip-art"
+								style="object-position: 50% {POSTERS[id].stripY}"
+								sizes="(min-width: 64rem) 34vw, (min-width: 40rem) 32vw, 16rem"
+								loading="lazy"
+								decoding="async"
+							/>
+						</DeferredArt>
 					</span>
 					<span class="strip-title font-display font-black tracking-wordmark uppercase">{GAME_CANDIDATES[id].title()}</span>
 				</button>
@@ -135,14 +138,16 @@
 				<GameFrame gameId={selected} load={candidate.load} label={candidate.title()} title={candidate.title()} onrecord={(value) => (record = value)}>
 					{#snippet poster()}
 						<div class="poster" aria-hidden="true" style:--poster-focus={POSTERS[selected].focus}>
-							<enhanced:img
-								src={POSTERS[selected].src}
-								alt=""
-								class="poster-art"
-								sizes="(min-width: 72rem) 72rem, (min-width: 40rem) 92vw, 200vw"
-								loading="lazy"
-								decoding="async"
-							/>
+							<DeferredArt rest>
+								<enhanced:img
+									src={POSTERS[selected].src}
+									alt=""
+									class="poster-art"
+									sizes="(min-width: 72rem) 72rem, (min-width: 40rem) 92vw, 200vw"
+									loading="lazy"
+									decoding="async"
+								/>
+							</DeferredArt>
 							<PaperGrain fixed={false} opacity={0.06} />
 						</div>
 					{/snippet}
