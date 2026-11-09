@@ -1,14 +1,14 @@
 /**
  * Eclipse moon egg (a Bleach night sky nod): replaces the navbar crescent and favicon for the rest of the session, all pages.
- * Woken by the third crescent slash of a visit (src/lib/home/eggs/Eggs.svelte) or `?eclipse=1` (`?eclipse=0` clears it).
+ * Woken when the hero moon reaches its crescent phase for the third time in a visit (src/lib/home/eggs/Eggs.svelte) or `?eclipse=1` (`?eclipse=0` clears it).
  * SiteNav restores it on mount. Art: `src/lib/assets/moon-eclipse.svg`, `favicon-eclipse.svg` (loaded only once awake).
  */
 
 /** On `<html>` while awake; SiteNav swaps its moon on it. */
 export const ECLIPSE_ATTR = 'data-eclipse-moon';
 
-/** Crescent slashes per visit that wake the eclipse moon. */
-export const ECLIPSE_AFTER_SLASHES = 3;
+/** Times per visit the hero moon reaches its crescent phase before the eclipse moon wakes. */
+export const ECLIPSE_AFTER_CRESCENTS = 3;
 
 const KEY = 'solostack:eclipse-moon';
 

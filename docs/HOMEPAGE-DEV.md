@@ -224,7 +224,7 @@ import { reducedMotion, pageVisibility, inView, InView, ScrollProgress, RafLoop 
 - `inView(callback, { rootMargin, threshold, once })`: attachment, `callback(visible, entry)`. Usage: `<div {@attach inView((v) => (near = v))}>`.
 - `new InView(options)`: reactive `.current`, attach with `{@attach seen.attach}`.
 - `new ScrollProgress({ mode, cssVar })`: reactive `.current` 0…1, attach to the element. Modes: `through` (enter bottom → leave top), `enter` (top at viewport bottom → top at viewport top). `cssVar: '--progress'` also writes the value to the element, which is cheaper than reactive markup for per-frame styling. Only measures while near the viewport.
-- `new RafLoop(tick, { fps, paused })`: `tick(dtSeconds, time)`; runs only while attached element is on screen, tab visible, and `!paused`. `.paused` (get/set), `.running` (reactive). dt is clamped to 0.1 s.
+- `new RafLoop(tick, { fps, paused })`: `tick(dtSeconds, time)`; runs only while attached element is on screen, tab visible, and `!paused`. `.paused` (get/set), `.running` (reactive). dt is clamped to 0.1 s. With `fps`, it waits on a timer between ticks instead of requesting every display frame (an empty rAF still costs a main-thread frame and restyles every running CSS animation); ticks keep the same vsync cadence. A loop without `fps` requests every frame while it runs, so pause it once it has nothing to do (hero and night-shift parallax).
 
 ```svelte
 <script lang="ts">
@@ -284,16 +284,16 @@ Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home
 
 `NightPage` mounts `<Eggs />` once. `Eggs.svelte` is the only egg code in the initial bundle (a few window listeners and dice rolls); every effect is its own lazy chunk, loaded on its trigger, rendered as a fixed `pointer-events: none` overlay (z-index 2: over the content, under the paper grain and the nav), and unmounted when done. Escape removes running eggs. Copy keys: `egg_*`.
 
-| Egg            | Trigger                                                                                                                  | Folder            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------- |
-| Crescent slash | hero `night:moon-phase` reaches `crescent`; at most once per 10 s; off under reduced motion                              | `crescent-slash/` |
-| Moon presence  | hero `night:moon-full-clicks` count 10, 20, 30 …; positioned over `[data-egg-moon]`                                      | `moon-presence/`  |
-| ARISE          | Konami code (ignored while typing in inputs, textareas, contenteditable), `arise()` in the console, `night:egg-arise`    | `arise/`          |
-| Three stars    | 1 in 6 page views after 30–90 s without input while a dark section (21:00–04:00) is centered, or `night:egg-three-stars` | `three-stars/`    |
-| Shiny mascot   | 1 in 4096 sessions (12-bit draw, cached in `sessionStorage`), `?shiny=1` forces it, `?shiny=0` forces it off             | `shiny/`          |
-| Console        | idle after load (production too): ASCII moon + message once per session, defines `window.arise()`                        | `console/`        |
+| Egg           | Trigger                                                                                                                         | Folder                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Eclipse moon  | hero `night:moon-phase` reaches `crescent` for the 3rd time in a visit (also under reduced motion), `?eclipse=1` / `?eclipse=0` | `src/lib/components/site/eclipse-moon.ts` |
+| Moon presence | hero `night:moon-full-clicks` count 10, 20, 30 …; positioned over `[data-egg-moon]`                                             | `moon-presence/`                          |
+| ARISE         | Konami code (ignored while typing in inputs, textareas, contenteditable), `arise()` in the console, `night:egg-arise`           | `arise/`                                  |
+| Three stars   | 1 in 6 page views after 30–90 s without input while a dark section (21:00–04:00) is centered, or `night:egg-three-stars`        | `three-stars/`                            |
+| Shiny mascot  | 1 in 4096 sessions (12-bit draw, cached in `sessionStorage`), `?shiny=1` forces it, `?shiny=0` forces it off                    | `shiny/`                                  |
+| Console       | idle after load (production too): ASCII moon + message once per session, defines `window.arise()`                               | `console/`                                |
 
-Reduced motion: eggs that would move render a calm opacity-only variant (`fade.ts`, Web Animations, because the global guard in `layout.css` collapses CSS animations); the crescent slash is skipped.
+Reduced motion: eggs that would move render a calm opacity-only variant (`fade.ts`, Web Animations, because the global guard in `layout.css` collapses CSS animations).
 
 **Triggering from your section.** Import the event names from `#lib/home/eggs/events.ts` (tiny, no egg code):
 

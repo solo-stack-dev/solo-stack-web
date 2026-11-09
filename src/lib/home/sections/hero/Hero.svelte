@@ -13,6 +13,7 @@
 	10th keeps the moon full for the presence egg). Listens to `night:shooting-star` (mascot leans back, looks up).
 -->
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
 	import { on } from 'svelte/events';
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
@@ -210,8 +211,13 @@
 	const target = { x: 0, y: 0 };
 	const current = { x: 0, y: 0 };
 
+	// Idle once settled (always, on touch screens): a running loop requests a frame on every vsync, which keeps the main thread busy.
+	// The next pointermove wakes it.
 	const parallax = new RafLoop(() => {
-		if (Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001) return;
+		if (Math.abs(target.x - current.x) < 0.001 && Math.abs(target.y - current.y) < 0.001) {
+			parallax.paused = true;
+			return;
+		}
 		current.x += (target.x - current.x) * 0.08;
 		current.y += (target.y - current.y) * 0.08;
 		hero.style.setProperty('--px', current.x.toFixed(3));
@@ -231,10 +237,25 @@
 			(event) => {
 				target.x = (event.clientX / window.innerWidth) * 2 - 1;
 				target.y = (event.clientY / window.innerHeight) * 2 - 1;
+				parallax.paused = false;
 			},
 			{ passive: true }
 		);
 	});
+
+	// --- Tagline: drop `settle` once it has finished, so `scroll-out` runs alone on the compositor (see the CSS) -----------------------
+
+	let taglineSettled = $state(false);
+
+	const dropSettle: Attachment<HTMLElement> = (element) => {
+		// A finished animation without fill is no longer listed, e.g. when hydration comes after the entrance.
+		const settle = element.getAnimations().find((animation) => animation instanceof CSSAnimation && animation.animationName.endsWith('-settle'));
+		if (!settle) {
+			taglineSettled = true;
+			return;
+		}
+		settle.finished.then(() => (taglineSettled = true)).catch(() => {});
+	};
 
 	// --- Mascot: leans back and looks up when a shooting star passes --------------------------------------------
 
@@ -355,7 +376,7 @@
 		<h1 id="home-hero-title" class="wordmark is-cream settle">{@render wordmarkText()}</h1>
 		<!-- The brand tagline (the four pillars); 21:00 names them by what happens there, so the row is not echoed one screen later -->
 		<div class="tagline-slot">
-			<p class="tagline settle label">{m.home_hero_tagline()}</p>
+			<p class="tagline settle label" class:settled={taglineSettled} {@attach dropSettle}>{m.home_hero_tagline()}</p>
 		</div>
 	</div>
 
@@ -374,9 +395,12 @@
      out. As a positioned sibling with a positive z-index it stays on top, at the hero's bottom edge (the hero is the page's first block). -->
 <a class="scroll-cue label" href="#making">
 	<span class="scroll-cue-label">{m.home_hero_scroll_cue()}</span>
-	<svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true">
-		<path d="M7 1v15M1.5 10.5 7 16l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-	</svg>
+	<!-- The nudge runs on this box, not on the <svg>: Chrome only composites transform animations on HTML boxes -->
+	<span class="scroll-cue-arrow">
+		<svg width="14" height="18" viewBox="0 0 14 18" aria-hidden="true">
+			<path d="M7 1v15M1.5 10.5 7 16l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+		</svg>
+	</span>
 </a>
 
 <style>
@@ -869,7 +893,10 @@
 		}
 	}
 
-	/* Fades out over the first 22svh of scroll, before it reaches the nav. Listed before `settle`, which wins while it runs. */
+	/* Fades out over the first 22svh of scroll, before it reaches the nav. Listed before `settle`, which eases in from 0.3 to the scroll
+	   fade's value. Once `settle` has finished (no fill: no visual change), `.settled` drops it and restarts the fade as an identical
+	   `scroll-out-alone`: two opacity animations on one element keep the fade off the compositor, and Chrome doesn't retry a running one.
+	   Both stay on one element: split across two, the opacities would multiply instead of easing into each other. */
 	@media (prefers-reduced-motion: no-preference) {
 		@supports (animation-timeline: scroll()) {
 			.tagline {
@@ -881,10 +908,23 @@
 					0 22svh,
 					normal;
 			}
+
+			.tagline.settled {
+				animation: scroll-out-alone linear both;
+				animation-timeline: scroll(root block);
+				animation-range: 0 22svh;
+			}
 		}
 	}
 
 	@keyframes scroll-out {
+		to {
+			opacity: 0;
+		}
+	}
+
+	/* Same as `scroll-out`. The tagline swaps to it after `settle`: a new animation starts on the compositor, the old one stays off it. */
+	@keyframes scroll-out-alone {
 		to {
 			opacity: 0;
 		}
@@ -908,6 +948,10 @@
 		color: var(--color-cream);
 		text-shadow: var(--halo-ink);
 		transition: color var(--dur-hover) ease;
+	}
+
+	.scroll-cue-arrow {
+		display: flex;
 	}
 
 	.scroll-cue svg {
@@ -952,7 +996,7 @@
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
-		.scroll-cue svg {
+		.scroll-cue-arrow {
 			animation: nudge 2.4s 1.6s ease-in-out infinite;
 		}
 	}

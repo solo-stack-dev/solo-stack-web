@@ -164,7 +164,7 @@ Every spec lists the reference mockups, behavior, build approach, required art l
 
 - On load, a short moonrise: the moon eases up 5–10 % and brightens, stars fade in, then the wordmark settles. Under 1.5 s, never blocks reading.
 - The moon slowly rotates (Threlte) with a soft rim glow. Subtle parallax on pointer move (a few px per layer) and on scroll.
-- **Moon phases:** clicking the moon cycles full → waning gibbous → half → crescent → new → back. In 3D this is just the light direction, which is why Threlte is worth it here. The crescent triggers the "crescent slash" egg (Phase 4). The moon is a real `<button>` with an aria label.
+- **Moon phases:** clicking the moon cycles full → waning gibbous → half → crescent → new → back. In 3D this is just the light direction, which is why Threlte is worth it here. Reaching the crescent for the third time in a visit wakes the eclipse moon egg (`src/lib/components/site/eclipse-moon.ts`). The moon is a real `<button>` with an aria label.
 - The mascot: idle loop (laptop glow flicker, occasional blink, maybe a small head turn when a shooting star passes).
 - Shooting stars occasionally.
 
@@ -342,7 +342,6 @@ References in `01-mascot-easter-eggs/` (mascot style there is outdated; use mode
 
 | Egg                  | Trigger                                               | Effect                                                                                          | Mockup                                      |
 | -------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Crescent slash       | Moon phase reaches the crescent (hero)                | A black ink crescent shaped slash sweeps across the sky with ink droplets                       | `04-egg-crescent-slash-desktop.png`         |
 | Presence on the moon | Click the full moon ~10 times                         | A faint, ambiguous giant silhouette appears on the moon for a moment                            | `05-egg-moon-presence-desktop.png`          |
 | ARISE                | Konami code anywhere                                  | Ink shadow figures rise from the cliff behind the mascot, then dissolve                         | `06-egg-arise-shadows-desktop.png`          |
 | Golden tree          | Hover or focus the bonsai (01:00)                     | The bonsai glows gold and its canopy grows into a luminous tree                                 | `09-…`, `12-…`                              |

@@ -146,8 +146,18 @@ export interface RafLoopOptions {
 }
 
 /**
+ * How long before a capped loop's next tick is due it asks for a frame again (ms): half a 60 Hz frame. The request then lands in the
+ * frame before the due one, so the callback runs on the same vsync as when the loop asked for every frame. On faster displays it can
+ * wake a frame early; that frame only asks again (the tick check below), so ticks never move.
+ */
+const RAF_LEAD = 1000 / 120;
+
+/**
  * rAF loop that runs only while its element is in view, the tab is visible, and it is not paused. `tick(dt, time)`: dt in
  * seconds, clamped to 0.1 s so a resumed loop never jumps. Under reduced motion, pause it and draw one static frame yourself.
+ *
+ * With `fps`, the loop waits on a timer between ticks instead of asking for every display frame: each rAF makes the browser run a
+ * main-thread frame (and restyle every running CSS animation), even when the tick is skipped. Ticks keep the same vsync cadence.
  * ```svelte
  * <script>
  *   const loop = new RafLoop((dt) => draw(dt), { fps: 30 });
@@ -164,7 +174,9 @@ export class RafLoop {
 	#interval: number;
 	#attached = false;
 	#inView = false;
+	#active = false;
 	#frame = 0;
+	#timer: ReturnType<typeof setTimeout> | undefined;
 	#last = 0;
 
 	constructor(tick: (dt: number, time: number) => void, { fps, paused = false }: RafLoopOptions = {}) {
@@ -201,22 +213,35 @@ export class RafLoop {
 	#update() {
 		if (typeof document === 'undefined') return;
 		const shouldRun = this.#attached && this.#inView && !this.#paused && document.visibilityState === 'visible';
-		if (shouldRun && !this.#frame) {
+		if (shouldRun && !this.#active) {
+			this.#active = true;
 			this.#last = 0;
 			this.#frame = requestAnimationFrame(this.#loop);
 			this.running = true;
-		} else if (!shouldRun && this.#frame) {
+		} else if (!shouldRun && this.#active) {
+			this.#active = false;
 			cancelAnimationFrame(this.#frame);
+			clearTimeout(this.#timer);
 			this.#frame = 0;
+			this.#timer = undefined;
 			this.running = false;
 		}
 	}
 
-	#loop = (time: number) => {
+	#request = () => {
+		this.#timer = undefined;
 		this.#frame = requestAnimationFrame(this.#loop);
+	};
+
+	#loop = (time: number) => {
 		const elapsed = this.#last ? time - this.#last : 0;
-		if (this.#last && elapsed < this.#interval - 1) return;
+		// Early (a faster display than 60 Hz, or a late tick): the next frame is the first one that can be due.
+		if (this.#last && elapsed < this.#interval - 1) return this.#request();
 		this.#last = time;
+		// Scheduled before the tick, so a tick that pauses the loop cancels it and a tick that throws doesn't end it.
+		const wait = this.#interval ? time + this.#interval - 1 - RAF_LEAD - performance.now() : 0;
+		if (wait > 1) this.#timer = setTimeout(this.#request, wait);
+		else this.#request();
 		this.#tick(Math.min(elapsed, 100) / 1000, time);
 	};
 }

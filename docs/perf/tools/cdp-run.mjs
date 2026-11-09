@@ -1,7 +1,7 @@
 // Mobile perf run via raw CDP (no dependencies). Usage:
 // node cdp-run.mjs <url> <outPrefix> [--cpu 6] [--trace] [--scroll] [--no-throttle-net] [--idle 8000] [--reduced]
 import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync, createWriteStream } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -52,7 +52,8 @@ ws.addEventListener('message', (e) => {
 	if (msg.id && pending.has(msg.id)) {
 		const { res, rej } = pending.get(msg.id);
 		pending.delete(msg.id);
-		msg.error ? rej(new Error(JSON.stringify(msg.error))) : res(msg.result);
+		if (msg.error) rej(new Error(JSON.stringify(msg.error)));
+		else res(msg.result);
 	} else if (msg.method) for (const l of listeners) l(msg);
 });
 const send = (method, params = {}) =>
@@ -65,7 +66,6 @@ const on = (fn) => listeners.push(fn);
 
 // --- network log
 const reqs = new Map();
-let t0 = 0;
 on(({ method, params }) => {
 	if (method === 'Network.requestWillBeSent') {
 		const r = reqs.get(params.requestId) ?? {};
@@ -165,7 +165,6 @@ if (flag('--trace')) {
 
 const loaded = new Promise((r) => on(({ method }) => method === 'Page.loadEventFired' && r()));
 const navStart = Date.now();
-t0 = performance.now();
 await send('Page.navigate', { url });
 await Promise.race([loaded, sleep(60000)]);
 const loadMs = Date.now() - navStart;
@@ -274,13 +273,6 @@ if (flag('--experiments')) {
 }
 
 let scroll = null;
-if (false)
-	console.log(
-		'paused:',
-		await evaluate(
-			`document.getAnimations().filter((a) => ${JSON.stringify(opt('--pause-anim').split(','))}.some((n) => (a.animationName || '').includes(n))).map((a) => (a.pause(), a.animationName)).join()`
-		)
-	);
 if (flag('--scroll')) {
 	const reqsBefore = reqs.size;
 	const loafBefore = (await evaluate('window.__perf.loaf.length')) ?? 0;
