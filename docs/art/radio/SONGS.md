@@ -17,15 +17,16 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
     python skills/yue2-music/scripts/run_yue2.py generate --request <request.json> --output <take> --model models/YuE2-3B --vae models/YuE2-Vae --offline
 
 - Requests: [`songs-requests.py`](songs-requests.py) builds one request per station and seed from the lyrics above and the style briefs below (the style brief is a model input, not visitor text). Two seeds per station (101, 202): 18 takes, all complete, none truncated.
-- Edit and encode: [`songs-edit.py`](songs-edit.py) (run with the YuE `.venv-tools` Python: numpy, soundfile, pyloudnorm, plus ffmpeg). Cut from the bar of the first sung note (one bar earlier if the voice enters on the downbeat) to one bar after the last one, normalize to -16 LUFS, limit at -4 dBFS, fade in 0.4 s and out 2.5 s (the loop restarts gently), AAC 77 to 80 kbps at 44.1 kHz.
-- Take choice: by objective checks (nobody listened yet): sung notes per lyric syllable close to 1 (every word sung, no extra melisma), no level dropouts or long silences, least clipping. The other takes, the raw FLACs and a local A/B player of all 18 takes stay in the owner's YuE checkout: `D:/repos/YuE/output/solo-stack-radio/` (`takes/`, `metrics.json`, `comparison/index.html`). To swap a take: `python songs-edit.py encode <station>-<seed> src/lib/home/sections/radio/track/<station>.m4a`.
+- First edit (2026-11-03): [`songs-edit.py`](songs-edit.py) (run with the YuE `.venv-tools` Python: numpy, soundfile, pyloudnorm, plus ffmpeg) cut each take to the whole song (first to last sung bar, 33 to 50 s, AAC 77 to 80 kbps, 340 to 490 kB).
+- Shipped cut (2026-11-09, owner: files too big, at most 20 s per song): [`src/lib/home/sections/radio/tools/trim-tracks.mjs`](../../../src/lib/home/sections/radio/tools/trim-tracks.mjs) (Node + ffmpeg only) re-encodes from the same lossless takes (`takes/<take>/audio.flac`, 48 kHz), no AAC to AAC generation loss. Window per song: the song's natural ending (end of the chorus, about one bar after the last sung note) and as many whole lyric lines before it as fit into 20 s (the full chorus where it is short enough, else its last three lines), starting on the take's beat grid at least 0.3 s before the first sung note (bar grid from the take's `score.abc`/`abc_check.json`; it lines up with the audio: the verse downbeat is where the level jumps). Fade in 0.3 s and out over the tail after the last note (2 to 2.5 s), quadratic, to silence (first and last 20 ms below -58 dBFS, so the `loop` restart cannot click). Normalized to -16 LUFS on the faded cut (one correction pass when the limiter shaves it), limit -4 dBFS, soxr to 44.1 kHz, AAC-LC 80 kbps (ffmpeg native encoder; kept at the old rate because lower rates with this encoder are not transparent), `.m4a` faststart. Run: `node src/lib/home/sections/radio/tools/trim-tracks.mjs [takes dir] [station …]`; windows live in its `SONGS` table.
+- Take choice: by objective checks (nobody listened yet): sung notes per lyric syllable close to 1 (every word sung, no extra melisma), no level dropouts or long silences, least clipping. The other takes, the raw FLACs and a local A/B player of all 18 takes stay in the owner's YuE checkout: `D:/repos/YuE/output/solo-stack-radio/` (`takes/`, `metrics.json`, `comparison/index.html`). To swap a take: pick its window from its score (see the comments in `trim-tracks.mjs`), edit `SONGS` there and rerun it for that station.
 
 ## Songs
 
 ### youtube: Small Red Light
 
 - Genre: sad rap. Style brief: `English, sad rap, melancholic, intimate, deep male rap vocal, soft felt piano loop, muted 808 bass, sparse trap hi-hats, vinyl crackle, late night, slow tempo, 78 BPM`
-- Chosen take: seed 202 (73 BPM as planned by YuE2), cut 13.15 to 53.0 s of 53.0 s, **39.8 s, 411 kB**
+- Chosen take: seed 202 (73 BPM as planned by YuE2), 32.88 to 52.88 s (bar 20: verse line 4 and the full chorus), **20.0 s, 208 kB** (first edit: 13.15 to 53.0 s, 39.8 s, 411 kB)
 
   [Verse]
   Small red light above your eye
@@ -42,7 +43,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### github: A Little Done
 
 - Genre: lo-fi. Style brief: `English, lo-fi hip hop, chill, soft sung male vocal, warm Rhodes electric piano, dusty boom bap drums, mellow round bass, vinyl crackle, relaxed, 82 BPM`
-- Chosen take: seed 101 (85 BPM as planned by YuE2), cut 11.29 to 56.65 s of 56.7 s, **45.4 s, 467 kB**
+- Chosen take: seed 101 (85 BPM as planned by YuE2), 39.53 to 56.65 s (bar 14: chorus lines 2 to 4), **17.1 s, 176 kB** (first edit: 11.29 to 56.65 s, 45.4 s, 467 kB)
 
   [Verse]
   I put the last small piece away
@@ -59,7 +60,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### instagram: Both Can Stay
 
 - Genre: lo-fi. Style brief: `English, lo-fi bedroom pop, dreamy, breathy sung female vocal, washed out chorus guitar chords, tape saturation, gentle drums, warm bass, hazy, 80 BPM`
-- Chosen take: seed 202 (83 BPM as planned by YuE2), cut 23.13 to 72.65 s of 76.2 s, **49.5 s, 490 kB**
+- Chosen take: seed 202 (83 BPM as planned by YuE2), 54.94 to 72.65 s (bar 19: chorus lines 2 to 4), **17.7 s, 182 kB** (first edit: 23.13 to 72.65 s, 49.5 s, 490 kB)
 
   [Verse]
   The picture keeps a golden glow
@@ -76,7 +77,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### tiktok: Hold Me Still
 
 - Genre: sad rap. Style brief: `English, sad rap, emo trap, melancholic female rap vocal, plucked acoustic guitar loop, punchy 808 bass, rolling hi-hats, 92 BPM`
-- Chosen take: seed 202 (93 BPM as planned by YuE2), cut 18.06 to 62.26 s of 63.7 s, **44.2 s, 454 kB**
+- Chosen take: seed 202 (93 BPM as planned by YuE2), 44.52 to 62.26 s (beat 2 of bar 17: chorus lines 2 to 4), **17.7 s, 182 kB** (first edit: 18.06 to 62.26 s, 44.2 s, 454 kB)
 
   [Verse]
   My thumb moves faster than my eyes
@@ -93,7 +94,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### x: Past the Fence
 
 - Genre: sad rap. Style brief: `English, dark sad rap, minimal, raspy male rap vocal, cold ambient synth pad, deep sub bass, slow sparse drums, echoing reverb, moody, 74 BPM`
-- Chosen take: seed 202 (73 BPM as planned by YuE2), cut 23.01 to 55.89 s of 76.6 s, **32.9 s, 338 kB**
+- Chosen take: seed 202 (73 BPM as planned by YuE2), 34.52 to 54.52 s (bar 21: verse line 4 and the full chorus), **20.0 s, 206 kB** (first edit: 23.01 to 55.89 s, 32.9 s, 338 kB)
 
   [Verse]
   I throw a few words past the fence
@@ -110,7 +111,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### bluesky: Open Air
 
 - Genre: lo-fi. Style brief: `English, lo-fi chillhop, light and open, airy sung female vocal, soft kalimba melody, mellow jazzy chords, brushed drums, warm bass, gentle, 84 BPM`
-- Chosen take: seed 202 (84 BPM as planned by YuE2), cut 8.57 to 57.68 s of 69.3 s, **49.1 s, 491 kB**
+- Chosen take: seed 202 (84 BPM as planned by YuE2), 40.00 to 57.68 s (bar 14: chorus lines 2 to 4), **17.7 s, 182 kB** (first edit: 8.57 to 57.68 s, 49.1 s, 491 kB)
 
   [Verse]
   I set my old coat by the door
@@ -127,7 +128,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### threads: Loose End
 
 - Genre: sad rap. Style brief: `English, melodic sad rap, male rap verse, soft sung chorus, fingerpicked acoustic guitar loop, mellow piano, soft trap drums, vinyl crackle, 80 BPM`
-- Chosen take: seed 101 (83 BPM as planned by YuE2), cut 8.67 to 49.16 s of 71.1 s, **40.5 s, 416 kB**
+- Chosen take: seed 101 (83 BPM as planned by YuE2), 28.92 to 48.92 s (bar 20: verse line 4 and the full chorus), **20.0 s, 206 kB** (first edit: 8.67 to 49.16 s, 40.5 s, 416 kB)
 
   [Verse]
   Your sleeve has caught against the chair
@@ -144,7 +145,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### twitch: Half a Cup
 
 - Genre: lo-fi. Style brief: `English, lo-fi jazz hop, cozy, warm mellow sung male vocal, muted trumpet, upright bass, jazzy piano chords, swung boom bap drums, 86 BPM`
-- Chosen take: seed 202 (84 BPM as planned by YuE2), cut 8.57 to 58.21 s of 68.6 s, **49.6 s, 491 kB**
+- Chosen take: seed 202 (84 BPM as planned by YuE2), 38.21 to 58.21 s (half a beat before chorus line 2: chorus lines 2 to 4), **20.0 s, 205 kB** (first edit: 8.57 to 58.21 s, 49.6 s, 491 kB)
 
   [Verse]
   The cup is warm against my knee
@@ -161,7 +162,7 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
 ### facebook: The Fold
 
 - Genre: sad rap. Style brief: `English, nostalgic sad rap, bittersweet, warm male rap vocal, dusty soul piano and strings, boom bap drums, vinyl crackle, 82 BPM`
-- Chosen take: seed 101 (85 BPM as planned by YuE2), cut 22.59 to 65.12 s of 69.2 s, **42.5 s, 441 kB**
+- Chosen take: seed 101 (85 BPM as planned by YuE2), 45.18 to 65.12 s (bar 16: the full chorus), **19.9 s, 206 kB** (first edit: 22.59 to 65.12 s, 42.5 s, 441 kB)
 
   [Verse]
   The picture's creased along the fold
