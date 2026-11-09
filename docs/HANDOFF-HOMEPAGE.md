@@ -291,8 +291,8 @@ The game is **not decided**. A game has to be played to judge, so build **three 
 
 **Music:**
 
-- Every station plays its own short song (30 to 45 s, looping; English sad rap or lo fi, generated with YuE2 from gpt-6.1-sol lyrics, see `docs/art/radio/SONGS.md`) while it is tuned. A station without a song file in `radio/track/` simply plays no music (e.g. Discord until it gets one). The former single music station "Solo Stack FM" was dropped (owner decision, 2026-11-03).
-- Audio never autoplays; a song starts only when the visitor tunes its station (a gesture), with a clear pause control and volume. Each file loads only when its station is tuned (`preload="none"`, AAC, < 500 kB).
+- Every station plays its own short song (17 to 20 s, looping; English sad rap or lo fi, generated with YuE2 from gpt-6.1-sol lyrics, see `docs/art/radio/SONGS.md`) while it is tuned. A station without a song file in `radio/track/` simply plays no music (e.g. Discord until it gets one). The former single music station "Solo Stack FM" was dropped (owner decision, 2026-11-03).
+- Audio never autoplays; a song starts only when the visitor tunes its station (a gesture), with a clear pause control and volume. Each file loads only when its station is tuned (`preload="none"`, AAC, about 200 kB).
 - **Waveform horizon:** while playing, a Web Audio `AnalyserNode` drives a glowing waveform along the horizon (Canvas 2D or SVG path), and the stars pulse slightly with the beat (CSS variable from RMS). When idle, the horizon shows a slow, quiet wave.
 - Tuning between stations plays a short burst of static generated with Web Audio (noise buffer), no extra file.
 

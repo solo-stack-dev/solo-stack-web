@@ -1,5 +1,8 @@
 """Edit + encode the radio station songs.
 
+Superseded for the shipped files: src/lib/home/sections/radio/tools/trim-tracks.mjs cuts the chosen takes to <= 20 s (2026-11-09).
+The `metrics` step below is still how the takes were picked.
+
 For each take: start at the bar of the first vocal note (one bar earlier if it enters on the downbeat), end one bar after the last, normalize to
 -16 LUFS, limit peaks at -4 dBFS (ffmpeg alimiter, keeps the AAC true peak under 0), fade in 0.4 s and out 2.5 s so the loop restarts
 gently, encode AAC <= 80 kbps 44.1 kHz stereo (.m4a, faststart). Also prints metrics used to pick the best take.

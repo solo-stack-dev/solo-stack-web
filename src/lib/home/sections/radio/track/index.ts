@@ -3,7 +3,8 @@
  * music; to add Discord, drop `discord.m4a` here and its title into `TITLES`.
  *
  * Generated locally with YuE2 (m-a-p/YuE2-3B) from gpt-6.1-sol lyrics/titles; prompts, seeds and takes in
- * docs/art/radio/SONGS.md. AAC 77–80 kbps, 33–50 s, < 500 kB, ≈ -16 LUFS, faded at both ends for a gentle loop.
+ * docs/art/radio/SONGS.md. Cut to the end of the chorus (whole lines, 17–20 s) by `../tools/trim-tracks.mjs`: AAC-LC
+ * 80 kbps 44.1 kHz, 175–210 kB, -16 LUFS, faded at both ends (to silence) for a gentle, click-free loop.
  *
  * Only the fingerprinted URLs are bundled; audio loads when tuned (`preload="none"`).
  */
