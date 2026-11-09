@@ -281,8 +281,12 @@
 					</div>
 
 					<div class="flex flex-wrap items-center gap-x-6 gap-y-4">
-						<!-- Sealed with butter wax: the seal lifts on hover, is pressed in on click and stays pressed while the owl takes the letter -->
+						<!--
+							A torn slab of ink (night: butter pigment) with the butter wax seal pressed into its left edge: the slab lifts on
+							hover, sinks with the seal on a press and stays pressed, ink running through it, while the owl takes the letter
+						-->
 						<button type="submit" class="send" disabled={contact.pending > 0}>
+							<span class="slab" aria-hidden="true"></span>
 							<span class="seal" aria-hidden="true">
 								<enhanced:img class="wax" src={seal} alt="" sizes="4.5rem" loading="lazy" decoding="async" />
 								<enhanced:img class="wax pressed" src={sealPressed} alt="" sizes="4.5rem" loading="lazy" decoding="async" />
@@ -309,7 +313,7 @@
 
 <style>
 	.giant {
-		/* Phones: one line at any width (the title is ≈ 5.3em wide); from 48rem the owl's clearance below is computed for 14vw */
+		/* Phones: one word per line beside the owl (below); from 48rem one line, the owl's clearance computed for 14vw */
 		font-size: clamp(3rem, 16vw, 10rem);
 		/* Ink on paper; moonlit at night (as /blog) */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
@@ -340,7 +344,7 @@
 	/*
 	 * The owl is one illustration with the title: a square canvas (`--owl`) flush with the right viewport edge, sized so its
 	 * head (26–53 % of the canvas) keeps 2.5rem clear of the title (≈ 75vw up to the 10rem cap, then 50vw + 19rem).
-	 * Below 48rem the owl perches above the title instead.
+	 * Below 48rem the owl perches beside the title, which stacks one word per line (as the /blog header).
 	 *
 	 * It rides a rail from the hero to the end of the page. From 64rem the letter column stops short of the twigs (they reach
 	 * 8 % into the canvas) and the owl stays pinned beside the letter while you write: head just under the nav, the empty
@@ -385,7 +389,7 @@
 	 * Where the flight ends (OwlMessenger measures it): in the sky between the thanks and the footer horizon, right of the text
 	 * and left of the branch, a little way into the footer's empty gap above the wordmark (4.5rem, 6.5rem from 64rem). Its width
 	 * is the small bird's wingspan.
-	 * Phones: none (the owl perches above the title there and flies off into the sky).
+	 * Phones: none (the owl perches beside the title there and flies off into the sky).
 	 */
 	.landing {
 		position: absolute;
@@ -431,16 +435,31 @@
 		}
 	}
 
-	/* Phones: the owl perches above the title; its twigs fade out (OwlMessenger) a clear 1.5rem above the title's ink */
+	/*
+	 * Phones (as the /blog header): the title stands in the owl's sky, one word per line (`min-content`), the owl perched to
+	 * its right, nudged past the viewport edge (only branch runs off). Its head is level with the first line, the scroll with
+	 * the second; the twigs fade out (OwlMessenger) before the intro.
+	 */
 	@media (max-width: 47.99rem) {
 		.contact {
-			--owl: min(13.5rem, 56vw);
-			--owl-top: calc(0.5rem - var(--owl) * 0.1);
+			--owl: min(18rem, 54vw);
+			--owl-top: calc(0.75rem - var(--owl) * 0.1);
 			min-height: 0;
 		}
 
+		.rail {
+			right: calc(var(--owl) * -0.14);
+		}
+
 		.hero {
-			padding-top: calc(var(--owl) * 0.86 - 2.5rem);
+			padding-top: calc(var(--owl) * 0.1);
+		}
+
+		/* Stacked lines: a little more leading than one line, so a descender (`Say`) clears the next line's ascenders */
+		.giant {
+			width: min-content;
+			font-size: clamp(3rem, 15.5vw, 6.5rem);
+			line-height: 0.86;
 		}
 	}
 
@@ -936,38 +955,107 @@
 		--ink-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.6 2.9C18.4 3.4 21.4 7.4 21 12.2c-.4 4.7-4.4 8.2-9.3 7.9C7 19.8 3.1 16 3.2 11.6 3.3 6.7 7.4 2.8 12.4 3.1c1.6.1 2.9.6 4 1.3' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3C/svg%3E");
 		/* The same brush ring, finer, drawn around the wax seal on focus */
 		--seal-ring: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M13.6 2.9C18.4 3.4 21.4 7.4 21 12.2c-.4 4.7-4.4 8.2-9.3 7.9C7 19.8 3.1 16 3.2 11.6 3.3 6.7 7.4 2.8 12.4 3.1c1.6.1 2.9.6 4 1.3' fill='none' stroke='%23000' stroke-width='0.7' stroke-linecap='round'/%3E%3C/svg%3E");
+		/* Torn edge of the send slab (as `DECKLE_MASK_WIDE` in #lib/blog/materials.ts, drawn for its ≈ 4.5:1 shape, a rougher tear) */
+		--slab-edge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 140' preserveAspectRatio='none'%3E%3Cfilter id='d' x='-3%25' y='-10%25' width='106%25' height='120%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.05' numOctaves='3' seed='17'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='18' xChannelSelector='R' yChannelSelector='G'/%3E%3C/filter%3E%3Crect x='10' y='10' width='580' height='120' rx='3' filter='url(%23d)'/%3E%3C/svg%3E");
 	}
 
 	/*
-	 * Send: the letter's butter wax seal (round-3 art) with the words beside it in ink, no pill. Hover lifts the seal off the
-	 * paper (its shadow grows), a press swaps in the pressed wax, and while the owl takes the letter the seal stays pressed and
-	 * a line of ink runs under the words. Keyboard focus is drawn in the material: an ink ring around the seal and the swash
-	 * under the words (`--focus-ring`, ≥ 3:1). The wax fills ≈ 80 % of its canvas, so the 4.5rem seal shows ≈ 58px of wax.
+	 * Send: a torn slab of ink on the paper (night: a slab of butter pigment glowing on the dark page) with the letter's butter
+	 * wax seal (round-3 art) pressed into its left edge, the words on the slab. The whole slab is the button (≥ 44px; the
+	 * control is as tall as the seal). Hover lifts slab and seal off the paper (their shadows grow) and a swash of the other
+	 * pigment inks in under the words; a press sinks the slab and swaps in the pressed wax; while the owl takes the letter the
+	 * seal stays pressed and wet ink runs through the slab. Keyboard focus is drawn in the material: an ink ring around the
+	 * seal, a swash under the slab (`--focus-ring`, ≥ 3:1 on the paper) and a soft light around it. The words on the slab are
+	 * ≥ 10:1 in both themes (also over the pooled edge). The wax fills ≈ 80 % of its canvas, so the 4.5rem seal shows ≈ 58px of wax.
 	 */
 	.send {
 		--seal: 4.5rem;
+		--slab-h: 3.25rem;
+		/* the slab starts under the seal's middle */
+		--slab-x: calc(var(--seal) * 0.46);
 		--seal-shadow: rgb(14 15 16 / 0.3);
+		--slab-paint: radial-gradient(140% 180% at 18% 0%, #3a352d, var(--color-ink) 62%);
+		--slab-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.98 0 0 0 0 0.92 0 0 0 0 0.78 0.45 0 0 0 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+		/* warm pigment pooled along the torn edge */
+		--slab-pool: rgb(226 169 59 / 0.22);
+		--slab-shadow: drop-shadow(0 1px 1px rgb(14 15 16 / 0.35)) drop-shadow(0 3px 6px rgb(14 15 16 / 0.18));
+		--slab-shadow-lift: drop-shadow(0 3px 2px rgb(14 15 16 / 0.28)) drop-shadow(0 10px 14px rgb(14 15 16 / 0.2));
+		--slab-shadow-pressed: drop-shadow(0 0.5px 0.5px rgb(14 15 16 / 0.4));
+		--slab-run: rgb(252 215 114 / 0.22);
+		--slab-swash: var(--color-butter);
+		position: relative;
+		isolation: isolate;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.375rem;
+		gap: 0.5rem;
 		min-height: var(--seal);
 		/* the canvas's empty rim: the wax lines up with the letter's left edge */
 		margin-left: calc(var(--seal) * -0.1);
-		padding-right: 0.25rem;
-		color: var(--foreground);
-		font-size: 1.0625rem;
-		font-weight: 600;
+		padding-right: 1.5rem;
+		color: var(--color-cream);
+		font-size: 1.125rem;
+		font-weight: 650;
+		letter-spacing: -0.005em;
+		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
 
 	:global(.dark) .send {
 		--seal-shadow: rgb(0 0 0 / 0.6);
+		--slab-paint: radial-gradient(130% 190% at 22% 0%, var(--color-moonlight), var(--color-butter) 44%, color-mix(in oklab, var(--color-butter) 70%, var(--color-ochre)));
+		--slab-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.6 0 0 0 0 0.38 0 0 0 0 0.08 0.8 0 0 0 -0.32'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+		--slab-pool: rgb(201 128 22 / 0.55);
+		--slab-shadow: drop-shadow(0 1px 1px rgb(0 0 0 / 0.6)) drop-shadow(0 0 1rem rgb(252 215 114 / 0.18));
+		--slab-shadow-lift: drop-shadow(0 3px 3px rgb(0 0 0 / 0.55)) drop-shadow(0 0 1.5rem rgb(252 215 114 / 0.3));
+		--slab-shadow-pressed: drop-shadow(0 0.5px 0.5px rgb(0 0 0 / 0.7)) drop-shadow(0 0 0.6rem rgb(252 215 114 / 0.12));
+		--slab-run: rgb(255 244 214 / 0.6);
+		--slab-swash: var(--color-ink);
+		color: var(--color-ink);
 	}
 
-	/* No box: the ring and the swash below draw the focus */
+	/* No box: the seal ring, the swash under the slab and the light around it draw the focus */
 	.send:focus-visible {
 		outline: none;
 		box-shadow: none;
+		animation: none;
+	}
+
+	/* The slab: paint and grain under a torn-paper mask; its shadow on a wrapper, since the mask would clip it */
+	.slab {
+		position: absolute;
+		z-index: -1;
+		top: 50%;
+		left: var(--slab-x);
+		right: 0;
+		height: var(--slab-h);
+		translate: 0 -50%;
+		rotate: -0.6deg;
+		filter: var(--slab-shadow);
+		transition:
+			translate var(--dur-hover) var(--ease-settle),
+			scale var(--dur-hover) var(--ease-settle),
+			filter var(--dur-hover) ease;
+	}
+
+	.slab::before,
+	.slab::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		mask: var(--slab-edge) center / 100% 100% no-repeat;
+	}
+
+	.slab::before {
+		background: var(--slab-grain), var(--slab-paint);
+		box-shadow:
+			inset 0 0 0.9rem var(--slab-pool),
+			inset 0 -0.2rem 0.5rem var(--slab-pool);
+	}
+
+	/* Wet ink running through the slab while sending */
+	.slab::after {
+		background: linear-gradient(90deg, transparent, var(--slab-run) 50%, transparent) -67% 0 / 40% 100% no-repeat;
+		opacity: 0;
 	}
 
 	.seal {
@@ -1009,33 +1097,65 @@
 	.send-label {
 		position: relative;
 		padding-block: 0.5rem;
-		transition: color var(--dur-state) ease;
+		white-space: nowrap;
+		transition: translate var(--dur-hover) var(--ease-settle);
 	}
 
-	/* The swash under the words: faint on hover, the focus mark on keyboard focus, running ink while sending */
+	/* The swash under the words: the other pigment, inked in on hover */
 	.send-label::after {
 		content: '';
 		position: absolute;
 		left: 0;
 		right: 0;
-		bottom: 0.1rem;
-		height: 0.4rem;
-		background: var(--ink-lit);
+		bottom: 0.2rem;
+		height: 0.35rem;
+		background: var(--slab-swash);
 		mask: var(--ink-underline) center / 100% 100% no-repeat;
-		opacity: 0;
-		transition:
-			opacity var(--dur-hover) ease,
-			translate var(--dur-hover) var(--ease-settle);
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
-	.send:hover:not(:disabled) .seal {
-		translate: 0 -3px;
-		filter: drop-shadow(0 3px 2px color-mix(in oklab, var(--seal-shadow) 75%, transparent))
-			drop-shadow(0 8px 10px color-mix(in oklab, var(--seal-shadow) 45%, transparent));
+	/* The focus swash under the slab, on the paper */
+	.send::after {
+		content: '';
+		position: absolute;
+		left: calc(var(--slab-x) + 0.25rem);
+		right: 0.25rem;
+		top: calc(50% + var(--slab-h) / 2 + 0.3rem);
+		height: 0.4rem;
+		background: var(--focus-ring);
+		mask: var(--ink-underline) center / 100% 100% no-repeat;
+		scale: 0 1;
+		transform-origin: left;
+		pointer-events: none;
+		transition: scale var(--dur-state) var(--ease-settle);
 	}
 
-	.send:hover:not(:disabled) .send-label::after {
-		opacity: 0.55;
+	/* Lifted off the paper */
+	@media (hover: hover) {
+		.send:hover:not(:disabled) .slab {
+			translate: 0 calc(-50% - 2px);
+			filter: var(--slab-shadow-lift);
+		}
+
+		.send:hover:not(:disabled) .seal {
+			translate: 0 -3px;
+			filter: drop-shadow(0 3px 2px color-mix(in oklab, var(--seal-shadow) 75%, transparent))
+				drop-shadow(0 8px 10px color-mix(in oklab, var(--seal-shadow) 45%, transparent));
+		}
+
+		.send:hover:not(:disabled) .send-label {
+			translate: 0 -2px;
+		}
+
+		.send:hover:not(:disabled) .send-label::after {
+			scale: 1 1;
+		}
+	}
+
+	.send:focus-visible .slab {
+		filter: var(--slab-shadow) drop-shadow(0 0 0.5rem var(--focus-halo));
 	}
 
 	.send:focus-visible .seal::after {
@@ -1043,16 +1163,28 @@
 		scale: 1;
 	}
 
-	.send:focus-visible .send-label::after {
-		background: var(--focus-ring);
-		opacity: 1;
+	.send:focus-visible::after {
+		scale: 1 1;
 	}
 
-	/* Pressed into the paper: the pressed wax, flat to the page */
+	/* Pressed into the paper: slab and seal flat to the page, the pressed wax */
+	.send:active:not(:disabled) .slab,
+	.send:disabled .slab {
+		translate: 0 calc(-50% + 1px);
+		scale: 0.985;
+		filter: var(--slab-shadow-pressed) brightness(0.94);
+		transition-duration: 60ms;
+	}
+
 	.send:active:not(:disabled) .seal,
 	.send:disabled .seal {
 		translate: 0 1px;
 		filter: drop-shadow(0 0.5px 0.5px var(--seal-shadow));
+		transition-duration: 60ms;
+	}
+
+	.send:active:not(:disabled) .send-label {
+		translate: 0 1px;
 		transition-duration: 60ms;
 	}
 
@@ -1061,27 +1193,27 @@
 		opacity: 1;
 	}
 
-	/* Sending: the seal stays pressed, the words rest in quieter ink and a line of ink runs under them */
+	/* Disabled: the slab rests pressed and a shade quieter; sending (the only time it is disabled), wet ink runs through it */
 	.send:disabled {
+		cursor: not-allowed;
+	}
+
+	.send:disabled .slab::before {
+		filter: saturate(0.8);
+	}
+
+	.letter[data-sending] .send {
 		cursor: progress;
 	}
 
-	.send:disabled .send-label {
-		color: color-mix(in oklab, var(--foreground) 80%, transparent);
-	}
-
-	.send:disabled .send-label::after {
-		opacity: 0.8;
-		clip-path: inset(0 100% 0 0);
-		animation: ink-run 1.6s var(--ease-settle) infinite;
+	.letter[data-sending] .slab::after {
+		opacity: 1;
+		animation: ink-run 1.4s ease-in-out infinite;
 	}
 
 	@keyframes ink-run {
-		45% {
-			clip-path: inset(0);
-		}
-		100% {
-			clip-path: inset(0 0 0 100%);
+		to {
+			background-position-x: 167%;
 		}
 	}
 
@@ -1176,8 +1308,9 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.send:disabled .send-label::after {
-			clip-path: none;
+		/* Sending without motion: the wet ink rests across the middle of the slab */
+		.letter[data-sending] .slab::after {
+			background-position-x: 50%;
 			animation: none;
 		}
 
@@ -1186,8 +1319,11 @@
 			animation: none;
 		}
 
+		.slab,
 		.seal,
 		.seal::after,
+		.send::after,
+		.send-label,
 		.send-label::after,
 		.mark,
 		.mark::after,
