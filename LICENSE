@@ -5,13 +5,16 @@ This repository contains material under different terms.
 
 1. Code: MIT License
 
-   The source code of the site (Svelte components, TypeScript, CSS, build
-   scripts, configuration) is licensed under the MIT License below.
+   Except for the material described in sections 2 and 3, the original
+   source code (including Svelte components, TypeScript, CSS, Workers,
+   build scripts, and configuration) and accompanying technical
+   documentation are licensed under the MIT License below.
 
 2. Brand, artwork, and content: all rights reserved
 
-   The MIT License below does NOT apply to the following. No license is
-   granted for them:
+   The MIT License below does NOT apply to the following material, even
+   when it is embedded in source code or technical documentation. Subject
+   to section 3, no license is granted here for this material:
 
    - the Solo Stack name, logo, wordmark, and mascot,
    - all artwork and images: the painted scenes and their layers (image files
@@ -19,14 +22,34 @@ This repository contains material under different terms.
      banner, thumbnails, and the icons in static/,
    - photos of the owner,
    - the radio tracks (src/lib/home/sections/radio/track/),
-   - blog posts, transcripts, legal pages, page copy, and other written
-     content (src/content/, messages/, docs/copy/).
+   - blog posts, transcripts, legal pages, page copy, and other editorial
+     content (including src/content/, messages/, and docs/copy/).
+
+   These paths are examples; the exclusions apply by type of material.
+   Technical documentation is covered by section 1, except for excluded
+   material reproduced within it.
+
+   All rights reserved only to the extent that such rights exist and are
+   held by the respective rights holder. This notice does not create
+   copyright or other exclusive rights in otherwise unprotected material,
+   including AI-generated material that does not qualify for protection.
+   It does not restrict uses permitted by applicable law or revoke rights
+   already granted under an earlier license. No trademark rights in the
+   Solo Stack name or branding are granted by this repository's license.
 
 3. Third-party material: its own terms
 
+   Third-party code, fonts, icons, and other material retain their own
+   licenses and notices. The exclusions in section 2 do not override those
+   terms or claim ownership of third-party material. In particular:
+
    - Geist and Geist Mono fonts: SIL Open Font License 1.1, see
      static/fonts/OFL-Geist.txt.
-   - Platform logos are trademarks of their respective owners.
+   - Platform logos sourced from Simple Icons: the Simple Icons project
+     is distributed under CC0 1.0, but individual logos may have separate
+     license terms and remain subject to their owners' trademark rights
+     and applicable brand guidelines. See https://simpleicons.org and
+     https://github.com/simple-icons/simple-icons/blob/develop/DISCLAIMER.md.
 
 --------------------------------------------------------------------------------
 

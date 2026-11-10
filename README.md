@@ -35,19 +35,8 @@ pnpm dev
 
 ## License
 
-The **code** is released under the [MIT License](LICENSE).
+The original **code and technical documentation** are released under MIT, subject to the exclusions in [LICENSE](LICENSE). That file contains the full scope and the MIT license text.
 
-The MIT license does **not** cover the Solo Stack brand, artwork, and content. All rights reserved for:
+The **Solo Stack brand, artwork, photos, radio tracks, and editorial content** are excluded, including when embedded in code or documentation. Rights are reserved only where they exist; this notice does not create rights in otherwise unprotected material, including AI-generated material that does not qualify for protection. Statutory permissions and rights already granted under earlier licenses remain unaffected. Fork the code, bring your own brand and content.
 
-- the name, logo, wordmark, and mascot,
-- all artwork and images: the painted scenes and their layers (image files in `docs/art/`, `docs/mockups/`, and the `assets/` folders under `src/lib/`), banner, thumbnails, and the icons in `static/`,
-- photos of the owner (e.g. `docs/mockups/assets/profile.jpg`),
-- the radio tracks (`src/lib/home/sections/radio/track/`),
-- blog posts, transcripts, legal pages, page copy, and other written content (`src/content/`, `messages/`, `docs/copy/`).
-
-Please don't reuse these in your own projects. Fork the code, bring your own brand.
-
-Third-party material keeps its own terms:
-
-- The Geist and Geist Mono fonts are licensed under the [SIL Open Font License 1.1](static/fonts/OFL-Geist.txt).
-- The platform logos (from [Simple Icons](https://simpleicons.org)) are trademarks of their respective owners.
+**Third-party material** retains its own terms. The Geist fonts use the [SIL Open Font License 1.1](static/fonts/OFL-Geist.txt). The [Simple Icons](https://simpleicons.org) project uses CC0 1.0, but individual logos can have separate terms and trademark restrictions; see its [disclaimer](https://github.com/simple-icons/simple-icons/blob/develop/DISCLAIMER.md). See [LICENSE](LICENSE) for the full third-party notice.
