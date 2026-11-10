@@ -37,12 +37,17 @@ pnpm dev
 
 The **code** is released under the [MIT License](LICENSE).
 
-The MIT license does **not** cover the Solo Stack brand and content. All rights reserved for:
+The MIT license does **not** cover the Solo Stack brand, artwork, and content. All rights reserved for:
 
-- the name, logo, wordmark, and brand artwork (e.g. banner, thumbnails),
+- the name, logo, wordmark, and mascot,
+- all artwork and images: the painted scenes and their layers (image files in `docs/art/`, `docs/mockups/`, and the `assets/` folders under `src/lib/`), banner, thumbnails, and the icons in `static/`,
 - photos of the owner (e.g. `docs/mockups/assets/profile.jpg`),
-- blog posts, transcripts, page copy, and other written content.
+- the radio tracks (`src/lib/home/sections/radio/track/`),
+- blog posts, transcripts, legal pages, page copy, and other written content (`src/content/`, `messages/`, `docs/copy/`).
 
 Please don't reuse these in your own projects. Fork the code, bring your own brand.
 
-The Geist font is licensed under the [SIL Open Font License 1.1](https://github.com/vercel/geist-font/blob/main/LICENSE.TXT).
+Third-party material keeps its own terms:
+
+- The Geist and Geist Mono fonts are licensed under the [SIL Open Font License 1.1](static/fonts/OFL-Geist.txt).
+- The platform logos (from [Simple Icons](https://simpleicons.org)) are trademarks of their respective owners.
