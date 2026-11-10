@@ -1,3 +1,35 @@
+Scope
+=====
+
+This repository contains material under different terms.
+
+1. Code: MIT License
+
+   The source code of the site (Svelte components, TypeScript, CSS, build
+   scripts, configuration) is licensed under the MIT License below.
+
+2. Brand, artwork, and content: all rights reserved
+
+   The MIT License below does NOT apply to the following. No license is
+   granted for them:
+
+   - the Solo Stack name, logo, wordmark, and mascot,
+   - all artwork and images: the painted scenes and their layers (image files
+     in docs/art/, docs/mockups/, and the assets/ folders under src/lib/),
+     banner, thumbnails, and the icons in static/,
+   - photos of the owner,
+   - the radio tracks (src/lib/home/sections/radio/track/),
+   - blog posts, transcripts, legal pages, page copy, and other written
+     content (src/content/, messages/, docs/copy/).
+
+3. Third-party material: its own terms
+
+   - Geist and Geist Mono fonts: SIL Open Font License 1.1, see
+     static/fonts/OFL-Geist.txt.
+   - Platform logos are trademarks of their respective owners.
+
+--------------------------------------------------------------------------------
+
 MIT License
 
 Copyright (c) 2026 Peter Ruß
