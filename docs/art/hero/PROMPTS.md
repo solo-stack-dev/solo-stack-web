@@ -8,7 +8,7 @@ Paths below are relative to the repository unless an external Windows path is sh
 
 - Native: 1672×941 px. Final: 2560×1440 px.
 - `transparent_background`: false.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-f145537e-fa8e-425e-b843-0032b5452e07.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-f145537e-fa8e-425e-b843-0032b5452e07.png`.
 
 References, in order:
 
@@ -28,7 +28,7 @@ Use case: stylized-concept. Produce one original PRODUCTION BACKGROUND LAYER, no
 
 - Native: 852×1846 px. Final: 1080×2340 px.
 - `transparent_background`: false.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-6b25bb84-7b76-4c27-974b-20755773e4f5.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-6b25bb84-7b76-4c27-974b-20755773e4f5.png`.
 
 References, in order:
 
@@ -47,7 +47,7 @@ Use case: stylized-concept. Highest available quality. Paint ONE original produc
 
 - Native: 2048×768 px. Final: 2560×1024 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-dd8ef195-5896-4b44-bde4-5db96f6be763.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-dd8ef195-5896-4b44-bde4-5db96f6be763.png`.
 
 References, in order:
 
@@ -65,7 +65,7 @@ Use case: stylized-concept. Highest available quality. Single original PRODUCTIO
 
 - Native: 2048×768 px. Final: 2560×1024 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b4884311-c530-491c-a520-e877e13c3738.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b4884311-c530-491c-a520-e877e13c3738.png`.
 
 References, in order:
 
@@ -82,7 +82,7 @@ Use case: stylized-concept. Production illustration at highest quality. Create o
 
 - Native: 1983×793 px. Final: 2560×1024 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b90ab74b-f321-4cbd-9efa-fb3d97110d4f.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b90ab74b-f321-4cbd-9efa-fb3d97110d4f.png`.
 
 References, in order:
 
@@ -99,7 +99,7 @@ Use case: stylized-concept. Highest quality. Paint ONE original wide isolated cl
 
 - Native: 1254×1254 px. Final: 2048×2048 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-eb087dd2-ffef-46b5-a7ce-fd07f1d45886.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-eb087dd2-ffef-46b5-a7ce-fd07f1d45886.png`.
 
 References, in order:
 
@@ -118,7 +118,7 @@ Use case: stylized-concept. Highest image quality. ONE isolated original painted
 
 - Native: 1774×887 px. Final: 4096×2048 px.
 - `transparent_background`: false.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-07a5b444-7821-420d-8da5-338a79628d9d.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-07a5b444-7821-420d-8da5-338a79628d9d.png`.
 
 References, in order:
 
@@ -136,7 +136,7 @@ Use case: stylized-concept. Highest available quality. Original PRODUCTION 3D TE
 
 - Native: 1134×1387 px. Final: 900×1100 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-3ff3b75f-0ea1-4f1e-939d-98ad1934d8a6.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-3ff3b75f-0ea1-4f1e-939d-98ad1934d8a6.png`.
 
 References, in order:
 
@@ -176,13 +176,13 @@ The tool accepts at most five input paths. The initial call with seven individua
 
 Candidates A, B and C used these ordered image inputs:
 
-1. `C:/Users/peter/.t3/userdata/attachments/045fafa9-1c82-48b7-8a68-d1b81143f990-db7d217c-39e9-4b65-aaa9-2951af656e6c.png`
+1. `~/.t3/userdata/attachments/045fafa9-1c82-48b7-8a68-d1b81143f990-db7d217c-39e9-4b65-aaa9-2951af656e6c.png`
 2. `D:/repos/solo-stack-web/docs/art/mascot/mascot-hero-moonrim.png`
 3. `D:/repos/solo-stack-web/docs/art/hero/hero-cloud-seat-references.png`
 
 All three returned 1774×887 RGBA. They were visually inspected and rejected as final assets because their substantial visible silhouettes were too long and shallow, about 4:1, despite matching the pigment palette. Candidate C had the strongest broken ochre/charcoal material and was used for the compactness refinement D. D was selected after viewing its isolated result and the actual-layer registration composite. It has a roughly 2.4:1 visible silhouette, short left wisps, a shallow seating hollow, a warm broken upper-right rim, and a substantial charcoal underside. No vector or sticker-style candidate was selected.
 
-Generated source directory: `C:/Users/peter/.codex/generated_images/01a1ae81-511b-7793-9022-5f837c88cba8/`.
+Generated source directory: `~/.codex/generated_images/01a1ae81-511b-7793-9022-5f837c88cba8/`.
 
 ### Candidate A (rejected as final)
 
@@ -218,7 +218,7 @@ Use case: stylized-concept. Highest available image quality, production watercol
 
 Source: `exec-c52b044a-8ac3-411f-82fe-03cb4bb76c81.png`. Ordered inputs:
 
-1. `C:/Users/peter/.codex/generated_images/01a1ae81-511b-7793-9022-5f837c88cba8/exec-d1122ed6-312b-4476-bba9-ad174c1b8b03.png`
+1. `~/.codex/generated_images/01a1ae81-511b-7793-9022-5f837c88cba8/exec-d1122ed6-312b-4476-bba9-ad174c1b8b03.png`
 2. `D:/repos/solo-stack-web/docs/art/hero/hero-cloud-seat-references.png`
 
 Exact prompt:

@@ -37,7 +37,7 @@ This document is the complete brief for building the solo-stack.dev homepage. It
 - Scaffold only: `src/routes/+page.svelte` is the SvelteKit welcome page; `+layout.svelte` handles hreflang; `layout.css` loads Geist (`static/fonts/Geist-wght.woff2`) and Tailwind. `messages/de.json` is empty. `src/lib/assets/favicon.svg` exists.
 - Installed: SvelteKit 3, Svelte 5, Tailwind 4, `@sveltejs/enhanced-img`, mdsvex, Paraglide, valibot, super-sitemap, adapter-cloudflare. **Threlte and three are not installed yet.**
 - Docs: [PROJECT.md](PROJECT.md) (decisions), [ARCHITECTURE.md](ARCHITECTURE.md) (stack, conventions), this file.
-- Mockups: round 1 is rejected (HTML concepts in `docs/mockups/01-…` to `04-…`, gallery `docs/mockups/index.html`, screenshots in `docs/mockups/screenshots/`); `docs/mockups/round-2/` (image mockups; `BRIEF.md` is the art brief used to make them; each subfolder has `README.md` with build notes and `PROMPTS.md` with exact prompts).
+- Mockups: round 1 is rejected (HTML concepts in `docs/mockups/01-…` to `04-…`, gallery `docs/mockups/index.html`, screenshots removed, see git history at `dbb4371`); `docs/mockups/round-2/` (image mockups, only the favorites and images referenced by art prompts are kept, the rest is in git history at `dbb4371`; `BRIEF.md` is the art brief used to make them; each subfolder has `README.md` with build notes and `PROMPTS.md` with exact prompts).
 - Brand assets (outside the repo): `D:\repos\Solo Stack\branding\final-branding-assets\` (banner, profile photo, thumbnails).
 
 ---

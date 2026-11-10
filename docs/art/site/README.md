@@ -1,5 +1,7 @@
 # Silhouettennacht production art
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Original watercolor/sumi artwork for the subpages of solo-stack.dev, generated and inspected on 2026-11-05. Thirteen PNG masters, nine with native alpha and four intentionally opaque. No moons, typography, logos or UI. No application files changed.
 
 ## Masters

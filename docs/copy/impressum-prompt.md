@@ -2,13 +2,13 @@ Schreibe den Text für das Impressum der Website https://solo-stack.dev (persön
 
 Fakten (nur diese verwenden, nichts erfinden):
 
-- Anbieter: Peter Ruß, Einzelunternehmer (Nebenerwerb), kein Handelsregistereintrag, keine Beschäftigten, keine zusätzliche Firmenbezeichnung. „Solo Stack“ ist nur der Kanal und Projektname, kein Firmenname.
-- Anschrift: c/o POSTFLEX PFX-656-644, Emsdettener Straße 10, 48268 Greven, Deutschland
+- Anbieter: <NAME DES ANBIETERS>, Einzelunternehmer (Nebenerwerb), kein Handelsregistereintrag, keine Beschäftigten, keine zusätzliche Firmenbezeichnung. „Solo Stack“ ist nur der Kanal und Projektname, kein Firmenname.
+- Anschrift: <LADUNGSFÄHIGE ANSCHRIFT>
 - E-Mail: business@solo-stack.dev
 - Zusätzlich gibt es ein Kontaktformular unter https://solo-stack.dev/kontakt
 - Keine Telefonnummer angeben.
 - Umsatzsteuer: Kleinunternehmer nach § 19 UStG. Eine Umsatzsteuer-Identifikationsnummer nach § 27a UStG ist beantragt, aber noch nicht zugeteilt: im Abschnitt Umsatzsteuer die Zeile „Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:“ aufführen und darunter bzw. dahinter „beantragt“ angeben.
-- Die Website enthält journalistisch-redaktionelle Inhalte (Blogartikel zu den Videos). Verantwortlich nach § 18 Abs. 2 MStV: Peter Ruß, gleiche Anschrift.
+- Die Website enthält journalistisch-redaktionelle Inhalte (Blogartikel zu den Videos). Verantwortlich nach § 18 Abs. 2 MStV: <NAME DES ANBIETERS>, gleiche Anschrift.
 - Kein reglementierter Beruf, keine Aufsichtsbehörde.
 
 Anforderungen:

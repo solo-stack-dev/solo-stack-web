@@ -107,7 +107,7 @@ The previously rejected sunrise-laptop.png was not opened or passed as a style r
 
 ### Attempt 1 — rejected
 
-Source: `C:/Users/peter/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-9edd3705-e974-4ec6-9fc7-0e0e9c6c2594.png`.
+Source: `~/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-9edd3705-e974-4ec6-9fc7-0e0e9c6c2594.png`.
 
 Inspected on butter and anthracite and beside the mug at a 2.2:1 body-width ratio. Warm illumination and contact were convincing, but the body read champagne gold instead of silver, and the perimeter was too uniformly smooth.
 
@@ -117,7 +117,7 @@ Use case: stylized-concept. Highest available image quality. Production watercol
 
 ### Attempt 2 — selected
 
-Source: `C:/Users/peter/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-0e6e0517-8129-4b82-89d0-df88a31f2925.png`.
+Source: `~/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-0e6e0517-8129-4b82-89d0-df88a31f2925.png`.
 
 Selected after butter, anthracite and cliff-path/mug comparison. Better warm silver-gray body, localized right sunlight, lower camera angle, fine ink and integrated contact shadow.
 
@@ -128,7 +128,7 @@ Refinement for this fresh painting: the LAPTOP MUST READ AS SILVER, not gold, br
 
 ### Attempt 3 — rejected
 
-Source: `C:/Users/peter/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-a7f37f38-b4a9-4d9e-b953-a10a18db4426.png`.
+Source: `~/.codex/generated_images/01a1a373-a5ca-7cf1-85cf-b29b7873617f/exec-a7f37f38-b4a9-4d9e-b953-a10a18db4426.png`.
 
 Inspected on both brand backgrounds and the path beside the mug. Stronger charcoal rock texture, but a more top-down view than the mug and tighter side margins made it weaker than attempt 2.
 
@@ -148,4 +148,4 @@ Final style emphasis: the mug reference has deep charcoal mineral facets, broken
 - Final placement measurements: rock-bottom anchor (450,625); highest visible rock top y≈322, supporting top at (700,458); approximate body bbox (191,151,1047,334), expressed as x,y,width,height. These are final-master coordinates, not native generation coordinates.
 - Mug assumption: 370 px width including handle on the 600 px master. Body 1047 px / (370 × 1.286240786) = 2.2. For the scene QA, laptop scale 0.55 and coffee scale 0.707432432 give widths 575.85 and 261.75 px.
 - Path QA canvas: 1400×900 over #FCD772. The source cliff-path crop (0,0,1400,600) is placed at (0,300). Laptop 770×385 at (570,206); coffee 424×424 at (60,56). These placements demonstrate relative scale and contact; integration may reposition both assets.
-- Final composites visually inspected after corrected export: `C:/Users/peter/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-butter.png`, `C:/Users/peter/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-night.png`, `C:/Users/peter/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-coffee-path.png`, `C:/Users/peter/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/contact-detail.png`. Metrics and color-mask definition: `C:/Users/peter/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/qa.json`. Attempts and intermediate QA also remain in that temp directory; only the final three named laptop composites reflect the corrected export.
+- Final composites visually inspected after corrected export: `~/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-butter.png`, `~/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-night.png`, `~/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/laptop-coffee-path.png`, `~/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/contact-detail.png`. Metrics and color-mask definition: `~/AppData/Local/Temp/sunrise-laptop-warm-wHTTQ3/qa.json`. Attempts and intermediate QA also remain in that temp directory; only the final three named laptop composites reflect the corrected export.

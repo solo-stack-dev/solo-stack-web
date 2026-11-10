@@ -33,3 +33,6 @@ worker-configuration.d.ts
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# Local QA screenshots (scripts write here; not tracked)
+docs/screens/

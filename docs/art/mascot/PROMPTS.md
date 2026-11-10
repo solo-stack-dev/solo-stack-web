@@ -8,8 +8,8 @@ Status: rejected: legs too long
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
 - `D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg`
 - `D:/repos/Solo Stack/branding/final-branding-assets/profil-buttergelb.png`
 
@@ -25,8 +25,8 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
 - `D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg`
 - `D:/repos/Solo Stack/branding/final-branding-assets/profil-buttergelb.png`
 
@@ -43,8 +43,8 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
 Exact submitted prompt:
 
@@ -59,9 +59,9 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/01-night-shift-desktop.png`
 
 Exact submitted prompt:
 
@@ -76,8 +76,8 @@ Status: selected; generated hand patch
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
 
 Exact submitted prompt:
 
@@ -91,8 +91,8 @@ Status: selected; generated hand patch
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-nightshift-typing@1.png`
 
 Exact submitted prompt:
 
@@ -106,9 +106,9 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/06-video-sunrise/01-video-cinema-desktop-facade.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/06-video-sunrise/01-video-cinema-desktop-facade.png`
 
 Exact submitted prompt:
 
@@ -123,8 +123,8 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
 Exact submitted prompt:
 
@@ -139,8 +139,8 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-hero-moonrim.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-hero-moonrim.png`
 
 Exact submitted prompt:
 
@@ -154,8 +154,8 @@ Status: selected
 
 Ordered reference image paths:
 
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
-- `C:/Users/peter/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/art/mascot/mascot-model-sheet-v2.png`
+- `~/.t3/worktrees/solo-stack-web/t3-ec7eabee/docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
 Exact submitted prompt:
 

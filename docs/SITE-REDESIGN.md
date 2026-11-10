@@ -1,5 +1,7 @@
 # Site redesign: "Silhouettennacht" (2026-11-05)
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Owner brief (2026-11-05): the design is not finished. The moon is used on every subpage and wears out (on /stats it looks out of place). Keep the homepage and the general ideas of every page, but push the craft until it never needs touching again. Functionality is done: **design only**, no feature or data changes. A critique loop (Claude Opus 5.5 high + gpt-6.1-sol) rates every page 1–10; the work is finished only at ≥ 9.5 from both.
 
 References (in `docs/art/site/refs/`):

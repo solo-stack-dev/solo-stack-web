@@ -19,7 +19,7 @@ Inputs, in order:
 
 Transparent background: true.
 
-Raw tool output: `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-e9aea3dd-0c49-4021-a404-0420fa76436a.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
+Raw tool output: `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-e9aea3dd-0c49-4021-a404-0420fa76436a.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
 
 ```text
 Use case: stylized-concept. Production transparent raster character sprite for an ink-painted night website. Highest available image quality. Portrait canvas exactly 1024x1536 pixels (2:3), no trimming.
@@ -39,7 +39,7 @@ Inputs, in order:
 
 Transparent background: true.
 
-Raw tool output: `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-32feb3c0-81a0-458d-a1ec-2e7a755560fd.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
+Raw tool output: `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-32feb3c0-81a0-458d-a1ec-2e7a755560fd.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
 
 ```text
 Use case: stylized-concept. Highest available image quality. Production transparent raster character sprite, exactly 1024x1536 portrait canvas (2:3), no trimming.
@@ -59,7 +59,7 @@ Inputs, in order:
 
 Transparent background: true.
 
-Raw tool output: `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-d4ea9fba-a09b-4ee9-bf19-7ca8e777d920.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
+Raw tool output: `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-d4ea9fba-a09b-4ee9-bf19-7ca8e777d920.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
 
 ```text
 Use case: stylized-concept. Highest available image quality. Production transparent raster character sprite, exactly 1024x1536 portrait canvas (2:3), no trimming.
@@ -80,7 +80,7 @@ Inputs, in order:
 
 Transparent background: true.
 
-Raw tool output: `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-42c20484-e457-4bb8-8ae4-8788612a3ca2.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
+Raw tool output: `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-42c20484-e457-4bb8-8ae4-8788612a3ca2.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
 
 ```text
 Use case: stylized-concept / identity-preserve. Highest available image quality. Exactly 1024x1536 portrait RGBA production sprite, preserve the full 2:3 canvas.
@@ -94,12 +94,12 @@ Genuine transparent background, with partial-alpha smoke and soft painted eye bl
 
 Inputs, in order:
 
-1. `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-42c20484-e457-4bb8-8ae4-8788612a3ca2.png`
+1. `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-42c20484-e457-4bb8-8ae4-8788612a3ca2.png`
 2. `docs/art/mascot/mascot-model-sheet-v2.png`
 
 Transparent background: true.
 
-Raw tool output: `C:/Users/peter/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-6a3addf3-0618-4b31-817c-946e745efdf0.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
+Raw tool output: `~/.codex/generated_images/01a19851-0a83-75d3-9e84-7b23ab7ead1f/exec-6a3addf3-0618-4b31-817c-946e745efdf0.png`. Raw originals are retained outside the repository; only the selected finals are delivered.
 
 ```text
 Use case: precise-object-edit / identity-preserve. Highest available quality. Edit input image 1, the shadow mascot. Input image 2 is its original identity model sheet only.

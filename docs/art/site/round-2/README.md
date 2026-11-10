@@ -1,5 +1,7 @@
 # Round 2 production art
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Thirteen original PNG masters for solo-stack.dev, generated and inspected on 2026-11-05. All artwork, documentation and proofs for this round live here. No application code, visitor copy or deployment changed. No text, letters, logos or UI are baked into the masters.
 
 ## Master inventory

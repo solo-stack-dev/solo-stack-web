@@ -1,6 +1,6 @@
 # transitions generation prompts
 
-Note: everything prefixed `_` referenced below (the `_source-*`, `_check-*` and `_rejected-*` images, `_wash-report.html`, the master finishing scripts `_process-mist.mjs` / `_process-washes.mjs` / `_check-washes.mjs` / `_validate-wash-spread.mjs`, the retired Python finishers and the `_*-validation.json` measurements) is not committed; it is archived outside the repo in `C:/Users/peter/solo-stack-redesign/art-scratch/transitions/` (the scripts are also in git history before this note). The finishing scripts resolve the repo relative to their own folder, so copy them back next to this file together with their `_source-*` inputs to re-finish a master. Shipped runtime assets are rebuilt from the committed masters only, see [README.md](README.md).
+Note: everything prefixed `_` referenced below (the `_source-*`, `_check-*` and `_rejected-*` images, `_wash-report.html`, the master finishing scripts `_process-mist.mjs` / `_process-washes.mjs` / `_check-washes.mjs` / `_validate-wash-spread.mjs`, the retired Python finishers and the `_*-validation.json` measurements) is not committed; it is archived outside the repo in `~/solo-stack-redesign/art-scratch/transitions/` (the scripts are also in git history before this note). The finishing scripts resolve the repo relative to their own folder, so copy them back next to this file together with their `_source-*` inputs to re-finish a master. Shipped runtime assets are rebuilt from the committed masters only, see [README.md](README.md).
 
 ## mist strips
 
@@ -20,7 +20,7 @@ Generation reference order in each successful call: catalog 2, 3, 4, 6, 7 (five 
 
 Prompt/documentation precedents inspected: `docs/art/shared/PROMPTS.md`, `docs/art/hero/PROMPTS.md`, `docs/art/sunrise/PROMPTS.md`.
 
-All native sources reside under `C:/Users/peter/.codex/generated_images/01a1a33d-71a7-7bd2-8754-c23dd1c14e0b/`. Final production outputs and check composites reside in this directory. The source PNGs are inputs to the documented finishing process, not approved production deliverables by themselves.
+All native sources reside under `~/.codex/generated_images/01a1a33d-71a7-7bd2-8754-c23dd1c14e0b/`. Final production outputs and check composites reside in this directory. The source PNGs are inputs to the documented finishing process, not approved production deliverables by themselves.
 
 ### mist-dusk.png
 
@@ -125,7 +125,7 @@ These five style inputs were opened with `view_image` and passed in this exact o
 4. `docs/art/making/making-plate.png`
 5. `docs/art/radio/radio-landscape.png`
 
-The material target is broad wet-in-wet cauliflower blossoms, pooled dark pigment, visible grain/backruns, overlapping washes, and light on sculpted cloud rims. Reference objects, moons, stars, and landscapes are not part of the generated strips. Source masters are retained locally as `_source-mist-<name>.png`. Native tool output directory: `C:/Users/peter/.codex/generated_images/01a1a351-7b70-7922-806b-f99de82a647f/`.
+The material target is broad wet-in-wet cauliflower blossoms, pooled dark pigment, visible grain/backruns, overlapping washes, and light on sculpted cloud rims. Reference objects, moons, stars, and landscapes are not part of the generated strips. Source masters are retained locally as `_source-mist-<name>.png`. Native tool output directory: `~/.codex/generated_images/01a1a351-7b70-7922-806b-f99de82a647f/`.
 
 #### Redo dusk — exact prompt
 
@@ -199,7 +199,7 @@ Opened and inspected before generation:
 
 These were visual references reviewed in the session. No `referenced_image_paths` or `num_last_images_to_include` arguments were passed to the new-image generation calls. Thus this is a visual material match, not a claim of explicitly attached reference conditioning. `docs/art/cinema/cinema-landscape.png` was additionally inspected for the comparison composites.
 
-Sources were generated in `C:/Users/peter/.codex/generated_images/01a1a33d-bd8a-7862-966a-4172baef5440/`. Selected sources are copied into this directory as `_source-*.png`; original generated files remain untouched.
+Sources were generated in `~/.codex/generated_images/01a1a33d-bd8a-7862-966a-4172baef5440/`. Selected sources are copied into this directory as `_source-*.png`; original generated files remain untouched.
 
 ### wash-spread.png
 

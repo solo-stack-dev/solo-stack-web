@@ -8,7 +8,7 @@ Paths below are relative to the repository unless an external Windows path is sh
 
 - Native: 1672×941 px. Final: 2560×1440 px.
 - `transparent_background`: false.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b19ac1bf-5f70-4a93-963a-7638fc999aa7.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-b19ac1bf-5f70-4a93-963a-7638fc999aa7.png`.
 
 References, in order:
 
@@ -27,7 +27,7 @@ Use case: stylized-concept. Highest image quality. Original PRODUCTION BACKGROUN
 
 - Native: 852×1846 px. Final: 1080×2340 px.
 - `transparent_background`: false.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-9e86bea9-e705-4917-bcbd-65036765c735.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-9e86bea9-e705-4917-bcbd-65036765c735.png`.
 
 References, in order:
 
@@ -46,7 +46,7 @@ Use case: stylized-concept. Highest quality original PRODUCTION BACKGROUND PLATE
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-c92d90e5-9c10-49fb-8e77-35f184266531.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-c92d90e5-9c10-49fb-8e77-35f184266531.png`.
 
 References, in order:
 
@@ -64,7 +64,7 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-569a3bae-0e09-4b2b-8d35-a932e4cfc5b1.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-569a3bae-0e09-4b2b-8d35-a932e4cfc5b1.png`.
 
 References, in order:
 
@@ -82,7 +82,7 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-a2a39623-d508-47f0-a4c7-3e5f3ad92532.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-a2a39623-d508-47f0-a4c7-3e5f3ad92532.png`.
 
 References, in order:
 
@@ -100,7 +100,7 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-09decb3a-5fc0-4c57-89bf-96a2258b468a.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-09decb3a-5fc0-4c57-89bf-96a2258b468a.png`.
 
 References, in order:
 
@@ -118,7 +118,7 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-77ffbcea-cfeb-48e8-b91a-37b7eabdff0a.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-77ffbcea-cfeb-48e8-b91a-37b7eabdff0a.png`.
 
 References, in order:
 
@@ -136,7 +136,7 @@ Use case: stylized-concept. Highest quality. ONE original production WATERCOLOR 
 
 - Native: 1254×1254 px. Final: 1400×1400 px.
 - `transparent_background`: true.
-- Original generated file: `C:/Users/peter/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-aeb61d6c-e5c6-4334-87ce-eacb81869895.png`.
+- Original generated file: `~/.codex/generated_images/01a194d6-09b3-7350-aa22-04604a882ed4/exec-aeb61d6c-e5c6-4334-87ce-eacb81869895.png`.
 
 References, in order:
 
@@ -162,8 +162,8 @@ Tool/model: built-in `image_gen.imagegen`; underlying model identifier is not ex
 
 ### Inputs and selection
 
-- Desktop measured lunar disc: center approximately (2255, 855), radius 158 px. Input 1: original desktop crop (1536, 416), size 1024×1024. Input 2: corresponding crop of the initial sky mask. Two 1254×1254 edits were generated; the first had finer grain and was rejected. Selected second output: `C:/Users/peter/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8225a66a-4499-47bd-b659-455d4fcce704.png`.
-- Mobile measured lunar disc: center approximately (919, 1661), radius 125 px. Input 1: original mobile crop (0, 1260), size 1080×1080. Input 2: corresponding crop of the initial sky mask. Selected 1254×1254 output: `C:/Users/peter/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8437b4c9-e1d2-41d4-abdd-3590af457d30.png`.
+- Desktop measured lunar disc: center approximately (2255, 855), radius 158 px. Input 1: original desktop crop (1536, 416), size 1024×1024. Input 2: corresponding crop of the initial sky mask. Two 1254×1254 edits were generated; the first had finer grain and was rejected. Selected second output: `~/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8225a66a-4499-47bd-b659-455d4fcce704.png`.
+- Mobile measured lunar disc: center approximately (919, 1661), radius 125 px. Input 1: original mobile crop (0, 1260), size 1080×1080. Input 2: corresponding crop of the initial sky mask. Selected 1254×1254 output: `~/.codex/generated_images/01a1a33d-bc33-7971-bf58-2b1242080372/exec-8437b4c9-e1d2-41d4-abdd-3590af457d30.png`.
 
 ### Initial prompt (selected mobile generation; rejected first desktop generation)
 
@@ -248,7 +248,7 @@ Tool: built-in `image_gen.imagegen`, underlying model not exposed; highest quali
 
 ### Input crops and attempts
 
-Originals were copied before edits to `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-original.png` and `mobile-original.png`.
+Originals were copied before edits to `~/AppData/Local/Temp/making-cliff-light-20261103/desktop-original.png` and `mobile-original.png`.
 
 - Desktop target: original crop (1560, 800, 2560, 1440), 1000x640. Both generated outputs: 1568x1003.
 - Mobile target: original crop (280, 1600, 1080, 2240), 800x640. Both generated outputs: 1402x1122.
@@ -258,13 +258,13 @@ Originals were copied before edits to `C:/Users/peter/AppData/Local/Temp/making-
 
 ### Rejected first pair outputs
 
-- desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-becffc26-c799-4870-aa13-6bfeb4649189.png`.
-- mobile: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-03a762ce-4a3c-45f8-b279-94fc25ac4430.png`.
+- desktop: `~/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-becffc26-c799-4870-aa13-6bfeb4649189.png`.
+- mobile: `~/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-03a762ce-4a3c-45f8-b279-94fc25ac4430.png`.
 
 ### Selected second pair outputs
 
-- desktop: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-e96f9cb7-4c8c-426c-8a98-285e5fcbf5f1.png`.
-- mobile: `C:/Users/peter/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-32d785c5-a89c-487a-a672-adac1b8af43b.png`.
+- desktop: `~/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-e96f9cb7-4c8c-426c-8a98-285e5fcbf5f1.png`.
+- mobile: `~/.codex/generated_images/01a1a373-d58d-7fa1-8819-ab4337127dbd/exec-32d785c5-a89c-487a-a672-adac1b8af43b.png`.
 
 ### First-generation exact desktop prompt
 
@@ -353,9 +353,9 @@ Audits compare decoded RGB against the pre-edit copies. Outside-mask SHA-256 val
 
 Before/after inspection crops (outside repo):
 
-- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-before.png`
-- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/desktop-after.png`
-- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/mobile-before.png`
-- `C:/Users/peter/AppData/Local/Temp/making-cliff-light-20261103/mobile-after.png`
+- `~/AppData/Local/Temp/making-cliff-light-20261103/desktop-before.png`
+- `~/AppData/Local/Temp/making-cliff-light-20261103/desktop-after.png`
+- `~/AppData/Local/Temp/making-cliff-light-20261103/mobile-before.png`
+- `~/AppData/Local/Temp/making-cliff-light-20261103/mobile-after.png`
 
 The same directory contains `audit.json`, `spec.json`, `masks.py`, `refine.py`, `tighten.py`, `composite2.py`, and independent `{desktop,mobile}-{laptop,screen,silhouette}-protect.png` diagnostic masks (white marks protected pixels in these temporary diagnostics, unlike the production edit masks). PNG master hashes were checked again after saving. This appendix supersedes the earlier statement that original warm cliff-top paint was wholly retained; it was retained during moon removal, then selectively repaired here.

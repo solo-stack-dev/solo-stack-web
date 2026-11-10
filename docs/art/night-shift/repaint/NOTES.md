@@ -1,5 +1,7 @@
 # Night shift repaint handoff
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Asset-only delivery for the lead to integrate. No application code, external documentation, or git state was changed; no commit or deployment was made. All task-authored output is under this directory. The built-in tool also retains its normal source copies in the user's Codex generated-image cache.
 
 ## Tool, model, and quality

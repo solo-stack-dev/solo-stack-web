@@ -15,7 +15,7 @@ All text in these design drafts is placeholder under BRIEF.md and is explicitly 
 
 Reference/edit inputs: brand banner; owner portrait.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-ce601449-5582-491b-b5ef-252b0516ddf4.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-ce601449-5582-491b-b5ef-252b0516ddf4.png
 
 Exact prompt:
 
@@ -27,7 +27,7 @@ Use case: ui-mockup. Create a highest-quality original raster website section mo
 
 Reference/edit inputs: 01-night-shift-desktop.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-a171a541-6c1e-4e4c-89d3-6f4941420c97.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-a171a541-6c1e-4e4c-89d3-6f4941420c97.png
 
 Exact prompt:
 
@@ -39,7 +39,7 @@ Use case: precise-object-edit. Edit the provided Night Shift desktop website ima
 
 Reference/edit inputs: 01-night-shift-desktop.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-73a244e3-63cd-4058-ade6-4953c0771308.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-73a244e3-63cd-4058-ade6-4953c0771308.png
 
 Exact prompt:
 
@@ -51,7 +51,7 @@ Use case: precise-object-edit. Edit the provided fixed-view Night Shift desktop 
 
 Reference/edit inputs: 01-night-shift-desktop.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-6db8b5c1-bb17-46e8-9923-06e6e70fec32.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-6db8b5c1-bb17-46e8-9923-06e6e70fec32.png
 
 Exact prompt:
 
@@ -63,7 +63,7 @@ Use case: ui-mockup, responsive adaptation. Adapt this exact Night Shift waterco
 
 Reference/edit inputs: 01-night-shift-desktop.png; brand banner.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-53a54e12-a431-4f50-b6da-f7bc1c53e4d3.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-53a54e12-a431-4f50-b6da-f7bc1c53e4d3.png
 
 Exact prompt:
 
@@ -75,7 +75,7 @@ Use case: ui-mockup. Generate an alternative Night Shift website section as a co
 
 Reference/edit inputs: initial radio generation, documented below.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-61d960eb-c87a-4965-b0e3-bf56df706153.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-61d960eb-c87a-4965-b0e3-bf56df706153.png
 
 Exact prompt:
 
@@ -87,7 +87,7 @@ Use case: lighting-weather and precise-object-edit. Edit this exact radio websit
 
 Reference/edit inputs: 06-night-radio-desktop-idle.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-182bebcc-8ad5-4ec6-94c4-8c10b4ee3e1f.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-182bebcc-8ad5-4ec6-94c4-8c10b4ee3e1f.png
 
 Exact prompt:
 
@@ -99,7 +99,7 @@ Use case: precise-object-edit. Edit this exact Night Radio desktop watercolor we
 
 Reference/edit inputs: 06-night-radio-desktop-idle.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-907010ff-2ad9-4c3f-937f-9dde46b34f45.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-907010ff-2ad9-4c3f-937f-9dde46b34f45.png
 
 Exact prompt:
 
@@ -111,7 +111,7 @@ Use case: precise-object-edit. Edit this exact Night Radio desktop watercolor we
 
 Reference/edit inputs: 10-night-radio-mobile-youtube.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-bbef8a41-7bb1-472e-b020-b17bfc8ed2c6.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-bbef8a41-7bb1-472e-b020-b17bfc8ed2c6.png
 
 Exact prompt:
 
@@ -123,7 +123,7 @@ Use case: precise-object-edit. Return this mobile radio screenshot to IDLE while
 
 Reference/edit inputs: 09-night-radio-mobile-idle.png.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-4e66276a-dadd-439a-9bf6-484d22e29bd4.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-4e66276a-dadd-439a-9bf6-484d22e29bd4.png
 
 Exact prompt:
 
@@ -135,7 +135,7 @@ Use case: precise-object-edit. Edit the provided MOBILE Night Radio image, prese
 
 Reference/edit inputs: intermediate mobile music state, see lineage.
 
-Original generated file: C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-21aa9ae1-aab0-4822-8735-5e76246b51b1.png
+Original generated file: ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-21aa9ae1-aab0-4822-8735-5e76246b51b1.png
 
 Exact prompt:
 
@@ -153,7 +153,7 @@ Initial radio image had too much yellow sky, suggesting sunrise. radioRefineProm
 
 References: Brand banner.
 
-Generated file: Generated images are saved to C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-14953c0f-7488-4fb6-844c-fc002675e2b8.png
+Generated file: Generated images are saved to ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-14953c0f-7488-4fb6-844c-fc002675e2b8.png
 
 ```text
 Use case: ui-mockup. Highest-quality original generated raster, actual desktop website section viewport, landscape 16:9 target 2560x1440. Reference image supplies Solo Stack brand palette and physical watercolor pigment texture. Design draft only: every UI text is placeholder. Build NIGHT RADIO at 02:00: a breathtaking warm vintage tabletop radio on a rough charcoal rocky ledge in a painted night landscape. The radio is the large foreground centerpiece occupying 65 percent screen width, hand painted rounded warm ochre wooden casing, charcoal woven speaker grille on its left, one LARGE circular buttery ivory tuning dial on its right, small tactile brass knobs along bottom. The dial has eight clear small painted station names around its perimeter with one small mark each: YouTube, Twitch, TikTok, Instagram, X, Bluesky, GitHub, Discord. Spell each perfectly once, spaced legibly around dial, no logos, no invented frequencies. A separate small crescent-marked local music detent below dial connects to a physical play triangle button. The radio display has just '—' in idle state. Behind radio: wide soft watercolor hills, quiet horizontal fine golden horizon line, moon upper right, a few warm white stars. Dry pigment granulation, bleeding edges, ink outlines, paper texture, amber reflected moonlight, excellent artistic craft. Warm charcoal and muted butter yellow only with off-white, no purple or neon. Fine drawn line from distant horizon subtly aligns with radio, ready to become an audio waveform in another state, but IDLE here: hills natural and no waveform, stars calm, needle at neutral bottom position. Small SOLO STACK wordmark top left, hamburger strokes top right, spacious heading NACHTRADIO in heavy geometric sans upper left, tiny mono 02:00. At bottom centered tiny play triangle and music note, no extra sentences or cards. Tiny TODO(copy) bottom right. Make it usable website art, not a product ad, not a UI dashboard, not a board of multiple screens. No physical phone frame or computer mockup.
@@ -165,7 +165,7 @@ Initial mobile radio established upright cabinet. It was input to 10; final 09 t
 
 References: 06-night-radio-desktop-idle.png.
 
-Generated file: Generated images are saved to C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-9f5ec84e-80d4-40d6-8905-06dc1ed650d6.png
+Generated file: Generated images are saved to ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-9f5ec84e-80d4-40d6-8905-06dc1ed650d6.png
 
 ```text
 Use case: ui-mockup, responsive art direction. Create a tall MOBILE counterpart of this exact Night Radio design, 9:19.5 portrait target 1080x2340, one actual website viewport without a phone frame. Maintain tactile hand-painted watercolor, paper grain, warm anthracite midnight, buttery moon, rocky foreground, layered hills and same vintage radio materials. Adapt radio for mobile as a compact upright model with large circular cream tuning dial occupying nearly full available width in upper half of casing, charcoal woven speaker and little black status display beneath it, and brass music play button near bottom. Keep the soft rounded wood housing, hand painted edges and ochre warmth; this is an art-directed narrow composition of the same product family. The eight station markers are clearly legible around dial in EXACT same order clockwise: YouTube at top, Twitch upper-right, TikTok right, Instagram lower-right, X bottom, Bluesky lower-left, GitHub left, Discord upper-left. No official logos. Neutral idle center hub without needle reaching a station. Display just '—'. Small crescent local-music station by physical play button, not a ninth social platform. Top small SOLO STACK and hamburger, bold heading NACHT / RADIO across two lines, small 02:00. Large moon upper right but not behind text, natural calm golden horizontal ridge above radio, calm sparse stars, no waveform. Radio fills portrait width with sensible margins and enough surrounding painted sky for atmosphere. Tiny bottom play triangle and music note, tiny TODO(copy) marker. All text draft placeholder. Premium illustration-led website, no cards, no dashboard. Preserve idle state throughout.
@@ -177,7 +177,7 @@ Initial music edit retained YouTube needle incorrectly. musicMobileFixPrompt rem
 
 References: 10-night-radio-mobile-youtube.png.
 
-Generated file: Generated images are saved to C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as C:\Users\peter\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-8b4b8a57-1e21-4856-9e55-11df04abe7ab.png
+Generated file: Generated images are saved to ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b as ~\.codex\generated_images\01a194a5-6008-7e43-95fb-2067bff6367b\exec-8b4b8a57-1e21-4856-9e55-11df04abe7ab.png
 
 ```text
 Use case: precise-object-edit. Edit this exact tall portrait mobile Night Radio website screenshot into LOCAL MUSIC PLAYING. Keep identical canvas 9:19.5, composition, cabinet, all eight social station labels, heading, 02:00, moon, wood grain, watercolor texture and pigment. Remove YouTube needle and YouTube label glow: social dial neutral. Change black display to exact 'SOLO STACK' plus small musical note, representing the owner's own lo-fi/sad rap track with no invented title. Make the crescent music station glow softly; physical play button becomes pause with two vertical strokes. Remove the YouTube external link below cabinet, replace bottom play triangle with pause and a thin music progress line, no timestamps. Behind cabinet, the high landscape ridge directly above radio turns into a beautiful golden ink audio waveform of organic varied amplitude, continuous edge-to-edge and visibly connected to the mountain silhouette; smaller portions visible either side of cabinet. Several stars gain soft watercolor halos captured on a beat. Not neon, no strobe, no disconnected chart overlay. Keep night dark and intimate. Keep tiny TODO(copy). One highest-quality mobile screenshot.

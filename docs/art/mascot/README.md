@@ -1,5 +1,7 @@
 # Mascot model sheet v2 and pose layers
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Generated with the built-in image generation tool on 2026-11-01. The approved night-shift reference style, owner portrait, banner and selected model sheet were supplied as image inputs; exact prompts and ordered paths are in [PROMPTS.md](PROMPTS.md). All artwork is original and contains no text. This folder contains production masters, the small game export, and integration notes only.
 
 ## Readiness and known limitation

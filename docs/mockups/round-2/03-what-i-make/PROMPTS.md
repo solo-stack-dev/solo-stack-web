@@ -10,10 +10,10 @@ Output: 02-storyboard-01-lightbulb.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-20080f6d-5793-457c-a064-8b66f7935794.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-20080f6d-5793-457c-a064-8b66f7935794.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -28,10 +28,10 @@ Output: 02-storyboard-02-chat-prompt.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-858f48ce-e7b4-4a6c-9a1e-92965c3acbcc.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-858f48ce-e7b4-4a6c-9a1e-92965c3acbcc.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -46,10 +46,10 @@ Output: 02-storyboard-03-code.png
 
 Status: rejected; retained in rejects/code-disconnected.png
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -64,10 +64,10 @@ Output: 02-storyboard-04-phone.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-b33af4f0-024f-4a51-a8dd-9eba18d49ff5.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-b33af4f0-024f-4a51-a8dd-9eba18d49ff5.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -82,10 +82,10 @@ Output: 02-storyboard-05-chart.png
 
 Status: superseded by targeted edit; original remains in generator output
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -100,10 +100,10 @@ Output: 02-storyboard-06-moon.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-be4b4e61-696d-48f2-8a8d-d4cd178bd3d4.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-be4b4e61-696d-48f2-8a8d-d4cd178bd3d4.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -118,7 +118,7 @@ Output: 01-ink-morph-desktop-context.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Reference image(s):
 - D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
@@ -137,10 +137,10 @@ Output: 02-storyboard-03-code.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-bf22b4a7-a978-46be-9f8c-b9d1026da0cf.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-bf22b4a7-a978-46be-9f8c-b9d1026da0cf.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-fe947b4b-eac8-4dfd-9355-c3bd54d4b1f2.png
 
 Exact prompt:
 
@@ -154,10 +154,10 @@ Output: 03-ink-morph-mobile.png
 
 Status: superseded by targeted edit; original remains in generator output
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-37cc84bd-99c0-4575-800b-a5d896ca05d3.png
 
 Exact prompt:
 
@@ -171,7 +171,7 @@ Output: 04-constellations-desktop.png
 
 Status: superseded by targeted edit; original remains in generator output
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
 
 Reference image(s):
 - D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
@@ -188,7 +188,7 @@ Output: 06-paper-folio-desktop.png
 
 Status: superseded by targeted edit; original remains in generator output
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
 
 Reference image(s):
 - D:/repos/Solo Stack/branding/final-branding-assets/04-buttergelb-banner-nachtstudio-youtube-2560x1440.jpg
@@ -206,10 +206,10 @@ Output: 05-constellations-mobile.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ee8facad-dff2-43a4-8cf9-5271d3d38f0c.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ee8facad-dff2-43a4-8cf9-5271d3d38f0c.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
 
 Exact prompt:
 
@@ -223,10 +223,10 @@ Output: 07-paper-folio-mobile.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-2635fcdb-1ac1-43bd-8a63-9f3675693840.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-2635fcdb-1ac1-43bd-8a63-9f3675693840.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
 
 Exact prompt:
 
@@ -240,10 +240,10 @@ Output: 02-storyboard-05-chart.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-5ce244de-f422-4a39-8abd-696b4e41b86e.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-5ce244de-f422-4a39-8abd-696b4e41b86e.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-332730f0-d705-4837-ab3a-9aaa5e5a5255.png
 
 Exact prompt:
 
@@ -257,10 +257,10 @@ Output: 03-ink-morph-mobile.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-f7e134fa-ec4b-47d0-b939-7ebba45cdb68.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-f7e134fa-ec4b-47d0-b939-7ebba45cdb68.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-07aab4a7-8da9-4a20-8a81-7d068deabc81.png
 
 Exact prompt:
 
@@ -274,10 +274,10 @@ Output: 04-constellations-desktop.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-cc745808-b2f2-4611-857c-4793a633da6b.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-cc745808-b2f2-4611-857c-4793a633da6b.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-ad3e6628-ec04-41e6-990f-3078e77ca317.png
 
 Exact prompt:
 
@@ -291,10 +291,10 @@ Output: 06-paper-folio-desktop.png
 
 Status: final
 
-Generated source: C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-643a3091-a7db-474a-94fd-ed6ac7f76adf.png
+Generated source: ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-643a3091-a7db-474a-94fd-ed6ac7f76adf.png
 
 Reference image(s):
-- C:\Users\peter\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
+- ~\.codex\generated_images\01a194a5-2ff0-7882-b8d4-8bfca40bbb4e\exec-4969617a-0c67-45e4-9f79-f87e7601a9b3.png
 
 Exact prompt:
 

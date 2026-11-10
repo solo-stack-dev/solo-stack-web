@@ -1,5 +1,7 @@
 # Solo Stack design explorations
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Open [the gallery](index.html) directly in a browser. Keep the folder structure intact. No build step, server, package installation, external font request or framework is needed.
 
 These are **design explorations, not production pages**. All German copy, dates, durations, episode numbers, consent wording and article content are placeholders as requested. None should ship. Production visitor text must be generated with **gpt-6.1-sol**; actual legal information comes from the owner.

@@ -68,7 +68,7 @@ Use case: illustration-story. Production PNG layer, original art only, highest a
 Refinement reference images (in order):
 
 - `docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-86b96b8c-d1a6-4ab8-8030-974639104fe5.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-86b96b8c-d1a6-4ab8-8030-974639104fe5.png`
 
 Exact refinement prompt:
 
@@ -153,7 +153,7 @@ Final mobile prompt:
 Use case: precise-object-edit. Highest available quality. Image 1 EDIT TARGET, original 720x800 crop. Image 2 white EDIT MASK, black protected. Remove the moon and every trace of its gold circular glow inside the mask. Inpaint only this area with the exact same dark sky pigment as the original. CRITICAL TEXTURE: faithfully MATCH the rather LARGE, SOFT, chunky, irregular overlapping pigment flecks in the original right half. Each rounded interlocking watercolor fleck is approximately 5 to 12 input pixels wide. Do not invent fine sand, feathery ridges, repeated diagonal stripes, high-frequency detail, hard edges, or a sharper new style. The input has slightly soft coarsely granulated watercolor paper: reproduce that exact same grain scale and softness in the new area. Natural irregular low-contrast mottled ink washes like the original upper-right sky, dark neutral anthracite matching its values. The new sky must not look circular, uniformly smooth, brighter, or more detailed. Preserve exactly all stars, the cloud edges left and below, crop framing, and composition. The narrow diagonal cloud bank below the moon stays in place; preserve its irregular silhouette precisely. No yellow aura, residual warm ring, replacement moon, additional objects or text. Match the ORIGINAL IMAGE's medium and grain exactly. Output same crop framing, only edited painting, no mask.
 ```
 
-Selected sources under `C:/Users/peter/.codex/generated_images/01a1a33d-e80d-7452-b442-4df793bb0282/`:
+Selected sources under `~/.codex/generated_images/01a1a33d-e80d-7452-b442-4df793bb0282/`:
 
 - Desktop: `exec-c623de21-bbe5-490a-b3db-36de5a45a40b.png`, native 1327x1185.
 - Mobile: `exec-db940204-1fcd-41fb-ad4a-48c6d14212db.png`, native 1189x1323.

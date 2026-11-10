@@ -12,7 +12,7 @@ These references established the warm pigment palette, cinema/sunrise seam probl
 
 ### 1. dawn-cloud-bank.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-792afe56-4024-4f9b-a1ec-41d7f53a82d8.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-792afe56-4024-4f9b-a1ec-41d7f53a82d8.png`
 
 New generation; `transparent_background: true`.
 
@@ -22,7 +22,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 2. dawn-cloud-bank-mobile.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f65fa150-2e62-4c92-af2d-9a30ed974632.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f65fa150-2e62-4c92-af2d-9a30ed974632.png`
 
 New generation; `transparent_background: true`.
 
@@ -32,7 +32,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 3. ink-ground-a.png — superseded
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-1e6f73d1-65f1-40c2-90ee-afcd464aea39.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-1e6f73d1-65f1-40c2-90ee-afcd464aea39.png`
 
 New generation; `transparent_background: true`.
 
@@ -42,7 +42,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 4. ink-ground-b.png — superseded
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-4c1ca2e5-40f7-4ea0-8384-96ffec0e29ce.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-4c1ca2e5-40f7-4ea0-8384-96ffec0e29ce.png`
 
 New generation; `transparent_background: true`.
 
@@ -52,7 +52,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 5. ink-feather.png — superseded
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f029520e-12f2-49d5-94d4-2fa1375801a1.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f029520e-12f2-49d5-94d4-2fa1375801a1.png`
 
 New generation; `transparent_background: true`.
 
@@ -62,7 +62,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 6. wax-seal.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f4d76320-33a6-49fe-b112-38444aa5cd60.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f4d76320-33a6-49fe-b112-38444aa5cd60.png`
 
 New generation; `transparent_background: true`.
 
@@ -72,7 +72,7 @@ Use case: stylized-concept. Highest available image generation quality. Producti
 
 ### 7. ink-ground-a.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-80276d22-082c-4c54-a3b2-d89fe733cacf.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-80276d22-082c-4c54-a3b2-d89fe733cacf.png`
 
 New generation; `transparent_background: true`.
 
@@ -82,7 +82,7 @@ Highest available quality. Use case stylized-concept. A flat scanned traditional
 
 ### 8. ink-ground-b.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-fc5d0f3f-4b38-4092-8779-cab76d903854.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-fc5d0f3f-4b38-4092-8779-cab76d903854.png`
 
 New generation; `transparent_background: true`.
 
@@ -92,9 +92,9 @@ Highest available quality. Use case stylized-concept. A flat scanned traditional
 
 ### 9. ink-feather.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-fbf5d9c0-75cb-48d8-91c1-c537dec67ac3.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-fbf5d9c0-75cb-48d8-91c1-c537dec67ac3.png`
 
-Edit input: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f029520e-12f2-49d5-94d4-2fa1375801a1.png`.
+Edit input: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f029520e-12f2-49d5-94d4-2fa1375801a1.png`.
 
 ```text
 Use case: precise-object-edit. Highest available quality. Edit this transparent ink hill edge, KEEP its exact native alpha, asymmetric lower contour, framing, solid top, empty lower half and all fine pigment texture. Change only pigment color: remove the PALE GRAY illuminated-looking fringe and make every visible pixel charcoal INK. Darkest pigment #141517, richest pigment #1b1c1e, lightest visible pigment #28292b. All translucent peripheral pixels DARK ink, no gray matte. Flatten shading into genuine dry-brush sumi, never a raised, lit or beveled object. Preserve texture through subtle charcoal variation. It dissolves by opacity and holes between bristles, NOT by becoming light grey. No white, gold, brown or yellow. No glow. No text, UI, logos or objects. Transparent PNG.
@@ -102,9 +102,9 @@ Use case: precise-object-edit. Highest available quality. Edit this transparent 
 
 ### 10. wax-seal-pressed.png — selected
 
-Source: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f9729ce7-dc53-457e-8f14-9e5b930f93b9.png`
+Source: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f9729ce7-dc53-457e-8f14-9e5b930f93b9.png`
 
-Edit input: `C:\Users\peter\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f4d76320-33a6-49fe-b112-38444aa5cd60.png`.
+Edit input: `~\.codex\generated_images\01a1a9ff-b2db-7d50-8373-355f43e1b14f\exec-f4d76320-33a6-49fe-b112-38444aa5cd60.png`.
 
 ```text
 Use case: precise-object-edit. Highest available quality. Edit ONLY the state of this exact butter-yellow crescent wax seal to its gently pressed state. Preserve the exact square canvas, center location, crescent orientation opening upper right, crescent curve and two tips, relief design, painted wax identity, irregular circular outline and native transparent background. Compress relief depth so the rim is a little flatter, make the wax about 10 percent darker and warmer toward ochre, subdued highlight. The disc itself remains same diameter and centered, no camera/perspective change, no rotation, no new marks. Should toggle with original at 56px without a perceptible position jump. Same hand-painted granular matte wax, no glossy gold, no external shadow or glow. Simple crescent only, no craters, text, letters, stars, logos, UI, ribbon, paper or new objects.

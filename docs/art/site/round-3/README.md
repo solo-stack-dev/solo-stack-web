@@ -1,5 +1,7 @@
 # Round 3 production art
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Seven painted PNG masters for solo-stack.dev, generated and inspected on 2026-11-05. This round addresses the repeated cinema-to-sunrise transition, synthetic stats ground and generic contact send button identified in both round-2 critiques. Everything delivered is under this folder. No runtime code, public copy or deployment changed.
 
 ## Masters

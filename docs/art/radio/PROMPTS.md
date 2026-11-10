@@ -18,7 +18,7 @@ Use case: illustration-story. Production PNG layer, original art only, highest a
 
 Refinement reference images (in order):
 
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-a34ea503-3a10-49eb-b9e1-232b77401956.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-a34ea503-3a10-49eb-b9e1-232b77401956.png`
 - `docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
 
 Exact refinement prompt:
@@ -66,7 +66,7 @@ Selected generated source: `exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`.
 Initial reference images (in order):
 
 - `docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
 
 Exact initial prompt:
 
@@ -81,7 +81,7 @@ Selected generated source: `exec-7e763db5-3e1b-4f7b-a3a3-4c3ec3676e94.png`.
 Initial reference images (in order):
 
 - `docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
 
 Exact initial prompt:
 
@@ -96,7 +96,7 @@ Selected generated source: `exec-69fde948-5f7c-42c2-8555-494955dc228a.png`.
 Initial reference images (in order):
 
 - `docs/mockups/round-2/05-night-shift-radio/02-night-shift-bonsai-hover.png`
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-f8629d75-8b06-44ab-9d9b-c3d479e63993.png`
 
 Exact initial prompt:
 
@@ -110,7 +110,7 @@ Selected generated source: `exec-f8ab5037-4506-4c58-b500-d67de2571f6d.png`.
 
 Refinement reference images (in order):
 
-- `C:/Users/peter/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-69fde948-5f7c-42c2-8555-494955dc228a.png`
+- `~/.codex/generated_images/01a194d6-7b62-7ee2-ab21-0f250ba08b19/exec-69fde948-5f7c-42c2-8555-494955dc228a.png`
 
 Exact refinement prompt:
 

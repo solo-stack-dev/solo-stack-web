@@ -1,6 +1,6 @@
 # Critique round 2: Claude Opus 5.5 (high)
 
-Screens: `docs/screens/critique/round-2/`. Critic captures (`mk3`, `post-end`, `post-tab2/3`, `m-menu-home`, `st90`, `k*` .png): `C:\Users\peter\AppData\Local\Temp\claude\7fd82884588d2ef0\533573c9-754a-4d2d-b80e-51353927520b\scratchpad\out\`.
+Screens: `docs/screens/critique/round-2/`. Critic captures (`mk3`, `post-end`, `post-tab2/3`, `m-menu-home`, `st90`, `k*` .png): `~\AppData\Local\Temp\claude\7fd82884588d2ef0\533573c9-754a-4d2d-b80e-51353927520b\scratchpad\out\`.
 
 | Area         | R1  | R2  |
 | ------------ | --- | --- |

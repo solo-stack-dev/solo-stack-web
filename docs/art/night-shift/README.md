@@ -1,5 +1,7 @@
 # Night shift production layers
 
+> **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
+
 Seven original painted PNG layers for solo-stack.dev, generated on 2026-11-01 with the built-in image-generation tool and registered for production. No mascot, visitor text, logos, coffee steam, or monitor content is painted into these assets. Exact prompts, references, rejected attempts, and export transforms are recorded in [PROMPTS.md](PROMPTS.md).
 
 ## Deliverables
