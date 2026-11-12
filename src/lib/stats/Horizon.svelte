@@ -133,11 +133,15 @@
 		margin-top: calc(-4.2% - 0.75rem);
 	}
 
-	/* From 640 px the hill tucks under the big number and the tree rises beside it */
+	/* From 640 px the hill tucks under the big number and the tree rises beside it. The tree grows with the width while the text
+	   above it does not, so on wide screens (from ~1400 px) the pull-up eases off: the canopy top of a tree on the period maximum
+	   (hill.ts wide: crest at 0.4 h, minus 1183 art px of tree at 0.35 w, = 0.2146 × the hill's width above its box) stays ~24 px
+	   under the nav. 33.5rem: the text block's height (~562 px) minus those 24 px. */
 	@media (min-width: 40rem) {
 		:global(.stats-hill) {
+			--hill-w: min(100vw, 100rem);
 			max-width: 100rem;
-			margin-top: calc(min(100vw, 100rem) * -0.17);
+			margin-top: max(calc(var(--hill-w) * -0.17), calc(var(--hill-w) * 0.2146 - 33.5rem));
 		}
 
 		.caption {

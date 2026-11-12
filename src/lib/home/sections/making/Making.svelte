@@ -430,15 +430,19 @@
 		if (!next || !(event.currentTarget as Element).contains(next)) keyboardFocus = false;
 	}
 
-	/** Hover pause (mouse only: a touch "hover" would stick after a tap). Only the controls and the hover zone take pointer events. */
-	const hover = (over: boolean) => (event: PointerEvent) => {
-		if (event.pointerType === 'mouse') hovered = over && onStage;
-	};
+	/**
+	 * Hover pause (mouse only: a touch "hover" would stick after a tap). Only the controls and the hover zone take pointer events.
+	 * It takes a real mouse move over them: the hover zone covers the middle of the screen, where a resting cursor sits while the
+	 * wheel scrolls the section in, and the browser's hover update after a scroll (an enter, and in Chrome a move with no movement)
+	 * would pause the rotation before it ever started.
+	 */
 	const watchHover: Attachment<HTMLElement> = (element) => {
-		const offEnter = on(element, 'pointerenter', hover(true));
-		const offLeave = on(element, 'pointerleave', hover(false));
+		const offMove = on(element, 'pointermove', (event) => {
+			if (event.pointerType === 'mouse' && !hovered && onStage && (event.movementX || event.movementY)) hovered = true;
+		});
+		const offLeave = on(element, 'pointerleave', () => (hovered = false));
 		return () => {
-			offEnter();
+			offMove();
 			offLeave();
 		};
 	};
