@@ -175,3 +175,9 @@ Rendered locally with YuE2 (`m-a-p/YuE2-3B` + `YuE2-Vae`, local snapshots in `D:
   Your face all warm with candlelight
   I wonder how your days have been
   I might just call and say goodnight
+
+### discord: Spare Chair
+
+- Instrumental (no lyrics), added 2026-11-12 (owner: the Discord station had no song). Source: `D:/repos/Solo Stack/videos/soundtracks/05 Code Flow Zwei.wav` from the owner's lofi background set (YuE2, `D:/repos/YuE/output/solo-stack-lofi-bg/b5-code-flow/seed-8501`, 85 BPM, 48 kHz WAV), style brief: `Instrumental, downtempo lo-fi electronic, 84 BPM, soft analog synth pads, gentle plucked synth arpeggio, mellow filtered chords, dusty soft drums, deep warm bass, tape saturation, calm, focused, no vocals`
+- Cut: 70.59 to 90.35 s (bars 25 to 31 of the louder second half, ending on its last phrase), **19.8 s, 204 kB**, same encode as the others (`trim-tracks.mjs`, `source` entry)
+- Title from `gpt-6.1-sol`: prompt [`discord-title-prompt.md`](discord-title-prompt.md), output [`discord-title-output.json`](discord-title-output.json) (2026-11-12, one run, used unchanged; `codex exec` needs stdin closed, `< /dev/null`, or it waits forever)

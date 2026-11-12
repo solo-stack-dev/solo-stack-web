@@ -25,7 +25,7 @@ const LUFS = -16;
 const FADE_IN = 0.3;
 const BITRATE = '80k';
 
-/** station → take folder, cut in source seconds, fade-out length (the tail after the last sung note, ≤ 2.5 s). */
+/** station → take folder (or a `source` file), cut in source seconds, fade-out length (the tail after the last sung note, ≤ 2.5 s). */
 const SONGS = {
 	// 73 BPM, 2/4: bar 20 (verse line 4 "I wish the dark…") to 2.3 s after the last note (50.55 s); full chorus
 	youtube: { take: 'youtube-202', start: 32.877, end: 52.877, fadeOut: 2.3 },
@@ -44,7 +44,10 @@ const SONGS = {
 	// 84 BPM: half a beat before chorus line 2 ("There's something warm…", 38.57 s) to one bar after the last note (55.36 s)
 	twitch: { take: 'twitch-202', start: 38.214, end: 58.214, fadeOut: 2.5 },
 	// 85 BPM: bar 16 (chorus "I still remember…") to one bar after the last note (62.29 s); full chorus
-	facebook: { take: 'facebook-101', start: 45.176, end: 65.118, fadeOut: 2.5 }
+	facebook: { take: 'facebook-101', start: 45.176, end: 65.118, fadeOut: 2.5 },
+	// Instrumental (no lyrics), from the owner's lofi set (Solo Stack/videos/soundtracks, YuE2 b5-code-flow seed 8501, 48 kHz
+	// WAV). 85 BPM, bars of 2.8235 s from 0: bars 25–31 (70.59 s), the louder second half, ending on its last phrase (90.35 s)
+	discord: { source: 'D:/repos/Solo Stack/videos/soundtracks/05 Code Flow Zwei.wav', start: 70.588, end: 90.353, fadeOut: 2.5 }
 };
 
 /** Runs ffmpeg and returns its log (stderr: filter reports). */
@@ -61,9 +64,9 @@ function measure(input, filters = []) {
 	return { lufs: Number(/I:\s+(-?[\d.]+) LUFS/.exec(summary)[1]), peak: Number(/Peak:\s+(-?[\d.]+) dBFS/.exec(summary)[1]) };
 }
 
-for (const [station, { take, start, end, fadeOut }] of Object.entries(SONGS)) {
+for (const [station, { take, source: file, start, end, fadeOut }] of Object.entries(SONGS)) {
 	if (ONLY.length && !ONLY.includes(station)) continue;
-	const source = `${TAKES}/${take}/audio.flac`;
+	const source = file ?? `${TAKES}/${take}/audio.flac`;
 	const length = end - start;
 	if (length > MAX_SECONDS + 0.001) throw new Error(`${station}: ${length.toFixed(2)} s is over ${MAX_SECONDS} s`);
 	const cut = [
@@ -102,6 +105,6 @@ for (const [station, { take, start, end, fadeOut }] of Object.entries(SONGS)) {
 		check = measure(target);
 	}
 	console.log(
-		`${station}: ${take} ${start}–${end} s → ${length.toFixed(2)} s, ${(statSync(target).size / 1000).toFixed(0)} kB, ${check.lufs} LUFS, true peak ${check.peak} dBFS (gain ${gain.toFixed(1)} dB)`
+		`${station}: ${take ?? file} ${start}–${end} s → ${length.toFixed(2)} s, ${(statSync(target).size / 1000).toFixed(0)} kB, ${check.lufs} LUFS, true peak ${check.peak} dBFS (gain ${gain.toFixed(1)} dB)`
 	);
 }
