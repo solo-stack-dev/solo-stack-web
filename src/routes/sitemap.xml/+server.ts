@@ -11,12 +11,11 @@ import type { RequestHandler } from './$types';
  * option does not apply. `processPaths` localizes instead, mirroring the page heads:
  * - pages that exist in every locale: one entry per locale, each with hreflang alternates + x-default (= the root layout)
  * - blog posts: each language version under its own URL, alternates only between its translations (= the post page's head)
- * - imprint: German only (= LegalPage's canonical); privacy exists in both locales
+ * Legal pages (imprint, privacy) are excluded: LegalPage marks them `noindex`. super-sitemap only reads the route files,
+ * not the page heads, so a new noindex page needs its own exclusion here.
  */
 
 export const prerender = true;
-
-const GERMAN_ONLY = new Set(['/impressum']);
 
 const localized = (path: string, locale: Locale) => localizeHref(path, { locale });
 
@@ -26,12 +25,12 @@ export const GET: RequestHandler = async ({ url }) => {
 
 	return sitemap.response({
 		origin: url.origin,
+		excludeRoutePatterns: [/\/impressum$/, /\/datenschutz$/],
 		paramValues: {
 			'/blog/[slug]': posts.map((post) => ({ values: [post.slug], lastmod: post.updatedAt ?? post.publishedAt }))
 		},
 		processPaths: (paths) =>
 			paths.flatMap((entry) => {
-				if (GERMAN_ONLY.has(entry.path)) return [{ ...entry, path: localized(entry.path, baseLocale) }];
 				const post = postByPath.get(entry.path);
 				if (post) {
 					const path = localized(entry.path, post.lang);

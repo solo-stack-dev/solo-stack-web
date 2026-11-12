@@ -21,6 +21,8 @@
 <svelte:head>
 	<title>{title} · SOLO STACK</title>
 	<link rel="canonical" href={canonical} />
+	<!-- Legal pages stay out of search results but crawlable (robots.txt must not block them, or the tag goes unseen); the sitemap excludes them. -->
+	<meta name="robots" content="noindex, follow" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="SOLO STACK" />
 	<meta property="og:title" content={title} />
