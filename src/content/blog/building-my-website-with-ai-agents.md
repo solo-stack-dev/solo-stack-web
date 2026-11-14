@@ -4,13 +4,30 @@ title: 'How I Built My Website with AI Agents'
 slug: building-my-website-with-ai-agents
 description: 'My website built with AI agents: my own design ideas, a familiar stack, seven rounds of critique and about six hours of active personal work.'
 summary: 'I built solo-stack.dev with AI agents, taking care of the design direction, setup and key decisions myself. Here I share why the design needed the most revision, what surprised me about the SVG charts and how I estimate my own time spent on the project.'
-# TODO(owner): youtubeId, durationSeconds, chapters and final transcript once the video is published.
-youtubeId: null
+youtubeId: gTus9QfjXI8
 publishedAt: '2026-11-01'
-updatedAt: '2026-11-08'
-durationSeconds: null
+updatedAt: '2026-11-14'
+durationSeconds: 378
 format: project
-chapters: []
+chapters:
+  - start: 0
+    title: 'My Website with AI'
+  - start: 34
+    title: 'Homepage Design'
+  - start: 107
+    title: 'The Other Pages'
+  - start: 134
+    title: 'Blog'
+  - start: 163
+    title: 'The Stats Page, My Highlight'
+  - start: 206
+    title: 'T3 Code, Opus 5.5 and Tech Stack'
+  - start: 241
+    title: 'Contact Form'
+  - start: 281
+    title: 'Seven Rounds of AI Feedback'
+  - start: 359
+    title: 'What Comes Next'
 takeaways:
   - 'The design direction needed the most iterations and my ongoing feedback.'
   - 'I handled the project setup, infrastructure and security decisions myself.'
@@ -88,4 +105,4 @@ These are specific decisions involved in implementing a form. With a personal we
 
 I estimate my own active work at about six hours. That was probably spread over three or four days. The agents ran intermittently when I had time for them, rather than continuously. I can't use that to determine an exact total runtime or make a reliable comparison with a fully manual implementation.
 
-My biggest takeaway is that working with multiple models in T3 Code worked well for me. After the necessary iterations, image generation fitted well into the project. The overall design remained more difficult: it needed my own direction and repeated feedback before the pages worked together. This article is being published before the accompanying video, which I'll add later.
+My biggest takeaway is that working with multiple models in T3 Code worked well for me. After the necessary iterations, image generation fitted well into the project. The overall design remained more difficult: it needed my own direction and repeated feedback before the pages worked together.

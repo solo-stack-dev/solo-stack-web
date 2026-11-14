@@ -4,13 +4,30 @@ title: 'Wie ich meine Website mit AI Agenten gebaut habe'
 slug: meine-website-mit-ai-agenten
 description: 'Meine Website mit AI Agenten: eigene Designideen, vertrauter Stack, sieben Kritikrunden und ungefähr sechs Stunden persönliche Arbeit.'
 summary: 'Ich habe solo-stack.dev mit AI Agenten gebaut und dabei Designrichtung, Einrichtung und wichtige Entscheidungen selbst übernommen. Hier erzähle ich, warum die Gestaltung am meisten Nacharbeit brauchte, was mich an den SVG Diagrammen überrascht hat und wie ich meinen Aufwand einschätze.'
-# TODO(owner): youtubeId, durationSeconds, chapters and final transcript once the video is published.
-youtubeId: null
+youtubeId: gTus9QfjXI8
 publishedAt: '2026-11-01'
-updatedAt: '2026-11-08'
-durationSeconds: null
+updatedAt: '2026-11-14'
+durationSeconds: 378
 format: project
-chapters: []
+chapters:
+  - start: 0
+    title: 'Meine Website mit AI'
+  - start: 34
+    title: 'Design der Startseite'
+  - start: 107
+    title: 'Die Unterseiten'
+  - start: 134
+    title: 'Blog'
+  - start: 163
+    title: 'Statistikseite, mein Highlight'
+  - start: 206
+    title: 'T3 Code, Opus 5.5 und Tech Stack'
+  - start: 241
+    title: 'Kontaktformular'
+  - start: 281
+    title: 'Sieben Runden AI Kritik'
+  - start: 359
+    title: 'Was als Nächstes kommt'
 takeaways:
   - 'Die Designrichtung brauchte die meisten Iterationen und mein laufendes Feedback.'
   - 'Projekt, Infrastruktur und Sicherheitsentscheidungen habe ich selbst eingerichtet.'
@@ -87,4 +104,4 @@ Das sind konkrete Entscheidungen, die zur Umsetzung eines Formulars gehören. Ge
 
 Meinen eigenen aktiven Aufwand schätze ich auf ungefähr sechs Stunden. Das hat sich vermutlich über drei oder vier Tage verteilt. Die Agenten liefen zwischendurch, wenn ich Zeit dafür hatte, und nicht durchgehend. Eine genaue gesamte Laufzeit oder einen belastbaren Vergleich mit einer vollständig manuellen Umsetzung kann ich daraus nicht ableiten.
 
-Am meisten nehme ich mit, dass die Arbeit mit mehreren Modellen in T3 Code für mich gut funktioniert hat. Die Bildgenerierung hat sich nach den nötigen Iterationen gut ins Projekt eingefügt. Schwieriger blieb die Gestaltung als Ganzes: Sie brauchte meine eigene Richtung und wiederholtes Feedback, bis die Seiten zusammenpassten. Dieser Artikel erscheint vor dem dazugehörigen Video, das ich später ergänze.
+Am meisten nehme ich mit, dass die Arbeit mit mehreren Modellen in T3 Code für mich gut funktioniert hat. Die Bildgenerierung hat sich nach den nötigen Iterationen gut ins Projekt eingefügt. Schwieriger blieb die Gestaltung als Ganzes: Sie brauchte meine eigene Richtung und wiederholtes Feedback, bis die Seiten zusammenpassten.

@@ -1,0 +1,24 @@
+{
+	"deChapters": [
+		{ "start": 0, "title": "Meine Website mit AI" },
+		{ "start": 34, "title": "Design der Startseite" },
+		{ "start": 107, "title": "Die Unterseiten" },
+		{ "start": 134, "title": "Blog" },
+		{ "start": 163, "title": "Statistikseite, mein Highlight" },
+		{ "start": 206, "title": "T3 Code, Opus 5.5 und Tech Stack" },
+		{ "start": 241, "title": "Kontaktformular" },
+		{ "start": 281, "title": "Sieben Runden AI Kritik" },
+		{ "start": 359, "title": "Was als Nächstes kommt" }
+	],
+	"enChapters": [
+		{ "start": 0, "title": "My Website with AI" },
+		{ "start": 34, "title": "Homepage Design" },
+		{ "start": 107, "title": "The Other Pages" },
+		{ "start": 134, "title": "Blog" },
+		{ "start": 163, "title": "The Stats Page, My Highlight" },
+		{ "start": 206, "title": "T3 Code, Opus 5.5 and Tech Stack" },
+		{ "start": 241, "title": "Contact Form" },
+		{ "start": 281, "title": "Seven Rounds of AI Feedback" },
+		{ "start": 359, "title": "What Comes Next" }
+	]
+}
