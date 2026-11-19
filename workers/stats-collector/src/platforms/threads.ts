@@ -2,11 +2,10 @@
 /**
  * Threads API (graph.threads.net): followers via `/me/threads_insights?metric=followers_count` (`threads_manage_insights`),
  * posts via `/me/threads` (`threads_basic`, newest first, paged). The long-lived token (60 days) is seeded from the
- * `THREADS_ACCESS_TOKEN` secret into KV (`stats:threads-token`) and refreshed there weekly, like Instagram Login's token.
+ * `THREADS_ACCESS_TOKEN` secret into KV (`stats:threads-token`) and refreshed there weekly.
  */
 import { count, fetchJson } from '../http.ts';
-import { readToken, sha256, THREADS_TOKEN_KEY, writeToken, type InstagramToken } from '../tokens.ts';
-import { isoTimestamp } from './instagram.ts';
+import { readToken, sha256, THREADS_TOKEN_KEY, writeToken, type LongLivedToken } from '../tokens.ts';
 import type { CollectContext, Reading } from './types.ts';
 
 const API = 'https://graph.threads.net';
@@ -19,6 +18,9 @@ interface ThreadsPage {
 	paging?: { next?: string };
 }
 
+/** Graph timestamps look like `2026-11-02T18:04:11+0000`; normalize to ISO `…Z`. */
+export const isoTimestamp = (value: string) => new Date(value.replace(/([+-]\d{2})(\d{2})$/, '$1:$2')).toISOString();
+
 interface Insights {
 	data: { name: string; total_value?: { value: number } }[];
 }
@@ -28,7 +30,7 @@ async function currentToken(env: Env): Promise<string> {
 	const secret = env.THREADS_ACCESS_TOKEN;
 	if (!secret) throw new Error('threads: THREADS_ACCESS_TOKEN is not set');
 	const seed = await sha256(secret);
-	let token = await readToken<InstagramToken>(env.KV, THREADS_TOKEN_KEY);
+	let token = await readToken<LongLivedToken>(env.KV, THREADS_TOKEN_KEY);
 	if (!token || token.seed !== seed) {
 		token = { token: secret, refreshedAt: null, expiresAt: null, seed };
 		await writeToken(env.KV, THREADS_TOKEN_KEY, token);

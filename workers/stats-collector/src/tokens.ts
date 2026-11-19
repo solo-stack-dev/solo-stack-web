@@ -3,7 +3,6 @@
  * it after every refresh. Keys are per environment (each environment has its own KV namespace).
  */
 export const TWITCH_TOKEN_KEY = 'stats:twitch-token';
-export const INSTAGRAM_TOKEN_KEY = 'stats:instagram-token';
 export const THREADS_TOKEN_KEY = 'stats:threads-token';
 
 /** Twitch user token from the authorization-code flow (`pnpm stats:twitch-login`). */
@@ -14,8 +13,8 @@ export interface TwitchToken {
 	expiresAt: string;
 }
 
-/** Long-lived user token (60 days) of Instagram or Threads, seeded from its `*_ACCESS_TOKEN` secret. */
-export interface InstagramToken {
+/** Long-lived Threads user token (60 days), seeded from the `THREADS_ACCESS_TOKEN` secret. */
+export interface LongLivedToken {
 	token: string;
 	/** ISO timestamp of the last successful refresh; `null` = seeded from the secret, age unknown. */
 	refreshedAt: string | null;
@@ -27,7 +26,7 @@ export interface InstagramToken {
 
 export const readToken = <T>(kv: KVNamespace, key: string) => kv.get<T>(key, { type: 'json' });
 
-export const writeToken = (kv: KVNamespace, key: string, token: TwitchToken | InstagramToken) => kv.put(key, JSON.stringify(token));
+export const writeToken = (kv: KVNamespace, key: string, token: TwitchToken | LongLivedToken) => kv.put(key, JSON.stringify(token));
 
 export async function sha256(value: string): Promise<string> {
 	const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));

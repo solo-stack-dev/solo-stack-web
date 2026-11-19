@@ -3,7 +3,7 @@ import { describe, test } from 'node:test';
 import * as v from 'valibot';
 import { HISTORY_DAYS, StatsSchema } from '#lib/stats/schema.ts';
 import { parseDuration } from './platforms/youtube.ts';
-import { isoTimestamp } from './platforms/instagram.ts';
+import { isoTimestamp } from './platforms/threads.ts';
 import {
 	addDays,
 	buildStats,
@@ -155,6 +155,19 @@ describe('buildStats', () => {
 		assert.equal(stats.youtube.watchMinutes?.at(-1), 90);
 	});
 
+	test('platforms without a collector drop out, old rows included', () => {
+		const retired: MetricRow[] = [
+			{ platform: 'instagram', metric: 'followers', day: addDays(AS_OF, -2), value: 50 },
+			{ platform: 'instagram', metric: 'posts', day: AS_OF, value: 4 }
+		];
+		const stats = buildStats(AS_OF, [...rows, ...retired], [], ['youtube', 'bluesky']);
+		assert.deepEqual(
+			stats.platforms.map((platform) => platform.id),
+			['youtube', 'bluesky']
+		);
+		assert.equal(stats.posts.at(-1), 3);
+	});
+
 	test('no follower rows → invalid (KV keeps the previous snapshot)', () => {
 		assert.equal(v.safeParse(StatsSchema, buildStats(AS_OF, [], [])).success, false);
 	});
@@ -168,7 +181,7 @@ describe('platform parsing', () => {
 		assert.equal(parseDuration('P0D'), 0);
 	});
 
-	test('Instagram timestamps', () => {
+	test('Graph timestamps', () => {
 		assert.equal(isoTimestamp('2026-11-02T18:04:11+0000'), '2026-11-02T18:04:11.000Z');
 		assert.equal(isoTimestamp('2026-11-02T20:04:11+0200'), '2026-11-02T18:04:11.000Z');
 	});

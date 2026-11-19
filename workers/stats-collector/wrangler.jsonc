@@ -16,8 +16,6 @@
 	"dev": {
 		"port": 8788
 	},
-	// Unified Login: the Instagram account ID (not the system user returned by /me). Empty = legacy Instagram Login.
-	"vars": { "INSTAGRAM_ACCOUNT_ID": "17841419275290834" },
 	// Same bindings as the site (root wrangler.jsonc), per environment; migrations are applied with the site's config
 	// (`pnpm db:migrate*`). Local: the dummy ids of the site's local state, so
 	// `pnpm stats:dev` (persisting to the root `.wrangler/state`) writes the snapshot `pnpm dev`/`pnpm preview` read.
@@ -36,7 +34,7 @@
 	],
 	// Uploaded from the repo-root `.env.<env>` by `pnpm stats:deploy:<env>` (`--secrets-file`); locally read from `.env`.
 	// Not inherited: repeated per environment.
-	"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+	"secrets": { "required": ["YOUTUBE_API_KEY", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
 	// Once a day at 23:17 UTC, late in the UTC day the rows belong to (a manual run the same day is overwritten by it).
 	"workflows": [
 		{
@@ -48,8 +46,7 @@
 	],
 	"env": {
 		"staging": {
-			"vars": { "INSTAGRAM_ACCOUNT_ID": "17841419275290834" },
-			"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+			"secrets": { "required": ["YOUTUBE_API_KEY", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
 			"d1_databases": [
 				{
 					"binding": "DB",
@@ -73,8 +70,7 @@
 			]
 		},
 		"production": {
-			"vars": { "INSTAGRAM_ACCOUNT_ID": "17841419275290834" },
-			"secrets": { "required": ["YOUTUBE_API_KEY", "INSTAGRAM_ACCESS_TOKEN", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
+			"secrets": { "required": ["YOUTUBE_API_KEY", "THREADS_ACCESS_TOKEN", "TWITCH_CLIENT_ID", "TWITCH_CLIENT_SECRET"] },
 			"d1_databases": [
 				{
 					"binding": "DB",

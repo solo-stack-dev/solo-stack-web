@@ -10,7 +10,6 @@ import * as v from 'valibot';
 import { STATS_KV_KEY, StatsSchema, type StatPlatformId } from '#lib/stats/schema.ts';
 import { collectBluesky } from './platforms/bluesky.ts';
 import { collectGithub } from './platforms/github.ts';
-import { collectInstagram } from './platforms/instagram.ts';
 import { collectThreads } from './platforms/threads.ts';
 import { collectTwitch } from './platforms/twitch.ts';
 import type { CollectContext, Reading } from './platforms/types.ts';
@@ -18,15 +17,19 @@ import { collectYoutube } from './platforms/youtube.ts';
 import { addDays, buildStats, dayOf, historyDays } from './series.ts';
 import { getDb, readSnapshotRows, storeReading, type StoreSummary } from './store.ts';
 
-/** Platforms with live numbers. TikTok, X, Facebook: no credentials yet (add a collector like `platforms/threads.ts`). */
+/**
+ * Platforms with live numbers. TikTok, X, Facebook: no credentials yet (add a collector like `platforms/threads.ts`). Instagram:
+ * collector removed (account deactivated, 2026-11-19); its old D1 rows stay but leave the snapshot.
+ */
 const COLLECTORS: [StatPlatformId, (context: CollectContext) => Promise<Reading>][] = [
 	['youtube', collectYoutube],
 	['github', collectGithub],
 	['bluesky', collectBluesky],
 	['twitch', collectTwitch],
-	['instagram', collectInstagram],
 	['threads', collectThreads]
 ];
+
+const LIVE_PLATFORMS = COLLECTORS.map(([platform]) => platform);
 
 const STEP: WorkflowStepConfig = { retries: { limit: 2, delay: '30 seconds', backoff: 'exponential' }, timeout: '2 minutes' };
 
@@ -61,7 +64,7 @@ export class StatsCollector extends WorkflowEntrypoint<Env> {
 
 		result.snapshot = await step.do('snapshot', STEP, async () => {
 			const rows = await readSnapshotRows(getDb(this.env), days[0], today);
-			const parsed = v.safeParse(StatsSchema, buildStats(today, rows.metrics, rows.videos));
+			const parsed = v.safeParse(StatsSchema, buildStats(today, rows.metrics, rows.videos, LIVE_PLATFORMS));
 			if (!parsed.success) {
 				const reason = JSON.stringify(v.flatten(parsed.issues)).slice(0, 500);
 				console.error('stats: snapshot invalid, KV keeps the previous one:', reason);

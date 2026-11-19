@@ -2,7 +2,7 @@
  * Pure parts of the collector: UTC days, view deltas, posting days and the `Stats` snapshot built from D1 rows. No I/O here,
  * so `series.test.ts` covers it with `node --test`.
  */
-import { HISTORY_DAYS, PERIODS, STAT_PLATFORM_IDS, type Period, type Stats, type TopVideo } from '#lib/stats/schema.ts';
+import { HISTORY_DAYS, PERIODS, STAT_PLATFORM_IDS, type Period, type StatPlatformId, type Stats, type TopVideo } from '#lib/stats/schema.ts';
 
 /** UTC day, `YYYY-MM-DD`. */
 export type Day = string;
@@ -108,18 +108,19 @@ function groupRows(rows: readonly MetricRow[]): Map<string, Map<Day, number>> {
 }
 
 /**
- * The live `Stats` snapshot from the D1 rows of the last `HISTORY_DAYS` days. Platforms without any follower row are left out
- * (the page shows them as "later"); watch time is `null` until rows exist (YouTube Analytics). Validate before storing.
+ * The live `Stats` snapshot from the D1 rows of the last `HISTORY_DAYS` days. Only `platformIds` count (the collected ones, so
+ * a retired collector's old rows drop out); platforms without any follower row are left out (the page shows them as "later");
+ * watch time is `null` until rows exist (YouTube Analytics). Validate before storing.
  */
-export function buildStats(asOf: Day, rows: readonly MetricRow[], videos: readonly VideoRow[]): Stats {
+export function buildStats(asOf: Day, rows: readonly MetricRow[], videos: readonly VideoRow[], platformIds: readonly StatPlatformId[] = STAT_PLATFORM_IDS): Stats {
 	const days = historyDays(asOf);
 	const groups = groupRows(rows);
-	const platforms = STAT_PLATFORM_IDS.flatMap((id) => {
+	const platforms = platformIds.flatMap((id) => {
 		const followers = runningSeries(groups.get(`${id}/followers`) ?? new Map(), days);
 		return followers ? [{ id, followers }] : [];
 	});
 	const watch = groups.get('youtube/watch_minutes');
-	const posts = days.map((day) => STAT_PLATFORM_IDS.reduce((total, id) => total + (groups.get(`${id}/posts`)?.get(day) ?? 0), 0));
+	const posts = days.map((day) => platformIds.reduce((total, id) => total + (groups.get(`${id}/posts`)?.get(day) ?? 0), 0));
 	return {
 		source: 'live',
 		asOf,
