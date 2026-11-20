@@ -4,12 +4,27 @@ title: 'GPT 6.2 Astra und Claude Opus 5.5 im Praxistest'
 slug: gpt-6-2-astra-opus-vergleich
 description: 'Ich vergleiche GPT 6.2 Astra mit Claude Opus 5.5 in Blender, SVG, Spielen und Webentwicklung und zeige, warum mein Tempoeindruck getäuscht hat.'
 summary: 'Ich habe GPT 6.2 Astra und Claude Opus 5.5 durch fünf praktische Tests geschickt. Astra gefällt mir besonders bei der Gestaltung von Minas Tirith und Tokio, Opus beim Jam Room. Bei der Laufzeit musste ich meinen ersten Eindruck korrigieren.'
-# TODO(owner): youtubeId
-youtubeId: null
-publishedAt: '2026-11-20'
+youtubeId: pwAYpa-v4KI
+publishedAt: '2026-11-18'
 durationSeconds: 527
 format: ai-test
-chapters: []
+chapters:
+  - start: 0
+    title: 'Intro'
+  - start: 27
+    title: 'Was sich bei Astra geändert hat'
+  - start: 76
+    title: 'Minas Tirith in Blender'
+  - start: 147
+    title: 'SVG Animation'
+  - start: 194
+    title: 'Rennspiel in Tokio'
+  - start: 282
+    title: 'Jam Room mit SolidJS'
+  - start: 376
+    title: 'Video mit Remotion'
+  - start: 505
+    title: 'Abschluss'
 takeaways:
   - 'Bei Minas Tirith in Blender liegt Astra für mich durch Gestaltung und Details vorne.'
   - 'Die SVG Entscheidung fällt knapp aus und bleibt eine Frage des persönlichen Geschmacks.'
