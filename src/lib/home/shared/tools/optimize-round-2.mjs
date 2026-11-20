@@ -4,11 +4,7 @@
 //
 //   node src/lib/home/shared/tools/optimize-round-2.mjs
 //
-// - Game posters (1664×936 RGB): sections/game/assets/poster-{moon-planet,stack-to-moon,constellations}.webp, full 16:9
-//   (the lower-left third is the reserved calm area for the title and play button; never center-crop).
 // - Cinema projection (1664×936 RGB): sections/cinema/assets/cinema-projection.webp.
-// - Seam clouds (2560×600 RGBA, cloud body in rows ~70…530): shared/assets/transitions/seam-cloud-{a,b,c}.webp, trimmed to
-//   2560×480 (rows 60…540) so the strip box hugs the painting, 1920 wide.
 //
 // Uses `sharp` from pnpm's virtual store (no new dependency).
 import { mkdirSync, statSync } from 'node:fs';
@@ -29,26 +25,8 @@ const report = (path) => console.log(`${path.padEnd(52)} ${(statSync(target(path
 // Plates: native 1664 px, high quality (enhanced-img derives AVIF/WebP sizes from these).
 const PLATE = { quality: 90, effort: 6, smartSubsample: true };
 
-for (const name of ['moon-planet', 'stack-to-moon', 'constellations']) {
-	const path = `sections/game/assets/poster-${name}.webp`;
-	await sharp(master(`poster-${name}.png`))
-		.webp(PLATE)
-		.toFile(target(path));
-	report(path);
-}
-
 {
 	const path = 'sections/cinema/assets/cinema-projection.webp';
 	await sharp(master('cinema-projection.png')).webp(PLATE).toFile(target(path));
-	report(path);
-}
-
-for (const name of ['a', 'b', 'c']) {
-	const path = `shared/assets/transitions/seam-cloud-${name}.webp`;
-	await sharp(master(`seam-cloud-${name}.png`))
-		.extract({ left: 0, top: 60, width: 2560, height: 480 })
-		.resize(1920, 360, { kernel: 'lanczos3' })
-		.webp({ quality: 80, alphaQuality: 85, effort: 6 })
-		.toFile(target(path));
 	report(path);
 }

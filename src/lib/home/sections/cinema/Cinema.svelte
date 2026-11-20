@@ -24,7 +24,6 @@
 	import { getLatestVideo } from '#lib/home/data/youtube.remote.ts';
 	import { InView } from '#lib/home/shared/motion.svelte.ts';
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import YouTubeConsent from '#lib/components/site/YouTubeConsent.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
@@ -99,7 +98,7 @@
 
 <section
 	id="cinema"
-	data-night-hour="04:00"
+	data-night-hour
 	class={['cinema', playing && 'is-playing', near.current && 'is-near', !video && 'is-empty']}
 	aria-labelledby="home-cinema-title"
 	style={sectionStyle}
@@ -108,7 +107,6 @@
 	<div class="backdrop" aria-hidden="true">
 		<StarField density={0.45} brightness={0.85} seed={404} />
 	</div>
-	<NightClock time="04:00" />
 	<h2 id="home-cinema-title" class="heading night-heading">{m.home_cinema_title()}</h2>
 
 	<div class="stage" {@attach near.attach}>
@@ -210,15 +208,12 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		overflow-x: clip;
-		/* Pulled up under the radio's rock foreground: the cinema's painted sky meets the rocks, no dead band between them (the
-		   seam's mist and cloud sit on the overlap). Only its own links and buttons take pointer events there. */
-		margin-top: calc(var(--cinema-overlap) * -1);
-		--cinema-overlap: clamp(3rem, 11vw, 11rem);
+		/* Starts in open sky (its backdrop feathers in at the top); only its own links and buttons take pointer events. */
 		pointer-events: none;
 		container-type: inline-size;
-		/* The 16:9 stage is bottom-anchored: clock and heading sit left of the screen, the clock level with the window's top */
+		/* The 16:9 stage is bottom-anchored: the heading sits left of the screen, level with the window's top */
 		--stage-top: calc(100% - 100cqw * 1440 / 2560);
-		--night-clock-top: calc(var(--stage-top) + 100cqw * 1440 / 2560 * var(--window-top));
+		--heading-y: calc(var(--stage-top) + 100cqw * 1440 / 2560 * var(--window-top));
 		/* the cliff dissolves into the dawn cloud bank (shared/dawn.ts) */
 		--cliff-cut: var(--dawn-cliff-cut);
 		--cliff-fade: var(--dawn-cliff-fade);
@@ -227,7 +222,7 @@
 	.heading {
 		position: absolute;
 		z-index: 3;
-		top: calc(var(--night-clock-top) + 1.5rem);
+		top: var(--heading-y);
 		left: var(--page-gutter);
 		/* left of the frame's painted edge */
 		width: calc(100cqw * var(--frame-left) - var(--page-gutter) - 2rem);
@@ -245,10 +240,10 @@
 		position: absolute;
 		inset: 0;
 		background: var(--cinema-sky);
-		/* painted soft edge (shared/transitions.ts): the top ~20 % feathers seamlessly into the 02:00 sky under the mist bank */
+		/* painted soft edge (shared/transitions.ts): the top third feathers seamlessly into the sky above */
 		mask:
-			var(--feather-up) top / 100% 20% no-repeat,
-			linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat;
+			var(--feather-up) top / 100% 34% no-repeat,
+			linear-gradient(#000 0 0) bottom / 100% 66.5% no-repeat;
 		pointer-events: none;
 	}
 
@@ -788,12 +783,10 @@
 
 	@media (max-width: 47.99rem) {
 		.cinema {
-			/* sky above the portrait stage: clock and heading sit in it, above the frame */
+			/* sky above the portrait stage: the heading sits in it, above the frame */
 			min-height: max(100svh, calc(216.67vw + 6rem));
-			/* the radio ends on its rock now (no printed station card below it): rise further under the rock, no dead band */
-			--cinema-overlap: 6.5rem;
 			--stage-top: calc(100% - 100cqw * 2340 / 1080);
-			--night-clock-top: calc(var(--stage-top) + 100cqw * 2340 / 1080 * var(--frame-top-m) - 7.25rem);
+			--heading-y: calc(var(--stage-top) + 100cqw * 2340 / 1080 * var(--frame-top-m) - 4rem);
 			--cliff-cut: var(--dawn-cliff-cut-m);
 			--cliff-fade: var(--dawn-cliff-fade-m);
 		}

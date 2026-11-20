@@ -19,7 +19,6 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
 	import LazyMount from '#lib/home/shared/LazyMount.svelte';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import ShootingStars, { SHOOTING_STAR_EVENT } from '#lib/home/shared/ShootingStars.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import { lcpImage } from '#lib/home/shared/deferred.svelte.ts';
@@ -203,7 +202,7 @@
 <section
 	bind:this={hero}
 	id="hero"
-	data-night-hour="20:00"
+	data-night-hour
 	class="hero"
 	aria-labelledby="home-hero-title"
 	style:--disc-left={pct(discBox.left)}
@@ -287,8 +286,6 @@
 			<p class="wordmark is-night settle">{@render wordmarkText()}</p>
 		</div>
 	</div>
-
-	<NightClock time="20:00" />
 </section>
 
 <!-- Outside the hero's stacking context (it isolates): the 21:00 wipe paints its first wash over the hero's bottom, which greyed the cue

@@ -2,6 +2,8 @@
 
 Read this before touching `src/lib/home/`. It describes the Phase 0 foundation that every section agent builds on: who owns which folder, the contracts between sections and the page, the shared component APIs, message key rules, and asset conventions. The product brief is [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md); stack-wide conventions are in [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](../AGENTS.md).
 
+> **Cleanup 2026-11-20 (owner request: less noise).** No clock times anywhere: `NightClock`, the hour rail and the hours list in the menu are gone (the menu overlay is phones only and lists the pages). Section order is now hero → making → night shift → radio → game → cinema → sunrise. Sections no longer overlap each other (except making over the hero and the sunrise under the dawn bank); a `Mist` with `air` puts a strip of plain sky between them. Older paragraphs below that mention `20:00`-style hours name the same sections.
+
 **Copy rule, again:** you never write visitor facing text. Every string a visitor can read or hear (headings, labels, `aria-label`, `alt`, button text, `<title>`, meta) is a Paraglide message whose value is `TODO(copy): <intent>`. Allowed literals: proper names (SOLO STACK, YouTube, GitHub, Svelte…), clock labels (`22:00`), and live data (video titles, commit messages, handles).
 
 ## 1. Map and ownership
@@ -10,8 +12,8 @@ Read this before touching `src/lib/home/`. It describes the Phase 0 foundation t
 src/routes/+page.svelte            composes <NightPage> + 7 sections (lead)
 src/routes/+layout.ts              prerender = true for the whole site (lead)
 src/lib/home/
-  night.ts                         NIGHT_HOURS: order, ids, clock times, sky colors (lead)
-  NightPage.svelte                 sky, --night, stars, grain, nav (SiteNav night variant), menu, hour rail (lead)
+  night.ts                         NIGHT_HOURS: order, ids, sky colors (lead)
+  NightPage.svelte                 sky, --night, stars, grain, nav (SiteNav night variant), phone menu (lead)
   shared/                          shared components and helpers (lead; see §6)
   data/                            socials.ts, youtube(.remote).ts, github(.remote).ts (lead)
   sections/
@@ -42,9 +44,8 @@ Every section component renders one root element with:
 | Requirement                                  | Why                                                                                                  |
 | -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `id="<section id>"` from `NIGHT_HOURS`       | Menu and rail anchors (`#hero`, `#making`, `#game`, `#night-shift`, `#radio`, `#cinema`, `#sunrise`) |
-| `data-night-hour="<time>"`                   | NightPage anchors the sky color stops to the section's real position                                 |
-| `position: relative`                         | NightClock is absolutely positioned inside it                                                        |
-| `<NightClock time="…" />`                    | Same clock position in every section                                                                 |
+| `data-night-hour` (no value)                 | NightPage anchors the sky color stops to the section's real position                                 |
+| `position: relative`                         | Headings and art are positioned inside it                                                            |
 | a heading with `aria-labelledby` on the root | Landmark and outline. Hero owns the only `<h1>` (the wordmark); others use `<h2>`                    |
 | transparent background                       | The global sky shows through; paint your art on top of it                                            |
 
@@ -79,7 +80,7 @@ Defined in `src/routes/layout.css`. Use them instead of local values so every se
 | Token                                                                                            | Use                                                                                                                      |
 | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | `--page-gutter`, `--bottom-gutter`                                                               | Left/right edge of all copy, chrome and controls; bottom line of in-section controls (on `[data-night-page]`)            |
-| `--clock-top`, `--heading-top`                                                                   | NightClock top; the section heading sits at `--heading-top`, under the clock                                             |
+| `--clock-top`, `--heading-top`, `--section-air`                                                  | Top band under the nav (the hero hangs its tagline from it); section headings sit on it; plain sky between two sections  |
 | `--nav-pad-y`                                                                                    | Vertical padding of the nav bar (the menu close button sits on it too)                                                   |
 | `--color-butter/ochre/cream/moonlight/night/ink/dusk`                                            | The only colors. Alpha via `color-mix(in oklab, var(--color-butter) 40%, transparent)`, never raw `rgb()`                |
 | `--halo-ink`, `--halo-butter`                                                                    | Text halo for cream on pigment / anthracite on paper                                                                     |
@@ -140,13 +141,13 @@ interface GameProps {
 - Drive your loop with `RafLoop` and set `loop.paused = paused` in an `$effect`. Keep a round between 30 and 90 seconds, instant restart, no network.
 - Each candidate folder holds its own game; the placeholder stub they started from is gone.
 - Message keys: `home_game_moon_*` (A), `home_game_stack_*` (B), `home_game_stars_*` (C). Each already has a `_title` key.
-- The 22:00 section shows all three games as tabs. `HOMEPAGE_DEFAULT_GAME` in `candidates.ts` picks the tab selected first (`moon-planet`). Only the selected tab's frame is mounted.
+- The game section shows one large poster; the three games are plain text tabs (mono labels, hand-drawn underline) above it. `HOMEPAGE_DEFAULT_GAME` in `candidates.ts` picks the tab selected first (`moon-planet`). Only the selected tab's frame is mounted.
 
 ## 6. Shared components and helpers (`src/lib/home/shared/`)
 
-### 6.1 `NightClock.svelte`
+### 6.1 `NightClock.svelte` (removed)
 
-`<NightClock time="22:00" />`. Props: `time` (required), `placement` (`'section'` absolute top left, default; `'inline'`), `class`. Position via `--night-clock-top` / `--night-clock-left`, color via `--night-clock-color` (set it on light backgrounds, e.g. sunrise).
+Removed 2026-11-20 together with every clock label. Section headings sit at `--heading-top`.
 
 ### 6.2 `PaperGrain.svelte`
 
@@ -183,7 +184,7 @@ All five are horizontally seamless, so `repeat-x` and sideways offsets work. Use
 
 **`[data-feather]` helper.** Put `data-feather` on a plate (or its wrapper) and set `--feather-top` / `--feather-bottom` (lengths, not percentages; default 0) in your CSS. NightPage's rule owns the element's `mask`: painted soft edge over those heights, solid in between. Without the attribute, write the mask yourself (the cinema backdrop uses `var(--feather-up) top / 100% 20% no-repeat, linear-gradient(#000 0 0) bottom / 100% 80.5% no-repeat`).
 
-**`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one): a zero-height boundary with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads after the hero moon (`DeferredArt`, §6.7), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion). Round 2: the lit mist is the far layer (keep it narrow and light, ≤ 0.4 opacity) and `cloud` adds a dark foreground silhouette (`strip` `a`/`b`/`c` from `docs/art/site/round-2/seam-cloud-*.png`, `height`, `above`, `opacity`, `mirror`, `stretch`, `shift`) that overlaps the upper plate's lit edge and drifts against the mist. Every seam uses a different strip, mirror or shift. Optimized by `node src/lib/home/shared/tools/optimize-round-2.mjs` (also the game posters and the cinema projection).
+**`Mist.svelte`** (placed in `src/routes/+page.svelte` between sections, never inside one; since 2026-11-20 every seam uses `air="var(--section-air)"`, one tall faint mist at 0.18–0.2 opacity and no `cloud`): a boundary that is zero-height unless `air` gives it a strip of plain sky with a painted mist strip (`variant`: `dusk` 20–22 h, `night` 01–02 h, `predawn` 02–04 h), `height`, `above` (share above the boundary), `opacity`, `mirror`, `drift` (parallax travel). It paints above both neighbors, takes no pointer events, loads after the hero moon (`DeferredArt`, §6.7), and drifts with a transform-only scroll-driven animation on its own view timeline (static without support and under reduced motion). The dark foreground cloud silhouettes of round 2 (`cloud`, `seam-cloud-*`) were removed with that cleanup.
 
 **`DawnBank.svelte`** (between `<Cinema />` and `<Sunrise />`, round 3): one wide, non-repeating painted dawn cloud bank (`docs/art/site/round-3/dawn-cloud-bank*.png`; the portrait painting below 48rem, never a crop), zero height, z-index 2, rising a little on its own view timeline (static under reduced motion). Its opaque middle band hides the only lines of the 04→06 seam: the sunrise overlaps the cinema and feathers its top in inside that band, and the cinema cliff dissolves into it; cinema cliff, mascot, beam, screen and heading paint in front (z-index 3). All numbers live in `shared/dawn.ts` (`dawnVars()` on the cinema, the bank and the sunrise); change them together. Optimized by `node src/lib/home/shared/tools/optimize-round-3.mjs`. The cinema overlaps the radio by `--cinema-overlap` (negative margin, own links/buttons only take pointer events), so its painted sky meets the radio's rocks; the radio overlaps the night shift the same way (`--radio-overlap`, only its scene takes pointer events).
 

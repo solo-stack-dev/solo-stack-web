@@ -18,7 +18,6 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { audio } from '#lib/home/shared/audio.svelte.ts';
 	import { inView, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import StarField from '#lib/home/shared/StarField.svelte';
 	import BrandIconSprite from './BrandIconSprite.svelte';
 	import StationList from './StationList.svelte';
@@ -144,7 +143,7 @@
 <section
 	bind:this={section}
 	id="radio"
-	data-night-hour="02:00"
+	data-night-hour
 	data-feather
 	class="radio"
 	aria-labelledby="home-radio-title"
@@ -167,7 +166,6 @@
 	{@attach inView((near) => near && void loadSound(), { rootMargin: '50% 0px', once: true })}
 >
 	<BrandIconSprite stations={STATIONS} />
-	<NightClock time="02:00" />
 
 	<div class="head">
 		<h2 id="home-radio-title" class="night-heading">{m.home_radio_title()}</h2>
@@ -333,10 +331,7 @@
 		/* soft painted section edges so the clipped plate never ends in a straight line (NightPage [data-feather]) */
 		--feather-top: clamp(1.5rem, 3vw, 3rem);
 		--feather-bottom: calc(var(--ground) * 0.5);
-		/* Pulled up under the desk's dissolving bottom edge: 02:00 follows the night shift without a dead band of black. The
-		   overlap holds only the heading's top padding (the top feather stays short, above the clock); only the scene (radio, station list) takes pointer events. */
-		--radio-overlap: clamp(4rem, 9.5vw, 9rem);
-		margin-top: calc(var(--radio-overlap) * -1);
+		/* only the scene (radio, station list) takes pointer events */
 		pointer-events: none;
 	}
 
@@ -639,8 +634,6 @@
 			--band: var(--band-tall);
 			--radio-w: min(calc(100cqw - 0.5rem), 25rem);
 			--stage-w: max(118cqw, calc(100svh / var(--plate-aspect)));
-			/* Pulled further under the desk's floor: half the flat black between the 01:00 tap hint and the 02:00 clock */
-			--radio-overlap: 7rem;
 		}
 
 		.horizon {
@@ -648,7 +641,7 @@
 		}
 
 		.head {
-			min-height: 9.5rem;
+			min-height: 6rem;
 		}
 
 		/* shorter slider on the tall glass, so the song title keeps room to show or ellipsize inside the painted bezel */

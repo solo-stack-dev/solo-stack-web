@@ -3,7 +3,8 @@
 	The painted radio, one variant (`wide` | `tall`, geometry in layout.ts). Radio.svelte renders both and CSS shows one
 	(no hydration shift); the hidden one is `display: none`: out of tab order and a11y tree, lazy images never fetched.
 
-	Layers, back to front: body → slide-rule scale + mini logos (SVG, body px) → needle → station on the glass →
+	Layers, back to front: body → slide-rule scale with one mark per station (SVG, body px; the logos are printed once, on the
+	keys) → needle → station on the glass →
 	dial (transparent range input) → display strip (snippet) → preset keys → knobs.
 -->
 <script lang="ts">
@@ -14,7 +15,6 @@
 	import knobImage from './assets/radio-knob.webp?enhanced';
 	import needleImage from './assets/radio-needle.webp?enhanced';
 	import BrandIcon from './BrandIcon.svelte';
-	import { iconHref } from './icons.ts';
 	import StationContent from './StationContent.svelte';
 	import { RADIO_LAYOUT, keySlots, toPercent, type Knob, type RadioLayout, type Rect } from './layout.ts';
 	import { DIAL_MAX, type Station } from './stations.ts';
@@ -70,8 +70,8 @@
 	const stationMarks = $derived(
 		stations.map((station) => {
 			const x = xAt(station.position);
-			const { rule, markTop, logoY, logoSize } = layout.scale;
-			return { station, tick: `M${x} ${markTop}V${rule + 8}`, logo: { x: x - logoSize / 2, y: logoY - logoSize / 2, size: logoSize } };
+			const { rule, markTop } = layout.scale;
+			return { station, tick: `M${x} ${markTop}V${rule + 8}` };
 		})
 	);
 
@@ -97,7 +97,6 @@
 		{#each stationMarks as mark (mark.station.id)}
 			<g class={['mark', tuned?.id === mark.station.id && 'on']}>
 				<path d={mark.tick} class="mark-tick" />
-				<use href={iconHref(mark.station.id)} x={mark.logo.x} y={mark.logo.y} width={mark.logo.size} height={mark.logo.size} />
 			</g>
 		{/each}
 	</svg>
@@ -294,9 +293,9 @@
 		opacity: 0.3;
 	}
 
-	/* Untuned platform marks: clearly printed cream; butter is reserved for the tuned station */
+	/* Untuned station marks: quiet printed cream; butter is reserved for the tuned station */
 	.mark {
-		opacity: 0.82;
+		opacity: 0.6;
 		transition: opacity 0.3s;
 	}
 

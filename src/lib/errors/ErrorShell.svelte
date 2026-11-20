@@ -1,7 +1,6 @@
 <!--
 	@component
-	Frame for every error page: the site navbar in its night look (crescent wordmark, the pages, and the 03:00 clock, the hour
-	the homepage night skips, in place of the menu), mono status, copy, home link, optional retry, the homepage sections as one
+	Frame for every error page: the site navbar in its night look (crescent wordmark and the pages), mono status, copy, home link, optional retry, the homepage sections as one
 	column of plain links. The `scene` snippet (`WorldTree`, `GiantWall`) renders behind; the optional `badge` sits on the
 	scene, outside the text column (the 404's seal, stamped into the painting); the optional `stamp` is pressed beside the status
 	numerals (the same seal on phones, where the painting has no quiet corner for it).
@@ -9,7 +8,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import SiteNav from '#lib/components/site/SiteNav.svelte';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import PaperGrain from '#lib/home/shared/PaperGrain.svelte';
 	import { NIGHT_HOURS, type SectionId } from '#lib/home/night.ts';
 	import { m } from '#lib/paraglide/messages.js';
@@ -50,11 +48,7 @@
 	<div class="scene">{@render scene()}</div>
 
 	<div class="chrome">
-		<SiteNav variant="night">
-			{#snippet actions()}
-				<NightClock time="03:00" placement="inline" class="error-clock" />
-			{/snippet}
-		</SiteNav>
+		<SiteNav variant="night" />
 	</div>
 
 	<main class="panel" aria-labelledby="error-title">
@@ -81,7 +75,6 @@
 				{#each NIGHT_HOURS as hour (hour.id)}
 					<li>
 						<a class="swash-focus" href="{home}#{hour.id}">
-							<span class="font-mono text-[0.7rem] tracking-clock tabular-nums" aria-hidden="true">{hour.time}</span>
 							<span>{sectionLabels[hour.id]()}</span>
 						</a>
 					</li>
@@ -134,12 +127,6 @@
 		position: relative;
 		z-index: 3;
 		height: calc(2.75rem + 2 * var(--nav-pad-y));
-	}
-
-	/* The clock ends on the gutter (the actions slot is offset for a 44px icon button) */
-	.chrome :global(.error-clock) {
-		margin-right: 0.75rem;
-		padding-inline: 0.25rem;
 	}
 
 	/* Panel ---------------------------------------------------------------------------------------------------- */
@@ -296,10 +283,6 @@
 		text-decoration-color: transparent;
 		text-underline-offset: 0.25em;
 		transition: color 160ms ease;
-	}
-
-	.sections a span:first-child {
-		color: color-mix(in oklab, var(--color-butter) 70%, transparent);
 	}
 
 	.sections a:hover {

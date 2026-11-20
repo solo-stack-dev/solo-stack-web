@@ -11,7 +11,6 @@
 	import { m } from '#lib/paraglide/messages.js';
 	import { getRecentCommits } from '#lib/home/data/github.remote.ts';
 	import { GITHUB_COMMIT_LIMIT } from '#lib/home/data/github.ts';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { InView, RafLoop, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import Scene from './Scene.svelte';
 	import { COMMITS_PER_PAGE, desktop, mobile, type SpotId } from './layout.ts';
@@ -108,7 +107,7 @@
 
 <section
 	id="night-shift"
-	data-night-hour="01:00"
+	data-night-hour
 	class="night-shift"
 	aria-labelledby="home-nightshift-title"
 	data-live={live ? '' : undefined}
@@ -119,7 +118,6 @@
 	{@attach parallax.attach}
 	{@attach seen.attach}
 >
-	<NightClock time="01:00" />
 	<h2 id="home-nightshift-title" class="title night-heading">{m.home_nightshift_title()}</h2>
 
 	<div class="sr-only" role="region" aria-label={m.home_nightshift_monitor_label()}>
@@ -178,10 +176,6 @@
 		left: var(--page-gutter);
 		max-width: min(44rem, 70vw);
 		pointer-events: none;
-	}
-
-	.night-shift :global(.night-clock) {
-		z-index: 6;
 	}
 
 	/* Art direction: portrait art below 4:5, the 16:9 painting otherwise. */

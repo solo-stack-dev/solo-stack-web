@@ -1,6 +1,6 @@
 <!--
 	@component
-	Homepage frame: fixed sky that follows the night, paper grain, stars, shooting stars, nav + menu overlay, hour rail.
+	Homepage frame: fixed sky that follows the night, paper grain, stars, shooting stars, nav + phone menu overlay.
 	Sections render as children, in NIGHT_HOURS order.
 
 	`--night` (docs/HOMEPAGE-DEV.md): page scroll progress 0…1 on this wrapper, inherited by every section. Driven by
@@ -11,10 +11,10 @@
 	Also provides the transition masks of shared/transitions.ts as `url()` vars and the `[data-feather]` helper (below).
 
 	Chrome that follows the art underneath:
-	- Nav wordmark and rail hide while the hero covers the top of the viewport.
+	- The nav wordmark hides while the hero covers the top of the viewport.
 	- Global shooting stars pause while the hero covers the sky (it has its own); the star field stops twinkling while the
 	  hero fills the viewport (its 20 fps full-screen canvas would redraw unseen).
-	- Nav and rail switch to dark ink only once sunrise paper is under them, tracked via `#sunrise [data-night-edge]`
+	- The nav switches to dark ink only once sunrise paper is under it, tracked via `#sunrise [data-night-edge]`
 	  (fallback `#sunrise .night`).
 	- `html[data-night-end]` while the sunrise is on screen: bottom overscroll shows butter paper, top overscroll night.
 -->
@@ -26,7 +26,7 @@
 	import { SITE_LINKS, siteCurrent, siteHref } from '#lib/components/site/links.ts';
 	import { m } from '#lib/paraglide/messages.js';
 	import Eggs from './eggs/Eggs.svelte';
-	import { NIGHT_HOURS, NIGHT_HOUR_ATTR, skyBackground, type NightHourDef, type SectionId } from './night.ts';
+	import { NIGHT_HOURS, NIGHT_HOUR_ATTR, skyBackground, type NightHourDef } from './night.ts';
 	import PaperGrain from './shared/PaperGrain.svelte';
 	import ShootingStars from './shared/ShootingStars.svelte';
 	import StarField from './shared/StarField.svelte';
@@ -36,30 +36,16 @@
 
 	interface Props {
 		children: Snippet;
-		/** Show the hour dots on the right edge (≥ md). Default true. */
-		rail?: boolean;
 	}
 
-	let { children, rail = true }: Props = $props();
+	let { children }: Props = $props();
 
 	/** Fallback when the sunrise night edge has no `data-edge-clear`: fraction of its height below which its ink is gone. */
 	const SUNRISE_EDGE_CLEAR = 0.72;
 
-	const labels: Record<SectionId, () => string> = {
-		hero: m.home_nav_section_hero,
-		making: m.home_nav_section_making,
-		game: m.home_nav_section_game,
-		'night-shift': m.home_nav_section_nightshift,
-		radio: m.home_nav_section_radio,
-		cinema: m.home_nav_section_cinema,
-		sunrise: m.home_nav_section_sunrise
-	};
-
 	const hours: readonly NightHourDef[] = NIGHT_HOURS;
-	/** Menu pages: all but Start (the homepage itself; its hours are listed under the pages). */
+	/** Menu pages (phones; from 48rem they are inline in the bar): all but Start, the homepage itself. */
 	const pages = SITE_LINKS.filter((link) => link.id !== 'home');
-	/** Sections with their own progress dots: the rail hides while they are active (one indicator at a time). */
-	const OWN_PROGRESS = new Set<SectionId>(['making']);
 	const maskVars = transitionMaskVars({ deferred: true });
 	// Only the night shift uses this mask: it loads after the hero moon (belowFold); without JS the <noscript> style sets it.
 	const washSpreadDown = `url("${TRANSITION_MASKS.washSpreadDown}")`;
@@ -70,18 +56,18 @@
 	let header = $state<HTMLElement>();
 	let menu: HTMLDialogElement;
 	let menuOpen = $state(false);
-	let active = $state<SectionId>('hero');
 	// The page loads at the top, so the hero covers the sky (and fills the viewport) until the observers say otherwise.
 	let heroCovers = $state(true);
 	let heroFills = $state(true);
 	let navOnPaper = $state(false);
-	let railOnPaper = $state(false);
+	/** Butter paper has reached the middle of the viewport: the stars have faded out and stop twinkling. */
+	let skyOnPaper = $state(false);
 	// Evenly spaced until measured on the client. stops[k]: hour k fully reached; starts[k]: its blend begins.
 	let stops = $state<number[]>(NIGHT_HOURS.map((_, index) => index / last));
 	let starts = $state<number[]>(NIGHT_HOURS.map((_, index) => Math.max(0, index - 1) / last));
 
 	const sections = () => Array.from(wrapper.querySelectorAll<HTMLElement>(`[${NIGHT_HOUR_ATTR}]`));
-	const byId = (id: SectionId) => wrapper.querySelector<HTMLElement>(`#${id}[${NIGHT_HOUR_ATTR}]`);
+	const byId = (id: string) => wrapper.querySelector<HTMLElement>(`#${id}[${NIGHT_HOUR_ATTR}]`);
 
 	// stop = scroll progress at which the section's center meets the viewport center.
 	function measureStops() {
@@ -175,7 +161,7 @@
 		};
 	});
 
-	// Sunrise: overscroll color, and nav/rail ink that follows the paper under them (not the page progress).
+	// Sunrise: overscroll color, and nav ink that follows the paper under it (not the page progress).
 	$effect(() => {
 		const sunrise = byId('sunrise');
 		if (!sunrise) return;
@@ -192,7 +178,7 @@
 			// The paper starts below the cleared part of the night edge (or at the section top without an edge).
 			const paperTop = Math.max(section.top, box ? box.top + box.height * clear : section.top);
 			navOnPaper = paperTop < (header?.offsetHeight ?? 0) * 0.75;
-			railOnPaper = paperTop < window.innerHeight / 2 - 80;
+			skyOnPaper = paperTop < window.innerHeight / 2 - 80;
 		};
 		const schedule = () => {
 			if (!frame) frame = requestAnimationFrame(update);
@@ -209,7 +195,7 @@
 			} else {
 				delete root.dataset.nightEnd;
 				navOnPaper = false;
-				railOnPaper = false;
+				skyOnPaper = false;
 			}
 		});
 		observer.observe(sunrise);
@@ -221,20 +207,6 @@
 		};
 	});
 
-	// Active hour for the rail and the menu (section crossing the viewport center).
-	$effect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				for (const entry of entries) {
-					if (entry.isIntersecting) active = entry.target.id as SectionId;
-				}
-			},
-			{ rootMargin: '-50% 0px -50% 0px' }
-		);
-		for (const element of sections()) observer.observe(element);
-		return () => observer.disconnect();
-	});
-
 	function openMenu() {
 		menu.showModal();
 		menuOpen = true;
@@ -242,17 +214,6 @@
 
 	function closeMenu() {
 		menu.close();
-	}
-
-	/** Close the menu and move keyboard focus to the chosen section (the anchor's default action scrolls to it). */
-	function goToSection(id: string) {
-		closeMenu();
-		requestAnimationFrame(() => {
-			const section = document.getElementById(id);
-			if (!section) return;
-			if (!section.hasAttribute('tabindex')) section.setAttribute('tabindex', '-1');
-			section.focus({ preventScroll: true });
-		});
 	}
 </script>
 
@@ -266,7 +227,6 @@
 	class="night-page"
 	data-night-page
 	data-hero-covers={heroCovers ? '' : undefined}
-	data-rail-away={OWN_PROGRESS.has(active) ? '' : undefined}
 	style:--dawn-from={starts[last]}
 	style:--dawn-to={stops[last]}
 	style={maskVars}
@@ -278,7 +238,7 @@
 			<div class="sky-layer is-blend" style:background={skyBackground(hour)} style:--from={starts[index + 1]} style:--to={stops[index + 1]}></div>
 		{/each}
 		<div class="sky-stars">
-			<StarField twinkle={!heroFills && !railOnPaper} />
+			<StarField twinkle={!heroFills && !skyOnPaper} />
 			<ShootingStars enabled={!heroCovers} />
 		</div>
 	</div>
@@ -306,8 +266,8 @@
 				<span class="close-icon" aria-hidden="true"></span>
 			</button>
 			<div class="menu-body">
-				<!-- The site pages first, large like the subpage phone menu (MobileMenu). Start is left out: this is it, and the hours below
-				     are its map. From 48rem the pages are also inline in the bar. -->
+				<!-- The site pages, large like the subpage phone menu (MobileMenu). Start is left out: this is it. Phones only: from 48rem
+				     the pages are inline in the bar and the menu button is hidden. -->
 				<nav class="menu-pages" aria-label={m.site_nav_label()}>
 					<ul>
 						{#each pages as link, index (link.id)}
@@ -317,38 +277,9 @@
 						{/each}
 					</ul>
 				</nav>
-				<!-- The night's hours as a compact timeline under them: mono time, the rail's dot on a hairline, the hour's title -->
-				<nav class="menu-hours" aria-label={m.home_nav_menu_title()}>
-					<ol>
-						{#each NIGHT_HOURS as hour, index (hour.id)}
-							<li style:--i={pages.length + index}>
-								<a href="#{hour.id}" aria-current={active === hour.id ? 'location' : undefined} onclick={() => goToSection(hour.id)}>
-									<span class="time label-sm">{hour.time}</span>
-									<span class="tick" aria-hidden="true"></span>
-									<span class="title">{labels[hour.id]()}</span>
-								</a>
-							</li>
-						{/each}
-					</ol>
-				</nav>
 			</div>
 		</div>
 	</dialog>
-
-	{#if rail}
-		<nav class="rail" aria-label={m.home_nav_rail_label()} data-tone={railOnPaper ? 'paper' : undefined}>
-			<ol>
-				{#each NIGHT_HOURS as hour (hour.id)}
-					<li>
-						<a href="#{hour.id}" aria-label={labels[hour.id]()} aria-current={active === hour.id ? 'location' : undefined}>
-							<span class="rail-time label-sm" aria-hidden="true">{hour.time}</span>
-							<span class="rail-dot" aria-hidden="true"></span>
-						</a>
-					</li>
-				{/each}
-			</ol>
-		</nav>
-	{/if}
 
 	<main id="main" class="night-main">
 		{@render children()}
@@ -467,6 +398,13 @@
 	.menu-button,
 	.menu-close {
 		transition: color var(--dur-hover) ease;
+	}
+
+	/* From 48rem the pages are inline in the bar, so the overlay (which only lists them) has no button */
+	@media (min-width: 48rem) {
+		.menu-button {
+			display: none;
+		}
 	}
 
 	.menu-button:hover,
@@ -628,140 +566,12 @@
 		height: 0.26em;
 	}
 
-	/* Hours: the secondary list, a compact timeline (mono time, the rail's dot on a hairline, the hour's title) */
-	.menu-hours {
-		margin-top: clamp(1.25rem, 4.5vh, 3rem);
-	}
-
-	.menu-hours a {
-		display: grid;
-		grid-template-columns: auto 0.75rem auto;
-		align-items: center;
-		column-gap: clamp(0.6rem, 2.5vw, 0.85rem);
-		width: fit-content;
-		min-height: clamp(2.25rem, 5.4vh, 2.75rem);
-		transition: color var(--dur-hover) ease;
-	}
-
-	.time {
-		color: color-mix(in oklab, var(--color-cream) 60%, transparent);
-		transition: color var(--dur-hover) ease;
-	}
-
-	/* One cell per row, full height: their hairlines join into the night's line, from the first dot to the last */
-	.tick {
-		position: relative;
-		align-self: stretch;
-	}
-
-	.tick::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 50%;
-		width: 1px;
-		translate: -50% 0;
-		background: color-mix(in oklab, var(--color-cream) 22%, transparent);
-	}
-
-	.menu-hours li:first-child .tick::before {
-		top: 50%;
-	}
-
-	.menu-hours li:last-child .tick::before {
-		bottom: 50%;
-	}
-
-	.tick::after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 0.35rem;
-		height: 0.35rem;
-		translate: -50% -50%;
-		border-radius: 999px;
-		background: currentColor;
-		opacity: 0.55;
-		transition:
-			opacity var(--dur-hover),
-			scale var(--dur-hover),
-			background-color var(--dur-hover);
-	}
-
-	.title {
-		position: relative;
-		font-family: var(--font-display);
-		/* every title on one line from 320px */
-		font-size: clamp(0.9375rem, min(5vw, 0.95rem + 0.5vw), 1.5rem);
-		font-weight: 800;
-		line-height: 1.15;
-		letter-spacing: -0.02em;
-	}
-
-	/* the swash, small: keyboard focus only (the current hour has its dot) */
-	.title::after {
-		content: '';
-		position: absolute;
-		left: -0.05em;
-		right: -0.1em;
-		bottom: -0.2em;
-		height: 0.3rem;
-		background: var(--focus-ring);
-		mask: var(--ink-underline) center / 100% 100% no-repeat;
-		scale: 0 1;
-		transform-origin: left;
-		transition: scale var(--dur-state) var(--ease-settle);
-	}
-
-	.menu-hours a:hover,
-	.menu-hours a[aria-current],
-	.menu-hours a:hover .time,
-	.menu-hours a[aria-current] .time {
-		color: var(--color-butter);
-	}
-
-	.menu-hours a:hover .tick::after {
-		opacity: 1;
-	}
-
-	.menu-hours a[aria-current] .tick::after {
-		opacity: 1;
-		scale: 1.6;
-		box-shadow: var(--glow-sm);
-	}
-
-	.menu-hours a:focus-visible {
-		outline: none;
-		color: var(--color-butter);
-		filter: drop-shadow(0 0 0.45rem var(--focus-halo));
-	}
-
-	.menu-hours a:focus-visible .title::after {
-		scale: 1 1;
-	}
-
-	/* Short landscape screens (phones turned sideways): pages and hours side by side, so the overlay still fits without scrolling */
-	@media (orientation: landscape) and (max-height: 32rem) {
-		.menu-body {
-			display: grid;
-			grid-template-columns: auto auto;
-			justify-content: start;
-			column-gap: clamp(2.5rem, 9vw, 7rem);
-		}
-
-		.menu-hours {
-			margin-top: 0;
-		}
-	}
-
 	@media (prefers-reduced-motion: no-preference) {
 		.menu[open] {
 			animation: menu-in var(--dur-state) var(--ease-settle);
 		}
 
-		/* the pages, then the hours, rise in one after another (as in MobileMenu) */
+		/* the pages rise in one after another (as in MobileMenu) */
 		.menu[open] li {
 			animation: menu-rise var(--dur-reveal) var(--ease-settle) both;
 			animation-delay: calc(60ms + var(--i) * 35ms);
@@ -779,104 +589,5 @@
 			opacity: 0;
 			translate: 0 0.75rem;
 		}
-	}
-
-	/* Rail ----------------------------------------------------------------------------------------------------- */
-
-	/* Quiet by design: time shows on hover/focus only; only the dots take pointer events, so the art underneath (moon,
-	   hotspots) stays clickable. */
-	.rail {
-		position: fixed;
-		z-index: 4;
-		top: 50%;
-		/* outside the gutter, which belongs to copy and controls */
-		right: clamp(0.25rem, 0.9vw, 0.9rem);
-		translate: 0 -50%;
-		display: none;
-		color: var(--color-cream);
-		pointer-events: none;
-		transition:
-			opacity var(--dur-state) ease,
-			color var(--dur-state) ease,
-			visibility 0s;
-	}
-
-	.rail[data-tone='paper'] {
-		color: var(--color-night);
-	}
-
-	.rail[data-tone='paper'] .rail-time {
-		text-shadow: var(--halo-butter);
-	}
-
-	[data-hero-covers] .rail,
-	[data-rail-away] .rail {
-		opacity: 0;
-		visibility: hidden;
-		transition:
-			opacity var(--dur-state) ease,
-			visibility 0s var(--dur-state);
-	}
-
-	@media (min-width: 48rem) {
-		.rail {
-			display: block;
-		}
-	}
-
-	.rail ol {
-		display: grid;
-		gap: 0.2rem;
-	}
-
-	.rail a {
-		position: relative;
-		display: grid;
-		place-items: center;
-		width: 1.5rem;
-		height: 1.5rem;
-		pointer-events: auto;
-	}
-
-	.rail-dot {
-		width: 0.35rem;
-		height: 0.35rem;
-		border-radius: 999px;
-		background: currentColor;
-		/* a hairline of the opposite ink keeps the dot visible on bright art */
-		box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 35%, transparent);
-		opacity: 0.45;
-		transition:
-			opacity var(--dur-hover),
-			scale var(--dur-hover);
-	}
-
-	.rail-time {
-		position: absolute;
-		top: 50%;
-		right: 100%;
-		translate: 0 -50%;
-		padding-right: 0.35rem;
-		color: inherit;
-		text-shadow: var(--halo-ink);
-		white-space: nowrap;
-		pointer-events: none;
-		opacity: 0;
-		transition: opacity var(--dur-hover);
-	}
-
-	.rail a:hover .rail-time,
-	.rail a:focus-visible .rail-time {
-		opacity: 1;
-	}
-
-	.rail a:hover .rail-dot,
-	.rail a:focus-visible .rail-dot {
-		opacity: 1;
-	}
-
-	.rail a[aria-current] .rail-dot {
-		opacity: 1;
-		scale: 1.6;
 	}
 </style>

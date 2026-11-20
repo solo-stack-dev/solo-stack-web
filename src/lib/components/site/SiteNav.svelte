@@ -12,8 +12,8 @@
 	- `variant="night"` (homepage): fixed on `--page-gutter` / `--nav-pad-y`. Links and the menu button sit in one pill of
 	  smoked night pigment with a moonlit rim, so they read over the brightest moon; the wordmark keeps an opposite-ink halo.
 	  Scrim off while the hero shows the giant wordmark. NightPage passes its menu button as `actions` and lists the site
-	  links in that overlay on phones (the pill then holds only the button). `tone="paper"` = anthracite ink on butter paper
-	  over the sunrise.
+	  links in that overlay on phones (the pill then holds only the button); from 48rem the links are inline and the
+	  actions are hidden. `tone="paper"` = anthracite ink on butter paper over the sunrise.
 	Never import the dropdown here: the homepage must not ship it.
 -->
 <script lang="ts">
@@ -132,12 +132,6 @@
 	}
 
 	@property --dock-rim-bottom {
-		syntax: '<color>';
-		inherits: true;
-		initial-value: transparent;
-	}
-
-	@property --dock-rule {
 		syntax: '<color>';
 		inherits: true;
 		initial-value: transparent;
@@ -514,7 +508,6 @@
 		--dock-glass: color-mix(in oklab, color-mix(in oklab, var(--color-night) 92%, var(--color-ochre)) 76%, transparent);
 		--dock-rim-top: color-mix(in oklab, var(--color-butter) 46%, transparent);
 		--dock-rim-bottom: color-mix(in oklab, var(--color-butter) 6%, transparent);
-		--dock-rule: color-mix(in oklab, var(--color-butter) 22%, transparent);
 		--dock-shade: color-mix(in oklab, var(--color-ink) 55%, transparent);
 		--dock-edge: color-mix(in oklab, var(--color-ink) 30%, transparent);
 		position: relative;
@@ -534,7 +527,6 @@
 			--dock-glass var(--dur-state) ease,
 			--dock-rim-top var(--dur-state) ease,
 			--dock-rim-bottom var(--dur-state) ease,
-			--dock-rule var(--dur-state) ease,
 			--dock-shade var(--dur-state) ease,
 			--dock-edge var(--dur-state) ease;
 	}
@@ -557,7 +549,6 @@
 		--dock-glass: color-mix(in oklab, color-mix(in oklab, var(--color-cream) 55%, var(--color-butter)) 82%, transparent);
 		--dock-rim-top: color-mix(in oklab, var(--color-cream) 90%, transparent);
 		--dock-rim-bottom: color-mix(in oklab, var(--color-night) 14%, transparent);
-		--dock-rule: color-mix(in oklab, var(--color-night) 18%, transparent);
 		--dock-shade: color-mix(in oklab, color-mix(in oklab, var(--color-ochre) 60%, var(--color-night)) 30%, transparent);
 		--dock-edge: color-mix(in oklab, var(--color-night) 12%, transparent);
 	}
@@ -594,10 +585,14 @@
 			display: block;
 		}
 
-		/* A hairline between the pages (and the language switch) and the section menu */
-		.is-night .locale + .actions {
-			padding-left: 0.25rem;
-			border-left: 1px solid var(--dock-rule);
+		/* The actions hold the phone menu button only (the overlay lists the pages, which are inline here) */
+		.is-night .actions {
+			display: none;
+		}
+
+		/* the language switch now ends the pill */
+		.is-night .dock {
+			padding-right: 0.4rem;
 		}
 	}
 

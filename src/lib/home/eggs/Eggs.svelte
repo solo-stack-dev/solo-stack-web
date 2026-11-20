@@ -119,8 +119,8 @@
 		const offs = ['pointerdown', 'pointermove', 'keydown', 'wheel', 'scroll', 'touchstart'].map((type) => on(window, type, touch, { passive: true }));
 		const timer = setInterval(() => {
 			if (document.visibilityState !== 'visible' || performance.now() - lastActivity < idleFor) return;
-			const hour = centerSection()?.dataset.nightHour;
-			if (!hour || hour === '20:00' || hour === '06:00') return;
+			const id = centerSection()?.id;
+			if (!id || id === 'hero' || id === 'sunrise') return;
 			stop();
 			void play('stars');
 		}, 2000);

@@ -2,18 +2,14 @@
 
 > **Cleanup (2026-11-10):** working images (previews, rejects, raw sources, superseded layers, QA screenshots) were removed from the tree to keep the repo small. They remain in git history at commit `dbb4371`.
 
+> **Cleanup (2026-11-20):** the three game posters (`poster-*.png`) and the three seam clouds (`seam-cloud-*.png`) were removed. The game posters are captured frames of the games now (`src/lib/home/sections/game/tools/capture-posters.mjs`) and the homepage seams no longer use cloud bands. The paragraphs below that mention them are history; the files remain in git history.
+
 Thirteen original PNG masters for solo-stack.dev, generated and inspected on 2026-11-05. All artwork, documentation and proofs for this round live here. No application code, visitor copy or deployment changed. No text, letters, logos or UI are baked into the masters.
 
 ## Master inventory
 
 Sizes are exact bytes. **RGB** means fully opaque with no alpha channel. **RGBA** means real native transparency with fully transparent exterior pixels and graded brush edges, retained through export.
 
-- [poster-moon-planet.png](poster-moon-planet.png) — **1664 × 936**, **2,211,007 bytes**, RGB. Running chibi mascot, round cratered moon and three bugs oriented around its rim.
-- [poster-stack-to-moon.png](poster-stack-to-moon.png) — **1664 × 936**, **2,005,412 bytes**, RGB. Uneven paper blocks, one falling block, moon at upper right.
-- [poster-constellations.png](poster-constellations.png) — **1664 × 936**, **2,102,765 bytes**, RGB. Cloud, droplet and branching network traced in warm stars; tool allusions without logos or lettering.
-- [seam-cloud-a.png](seam-cloud-a.png) — **2560 × 600**, **538,523 bytes**, RGBA. Left-heavy bank with three unequal rising gestures.
-- [seam-cloud-b.png](seam-cloud-b.png) — **2560 × 600**, **499,390 bytes**, RGBA. Rising right shoulder, two wisps and a low left tail.
-- [seam-cloud-c.png](seam-cloud-c.png) — **2560 × 600**, **336,984 bytes**, RGBA. Shallow central crest with two left-leaning wisps.
 - [cinema-projection.png](cinema-projection.png) — **1664 × 936**, **2,048,988 bytes**, RGB. Quiet projected laptop-on-cliff landscape, muted ochre horizon, grain and dark vignette.
 - [root-top.png](root-top.png) — **700 × 1750**, **304,306 bytes**, RGBA. Thicker entrance from above, descending into the common root width.
 - [root-mid.png](root-mid.png) — **700 × 1750**, **299,601 bytes**, RGBA. Exact 2:5 vertical repeat, no overall taper, thin gold vein.

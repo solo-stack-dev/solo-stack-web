@@ -229,17 +229,19 @@
 }
 
 /*
- * Homepage layout lines (docs/HOMEPAGE-DEV.md §3b), read by every section, the nav, rail and clock so all edges align:
+ * Homepage layout lines (docs/HOMEPAGE-DEV.md §3b), read by every section and the nav so all edges align:
  *   --page-gutter    left/right edge of all chrome and copy
  *   --bottom-gutter  bottom edge of in-section controls
- *   --clock-top      top of the hour label (NightClock)
- *   --heading-top    top of a section heading, locked under the clock
+ *   --clock-top      the top band under the nav (the hero hangs its tagline from it)
+ *   --heading-top    top of a section heading, on that band
+ *   --section-air    plain sky between two sections (Mist `air`)
  */
 [data-night-page] {
 	--page-gutter: clamp(1.25rem, 4vw, 3.5rem);
 	--bottom-gutter: clamp(1.5rem, 5vh, 3.25rem);
 	--clock-top: clamp(5.5rem, 12vh, 8rem);
-	--heading-top: calc(var(--clock-top) + 1.5rem);
+	--heading-top: var(--clock-top);
+	--section-air: clamp(3rem, 10vh, 7rem);
 	/* Nav bar vertical padding: centers its row on the same top band on every page */
 	--nav-pad-y: clamp(1rem, 2.5vh, 1.75rem);
 }
@@ -339,13 +341,13 @@
 	font-variant-numeric: tabular-nums;
 }
 
-/* Homepage section heading: every visible h2, placed at --heading-top */
+/* Homepage section heading: every visible h2, placed at --heading-top. One step under the display scale: the art leads. */
 @utility night-heading {
 	margin: 0;
 	font-family: var(--font-display);
-	font-size: clamp(2rem, 4vw, 3.5rem);
+	font-size: clamp(1.5rem, 2.6vw, 2.25rem);
 	font-weight: 900;
-	line-height: 0.95;
+	line-height: 1;
 	letter-spacing: var(--tracking-wordmark);
 	text-transform: uppercase;
 	text-wrap: balance;

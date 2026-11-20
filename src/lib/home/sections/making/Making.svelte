@@ -3,14 +3,15 @@
 	21:00 What I make (docs/HANDOFF-HOMEPAGE.md §5.2). One continuous ink line enters from the left, draws the current shape mid-stage and
 	runs on to the laptop screen on the cliff, which lights up at the end. One viewport tall, scrolls like any section (no pinning). While
 	the stage is on screen the line rotates on its own through six states (idea → AI → code → side projects → business → moon): morph,
-	then a dwell while the bloom grows (the active dot's ring fills); from the moon the line pours into the laptop and the idea draws in anew.
+	then a dwell while the bloom grows; from the moon the line pours into the laptop and the idea draws in anew.
 	Pauses on hover over the drawing or the controls, keyboard focus in the controls, a hidden tab, off screen, and the pause button
-	(WCAG 2.2.2). Pillars and dots jump to a state (arrow keys move along the row). The rAF loop runs only on screen.
+	(WCAG 2.2.2). The four pillars jump to their state (arrow keys move along the row); they are the only control besides pause.
+	The rAF loop runs only on screen.
 
 	Geometry: all scene layers use plate px (2560×1440 desktop, 1080×2340 portrait) inside `.frame`, a plate-aspect box scaled by `--s` to
 	cover the stage, so line, blooms and painted laptop stay aligned. Shapes: paths.ts (from scripts/making-paths.mjs); runtime: morph.ts.
 
-	Reduced motion: no autoplay and no morph; the stage rests on one state (full bloom) and the pillars and dots switch it instantly. One
+	Reduced motion: no autoplay and no morph; the stage rests on one state (full bloom) and the pillars switch it instantly. One
 	still frame keeps the painted composition (the line running into the laptop) that a list of six separate figures lost.
 -->
 <script lang="ts">
@@ -20,7 +21,6 @@
 	import { MediaQuery } from 'svelte/reactivity';
 	import { m } from '#lib/paraglide/messages.js';
 	import { NIGHT_HOURS } from '#lib/home/night.ts';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import DeferredArt from '#lib/home/shared/DeferredArt.svelte';
 	import { belowFold } from '#lib/home/shared/deferred.svelte.ts';
 	import { RafLoop, inView, pageVisibility, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
@@ -54,7 +54,7 @@
 	const MASK_VARS = STATE_IDS.map((id) => `--mask-${id}: ${bloomMask(id)}`).join('; ');
 	const MASKS = Object.fromEntries(STATE_IDS.map((id) => [id, `var(--mask-${id})`])) as Record<MakingStateId, string>;
 
-	/** Seconds: morph to the next state; the moon → idea loop (retract into the laptop, draw in anew); rest per state (bloom, dot ring). */
+	/** Seconds: morph to the next state; the moon → idea loop (retract into the laptop, draw in anew); rest per state (bloom). */
 	const MORPH = 1.4;
 	const REDRAW = 2.6;
 	const DWELL = 4;
@@ -73,11 +73,8 @@
 	/** The 21:00 sky color backs the plate in the wipe overlap (night.ts). */
 	const SKY = NIGHT_HOURS.find((hour) => hour.id === 'making')!.sky;
 
-	/** State named by title, pillars and dots (switches mid-morph, or at once on a click). */
+	/** State named by title and pillars (switches mid-morph, or at once on a click). */
 	let active = $state(0);
-	/** The line rests (no morph running): the active dot's dwell ring shows; `rests` restarts it. */
-	let resting = $state(true);
-	let rests = $state(0);
 	let userPaused = $state(false);
 	let hovered = $state(false);
 	let keyboardFocus = $state(false);
@@ -92,7 +89,6 @@
 	let ink: SVGSVGElement;
 	let glow: HTMLElement;
 	const blooms: HTMLDivElement[] = [];
-	const dots: HTMLButtonElement[] = [];
 	const pillarButtons: HTMLButtonElement[] = [];
 
 	/**
@@ -183,7 +179,6 @@
 		t = 0;
 		kind = how;
 		dwell = 0;
-		resting = false;
 		redrawPhase = -1;
 	}
 
@@ -227,17 +222,14 @@
 		loop.paused = reducedMotion.current;
 	}
 
-	/** Jump to a state (pillar, dot, arrow key): morph there and restart the dwell. */
+	/** Jump to a state (pillar, arrow key): morph there and restart the dwell. */
 	function goTo(state: number) {
 		if (asleep) sleepReset = true;
 		wake();
 		active = state;
 		dwell = 0;
 		if (reducedMotion.current) return;
-		if (t >= 1 && state === to) {
-			rests++;
-			return;
-		}
+		if (t >= 1 && state === to) return;
 		// During the moon → idea loop: retarget it (once it draws in, that draw starts over with the new shape).
 		if (kind === 'redraw' && t < 1) {
 			to = state;
@@ -292,10 +284,6 @@
 				if (t < 1) dash = String(Math.round(offset * 1000) / 1000);
 			}
 			if (t >= 0.5 && active !== to) active = to;
-			if (t >= 1) {
-				resting = true;
-				rests++;
-			}
 		} else if (playing) {
 			dwell += dt;
 			if (dwell >= DWELL) begin(to === LAST ? 0 : to + 1, to === LAST ? 'redraw' : 'morph');
@@ -404,20 +392,15 @@
 		glowWritten = -1;
 	});
 
-	/** Arrow keys (and Home/End) move along a control row: the dots step through the states, the pillars through the pillars. */
-	function onRowKey(event: KeyboardEvent, row: 'dots' | 'pillars', index: number) {
-		const count = row === 'dots' ? STATE_IDS.length : PILLARS.length;
+	/** Arrow keys (and Home/End) move along the pillar row. */
+	function onRowKey(event: KeyboardEvent, index: number) {
+		const count = PILLARS.length;
 		const step = ({ ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 } as Record<string, number>)[event.key];
 		const next = event.key === 'Home' ? 0 : event.key === 'End' ? count - 1 : step === undefined ? -1 : (index + step + count) % count;
 		if (next < 0) return;
 		event.preventDefault();
-		if (row === 'dots') {
-			goTo(next);
-			dots[next]?.focus();
-		} else {
-			goTo(PILLARS[next].target);
-			pillarButtons[next]?.focus();
-		}
+		goTo(PILLARS[next].target);
+		pillarButtons[next]?.focus();
 	}
 
 	// Keyboard focus in the controls pauses; a mouse click does not (hover covers that while the pointer stays there).
@@ -449,7 +432,7 @@
 </script>
 
 <!-- Hero transition: ink-wash wipe on .track (CSS below, docs/HOMEPAGE-DEV.md §6.5). -->
-<section id="making" data-night-hour="21:00" class="making" style={MASK_VARS} style:--making-sky={SKY} aria-labelledby="home-making-title">
+<section id="making" data-night-hour class="making" style={MASK_VARS} style:--making-sky={SKY} aria-labelledby="home-making-title">
 	<div class="track">
 		<div
 			class="stage"
@@ -465,7 +448,6 @@
 			style:--screen-x={screenX}
 			style:--screen-y={screenY}
 			style:--screen-clip={screenClip}
-			style:--dwell="{DWELL}s"
 			style:--blot={blot || undefined}
 			{@attach watchStage}
 			{@attach watchHover}
@@ -533,11 +515,9 @@
 				</div>
 			</div>
 
-			<NightClock time="21:00" />
 			<h2 id="home-making-title" class="sr-only">{m.home_making_title()}</h2>
 
-			<!-- Caption under the drawing: the state title, then (one group, centered) the pillar row and the transport row. Phones: the title
-			     stays under the drawing, the group sits on the rock at the bottom (display: contents). -->
+			<!-- Caption under the drawing: the state title, then the pillar row with the quiet pause button at its end. -->
 			<div class="caption">
 				<!-- All six titles stay in the document as a list; no live region, so the rotation never talks over a screen reader. -->
 				<ol class="titles" aria-label={m.home_making_states_label()}>
@@ -557,7 +537,7 @@
 										class="pillar"
 										aria-current={current ? 'step' : undefined}
 										onclick={() => goTo(pillar.target)}
-										onkeydown={(event) => onRowKey(event, 'pillars', p)}
+										onkeydown={(event) => onRowKey(event, p)}
 										{@attach (element) => void (pillarButtons[p] = element)}
 									>
 										{PILLAR_LABELS[pillar.id]()}
@@ -570,42 +550,15 @@
 						</ul>
 					</nav>
 
-					<!-- pause, the six states (one tab stop, arrows step; the title shows on hover/focus), skip cue -->
-					<div class="transport">
-						<button type="button" class="toggle" aria-label={userPaused ? m.home_making_play() : m.home_making_pause()} onclick={() => (userPaused = !userPaused)}>
-							<svg viewBox="0 0 24 24" aria-hidden="true">
-								{#if userPaused}
-									<path d="M8.6 5.6 C 8.3 9.7, 8.4 14.4, 8.8 18.5 C 12.1 16.5, 15.2 14.3, 18.3 12 C 15.2 9.8, 12 7.6, 8.6 5.6 Z" />
-								{:else}
-									<path d="M8.9 5.8 C 8.6 9.8, 8.7 14.3, 9.1 18.3 M15.1 5.6 C 14.8 9.7, 14.9 14.2, 15.2 18.4" />
-								{/if}
-							</svg>
-						</button>
-						<div class="dots" role="group" aria-label={m.home_making_states_label()}>
-							{#each STATE_IDS as id, i (id)}
-								<button
-									type="button"
-									class="dot-hit"
-									aria-label={TITLES[id]()}
-									aria-current={i === active ? 'step' : undefined}
-									tabindex={i === active ? 0 : -1}
-									onclick={() => goTo(i)}
-									onkeydown={(event) => onRowKey(event, 'dots', i)}
-									{@attach (element) => void (dots[i] = element)}
-								>
-									<span class="dot">
-										{#if i === active && resting}
-											{#key rests}<span class="ring"></span>{/key}
-										{/if}
-									</span>
-									<span class="tip label-sm" aria-hidden="true">{TITLES[id]()}</span>
-								</button>
-							{/each}
-						</div>
-						<a class="cue" href="#game" aria-label={m.home_making_skip_label()}>
-							<svg viewBox="0 0 24 40" aria-hidden="true"><path d="M12 2 V37 M3 28 L12 37 L21 28" /></svg>
-						</a>
-					</div>
+					<button type="button" class="toggle" aria-label={userPaused ? m.home_making_play() : m.home_making_pause()} onclick={() => (userPaused = !userPaused)}>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							{#if userPaused}
+								<path d="M8.6 5.6 C 8.3 9.7, 8.4 14.4, 8.8 18.5 C 12.1 16.5, 15.2 14.3, 18.3 12 C 15.2 9.8, 12 7.6, 8.6 5.6 Z" />
+							{:else}
+								<path d="M8.9 5.8 C 8.6 9.8, 8.7 14.3, 9.1 18.3 M15.1 5.6 C 14.8 9.7, 14.9 14.2, 15.2 18.4" />
+							{/if}
+						</svg>
+					</button>
 				</div>
 			</div>
 		</div>
@@ -628,7 +581,7 @@
 		pointer-events: none;
 	}
 
-	.making :is(a, button),
+	.making button,
 	.stage[data-on-stage] .hover-zone {
 		pointer-events: auto;
 	}
@@ -911,8 +864,10 @@
 
 	.console {
 		display: flex;
-		flex-direction: column;
+		flex-wrap: wrap;
+		justify-content: center;
 		align-items: center;
+		column-gap: 0.5rem;
 		margin-top: 2.25rem;
 	}
 
@@ -924,10 +879,6 @@
 		}
 
 		.console {
-			flex-direction: row;
-			flex-wrap: wrap;
-			justify-content: center;
-			column-gap: 0.75rem;
 			margin-top: 0.5rem;
 		}
 	}
@@ -984,135 +935,29 @@
 		scale: 1 1;
 	}
 
-	/* Under the pillars: pause, the dots, the skip cue. 44px targets; the dots are 32px wide each. */
-	.transport {
-		display: flex;
-		align-items: center;
-	}
-
-	.toggle,
-	.cue {
+	/* Pause: a quiet hand-drawn glyph at the end of the pillar row (44px target) */
+	.toggle {
 		display: grid;
 		place-items: center;
 		width: 2.75rem;
 		height: 2.75rem;
-		color: var(--color-cream);
+		color: color-mix(in oklab, var(--color-cream) 70%, transparent);
 		cursor: pointer;
 		transition: color var(--dur-hover);
 	}
 
-	.toggle:hover,
-	.cue:hover {
+	.toggle:hover {
 		color: var(--color-butter);
 	}
 
 	.toggle svg {
-		width: 1.35rem;
-		height: 1.35rem;
+		width: 1.2rem;
+		height: 1.2rem;
 		fill: none;
 		stroke: currentColor;
 		stroke-width: 1.6;
 		stroke-linecap: round;
 		stroke-linejoin: round;
-	}
-
-	.cue svg {
-		width: 0.9rem;
-		height: 1.6rem;
-		fill: none;
-		stroke: currentColor;
-		stroke-width: 1.6;
-		stroke-linecap: round;
-		stroke-linejoin: round;
-	}
-
-	.dots {
-		display: flex;
-	}
-
-	.dot-hit {
-		position: relative;
-		display: grid;
-		place-items: center;
-		width: 2rem;
-		height: 2.75rem;
-		cursor: pointer;
-	}
-
-	.dot {
-		position: relative;
-		width: 0.55rem;
-		height: 0.55rem;
-		border-radius: 50%;
-		border: 1.5px solid color-mix(in oklab, var(--color-cream) 85%, transparent);
-		box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 50%, transparent);
-		transition:
-			background-color var(--dur-state),
-			border-color var(--dur-hover),
-			scale var(--dur-state);
-	}
-
-	.dot-hit:hover .dot {
-		border-color: var(--color-butter);
-	}
-
-	/* Active: a solid butter core with an ink rim, clearly the one lit station */
-	.dot-hit[aria-current] .dot {
-		background: var(--color-butter);
-		border-color: var(--color-butter);
-		box-shadow:
-			0 0 0 1.5px var(--color-ink),
-			var(--glow-sm);
-		scale: 1.45;
-	}
-
-	/* The state's title under its dot on hover or keyboard focus (phones: above, the row sits at the bottom) */
-	.tip {
-		position: absolute;
-		left: 50%;
-		top: calc(100% - 0.15rem);
-		translate: -50% -0.25rem;
-		white-space: nowrap;
-		color: var(--color-cream);
-		text-shadow: var(--halo-ink);
-		text-transform: uppercase;
-		opacity: 0;
-		pointer-events: none;
-		transition:
-			opacity var(--dur-hover) ease,
-			translate var(--dur-state) var(--ease-settle);
-	}
-
-	.dot-hit:hover .tip,
-	.dot-hit:focus-visible .tip {
-		opacity: 1;
-		translate: -50% 0;
-	}
-
-	/* Dwell cue: a hairline ring around the active dot fills clockwise until the next state; it runs only while the rotation plays. */
-	@property --dwell-fill {
-		syntax: '<number>';
-		inherits: false;
-		initial-value: 0;
-	}
-
-	.ring {
-		position: absolute;
-		inset: -0.3rem;
-		border-radius: 50%;
-		background: conic-gradient(var(--color-butter) calc(var(--dwell-fill) * 1turn), color-mix(in oklab, var(--color-cream) 22%, transparent) 0);
-		mask: radial-gradient(closest-side, transparent calc(100% - 1.5px), #000 calc(100% - 0.75px));
-		animation: making-dwell var(--dwell) linear both paused;
-	}
-
-	[data-playing] .ring {
-		animation-play-state: running;
-	}
-
-	@keyframes making-dwell {
-		to {
-			--dwell-fill: 1;
-		}
 	}
 
 	/* ── portrait: tall plate, vertical line, compact indicator ─────────── */
@@ -1140,14 +985,13 @@
 			padding-inline: 12vw;
 		}
 
-		/* Title, transport and pillars are one group under the drawing (transport first, its tips open upwards), the control row 32–48px
-		   under the title. The line runs down the right margin around the group into the laptop (morph.ts `via`), so the cliff stays free. */
+		/* Title and pillars are one group under the drawing, the pause button under them. The line runs down the right margin around the group into the laptop (morph.ts `via`), so the cliff stays free. */
 		.caption {
 			width: calc(100% - 2 * var(--page-gutter) + 1rem);
 		}
 
 		.console {
-			flex-direction: column-reverse;
+			flex-direction: column;
 			margin-top: 1.5rem;
 		}
 
@@ -1173,12 +1017,6 @@
 			left: 0.15rem;
 			width: calc(100% - 0.3rem);
 		}
-
-		.tip {
-			top: auto;
-			bottom: calc(100% - 0.35rem);
-			translate: -50% 0.25rem;
-		}
 	}
 
 	/* ── reduced motion: one still frame, the controls switch it ─────────── */
@@ -1190,8 +1028,7 @@
 		}
 
 		/* nothing moves, so nothing to pause */
-		.toggle,
-		.ring {
+		.toggle {
 			display: none;
 		}
 	}

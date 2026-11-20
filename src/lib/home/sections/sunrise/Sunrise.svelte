@@ -16,7 +16,6 @@
 	import { localizeHref } from '#lib/paraglide/runtime.js';
 	import { linkedSocials } from '#lib/home/data/socials.ts';
 	import { InView, ScrollProgress, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
-	import NightClock from '#lib/home/shared/NightClock.svelte';
 	import { dawnVars } from '#lib/home/shared/dawn.ts';
 	import { SOCIAL_ICON_PATHS } from './icons.ts';
 	import { LEGAL_LINKS, SUNRISE_LAYOUT, placeVars } from './layout.ts';
@@ -41,8 +40,8 @@
 		laptopGlint: placeVars(d.laptopGlint, mo.laptopGlint)
 	};
 
-	// Seam geometry (shared/dawn.ts) and the cup the 06:00 clock stands beside (stage %).
-	const cupVars = [dawnVars(), `--cup-y: ${(d.coffee.y + d.coffee.h * 0.05) / 100}`, `--cup-y-m: ${(mo.coffee.y + mo.coffee.h * 0.02) / 100}`].join('; ');
+	// Seam geometry (shared/dawn.ts)
+	const seamVars = dawnVars();
 
 	let root: HTMLElement;
 	const near = new InView();
@@ -66,10 +65,10 @@
 <footer
 	bind:this={root}
 	id="sunrise"
-	data-night-hour="06:00"
+	data-night-hour
 	class={['sunrise', near.current && 'is-near']}
 	aria-labelledby="home-sunrise-title"
-	style={cupVars}
+	style={seamVars}
 	{@attach fallback && entering.attach}
 	{@attach near.attach}
 >
@@ -130,8 +129,6 @@
 	<!-- The night ends in the dawn cloud bank's underside (shared/DawnBank.svelte); NightPage tracks this line for the nav ink. -->
 	<span class="night-clear" data-night-edge data-edge-clear="1" aria-hidden="true"></span>
 
-	<NightClock time="06:00" />
-
 	<div class="bar">
 		<div class="brand">
 			<enhanced:img class="portrait" src={portrait} alt={m.home_sunrise_portrait_alt()} sizes="9rem" loading="lazy" decoding="async" />
@@ -188,10 +185,6 @@
 		mask:
 			var(--feather-up) top / 100% var(--fade) repeat-x,
 			linear-gradient(#000 0 0) bottom / 100% calc(100% - var(--fade) + 1px) no-repeat;
-		/* 06:00 stands beside the coffee cup, on the paper sky: anthracite with a butter halo */
-		--night-clock-color: color-mix(in oklab, var(--color-night) 85%, transparent);
-		--night-clock-halo: 0 0 2px var(--color-butter), 0 0 8px color-mix(in oklab, var(--color-butter) 80%, transparent);
-		--night-clock-top: calc(100% - 100cqw * 9 / 16 * (1 - var(--cup-y)) - 0.5rem);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -495,8 +488,6 @@
 			--clear: var(--dawn-clear-m);
 			min-height: 0;
 			--stage-margin: 20cqw;
-			/* 06:00 on the column like every other hour label (page gutter), in the dawn sky just above the cup and the hill line */
-			--night-clock-top: calc(var(--stage-margin) + 100cqw * var(--cup-y-m) - 2rem);
 		}
 
 		/* In the flow: a short band of dawn sky under the cloud bank, then the square scene, then the footer bar. The far ridge
