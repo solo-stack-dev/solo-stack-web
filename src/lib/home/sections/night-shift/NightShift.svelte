@@ -1,6 +1,6 @@
 <!--
 	@component
-	01:00 Night shift (docs/HANDOFF-HOMEPAGE.md §5.4): one fixed, cover-cropped view of the studio (Scene). The monitor
+	01:00 Night shift: one fixed, cover-cropped view of the studio (Scene). The monitor
 	types the latest commits as `git log --oneline`; six objects are hotspots (bonsai = golden tree egg). Geometry: layout.ts.
 
 	Motion (typing, hand frames, steam, lamp flicker, dust, pointer parallax) pauses off screen and in hidden tabs.

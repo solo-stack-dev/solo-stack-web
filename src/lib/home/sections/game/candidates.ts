@@ -1,7 +1,7 @@
 import { m } from '#lib/paraglide/messages.js';
 import type { GameLoader } from './shared/types.ts';
 
-/** The three games (docs/HANDOFF-HOMEPAGE.md §5.3), one folder each, lazy-loaded as separate chunks on play. */
+/** The three games, one folder each, lazy-loaded as separate chunks on play. */
 export const GAME_CANDIDATES = {
 	'moon-planet': { load: () => import('./moon-planet/index.ts'), title: m.home_game_moon_title },
 	'stack-to-moon': { load: () => import('./stack-to-moon/index.ts'), title: m.home_game_stack_title },

@@ -10,7 +10,7 @@
 	layers): tagline and platforms (small glyphs, 44px tall targets, one row on phones too), then © and the legal links, on the
 	content's left edge on phones as on desktop.
 
-	Spacing budget (docs/critique/ROUND-2.md): pages end without a bottom runway; the footer pulls its sky up so the top of
+	Spacing budget: pages end without a bottom runway; the footer pulls its sky up so the top of
 	the wordmark sits `--gap` under the page's last content (104px desktop, 72px phones). The screen glow and three fireflies
 	run only while the horizon is on screen; reduced motion gets them still.
 -->

@@ -1,5 +1,5 @@
 /**
- * Visual pauses in a post body (docs/critique/ROUND-2.md, ROUND-3.md).
+ * Visual pauses in a post body.
  *
  * - **Section break:** a pause between two sections, tied to the section it opens. In Markdown either a named break,
  *   `<hr data-art="radio" />` (blank lines around it; names: the keys of `BREAK_ART`), or a plain thematic break

@@ -1,6 +1,6 @@
 <!--
 	@component
-	21:00 What I make (docs/HANDOFF-HOMEPAGE.md §5.2). One continuous ink line enters from the left, draws the current shape mid-stage and
+	21:00 What I make. One continuous ink line enters from the left, draws the current shape mid-stage and
 	runs on to the laptop screen on the cliff, which lights up at the end. One viewport tall, scrolls like any section (no pinning). While
 	the stage is on screen the line rotates on its own through six states (idea → AI → code → side projects → business → moon): morph,
 	then a dwell while the bloom grows; from the moon the line pours into the laptop and the idea draws in anew.

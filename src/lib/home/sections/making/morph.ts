@@ -1,7 +1,6 @@
 /**
  * Ink morph runtime for 21:00 "What I make": layouts (plate coordinates) and the one continuous line (entry → shape → exit to the laptop
  * screen) for each of the six shapes in paths.ts, plus the morph between any two of them. Pure functions plus small caches; no DOM.
- * HANDOFF-HOMEPAGE §5.2.
  */
 import { SHAPES, SHAPE_MASKS, SHAPE_POINTS, STATE_IDS, type MakingStateId } from './paths.ts';
 

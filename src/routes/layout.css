@@ -62,7 +62,7 @@
 /* shadcn-svelte (style "nova"): class dark mode via mode-watcher on non-home pages. The homepage ignores it (fixed night). */
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens (docs/HANDOFF-HOMEPAGE.md §3), sampled from the banner; refine against the final art. Each becomes a utility (`bg-night`, …). */
+/* Design tokens, sampled from the banner. Each becomes a utility (`bg-night`, …). */
 @theme {
 	--color-butter: #fcd772;
 	--color-ochre: #e2a93b;
@@ -268,7 +268,7 @@
 }
 
 /*
- * The one content grid of the site pages (docs/critique/ROUND-2.md): pages use `mx-auto max-w-6xl px-4 sm:px-6 lg:px-8`
+ * The one content grid of the site pages: pages use `mx-auto max-w-6xl px-4 sm:px-6 lg:px-8`
  * (= these tokens); the site nav and footer use `content-frame`, so the wordmark sits flush with the content's left edge and
  * the last nav control with its right edge.
  */

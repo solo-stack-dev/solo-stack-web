@@ -30,4 +30,4 @@ node src/lib/home/sections/hero/tools/build-assets.mjs clouds --preview C:/tmp/f
 - **Shiny:** `.mascot` has `data-shiny-art`; under `[data-shiny]` the golden variant replaces the normal one (lazy + `display: none`, so nobody else downloads it).
 - **Moon:** always full and decorative (no button, no phases). The painted disc is the LCP image (`lcpImage` from `#lib/home/shared/deferred.svelte.ts`); the anthracite wordmark copy is clipped to `circle(50%)` of the moon box.
 - **3D material:** the texture is flat albedo; `MoonBody.svelte` adds the painted disc's pale outer ring and is lit from the viewer (full moon), so the 2D → 3D crossfade stays quiet.
-- **Budgets:** each `?…&enhanced` import has an explicit width ladder that stops at the native detail, and an AVIF quality tuned for the ≤ 250 kB above-the-fold budget (handoff §6.4); the `sizes` table in the script mirrors the CSS widths.
+- **Budgets:** each `?…&enhanced` import has an explicit width ladder that stops at the native detail, and an AVIF quality tuned for the ≤ 250 kB above-the-fold budget; the `sizes` table in the script mirrors the CSS widths.

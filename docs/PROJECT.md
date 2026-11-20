@@ -4,9 +4,9 @@ The website for **Solo Stack**, a German YouTube channel by a software developer
 
 It is the home of the owner's personal brand and the hub for all social channels. The site has three jobs:
 
-1. **Homepage (top priority):** a unique, flashy, slightly over the top showpiece that is unmistakably on brand. It must never look like a generic AI or template design. The concept is decided: **"Eine Nacht im Studio"** (see below and [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md)).
-2. **Contact for business (later, simple):** a page with a form for sponsorships, product placements, collaborations, and other business requests.
-3. **Blog (later, simple):** one article per YouTube video, generated automatically. Each post explains what happens in the video, summarizes it, and includes the transcript. The goal is discoverability (SEO) and a permanent, searchable home for the content.
+1. **Homepage (top priority):** a unique, flashy, slightly over the top showpiece that is unmistakably on brand. It must never look like a generic AI or template design. The concept is **"Eine Nacht im Studio"** (see below; code guide: [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md)).
+2. **Contact for business:** a page with a form for sponsorships, product placements, collaborations, and other business requests.
+3. **Blog:** one article per YouTube video, generated with `gpt-6.1-sol` (the `blog-post` skill). Each post explains what happens in the video, summarizes it, and includes the transcript. The goal is discoverability (SEO) and a permanent, searchable home for the content.
 
 **Performance stance:** important, but not at the cost of the experience. Pages are prerendered. The homepage may use rich SVG animation, painted raster art, audio, and individual Threlte (Three.js for Svelte) scenes, as long as heavy parts load lazily when they come into view, pause off screen, and every section has a beautiful static fallback for `prefers-reduced-motion`. Never a walkable 3D world as the whole site (e.g. a Three.js apartment you click through).
 
@@ -22,7 +22,7 @@ Domains: `solo-stack.dev` (production), `staging.solo-stack.dev` (staging).
 
 Full source of truth lives in the channel workspace, outside this repo: `D:\repos\Solo Stack\branding\` (start with `BRANDING.md`, `DESIGN-UND-THUMBNAILS.md`, and `final-branding-assets/`). Summary:
 
-- **Colors:** warm **butter yellow** with **anthracite**; warm off white paper as support. Starting tokens sampled from the banner: butter `#FCD772`, night `#18191B`. Define them once as Tailwind theme tokens (details in the handoff).
+- **Colors:** warm **butter yellow** with **anthracite**; warm off white paper as support. Starting tokens sampled from the banner: butter `#FCD772`, night `#18191B`. They are Tailwind theme tokens in `src/routes/layout.css` (full list in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md#3b-system-tokens-lead)).
 - **Material:** watercolor pigment paper, granulation, soft bleeding edges, ink linework. The "Nachtstudio" banner (yellow pigment paper fading into an anthracite night with a glowing moon, stars, and a laptop on a cliff) is the visual seed of the whole site.
 - **Type:** bold geometric sans for the wordmark "SOLO STACK". The site uses **Geist** (variable, self hosted in `static/fonts/`); Geist Black for display, a monospace for clock labels and code.
 - **Tagline in the banner:** "AI · CODE · SIDE PROJECTS · BUSINESS".
@@ -51,7 +51,7 @@ All visitor facing text is generated with `gpt-6.1-sol` (see [AGENTS.md](../AGEN
 
 ## Homepage: "Eine Nacht im Studio" (decided)
 
-Scrolling the homepage is one night passing. Every section is an hour with a small monospace clock label, and the whole page is one continuous painted world: the sky darkens after the hero and brightens again toward the sunrise footer, which ends on the butter yellow paper where the banner begins. Full specs, assets, build approach, and the implementation plan are in [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md). Mockups: [docs/mockups/round-2/index.html](mockups/round-2/index.html).
+Scrolling the homepage is one night passing. Every section is an hour of that night, and the whole page is one continuous painted world: the sky darkens after the hero and brightens again toward the sunrise footer, which ends on the butter yellow paper where the banner begins. The table lists the sections by their hour as designed; since 2026-11-20 the page shows no clock labels and runs hero → making → night shift → radio → game → cinema → sunrise. How it is built: [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md). Mockups: [docs/mockups/round-2/index.html](mockups/round-2/index.html).
 
 | Time  | Section         | Decided direction                                                                                                                                                                                                                                                             | Reference mockup                                                                        |
 | ----- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -89,15 +89,20 @@ Public profiles, verified by the owner on 2026-10-31 (source: `D:\repos\Solo Sta
 
 YouTube channel ID: `UCv6ihOMjTq6zdJC7IbCdpKQ` (feed: `https://www.youtube.com/feeds/videos.xml?channel_id=UCv6ihOMjTq6zdJC7IbCdpKQ`). Not listed: Spotify (show has no cover and no episode yet), LinkedIn (deferred).
 
-## Pages (planned)
+## Pages
+
+All built; how each works is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 - `/` Homepage as above.
-- `/kontakt` (name TBD, later) Business contact: form with request type (sponsoring/placement, collaboration, other), name, email, company, optional budget and timeframe, message. Remote `form` function with valibot validation, spam protection (e.g. Cloudflare Turnstile), delivery by email. Styled with the same paper and night materials, but simple.
-- `/blog` (later) List of video posts, newest first, filterable by format (project progress, AI test, AI news, business).
-- `/blog/[slug]` (later) Video post: embedded video, summary, chapters, key takeaways, full transcript, links mentioned in the video.
+- `/kontakt` Business contact: remote `form` function with valibot validation, Cloudflare Turnstile, delivery by email. Header art: the night owl messenger.
+- `/blog` List of video posts, newest first, filterable by format (project progress, AI test, AI news, business).
+- `/blog/[slug]` Video post: embedded video, summary, chapters, key takeaways, full transcript, links mentioned in the video.
+- `/stats` The numbers of all social profiles, collected daily by a separate Worker.
 - Custom 404 and 500 pages (see Easter eggs).
-- Legal pages required in Germany (Impressum, Datenschutz). Content comes from the owner, not from a model.
-- `sitemap.xml`, `robots.txt`, RSS feed.
+- Legal pages required in Germany (`/impressum`, `/datenschutz`). Content comes from the owner, not from a model.
+- `sitemap.xml`, `robots.txt`, RSS feeds, `llms.txt`.
+
+The subpages leave the homepage's moon behind: each has its own landmark of the same night in ink silhouette (blog: the reading hill, stats: the growth tree, contact: the owl), and they share the silhouette horizon footer.
 
 ## Ideas for later
 
@@ -117,10 +122,8 @@ YouTube channel ID: `UCv6ihOMjTq6zdJC7IbCdpKQ` (feed: `https://www.youtube.com/f
 
 ## Open decisions
 
-- Final color tokens (starting values in the handoff) and whether the wordmark gets its own SVG logo instead of Geist Black.
-- Which game ships at 22:00 (decided after playtesting the three prototypes), and where the star signs appear on the site, with which tools besides Svelte and how strictly official logos may be used.
-- The music track for the night radio (owner generates it with their AI music tool) and the hidden station Easter egg.
-- YouTube channel ID for the latest video feed, and whether the latest video updates via rebuild or a cached remote query.
+- Whether the wordmark gets its own SVG logo instead of Geist Black.
+- Where the star signs appear on the site beyond the constellation game, with which tools besides Svelte and how strictly official logos may be used.
+- The hidden radio station Easter egg.
+- A permanent Discord invite (the Discord station has no link until then).
 - Whether an animation library (e.g. GSAP) may be added; the default is CSS plus small custom code.
-- Blog: committed Markdown files (recommended) or a database; automatic publishing or owner review.
-- Contact form: route name, email provider, request types.

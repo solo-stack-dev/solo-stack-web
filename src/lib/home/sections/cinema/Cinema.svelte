@@ -1,6 +1,6 @@
 <!--
 	@component
-	04:00 Open air cinema (docs/HANDOFF-HOMEPAGE.md §5.6): the mascot's laptop on the cliff projects the latest video into a painted frame.
+	04:00 Open air cinema: the mascot's laptop on the cliff projects the latest video into a painted frame.
 
 	- Facade: self-hosted thumbnail (./thumbnail.ts) + moon play button; no request to YouTube before the click.
 	- First click: the consent panel (#lib/components/site/YouTubeConsent.svelte) over the thumbnail. Its button loads the

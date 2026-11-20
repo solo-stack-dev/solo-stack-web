@@ -29,8 +29,10 @@ pnpm dev
 ## Docs
 
 - [docs/PROJECT.md](docs/PROJECT.md): goals, audience, brand, pages, open decisions
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): stack, conventions, environments, planned blog pipeline
-- [docs/mockups/](docs/mockups/README.md): static design explorations (open `docs/mockups/index.html` in a browser, no build step)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): stack, conventions, environments, pages, stats collector
+- [docs/HOMEPAGE-DEV.md](docs/HOMEPAGE-DEV.md): how the homepage code in `src/lib/home/` is organized
+- [docs/mockups/round-2/](docs/mockups/round-2/index.html): the image mockups the homepage was built from (open the gallery in a browser, no build step)
+- `docs/art/` (painted masters and their prompts), `docs/copy/` (prompts and raw output of all generated copy), `docs/perf/` (performance audit and its tools)
 - [AGENTS.md](AGENTS.md): rules for AI coding agents working in this repo
 
 ## License

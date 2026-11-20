@@ -1,6 +1,6 @@
 # Homepage development guide
 
-Read this before touching `src/lib/home/`. It describes the Phase 0 foundation that every section agent builds on: who owns which folder, the contracts between sections and the page, the shared component APIs, message key rules, and asset conventions. The product brief is [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md); stack-wide conventions are in [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](../AGENTS.md).
+Read this before touching `src/lib/home/`. It describes the foundation every section builds on: who owns which folder, the contracts between sections and the page, the shared component APIs, message key rules, and asset conventions. The concept is in [PROJECT.md](PROJECT.md#homepage-eine-nacht-im-studio-decided) (the original build brief, `docs/HANDOFF-HOMEPAGE.md`, was removed on 2026-11-20 and is in git history); stack-wide conventions are in [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](../AGENTS.md).
 
 > **Cleanup 2026-11-20 (owner request: less noise).** No clock times anywhere: `NightClock`, the hour rail and the hours list in the menu are gone (the menu overlay is phones only and lists the pages). Section order is now hero → making → night shift → radio → game → cinema → sunrise. Sections no longer overlap each other (except making over the hero and the sunrise under the dawn bank); a `Mist` with `air` puts a strip of plain sky between them. Older paragraphs below that mention `20:00`-style hours name the same sections.
 
@@ -271,14 +271,14 @@ API: `audio.unlock(): AudioContext`, `audio.context`, `audio.output` (master `Ga
 ## 7. Messages
 
 - Files: `messages/de.json` (base locale) and `messages/en.json`. **Both files always get the same keys.** Values are `TODO(copy): <intent>` until the lead generates copy with `gpt-6.1-sol` in Phase 3. The intent is a brief for the copywriter model: what the text is, where it appears, length, tone hints. No draft copy.
-- Prefixes (§4.4 of the handoff): `home_meta_*`, `home_nav_*` (lead), `home_hero_*`, `home_making_*`, `home_game_*` (shell), `home_game_moon_*`, `home_game_stack_*`, `home_game_stars_*` (candidates), `home_nightshift_*`, `home_radio_*`, `home_cinema_*`, `home_sunrise_*`, later `error_*`, `egg_*`.
+- Prefixes: `home_meta_*`, `home_nav_*` (lead), `home_hero_*`, `home_making_*`, `home_game_*` (shell), `home_game_moon_*`, `home_game_stack_*`, `home_game_stars_*` (candidates), `home_nightshift_*`, `home_radio_*`, `home_cinema_*`, `home_sunrise_*`, later `error_*`, `egg_*`.
 - Naming: `<prefix>_<thing>[_<variant>]` in snake case, e.g. `home_radio_preset_label`, `home_cinema_play_label`. Parameters use Paraglide inputs: `"home_radio_station_label": "TODO(copy): … {name} …"` → `m.home_radio_station_label({ name })`.
 - **Merge rule:** the files are ordered in one contiguous block per owner. Add your keys **inside your own block, right after its last existing key**, never at the end of the file and never inside another block. That keeps parallel branches from touching the same lines, so merges are conflict free.
 - Use: `import { m } from '#lib/paraglide/messages.js';` then `{m.home_radio_title()}`. `src/lib/paraglide/` is generated (`pnpm check` or the Vite plugin recompiles); never edit it.
 
 Phase 0 keys: `home_meta_title`, `home_meta_description`; `home_nav_skip`, `home_nav_menu_close`, `home_nav_menu_title`, `home_nav_rail_label`, `home_nav_section_{hero,making,game,nightshift,radio,cinema,sunrise}`; `home_hero_tagline`, `home_hero_scroll_cue`; `home_making_title`; `home_game_{title,play,pause,resume,restart,score,highscore,loading,load_error,controls_label}`, `home_game_touch_{left,right,up,down,action}`; `home_game_moon_title`, `home_game_stack_title`, `home_game_stars_title`; `home_nightshift_{title,monitor_label,monitor_empty}`; `home_radio_{title,socials_label}`; `home_cinema_{title,watch_link,channel_link}`; `home_sunrise_{title,footer_label}`; `lab_games_{title,tabs_label,debug_title,debug_reset,touch_toggle}`.
 
-## 8. Assets (handoff §6.4, decided in Phase 0)
+## 8. Assets
 
 - **Masters** (full-size PNGs from the art agents) go to `docs/art/<section>/` with `PROMPTS.md` and `README.md` (layer list, intended position, size, z order). Never into `static/`.
 - **Optimized imports** live in `src/lib/home/sections/<section>/assets/`, consumed with `@sveltejs/enhanced-img` (`<enhanced:img src={layer} alt="" sizes="…" />` or `import layer from './assets/x.png?enhanced'`), which emits AVIF/WebP in responsive sizes. Downscale before copying if the master is far larger than the largest rendered size (2× of the max CSS width).

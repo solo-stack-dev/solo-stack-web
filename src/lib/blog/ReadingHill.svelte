@@ -1,6 +1,6 @@
 <!--
 	@component
-	Blog header art, "the reading hill" (docs/SITE-REDESIGN.md): the mascot in ink silhouette under a crooked tree, laptop
+	Blog header art, "the reading hill": the mascot in ink silhouette under a crooked tree, laptop
 	glowing on his lap, on a hill that runs off the right and bottom. Behind it a butter pigment bloom (dark: backlight on
 	the night; light: a wash on the paper), in front a few CSS fireflies rising from the laptop. The left 45 % of the art is
 	empty sky for the page title. Fireflies animate transform/opacity only, pause off screen and stand still under reduced

@@ -1,6 +1,6 @@
 <!--
 	@component
-	Easter egg triggers (docs/HANDOFF-HOMEPAGE.md §5.8, docs/HOMEPAGE-DEV.md §11). Mounted once inside NightPage.
+	Easter egg triggers (docs/HOMEPAGE-DEV.md §11). Mounted once inside NightPage.
 
 	The only egg code in the initial bundle. Each egg is a dynamic import loaded on its trigger: a `pointer-events: none`
 	overlay that unmounts itself. Escape removes all running eggs.

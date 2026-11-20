@@ -1,6 +1,6 @@
 # Architecture
 
-Status: initial scaffold. This describes what is set up and the intended direction. Sections marked **Proposed** are not built yet.
+This describes what is built. Sections marked **Proposed** are not built yet.
 
 ## Stack
 
@@ -147,9 +147,9 @@ Recommended shape:
 - Entries in `sitemap.xml` (super-sitemap) and an RSS feed.
 - **Facade embed:** show the thumbnail and load the YouTube iframe only on click. The iframe is the heaviest thing on the page otherwise.
 
-## Performance budget (Proposed)
+## Performance budget
 
-- Homepage: the owner accepts a richer homepage (painted art, Threlte hero, audio) in exchange for some speed. Targets: LCP ≤ 2.5 s on mobile, CLS < 0.05, INP < 200 ms, initial JS ≤ ~120 kB gzip with Threlte, audio, and games in lazy chunks. Details in [HANDOFF-HOMEPAGE.md](HANDOFF-HOMEPAGE.md#8-performance-and-quality-budgets). Other pages: Lighthouse 95+ on mobile.
+- Homepage: the owner accepts a richer homepage (painted art, Threlte hero, audio) in exchange for some speed. Targets: LCP ≤ 2.5 s on a mid range phone (4G), CLS < 0.05, INP < 200 ms, initial JS ≤ ~120 kB gzip with Threlte, audio, and games in lazy chunks. No main thread task over 100 ms while scrolling; animate only `transform`, `opacity`, `clip-path`/`mask` positions, and CSS variables. Image budgets are in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md#8-assets), measurements and fixes in [perf/AUDIT-2026-11.md](perf/AUDIT-2026-11.md). Other pages: Lighthouse 95+ on mobile.
 - Prerender everything that does not need live data.
 - Prefer CSS (scroll driven animations, View Transitions API, `@starting-style`) over JS animation libraries. If a library is added later, import it only in the component that needs it.
 - Games and canvas experiments load on interaction or when scrolled into view, and pause when off screen.
@@ -158,7 +158,7 @@ Recommended shape:
 
 ## Homepage code
 
-The homepage lives in `src/lib/home/` (one folder per section, shared components, data remote functions) and is composed by `src/routes/+page.svelte`. Folder ownership, the `--night` scroll contract, shared component APIs, the game module contract, message key rules, and asset conventions are in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md). `docs/mockups/` holds design artifacts and is excluded from oxfmt and oxlint.
+The homepage lives in `src/lib/home/` (one folder per section, shared components, data remote functions) and is composed by `src/routes/+page.svelte`. Folder ownership, the `--night` scroll contract, shared component APIs, the game module contract, message key rules, and asset conventions are in [HOMEPAGE-DEV.md](HOMEPAGE-DEV.md). `docs/mockups/round-2/` holds the image mockups the homepage was built from (still the style references of the art prompts in `docs/art/`); it is excluded from oxfmt and oxlint.
 
 ## Stats page
 

@@ -1,6 +1,6 @@
 <!--
 	@component
-	20:00 Hero: moonrise (docs/HANDOFF-HOMEPAGE.md §5.1).
+	20:00 Hero: moonrise.
 
 	Geometry: `--moon-r`, `--moon-cx`, `--moon-cy` on `.hero` (hero container units, per breakpoint) define the moon circle once. The moon
 	rig (glow, painted/3D moon, mascot) and the anthracite wordmark copy use them. That copy sits in a moon-sized box clipped to the moon
@@ -25,7 +25,7 @@
 	import { InView, RafLoop, reducedMotion } from '#lib/home/shared/motion.svelte.ts';
 	import { ART_CROPS } from './art.ts';
 	// Width ladders (`…&enhanced`, imagetools.d.ts) stop at the native detail of the masters (they are upscales); AVIF quality fits the
-	// above-the-fold budget (handoff §6.4). Clouds capped at 1280 px, quality 50 keeps their grain: ~55 kB less at 1440@2x.
+	// above-the-fold budget. Clouds capped at 1280 px, quality 50 keeps their grain: ~55 kB less at 1440@2x.
 	import sky from './assets/hero-sky.webp?w=1672;1280;960&quality=40&enhanced';
 	import skyMobile from './assets/hero-sky-mobile.webp?w=852;640&quality=45&enhanced';
 	import clouds1 from './assets/hero-clouds-1.webp?w=1280;960;640&quality=50&enhanced';

@@ -1,6 +1,6 @@
 <!--
 	@component
-	02:00 Night radio (docs/HANDOFF-HOMEPAGE.md §5.5): painted radio with one preset key per platform (real logos), a
+	02:00 Night radio: painted radio with one preset key per platform (real logos), a
 	dial that snaps to stations, a display strip (tuned station's handle, follow disc), a song per station (`track/`),
 	and a visually hidden list of every link (StationList: accessible, no-JS fallback; no printed card).
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 21:00 "What I make": build-time resampler for the ink morph (docs/HANDOFF-HOMEPAGE.md §5.2).
+ * 21:00 "What I make": build-time resampler for the ink morph.
  *
  * Each state is ONE continuous SVG path (absolute M/L/C/Q only) in a local box centered on (0, 0), roughly ±300 units, from the shape's
  * left (line enters) to its right (line leaves). Interior details are reached by retracing: a segment drawn twice reads as one stroke.

@@ -1,6 +1,6 @@
 <!--
 	@component
-	The night owl messenger of /kontakt (docs/SITE-REDESIGN.md): a silhouette owl on a gnarled branch with the sealed letter,
+	The night owl messenger of /kontakt: a silhouette owl on a gnarled branch with the sealed letter,
 	backlit by the pigment wash. It blinks now and then (random 4–9 s, sometimes twice), its eyes light up while `watching`
 	(someone writes the letter), and when `flown` turns true it takes off with the letter and the empty branch springs back. With a
 	`landing` element it glides down to it and stays there as a small silhouette (the parent places it in the sky above the footer

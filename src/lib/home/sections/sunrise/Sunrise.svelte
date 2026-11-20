@@ -1,6 +1,6 @@
 <!--
 	@component
-	06:00 Sunrise footer (docs/HANDOFF-HOMEPAGE.md §5.7). Under the dawn cloud bank (shared/DawnBank.svelte) the dawn sky opens on a
+	06:00 Sunrise footer. Under the dawn cloud bank (shared/DawnBank.svelte) the dawn sky opens on a
 	misty valley with the rising sun, and coffee next to a closed laptop on the cliff path; 06:00 stands beside the cup. The owner's
 	duotone print (ochre and anthracite inks multiplied into the paper), legal links, and socials sit on the paper.
 

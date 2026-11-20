@@ -1,6 +1,6 @@
 <!--
 	@component
-	Backlit silhouette vignette of a post format (docs/SITE-REDESIGN.md): the same night horizon, a different landmark on the
+	Backlit silhouette vignette of a post format: the same night horizon, a different landmark on the
 	cliff per format (laptop, firefly jar, radio mast, the little shop). Stands in for the video while it is not public (post
 	cards, the post page facade, the empty filter state). Always night, also in light mode: a window into the night. The
 	subject sits on the right, the dark sky top left and the hills bottom left carry text (`children`). Decorative.

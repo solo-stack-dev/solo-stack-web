@@ -2,7 +2,7 @@ import type { GameButton } from '../shared/input.svelte.ts';
 import { MOON_TUNING } from './tuning.ts';
 
 /**
- * Candidate A: moon planet (docs/HANDOFF-HOMEPAGE.md §5.3). Contract: GameModule in ../shared/types.ts.
+ * Candidate A: moon planet. Contract: GameModule in ../shared/types.ts.
  * Canvas 2D prototype: radial gravity platformer around a tiny moon. Simulation in sim.ts, drawing in render.ts.
  */
 export { default } from './MoonPlanet.svelte';
