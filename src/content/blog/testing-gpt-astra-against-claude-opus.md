@@ -2,10 +2,11 @@
 # Copy prompts and model outputs: docs/copy/blog/.
 title: 'GPT 6.2 Astra and Claude Opus 5.5 Put to the Test'
 slug: testing-gpt-astra-against-claude-opus
-description: 'I compare GPT 6.2 Astra with Claude Opus 5.5 in Blender, SVG, games and web development, and show why my impression of its speed was misleading.'
-summary: 'I put GPT 6.2 Astra and Claude Opus 5.5 through five practical tests. I particularly like Astra''s take on Minas Tirith and Tokyo, while Opus wins me over with its Jam Room. When it came to runtime, I had to correct my first impression.'
+description: 'I test GPT 6.2 Astra and Claude Opus 5.5 with Blender, SVG, a racing game, Jam Room, and Remotion, with technical details and runtimes.'
+summary: 'I compare GPT 6.2 Astra and Claude Opus 5.5 using the same prompts and a clean start. I prefer Astra''s design in Blender and Tokyo, and Opus''s Jam Room controls. Both SVGs run for 24 seconds, and the recorded times correct my impression of Astra''s speed. For everyday work, I would choose Opus first. For 3D and game development, I would try Astra.'
 youtubeId: pwAYpa-v4KI
 publishedAt: '2026-11-18'
+updatedAt: '2026-11-20'
 durationSeconds: 527
 format: ai-test
 chapters:
@@ -26,11 +27,11 @@ chapters:
   - start: 505
     title: 'Final thoughts'
 takeaways:
-  - 'For Minas Tirith in Blender, Astra comes out ahead for me thanks to its design and details.'
-  - 'The SVG comparison is close and comes down to personal taste.'
-  - 'In the Tokyo game, I prefer Astra''s city and cars, while Opus impresses me more with its rain.'
-  - 'Both Jam Rooms work, but Opus has less lag and an interface I find more pleasant.'
-  - 'The times shown in Remotion correct my first impression of Astra''s speed.'
+  - 'I prefer Astra''s Minas Tirith design. Both models document checks and revisions to their scenes.'
+  - 'Both SVGs run for 24 seconds. My impression in the video that Astra''s animation was longer was wrong.'
+  - 'In Tokyo, I prefer Astra''s city and cars, but the controls respond comparatively slowly.'
+  - 'I prefer Opus''s Jam Room because participants are easier to tell apart and the cursor looks smoother.'
+  - 'Opus was faster at the racing game at around 34 minutes, Astra at Remotion at around 13 minutes. These are individual runs.'
 tags:
   - 'GPT Astra'
   - 'Claude Opus'
@@ -153,54 +154,52 @@ translationOf: gpt-6-2-astra-opus-vergleich
 generatedBy: gpt-6.1-sol
 ---
 
-GPT 6.2 Astra surprised me several times in this test. I compared it with Claude Opus 5.5 to see what they could produce for tasks in Blender, SVG, game development and web development. To wrap things up, both present their results with Remotion. I check the implementations, you can see the results in the video, and here you'll find out where my first impression later needs correcting.
+When I try Astra's racing game, the controls feel comparatively sluggish, even though I immediately like its city and cars better. For my comparison, GPT 6.2 Astra and Claude Opus 5.5 both ran with High Reasoning. Both received the same prompts and started in fresh working folders with essentially the same clean environment. I made no manual adjustments to the finished results before trying them.
 
-## What I want to put in context before the results
+## Minas Tirith in Blender
 
-At the start of the video, I show Astra's price changes. Per million tokens, the displayed input price drops from $10 to $8, and the output price from $50 to $40. Cached input drops from $1 to $0.40. So the 60 percent reduction refers to this cache price.
+Opus already delivers a version of Minas Tirith that I find very impressive. The overall shape, the buildings, and the tree work well together for me. I like Astra's use of color even better. There is also the white tree emblem on the gate, which particularly catches my eye in the video. The large tree extends a little beyond the edge, but overall I still prefer Astra's scene.
 
-The chart from Artificial Analysis shown in the video lists 41,000 output tokens and $4.00 in costs per task for Astra, 173,000 and $10.04 for Opus 5.5, and 274,000 and $26.54 for Fable 5.2. These figures come from the chart, not from my five practical tests. They establish neither current prices nor comparable runtimes.
+Both projects build the scene in Blender using a Python script. The task also includes checking the generated image and then revising the scene. According to Astra's notes, the model checked several camera views and then adjusted the mountain silhouettes and the framing of the main view, among other things. After its preview renders, Opus records adjustments to the rock and lighting.
 
-At the time of recording, I compare the regular input and output prices with Claude Fable 5.2. Fable itself doesn't take part in the practical tests, though. Here, I'm looking at Astra and Opus 5.5. My first impression while working was that Astra was pretty fast. That's exactly why I find the last part interesting, because the times shown there don't line up so well with how it felt.
+Astra describes house types with slate roofs, dormers, chapels, and towers, using a small set of repeating floor plans. Opus lists a total of 558 houses and towers on the terraces with various roof types. According to their notes, both could recreate the scene with a script from a fresh Blender session. The practical benefit is that the scene's construction remains in the code.
 
-## Blender shows Astra's strength with Minas Tirith
+## Extinction Day as SVG
 
-With a reconstruction, I want to see whether the characteristic shapes and details fit together. The task here is Minas Tirith from The Lord of the Rings. I first open the Opus 5.5 version in Blender and already find it very impressive. The overall shape, the buildings and the correctly depicted tree make a good impression.
+Extinction Day called for a single animated SVG file, without JavaScript, raster images, or external resources. The dinosaurs, the impact, and the eventual new beginning had to be implemented entirely through the shapes and animations in that file.
 
-For me, Astra still takes it a little further. The color choices visibly help the model, making it immediately more appealing. Then there are details like the white tree emblem on the gate. The large tree does stick out a little over the edge, but overall I prefer this version.
+In the video, I say that Astra's animation is longer. However, both SVGs have 24 seconds in `data-loop`. My initial impression was wrong. Both show the impact about eleven seconds after the start and later have a small mammal peek out of its burrow. According to their notes, both models checked rendered frames and the transition back to the first frame.
 
-I'd therefore clearly give this round to Astra. That's a judgment of the models shown and their design. Of course, this one castle isn't enough to draw a general conclusion about every possible task in Blender.
+I slightly prefer Astra's design, although the movement may look a little less fluid to me. I also think Opus did a very good job. The longer duration I thought I noticed while watching no longer holds up as a reason for my preference.
 
-## The SVG animation is a close call
+## Through Rainy Tokyo
 
-The next test is interesting because it creates an animated scene using SVG. It shows the extinction of the dinosaurs, and Opus already delivers a version I think works really well. What you see in the video comes from shapes and animations, not from a generated video file.
+The racing game is called Neon Rain: Tokyo. The task specifies rain, nitro, and explicitly a parking garage whose ramps and roof should form part of the track. Its appearance in both results comes from that shared requirement. The task combines designing the city with creating an environment that actually has to be drivable.
 
-I hadn't judged Astra's version before watching it. It runs longer and looks good to me too. I'm less sure about the movement, though, because it may not be quite as smooth. This is exactly where a seemingly simple comparison becomes a matter of taste.
+Along with the parking garage, the task calls for a narrow shopping street full of illuminated signs, a large intersection with crosswalks and billboards, and a section beneath an elevated railway where a train should occasionally pass. It also includes three laps, three AI opponents, and slow city traffic. Drifting should fill the nitro meter. This connects vehicle handling with track construction. The narrow street limits room to maneuver, the intersection offers more space, and the curves need to work for drifting.
 
-In the video, I lean slightly toward Astra, but I wouldn't call it a clear win. If smooth movement matters more to you than the longer treatment, you might weigh the same results differently. For me, the two are much closer here than with Minas Tirith.
+I particularly like Astra's city, cars, and parking garage. Its interface also appeals to me. When driving, however, the controls respond comparatively slowly, and I hold down Shift to drift. I find the rain more convincing in Opus. During my brief test, I also notice no major bugs or obviously broken features there. I prefer the look of Astra's environment, but the sluggish response bothers me when driving.
 
-## In Tokyo, I prefer Astra's city and cars
+## What the Jam Room Should Synchronize
 
-A game needs more than a pretty picture. I also want to see whether I can drive and how the controls feel. Opus shows a car racing game set in a rainy Tokyo, with nitro and other cars to compete against. While trying it out, I don't notice any major bugs or obviously broken features.
+Behind the Jam Room's interface is a shared sequencer with four tracks. Multiple browsers should play the same beat, even if their clocks differ. Tempo changes should take effect at the next bar boundary, and changes need to be merged again after an interruption. Both use Solid 1.9 and WebSockets for this. Solid 2.0 was only an idea for a later test.
 
-With Astra, I prefer the car models and the city. I also like the interface here, even though Astra's designs don't always win me over. Both versions have sound and a parking garage. I prefer the look of Astra's parking garage, and it's a nice place to try drifting.
+In the video, I try the controls in two tabs. In both versions, I can create a room and join a session. I prefer Opus here because I can tell the participants apart more easily and the other person's cursor looks smoother. In Astra, both participants appear in a similar green, and the other pointer's movement also seems more delayed. How much details like these shape my impression of an interface is something I also think about when [building my website with AI agents](/en/blog/building-my-website-with-ai-agents).
 
-Astra's controls respond relatively slowly, and I have to hold Shift to drift. I think Opus does a better job with the rain, though. My preference for Astra's city and cars doesn't mean it wins on every detail. Especially in a game, visuals and how the controls feel remain two things I need to consider separately.
+Transmitting a mouse pointer tests something different from two beats sounding at the same time. When you move the mouse, the other tab can display the pointer a little later and still schedule the next beat for the shared time. My test in two tabs therefore provides no measurement of audio synchronization and no complete test of conflicts. Both versions estimate the time offset from the server using ping times. In its README, Opus also documents a browser test with two windows that simulates clock offsets of plus five and minus nine seconds. No actual system clocks were changed for this.
 
-## In the Jam Room, the connection between players matters
+## Remotion and the Actual Times
 
-For the web test, I have them build a Jam Room with SolidJS and WebSockets. I'm interested in whether the connection between multiple participants works and how easy the interface is to understand. With Opus, I see the same active session in two tabs. There's a little lag, but the interaction basically works.
+With Remotion, both models were supposed to present their own material from the previous tasks as a clip. The results and associated files were available to them in their respective projects. I also wanted runtimes and token usage displayed so I could compare the effort alongside the visible results.
 
-With Astra, I can also create a room and join a session. The live connection works, but the other participant's movement seems more delayed. Both participants also appear in a similar shade of green, making them harder to tell apart. So I prefer Opus's interface.
+According to the run log, Opus's racing game footage rendered black at the high graphics setting in Edge running without a visible window, so the model switched to the medium setting for the recording. This happened during production of the trailer. I did not observe this error while playing.
 
-Both models choose Solid 1.9. I only mention Solid 2.0 as a possible requirement for another test. It wasn't tested here. How much an interface's design matters is something I also explore when [building my website with AI agents](/en/blog/building-my-website-with-ai-agents). Here in the Jam Room, I find Opus more pleasant to use, even though both implementations serve their purpose.
+Iron Arena also appears briefly here. Test four called for a bot for a specified simulated tank game, where it competes against other bots. The models programmed their bot's game logic. I found the task less interesting for the video, so it did not get its own demonstration round.
 
-## Remotion corrects my impression of the speed
+My feeling that Astra had been particularly fast does not consistently match the recorded times. For the racing game, Astra took around 42 minutes and Opus around 34. For Remotion, Astra finished first at around 13 minutes, while Opus needed around 26. Even across these two tasks, which model finished first changes. These numbers are individual measurements from these exact runs with High Reasoning and do not support a general conclusion about which model is faster.
 
-To finish, both models are asked to present their results with Remotion. This produces videos made with code that walk through the previous work. I explicitly asked them to display runtimes and tokens used. Alongside the visible results, this should make the effort behind them easier to grasp.
+Astra's figures are missing, so I cannot compare token usage.
 
-According to the overview shown, Opus 5.5 with High Reasoning takes roughly half an hour on average. When I look at Astra's times, I realize my impression of particularly short runtimes doesn't hold up. It had felt faster while I was working. The numbers lead me to correct that assessment right there in the video.
+## What I Would Keep Working With
 
-I also mention a tank game that took Astra around two minutes with Medium Reasoning. There was no corresponding run with Opus on Medium, so there's no comparison here. The gameplay is only mentioned and isn't one of the five tests demonstrated.
-
-Unfortunately, Astra's final overview is missing the token counts. That leaves part of the comparison I wanted incomplete, and I don't name a separate winner for Remotion. What I took away above all were specific preferences for individual results and the realization of how easily my sense of time can fool me. If you compare the models yourself, it's worth looking at the actual runtime alongside the finished result.
+For almost all everyday tasks, I would choose Opus first. I find its responses more pleasant to read, and overall I also prefer the code it produced. I found Astra's responses harder to read and the collaboration less pleasant. That is my personal impression from working with them, without a systematic code review. For 3D modeling and game development, I would try Astra first based on the results shown.
