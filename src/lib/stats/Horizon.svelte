@@ -114,6 +114,11 @@
 
 	.giant {
 		font-size: clamp(5rem, 17vw, 12.5rem);
+		/* The black display glyphs (with the tight wordmark tracking) reach past their advance box, and background-clip: text only
+		   paints inside the box, so the last digit lost a sliver on the right. Pad the box out and pull the margin back so the
+		   number stays where it was. */
+		padding-inline: 0.08em;
+		margin-inline: -0.08em;
 		/* Ink on paper; at night the number catches the moonlight */
 		background: linear-gradient(180deg, var(--foreground) 55%, color-mix(in oklab, var(--foreground) 70%, var(--color-ochre)));
 		background-clip: text;
