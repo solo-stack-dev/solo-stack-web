@@ -26,7 +26,7 @@ SvelteKit 3 + Svelte 5 (runes, experimental `async`) on Cloudflare Workers, D1 v
 
 ## Blog posts
 
-New post for a video, its translation, or a revision: follow the `blog-post` skill ([.claude/skills/blog-post/SKILL.md](.claude/skills/blog-post/SKILL.md)). A translation names its original in `translationOf`; that links the versions for hreflang, the sitemap and the blog index.
+For a new video post, translation, or revision, follow the `blog-post` skill for [Codex](.agents/skills/blog-post/SKILL.md) or [Claude](.claude/skills/blog-post/SKILL.md). A translation names its original in `translationOf`, which links the versions for hreflang, the sitemap and the blog index.
 
 ## Commands
 

@@ -1,0 +1,44 @@
+{
+  "slug": "t3-code-agenten-im-alltag",
+  "title": "T3 Code im Alltag mit Claude Code und Codex",
+  "description": "Wie ich in T3 Code Claude Code und Codex zusammen nutze, mit dem Decision Maker Ideen sammle und Modelltests auf einem alten Linux Laptop starte.",
+  "summary": "T3 Code bringt für mich Claude Code und Codex in einer App zusammen. Besonders hilfreich sind der Decision Maker für neue Ideen und mein alter Linux Laptop für Modelltests. Ich zeige, was mir im Alltag daran gefällt und welche zwei Dinge mir noch fehlen.",
+  "takeaways": [
+    "Mit dem Decision Maker hole ich über meine bestehenden Abos Agenten verschiedener Anbieter zur Ideenfindung dazu.",
+    "Claude kann bei meinem Spielprojekt die Bildgenerierung an Codex übergeben, und ich kann die Übergabe in der App verfolgen.",
+    "Meine Modelltests laufen über T3 Code auf einem alten Linux Laptop, während ich am Hauptrechner das Video vorbereite.",
+    "Mir fehlen eine einfachere Einrichtung globaler Skills über mehrere AI Harnesses hinweg und eine Markdown Vorschau."
+  ],
+  "tags": [
+    "T3 Code",
+    "Claude Code",
+    "Codex",
+    "AI Agenten",
+    "Decision Maker"
+  ],
+  "links": [
+    {
+      "url": "https://t3.codes/",
+      "label": "T3 Code Website"
+    },
+    {
+      "url": "https://github.com/pingdotgg/t3code",
+      "label": "T3 Code auf GitHub"
+    },
+    {
+      "url": "https://www.youtube.com/@solostack_dev",
+      "label": "Solo Stack auf YouTube"
+    }
+  ],
+  "chapters": [
+    "Worum es geht",
+    "Download und Oberfläche",
+    "So arbeiten Claude und Codex zusammen",
+    "Anbieter und Abolimits",
+    "Aufgaben auf einem anderen Rechner mit T3 Connect",
+    "Worktrees, Pull Requests und geplante Aufgaben",
+    "Threads, Browser und Android Simulator",
+    "Orca als Alternative"
+  ],
+  "body": "Wenn ich bei meinem Spiel überlege, wie es weitergehen soll, helfen mir verschiedene Vorschläge. Und wenn ein neues Modell erscheint, möchte ich den Test starten und währenddessen mein Video vorbereiten können. Für beides nutze ich inzwischen T3 Code. Die App bringt Claude Code und Codex für mich so zusammen, dass ich im Alltag gerne damit arbeite.\n\n## Warum ich bei T3 Code geblieben bin\n\nT3 Code ist ein Open Source Projekt, das Theo ins Leben gerufen hat. Ich hatte die App schon in der Alpha ausprobiert, damals hat sie mich noch nicht überzeugt. Mein Eindruck im November 2026 mit der Beta ist deutlich besser. Gefühlt mache ich seitdem auch viel mehr Vibe Coding, wobei das natürlich mein persönlicher Eindruck ist.\n\nEin Grund dafür ist die Übersicht. In der Seitenleiste erkenne ich meine Projekte an Farben und Kürzeln und sehe, welcher Thread wohin gehört. Laufende Threads landen unter „Working“ und rutschen nach oben zurück, sobald sie fertig sind. Wenn mehrere Aufgaben offen sind, kann ich dadurch schnell sehen, wo noch gearbeitet wird.\n\nBeim Anlegen eines Threads wähle ich den Anbieter aus. So habe ich meine Arbeit mit unterschiedlichen Agenten an einem Ort und erkenne auch später noch, ob ein Thread etwa mit Claude oder einem GPT Modell läuft.\n\n## Wie ich mit dem Decision Maker Ideen finde\n\nFür Ideen und Entscheidungen nutze ich meinen Decision Maker Skill. Er ruft Agenten verschiedener Anbieter über meine bestehenden Abos auf und holt ihre Vorschläge ein. Ich kann dadurch mehrere Perspektiven in meine Überlegungen einbeziehen, ohne die Anfragen einzeln in verschiedenen Apps anzustoßen.\n\nIm Video frage ich damit nach der nächsten Richtung für mein Spiel. Die Ideen der beteiligten Agenten fallen häufig ziemlich unterschiedlich aus, und genau diese Bandbreite hilft mir bei der Entscheidung. Ich schaue mir an, welche Ansätze für das Projekt passen und was ich davon weiterverfolgen möchte. Der Skill übernimmt damit einen Teil der Suche, die Entscheidung treffe ich selbst.\n\n## Wenn Claude Codex dazuholt\n\nEin anderes Beispiel aus meinem Spielprojekt ist die Bildgenerierung. Claude konnte in meinem gezeigten Ablauf keine Bilder erzeugen. Deshalb habe ich in meiner AGENTS.md hinterlegt, dass es dafür einen weiteren Agenten aufrufen und die Aufgabe an Codex übergeben soll.\n\nIm Video zeige ich einen Thread, in dem auf diesem Weg Bilder entstanden sind. Ich kann dort nachvollziehen, welche weiteren Agenten aufgerufen wurden und was sie beigetragen haben. Dass ich diese Übergabe direkt in der App verfolgen kann, macht die Zusammenarbeit für mich angenehm.\n\nDazu passt die Übersicht über meine Abos. In den gezeigten Einstellungen sehe ich verbleibende Limits und die Zeit bis zum nächsten Reset. Nicht benötigte Modelle habe ich ausgeblendet, damit die Auswahl übersichtlich bleibt. Im Video war bei einem meiner Abos bereits kein Kontingent mehr übrig, und auch das war direkt sichtbar.\n\n## Mein alter Linux Laptop bekommt die Modelltests\n\nWenn ein neues Modell erscheint, lasse ich meine Modelltests inzwischen über T3 Code auf einem alten Linux Laptop laufen. Ich wähle den Rechner als Umgebung aus, starte dort den Thread und bereite während des Tests am Hauptrechner das Video vor. Die Verbindung läuft in meinem Setup über T3 Connect.\n\nAuf dem Laptop liegt außerdem sehr wenig anderer Code, den die Agenten als Referenz heranziehen könnten. Das ist für mich ein weiterer Grund, diese Testumgebung getrennt zu halten. Welche Art von Aufgaben ich bei Modelltests ausprobiere, kannst du dir auch in meinem [Vergleich von GPT 6.2 Astra und Claude Opus 5.5](/blog/gpt-6-2-astra-opus-vergleich) ansehen.\n\nTailscale wird ebenfalls als Möglichkeit für die Verbindung angeboten. Das habe ich selbst nicht eingerichtet. Für meinen gezeigten Ablauf nutze ich T3 Connect und kann die Threads auf dem anderen Rechner aus derselben App heraus steuern.\n\n## Weniger Aufräumen nach der Arbeit\n\nBei mehreren Aufgaben bleiben schnell Arbeitsstände liegen. Dafür gefallen mir die Einstellungen für Worktrees, also separate Arbeitsverzeichnisse für Änderungen an einem Projekt. Ich habe die automatische Bereinigung für zusammengeführte Worktrees und beim Abschließen eines Threads aktiviert. So muss ich diese Verzeichnisse anschließend seltener selbst aufräumen.\n\nDie Ansicht für Pull Requests erwähne ich im Video ebenfalls. Das eingeblendete Beispiel stammt aus Theos Video, weil ich selbst gerade kein passendes Beispiel offen hatte. Geplante Aufgaben zeige ich als weitere Möglichkeit. Die regelmäßige Prüfung, ob Unreal Engine noch läuft, ist dabei ein Beispiel für eine solche Aufgabe.\n\n## Was mir im Alltag noch fehlt\n\nOrca habe ich nach T3 Code kurz ausprobiert. Für einen belastbaren Vergleich habe ich damit zu wenig gearbeitet, deshalb bleibt es hier bei der Erwähnung als Alternative. Für meine Arbeit mit Agenten bevorzuge ich aktuell T3 Code.\n\nZwei Dinge fehlen mir dabei noch. Ich hätte gerne einen einfacheren Weg, globale Skills über verschiedene AI Harnesses hinweg einzurichten. Gerade bei einem Skill wie dem Decision Maker möchte ich die Einrichtung möglichst unkompliziert halten. Außerdem wünsche ich mir eine Markdown Vorschau, damit ich geschriebene Texte direkt bequem lesen und prüfen kann."
+}
