@@ -84,7 +84,7 @@ Public profiles, verified by the owner on 2026-10-31 (source: `D:\repos\Solo Sta
 | Bluesky   | https://bsky.app/profile/solo-stack.bsky.social        | @solo-stack.bsky.social |
 | Threads   | https://www.threads.com/@solostack.dev                 | @solostack.dev          |
 | Twitch    | https://www.twitch.tv/solo_stack                       | solo_stack              |
-| Facebook  | https://www.facebook.com/profile.php?id=61595766765047 | (profile, no handle)    |
+| Facebook  | https://www.facebook.com/profile.php?id=61596358996939 | (profile, no handle)    |
 | Discord   | open: needs a permanent invite from the owner          |                         |
 
 YouTube channel ID: `UCv6ihOMjTq6zdJC7IbCdpKQ` (feed: `https://www.youtube.com/feeds/videos.xml?channel_id=UCv6ihOMjTq6zdJC7IbCdpKQ`). Not listed: Spotify (show has no cover and no episode yet), LinkedIn (deferred).

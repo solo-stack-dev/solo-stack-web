@@ -36,7 +36,7 @@ export const SOCIALS: readonly Social[] = [
 	{ id: 'bluesky', name: 'Bluesky', url: 'https://bsky.app/profile/solo-stack.bsky.social', handle: '@solo-stack.bsky.social', icon: 'bluesky' },
 	{ id: 'threads', name: 'Threads', url: 'https://www.threads.com/@solostack.dev', handle: '@solostack.dev', icon: 'threads' },
 	{ id: 'twitch', name: 'Twitch', url: 'https://www.twitch.tv/solo_stack', handle: 'solo_stack', icon: 'twitch' },
-	{ id: 'facebook', name: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61595766765047', handle: null, icon: 'facebook' },
+	{ id: 'facebook', name: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61596358996939', handle: null, icon: 'facebook' },
 	{ id: 'discord', name: 'Discord', url: DISCORD_INVITE_URL, handle: null, icon: 'discord' }
 ];
 
