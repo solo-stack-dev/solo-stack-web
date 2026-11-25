@@ -4,31 +4,31 @@
 
 ## Anbieter gemäß [§ 5 DDG](https://www.gesetze-im-internet.de/ddg/__5.html)
 
-Peter Ruß  
-Einzelunternehmer  
-c/o POSTFLEX PFX-656-644  
-Emsdettener Straße 10  
-48268 Greven  
+Peter Ruß<br />
+Einzelunternehmer<br />
+c/o POSTFLEX PFX-656-644<br />
+Emsdettener Straße 10<br />
+48268 Greven<br />
 Deutschland
 
 ## Kontakt
 
-E-Mail: [business@solo-stack.dev](mailto:business@solo-stack.dev)  
+E-Mail: [business@solo-stack.dev](mailto:business@solo-stack.dev)<br />
 Kontaktformular: [solo-stack.dev/kontakt](https://solo-stack.dev/kontakt)
 
 ## Umsatzsteuer
 
 Kleinunternehmer gemäß § 19 UStG.
 
-Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:  
+Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG:<br />
 beantragt
 
 ## Verantwortlich für journalistisch-redaktionelle Inhalte gemäß [§ 18 Abs. 2 MStV](https://www.gesetze-bayern.de/Content/Document/MStV-18)
 
-Peter Ruß  
-c/o POSTFLEX PFX-656-644  
-Emsdettener Straße 10  
-48268 Greven  
+Peter Ruß<br />
+c/o POSTFLEX PFX-656-644<br />
+Emsdettener Straße 10<br />
+48268 Greven<br />
 Deutschland
 
 ## Verbraucherstreitbeilegung gemäß [§ 36 VSBG](https://www.gesetze-im-internet.de/vsbg/__36.html)

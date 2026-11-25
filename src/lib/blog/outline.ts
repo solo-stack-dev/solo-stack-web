@@ -1,6 +1,7 @@
 /**
- * Section ids of a post body: `rehypeHeadingIds` (mdsvex, vite.config.ts) sets them on `##` headings, `outlineOf` builds
- * the TOC from raw Markdown; both use `headingId`, so links match. Keep dependency free: vite.config.ts imports this file.
+ * Section ids of a post body: mdsvex (`heading_ids` with `sectionSlug`, vite.config.ts) sets them on `##` headings,
+ * `outlineOf` builds the TOC from raw Markdown; both use `headingId` and number repeats alike, so links match.
+ * Keep dependency free: vite.config.ts imports this file.
  */
 
 /** A heading's plain text → a readable URL fragment (`Erst die Stimmung, dann der Code` → `erst-die-stimmung-dann-der-code`). */
@@ -17,14 +18,17 @@ export function headingId(text: string) {
 		.replace(/^-+|-+$/g, '');
 }
 
-/** Hands out `id`, `id-2`, `id-3`, … so repeated headings stay unique; an empty slug becomes `section`. */
+/** mdsvex slug: `##` headings only (an empty slug means no id); an empty heading becomes `section`. */
+export const sectionSlug = (text: string, { depth }: { depth: number }) => (depth === 2 ? headingId(text) || 'section' : '');
+
+/** Hands out `id`, `id-1`, `id-2`, … as mdsvex makes repeated ids unique (github-slugger style). */
 function uniqueIds() {
 	const seen = new Map<string, number>();
 	return (text: string) => {
-		const id = headingId(text) || 'section';
-		const count = (seen.get(id) ?? 0) + 1;
-		seen.set(id, count);
-		return count === 1 ? id : `${id}-${count}`;
+		const id = sectionSlug(text, { depth: 2 });
+		const count = seen.get(id) ?? 0;
+		seen.set(id, count + 1);
+		return count === 0 ? id : `${id}-${count}`;
 	};
 }
 
@@ -43,29 +47,4 @@ export function outlineOf(source: string): { id: string; title: string }[] {
 		const title = plain(heading);
 		return { id: idOf(title), title };
 	});
-}
-
-interface HastNode {
-	type: string;
-	tagName?: string;
-	value?: string;
-	properties?: Record<string, unknown>;
-	children?: HastNode[];
-}
-
-const textOf = (node: HastNode): string => (node.type === 'text' ? (node.value ?? '') : (node.children ?? []).map(textOf).join(''));
-
-/** rehype plugin for mdsvex: an `id` on every `h2` that has none. */
-export function rehypeHeadingIds() {
-	return (tree: HastNode) => {
-		const idOf = uniqueIds();
-		const visit = (node: HastNode) => {
-			if (node.type === 'element' && node.tagName === 'h2') {
-				node.properties ??= {};
-				node.properties.id ??= idOf(textOf(node).trim());
-			}
-			node.children?.forEach(visit);
-		};
-		visit(tree);
-	};
 }

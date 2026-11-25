@@ -8,5 +8,6 @@
 	"sortTailwindcss": {
 		"stylesheet": "./src/routes/layout.css"
 	},
-	"ignorePatterns": ["pnpm-lock.yaml", "src/lib/paraglide", "worker-configuration.d.ts", "/static/", "docs/mockups/"]
+	// src/content/: mdsvex 1 parses PFM, where `*a*` is bold; a CommonMark formatter would rewrite it to italic `_a_`
+	"ignorePatterns": ["src/content/", "pnpm-lock.yaml", "src/lib/paraglide", "worker-configuration.d.ts", "/static/", "docs/mockups/"]
 }

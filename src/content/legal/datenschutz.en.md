@@ -8,10 +8,10 @@ Technical data arise when you access the website. We receive information about y
 
 ## 2. Controller
 
-Peter Ruß  
-c/o POSTFLEX PFX-656-644  
-Emsdettener Straße 10  
-48268 Greven  
+Peter Ruß<br />
+c/o POSTFLEX PFX-656-644<br />
+Emsdettener Straße 10<br />
+48268 Greven<br />
 Germany
 
 Email: [business@solo-stack.dev](mailto:business@solo-stack.dev)
@@ -78,7 +78,7 @@ You can delete or block cookies and website storage in your browser. This may re
 
 When you use the contact form, we process your selected topic, name, email address and message, together with technical transmission and spam prevention data. We use these details to respond and handle follow-up questions. The form cannot send your message without the required fields and a successful spam check. You can alternatively email us.
 
-Messages are sent through Cloudflare Email Sending to business@solo-stack.dev; Cloudflare Email Routing forwards them to our Gmail mailbox. The provider is Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland. Google receives message content, sender and contact details and communication metadata to deliver and store emails and enable us to handle them in the mailbox. If delivery fails, the message may also be retained in a technical log for troubleshooting. We similarly process email enquiries together with their contact details, content and communication data. If you contact us through another channel, we also process the information you provide to handle your request.
+Messages are sent through Cloudflare Email Sending to [business@solo-stack.dev](mailto:business@solo-stack.dev); Cloudflare Email Routing forwards them to our Gmail mailbox. The provider is Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland. Google receives message content, sender and contact details and communication metadata to deliver and store emails and enable us to handle them in the mailbox. If delivery fails, the message may also be retained in a technical log for troubleshooting. We similarly process email enquiries together with their contact details, content and communication data. If you contact us through another channel, we also process the information you provide to handle your request.
 
 The legal basis is Article 6(1)(b) GDPR for contractual or precontractual requests, otherwise Article 6(1)(f) GDPR based on our interest in handling enquiries. Where consent is separately obtained, Article 6(1)(a) GDPR applies. Data are disclosed only as part of a necessary service or on another legal basis. Once an enquiry has been resolved, we delete the data according to section 3 unless retention duties or legitimate grounds for further retention apply.
 
@@ -170,9 +170,9 @@ For data you have provided that we process automatically on the basis of your co
 
 ### Objection under Article 21 GDPR
 
-**Where processing relies on Article 6(1)(e) or (f) GDPR, you can object at any time on grounds relating to your particular situation. This also applies to profiling based on those provisions. We will then stop processing the affected data unless we demonstrate compelling legitimate grounds overriding your interests, rights and freedoms, or the processing serves to establish, exercise or defend legal claims.**
+*Where processing relies on Article 6(1)(e) or (f) GDPR, you can object at any time on grounds relating to your particular situation. This also applies to profiling based on those provisions. We will then stop processing the affected data unless we demonstrate compelling legitimate grounds overriding your interests, rights and freedoms, or the processing serves to establish, exercise or defend legal claims.*
 
-**You can object to processing for direct marketing at any time without giving a particular reason. This also applies to related profiling. The data concerned will then no longer be processed for direct marketing.**
+*You can object to processing for direct marketing at any time without giving a particular reason. This also applies to related profiling. The data concerned will then no longer be processed for direct marketing.*
 
 ### Complaints to a supervisory authority
 

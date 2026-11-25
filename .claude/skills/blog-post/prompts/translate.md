@@ -11,7 +11,7 @@ Do not run commands or read files. Everything you need is in this prompt. Reply 
 - Keep the owner's voice: first person, personal, direct, calm, a little playful, talking to the reader as "you". Write it as the owner would have written it in {{TARGET}}, not word for word. Use the terms people actually search for in {{TARGET}}.
 - Keep every fact, number and name exactly. Add nothing, drop nothing, no new claims.
 - No hyphenated compounds and no dashes as punctuation in the prose. Proper names keep their own spelling (Solo Stack, gpt-6.1-sol, SvelteKit, GitHub, YouTube …).
-- Keep the Markdown structure of the body: the same "##"/"###" headings (translated), paragraphs, lists and inline code.
+- Keep the Markdown structure of the body: the same "##"/"###" headings (translated), paragraphs, lists and inline code; add no bold or italic.
 - Internal links: the body links to other articles by path. Replace each one with the path of its {{TARGET}} version from this list, as "original path → {{TARGET}} path". If an article has no {{TARGET}} version, keep the original path.
 
 {{LINK_MAP or "no internal links"}}

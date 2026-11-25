@@ -8,10 +8,10 @@ Technische Daten fallen beim Abruf der Website an. Angaben zu Ihrer Person erhal
 
 ## 2. Verantwortlicher
 
-Peter Ruß  
-c/o POSTFLEX PFX-656-644  
-Emsdettener Straße 10  
-48268 Greven  
+Peter Ruß<br />
+c/o POSTFLEX PFX-656-644<br />
+Emsdettener Straße 10<br />
+48268 Greven<br />
 Deutschland
 
 E-Mail: [business@solo-stack.dev](mailto:business@solo-stack.dev)
@@ -78,7 +78,7 @@ Sie können Cookies und Website Speicher in Ihrem Browser löschen oder blockier
 
 Wenn Sie das Kontaktformular verwenden, verarbeiten wir das gewählte Thema, Ihren Namen, Ihre E-Mail-Adresse und Ihre Nachricht. Hinzu kommen technische Daten zur Übermittlung und zur Spamprüfung. Die Angaben dienen der Beantwortung und gegebenenfalls Rückfragen. Ohne die erforderlichen Formularangaben und die erfolgreiche Spamprüfung ist der Versand über das Formular nicht möglich. Alternativ können Sie uns eine E-Mail schreiben.
 
-Der Versand erfolgt über Cloudflare Email Sending an business@solo-stack.dev; Cloudflare Email Routing leitet die Nachricht an unser Gmail Postfach weiter. Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google erhält dabei Nachrichteninhalte, Absender- und Kontaktdaten sowie Kommunikationsmetadaten, um die E-Mails zuzustellen, zu speichern und die Bearbeitung im Postfach zu ermöglichen. Bei Versandfehlern kann die Nachricht zur Fehlerklärung auch im technischen Protokoll gespeichert werden. E-Mail-Anfragen verarbeiten wir entsprechend mit den darin enthaltenen Kontakt-, Inhalts- und Kommunikationsdaten. Falls Sie uns auf anderem Weg kontaktieren, verarbeiten wir die dabei übermittelten Angaben ebenfalls zur Bearbeitung des Anliegens.
+Der Versand erfolgt über Cloudflare Email Sending an [business@solo-stack.dev](mailto:business@solo-stack.dev); Cloudflare Email Routing leitet die Nachricht an unser Gmail Postfach weiter. Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Google erhält dabei Nachrichteninhalte, Absender- und Kontaktdaten sowie Kommunikationsmetadaten, um die E-Mails zuzustellen, zu speichern und die Bearbeitung im Postfach zu ermöglichen. Bei Versandfehlern kann die Nachricht zur Fehlerklärung auch im technischen Protokoll gespeichert werden. E-Mail-Anfragen verarbeiten wir entsprechend mit den darin enthaltenen Kontakt-, Inhalts- und Kommunikationsdaten. Falls Sie uns auf anderem Weg kontaktieren, verarbeiten wir die dabei übermittelten Angaben ebenfalls zur Bearbeitung des Anliegens.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vertraglichen oder vorvertraglichen Anliegen, sonst Art. 6 Abs. 1 lit. f DSGVO aufgrund unseres Interesses an der Bearbeitung von Anfragen. Soweit eine Einwilligung gesondert eingeholt wird, gilt Art. 6 Abs. 1 lit. a DSGVO. Eine Weitergabe erfolgt nur im Rahmen einer erforderlichen Dienstleistung oder auf anderer Rechtsgrundlage. Nach Abschluss der Bearbeitung löschen wir die Daten nach den Kriterien in Abschnitt 3, soweit insbesondere keine Aufbewahrungspflichten oder berechtigten Gründe für die weitere Speicherung bestehen.
 
@@ -170,9 +170,9 @@ Für Daten, die Sie bereitgestellt haben und die wir aufgrund Ihrer Einwilligung
 
 ### Widerspruch nach Art. 21 DSGVO
 
-**Wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. e oder f DSGVO beruht, können Sie aus Gründen Ihrer besonderen Situation jederzeit widersprechen. Dies gilt auch für darauf gestütztes Profiling. Wir stellen die Verarbeitung der betroffenen Daten dann ein. Eine Fortsetzung ist nur zulässig, wenn wir zwingende schutzwürdige Gründe nachweisen, die Ihre Interessen, Rechte und Freiheiten überwiegen, oder wenn die Verarbeitung der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen dient.**
+*Wenn eine Verarbeitung auf Art. 6 Abs. 1 lit. e oder f DSGVO beruht, können Sie aus Gründen Ihrer besonderen Situation jederzeit widersprechen. Dies gilt auch für darauf gestütztes Profiling. Wir stellen die Verarbeitung der betroffenen Daten dann ein. Eine Fortsetzung ist nur zulässig, wenn wir zwingende schutzwürdige Gründe nachweisen, die Ihre Interessen, Rechte und Freiheiten überwiegen, oder wenn die Verarbeitung der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen dient.*
 
-**Gegen eine Verarbeitung zu Zwecken der Direktwerbung können Sie jederzeit ohne besondere Begründung widersprechen. Dies gilt auch für damit verbundenes Profiling. Die betreffenden Daten werden dann nicht mehr für Direktwerbung verarbeitet.**
+*Gegen eine Verarbeitung zu Zwecken der Direktwerbung können Sie jederzeit ohne besondere Begründung widersprechen. Dies gilt auch für damit verbundenes Profiling. Die betreffenden Daten werden dann nicht mehr für Direktwerbung verarbeitet.*
 
 ### Beschwerde bei einer Aufsichtsbehörde
 
