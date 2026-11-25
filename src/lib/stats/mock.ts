@@ -27,7 +27,8 @@ const MOCK_FOLLOWERS: Record<StatPlatformId, [start: number, end: number]> = {
 	bluesky: [96, 341],
 	threads: [188, 566],
 	twitch: [120, 397],
-	facebook: [64, 158]
+	facebook: [64, 158],
+	discord: [40, 175]
 };
 
 /** mulberry32: tiny seeded PRNG. */

@@ -28,6 +28,10 @@ SvelteKit 3 + Svelte 5 (runes, experimental `async`) on Cloudflare Workers, D1 v
 
 For a new video post, translation, or revision, follow the `blog-post` skill for [Codex](.agents/skills/blog-post/SKILL.md) or [Claude](.claude/skills/blog-post/SKILL.md). A translation names its original in `translationOf`, which links the versions for hreflang, the sitemap and the blog index.
 
+## Stats
+
+Follower counts for platforms without an API (Instagram, TikTok, X, Facebook, Discord) are hand-entered in `workers/stats-collector/src/platforms/manual.ts`. When the owner gives new numbers, update `MANUAL_FOLLOWERS` and its date there.
+
 ## Commands
 
 - `pnpm dev`: dev server

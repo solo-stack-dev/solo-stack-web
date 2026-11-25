@@ -5,8 +5,19 @@
 import * as v from 'valibot';
 import type { SocialId } from '#lib/home/data/socials.ts';
 
-/** Platforms with numbers. Discord has no stats yet (no permanent invite, see socials.ts). */
-export const STAT_PLATFORM_IDS = ['youtube', 'github', 'instagram', 'tiktok', 'x', 'bluesky', 'threads', 'twitch', 'facebook'] as const satisfies readonly SocialId[];
+/** Platforms with numbers (some hand-entered, see `workers/stats-collector/src/platforms/manual.ts`). */
+export const STAT_PLATFORM_IDS = [
+	'youtube',
+	'github',
+	'instagram',
+	'tiktok',
+	'x',
+	'bluesky',
+	'threads',
+	'twitch',
+	'facebook',
+	'discord'
+] as const satisfies readonly SocialId[];
 export type StatPlatformId = (typeof STAT_PLATFORM_IDS)[number];
 
 /** Page switch periods. History covers two of the longest (current + previous). */

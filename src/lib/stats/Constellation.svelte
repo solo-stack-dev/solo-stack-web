@@ -4,7 +4,7 @@
 	Night: a planisphere disc of night sky with butter stars. Paper: no disc, ink stars on a pale butter wash with a bled edge.
 	Every label has its own anchor (side of its star), so names never run into each other; below 640 px the names grow to ~12 px
 	and the numbers leave the diagram (the ledger has them). Right: the ledger on one column grid with tabular numbers.
-	Hovering or focusing a row lights its star; hovering a star lights its row. Discord is an unlit star ("comes later").
+	Hovering or focusing a row lights its star; hovering a star lights its row. A platform without numbers is an unlit star ("comes later").
 -->
 <script lang="ts">
 	import { SOCIALS, type SocialId } from '#lib/home/data/socials.ts';
@@ -135,7 +135,6 @@
 					class="sign"
 					stroke-opacity={lit ? 0.8 : 0.3}
 					stroke-width={lit ? 0.45 : 0.3}
-					stroke-dasharray={to === 'discord' ? '0.8 1.2' : undefined}
 				/>
 			{/each}
 
